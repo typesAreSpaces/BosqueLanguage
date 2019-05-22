@@ -1,4 +1,7 @@
-"use strict";
+//-------------------------------------------------------------------------------------------------------
+// Copyright (C) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+//-------------------------------------------------------------------------------------------------------
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12,11 +15,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
-//-------------------------------------------------------------------------------------------------------
-// Copyright (C) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
-//-------------------------------------------------------------------------------------------------------
 var TypeExpr = /** @class */ (function () {
     function TypeExpr() {
     }
@@ -90,8 +88,8 @@ var PredicateExpr = /** @class */ (function (_super) {
 }(FormulaExpr));
 var EqualityExpr = /** @class */ (function (_super) {
     __extends(EqualityExpr, _super);
-    function EqualityExpr(name, left, right) {
-        var _this = _super.call(this, name) || this;
+    function EqualityExpr(left, right) {
+        var _this = _super.call(this, left.name + "=" + right.name) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -140,7 +138,7 @@ var ImplExpr = /** @class */ (function (_super) {
 var ForAllExpr = /** @class */ (function (_super) {
     __extends(ForAllExpr, _super);
     function ForAllExpr(nameBinder, formula) {
-        var _this = _super.call(this, "forall " + nameBinder.name + "." + formula.name) || this;
+        var _this = _super.call(this, "forall " + nameBinder.name + ".(" + formula.name + ")") || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
@@ -150,7 +148,7 @@ var ForAllExpr = /** @class */ (function (_super) {
 var ExistsExpr = /** @class */ (function (_super) {
     __extends(ExistsExpr, _super);
     function ExistsExpr(nameBinder, formula) {
-        var _this = _super.call(this, "exists " + nameBinder.name + "." + formula.name) || this;
+        var _this = _super.call(this, "exists " + nameBinder.name + ".(" + formula.name + ")") || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
@@ -160,16 +158,16 @@ var ExistsExpr = /** @class */ (function (_super) {
 // Testing
 var x = new VarExpr("x");
 var y = new VarExpr("y");
-var predicate = new PredicateExpr("p", [x, y]);
-var p = new NegExpr(predicate);
-var p2 = new NegExpr(new PredicateExpr("p", [x, y]));
+var p = new PredicateExpr("p", [x, y]);
+var not_p = new NegExpr(p);
 var fxy = new FuncExpr("f", [x, y]);
+console.log("Examples---");
 console.log(x);
-console.log(predicate);
 console.log(p);
-console.log(p2);
+console.log(not_p);
 console.log(fxy);
 console.log(new FuncExpr("g", [x, y, x, x, x]));
 console.log(new FuncExpr("g", [x]));
 console.log(new FuncExpr("g", []));
-console.log("Ok");
+console.log(new ForAllExpr(x, p));
+console.log("Ok---");

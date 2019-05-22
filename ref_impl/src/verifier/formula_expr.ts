@@ -24,15 +24,15 @@ class FuncExpr extends TermExpr {
     readonly terms : TermExpr[];
     constructor(name : string, terms : TermExpr[]){
         switch(terms.length){
-            case 0:{
+            case 0: {
                 super(name + "()");
                 break;
             }   
-            case 1:{
+            case 1: {
                 super(name + "(" + terms[0].name + ")")
                 break;
             }
-            default:{
+            default: {
                 super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")");
                 break;  
             }
@@ -52,15 +52,15 @@ class PredicateExpr extends FormulaExpr {
     readonly terms : TermExpr[];
     constructor(name : string, terms : TermExpr[]){
         switch(terms.length){
-            case 0:{
+            case 0: {
                 super(name + "()");
                 break;
             }   
-            case 1:{
+            case 1: {
                 super(name + "(" + terms[0].name + ")")
                 break;
             }
-            default:{
+            default: {
                 super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")");
                 break;  
             }
@@ -139,16 +139,20 @@ class ExistsExpr extends FormulaExpr {
 }
 
 // Testing
+
 let x = new VarExpr("x");
 let y = new VarExpr("y");
-let predicate = new PredicateExpr("p", [x, y]);
-let p = new NegExpr(predicate);
-let fxy = new FuncExpr("f", [x, y])
+let p = new PredicateExpr("p", [x, y]);
+let not_p = new NegExpr(p);
+let fxy = new FuncExpr("f", [x, y]);
+
+console.log("Examples---");
 console.log(x);
-console.log(predicate);
 console.log(p);
+console.log(not_p);
 console.log(fxy);
 console.log(new FuncExpr("g", [x, y, x, x, x]));
 console.log(new FuncExpr("g", [x]));
 console.log(new FuncExpr("g", []));
-console.log("Ok");
+console.log(new ForAllExpr(x, p));
+console.log("Ok---");
