@@ -1,3 +1,4 @@
+"use strict";
 //-------------------------------------------------------------------------------------------------------
 // Copyright (C) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
@@ -15,11 +16,34 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
+var deepEqual = require("deep-equal");
 var TypeExpr = /** @class */ (function () {
     function TypeExpr() {
     }
     return TypeExpr;
 }());
+var IntType = /** @class */ (function (_super) {
+    __extends(IntType, _super);
+    function IntType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return IntType;
+}(TypeExpr));
+var BoolType = /** @class */ (function (_super) {
+    __extends(BoolType, _super);
+    function BoolType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return BoolType;
+}(TypeExpr));
+var StringType = /** @class */ (function (_super) {
+    __extends(StringType, _super);
+    function StringType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return StringType;
+}(TypeExpr));
 var TermExpr = /** @class */ (function () {
     function TermExpr(name) {
         this.name = name;
@@ -157,6 +181,7 @@ var ExistsExpr = /** @class */ (function (_super) {
 }(FormulaExpr));
 // Testing
 var x = new VarExpr("x");
+var x2 = new VarExpr("x");
 var y = new VarExpr("y");
 var p = new PredicateExpr("p", [x, y]);
 var not_p = new NegExpr(p);
@@ -171,3 +196,6 @@ console.log(new FuncExpr("g", [x]));
 console.log(new FuncExpr("g", []));
 console.log(new ForAllExpr(x, p));
 console.log("Ok---");
+// Testing equality
+console.log(deepEqual(x, x2));
+console.log(deepEqual(new ForAllExpr(x, p), new ForAllExpr(x2, p)));

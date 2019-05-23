@@ -3,8 +3,20 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-class TypeExpr {
+import * as deepEqual from "deep-equal"
 
+abstract class TypeExpr {
+}
+
+class IntType extends TypeExpr {
+}
+
+
+class BoolType extends TypeExpr {
+}
+
+
+class StringType extends TypeExpr {
 }
 
 abstract class TermExpr {
@@ -119,8 +131,8 @@ class ImplExpr extends FormulaExpr {
 }
 
 class ForAllExpr extends FormulaExpr {
-    readonly formula : FormulaExpr;
     readonly nameBinder : VarExpr;
+    readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
         super("forall " + nameBinder.name + ".(" + formula.name + ")");
         this.nameBinder = nameBinder;
@@ -129,8 +141,8 @@ class ForAllExpr extends FormulaExpr {
 }
 
 class ExistsExpr extends FormulaExpr { 
-    readonly formula : FormulaExpr;
     readonly nameBinder : VarExpr;
+    readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
         super("exists " + nameBinder.name + ".(" + formula.name + ")");
         this.nameBinder = nameBinder;
@@ -139,8 +151,8 @@ class ExistsExpr extends FormulaExpr {
 }
 
 // Testing
-
 let x = new VarExpr("x");
+let x2 = new VarExpr("x");
 let y = new VarExpr("y");
 let p = new PredicateExpr("p", [x, y]);
 let not_p = new NegExpr(p);
@@ -156,3 +168,7 @@ console.log(new FuncExpr("g", [x]));
 console.log(new FuncExpr("g", []));
 console.log(new ForAllExpr(x, p));
 console.log("Ok---");
+
+// Testing equality
+console.log(deepEqual(x, x2));
+console.log(deepEqual(new ForAllExpr(x, p), new ForAllExpr(x2, p)))
