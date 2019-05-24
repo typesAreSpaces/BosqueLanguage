@@ -363,6 +363,8 @@ class MIRBodyEmitter {
         
         console.log(ibody.jsonify());
 
+        console.log(ibody.jsonify());
+
         return ibody;
     }
 }
