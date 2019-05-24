@@ -2,6 +2,5 @@
 (declare-fun y () Int)
 (declare-fun p () Bool)
 (declare-fun f (Int Int) String)
-(declare-fun p () Bool)
-(assert (forall (and (p x y) (forall (p (f x y) x x y (f x y) x)))))
+(assert (forall (x Int) (and (p x y) (forall (y Int) (p (f x y) x x y (f x y) x)))))
 (assert (p x y))

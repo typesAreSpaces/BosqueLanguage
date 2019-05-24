@@ -107,9 +107,9 @@ var VarExpr = /** @class */ (function (_super) {
         return _this;
     }
     VarExpr.prototype.toZ3Declaration = function (fd) {
-        if (!VarExpr.symbolTable.get(this.name)) {
+        if (!VarExpr.symbolTable.get(this.symbolName)) {
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            VarExpr.symbolTable.set(this.name, true);
+            VarExpr.symbolTable.set(this.symbolName, true);
         }
     };
     VarExpr.prototype.sexpr = function () {
@@ -137,7 +137,7 @@ var FuncExpr = /** @class */ (function (_super) {
             }
         }
         _this.terms = terms;
-        FuncExpr.symbolTable.set(_this.name, false);
+        FuncExpr.symbolTable.set(_this.symbolName, false);
         return _this;
     }
     FuncExpr.prototype.toZ3Declaration = function (fd) {
@@ -145,9 +145,9 @@ var FuncExpr = /** @class */ (function (_super) {
             var item = _a[_i];
             item.toZ3Declaration(fd);
         }
-        if (!FuncExpr.symbolTable.get(this.name)) {
+        if (!FuncExpr.symbolTable.get(this.symbolName)) {
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
-            FuncExpr.symbolTable.set(this.name, true);
+            FuncExpr.symbolTable.set(this.symbolName, true);
         }
     };
     FuncExpr.prototype.sexpr = function () {
@@ -190,7 +190,7 @@ var PredicateExpr = /** @class */ (function (_super) {
             }
         }
         _this.terms = terms;
-        PredicateExpr.symbolTable.set(_this.name, false);
+        PredicateExpr.symbolTable.set(_this.symbolName, false);
         return _this;
     }
     PredicateExpr.prototype.sexpr = function () {
@@ -201,9 +201,9 @@ var PredicateExpr = /** @class */ (function (_super) {
             var item = _a[_i];
             item.toZ3Declaration(fd);
         }
-        if (!PredicateExpr.symbolTable.get(this.name)) {
+        if (!PredicateExpr.symbolTable.get(this.symbolName)) {
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            PredicateExpr.symbolTable.set(this.name, true);
+            PredicateExpr.symbolTable.set(this.symbolName, true);
         }
     };
     return PredicateExpr;
@@ -300,7 +300,7 @@ var ForAllExpr = /** @class */ (function (_super) {
         return _this;
     }
     ForAllExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
     };
     ForAllExpr.prototype.toZ3Declaration = function (fd) {
         this.formula.toZ3Declaration(fd);
@@ -316,7 +316,7 @@ var ExistsExpr = /** @class */ (function (_super) {
         return _this;
     }
     ExistsExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
     };
     ExistsExpr.prototype.toZ3Declaration = function (fd) {
         this.formula.toZ3Declaration(fd);

@@ -4,11 +4,8 @@
 //-------------------------------------------------------------------------------------------------------
 
 // import * as deepEqual from "deep-equal"
-<<<<<<< HEAD
 import * as fs from "fs";
-=======
-import * as fs from "fs"
->>>>>>> 9485f00e04636d35f35c9bd3fe4ed92002648cd0
+
 
 abstract class TypeExpr {
     abstract readonly isPrimitiveType : boolean;
@@ -88,9 +85,9 @@ class VarExpr extends TermExpr {
         VarExpr.symbolTable.set(this.name, false);
     }
     toZ3Declaration(fd : number){
-        if(!VarExpr.symbolTable.get(this.name)){
+        if(!VarExpr.symbolTable.get(this.symbolName)){
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            VarExpr.symbolTable.set(this.name, true);
+            VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
     sexpr(){
@@ -117,15 +114,15 @@ class FuncExpr extends TermExpr {
             }
         }
         this.terms = terms;
-        FuncExpr.symbolTable.set(this.name, false);
+        FuncExpr.symbolTable.set(this.symbolName, false);
     }
     toZ3Declaration(fd : number){
         for (let item of this.terms){
             item.toZ3Declaration(fd);
         }
-        if(!FuncExpr.symbolTable.get(this.name)){
+        if(!FuncExpr.symbolTable.get(this.symbolName)){
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
-            FuncExpr.symbolTable.set(this.name, true);
+            FuncExpr.symbolTable.set(this.symbolName, true);
         }
     }
     sexpr(){
@@ -173,7 +170,7 @@ class PredicateExpr extends FormulaExpr {
             }
         }
         this.terms = terms;
-        PredicateExpr.symbolTable.set(this.name, false);
+        PredicateExpr.symbolTable.set(this.symbolName, false);
     }
     sexpr(){
         return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
@@ -182,9 +179,9 @@ class PredicateExpr extends FormulaExpr {
         for (let item of this.terms){
             item.toZ3Declaration(fd);
         }
-        if(!PredicateExpr.symbolTable.get(this.name)){
+        if(!PredicateExpr.symbolTable.get(this.symbolName)){
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            PredicateExpr.symbolTable.set(this.name, true);
+            PredicateExpr.symbolTable.set(this.symbolName, true);
         }
     }
 }
@@ -280,7 +277,7 @@ class ForAllExpr extends FormulaExpr {
         this.formula = formula;
     }
     sexpr(){
-        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
         this.formula.toZ3Declaration(fd);
@@ -296,7 +293,7 @@ class ExistsExpr extends FormulaExpr {
         this.formula = formula;
     }
     sexpr(){
-        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
         this.formula.toZ3Declaration(fd);
