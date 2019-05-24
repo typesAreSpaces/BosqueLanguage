@@ -5,7 +5,6 @@
 
 // import * as deepEqual from "deep-equal"
 import * as fs from "fs"
-import { timingSafeEqual } from "crypto";
 
 abstract class TypeExpr {
     abstract readonly isPrimitiveType : boolean;

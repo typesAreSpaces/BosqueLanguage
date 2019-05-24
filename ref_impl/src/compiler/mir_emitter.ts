@@ -361,6 +361,8 @@ class MIRBodyEmitter {
         removeDeadTempAssignsFromBody(ibody);
         convertBodyToSSA(ibody, args, captured);
 
+        console.log(ibody.jsonify());
+
         return ibody;
     }
 }
