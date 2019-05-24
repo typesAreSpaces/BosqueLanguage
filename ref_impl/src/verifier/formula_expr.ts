@@ -20,6 +20,16 @@ class BoolType extends TypeExpr {
 class StringType extends TypeExpr {
 }
 
+class FuncType extends TypeExpr {
+    readonly domain : TypeExpr[];
+    readonly image : TypeExpr;
+    constructor(domain : TypeExpr[], image  : TypeExpr){
+        super();
+        this.domain = domain;
+        this.image = image;
+    }
+}
+
 // TODO: Add more elements to the 
 // abstract class TypeExpr once we 
 // have formalized the type system
@@ -33,7 +43,7 @@ class StringType extends TypeExpr {
 abstract class TermExpr {
     readonly name: string;
     readonly ty : TypeExpr;
-    static readonly symbolTable : Map<string, TypeExpr> = new Map<String, TypeExpr>();
+    static readonly symbolTable : Map<string, TypeExpr> = new Map<string, TypeExpr>();
     constructor(name : string, ty : TypeExpr){
         this.name = name;
         this.ty = ty;
@@ -44,6 +54,7 @@ abstract class TermExpr {
 class VarExpr extends TermExpr {
     constructor(name : string, ty : TypeExpr){
         super(name, ty);
+        VarExpr.symbolTable.set(this.name, this.ty);
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -52,22 +63,24 @@ class VarExpr extends TermExpr {
 
 class FuncExpr extends TermExpr {
     readonly terms : TermExpr[];
-    constructor(name : string, terms : TermExpr[]){
+    constructor(name : string, ty : TypeExpr, terms : TermExpr[]){
+        let collectType = new FuncType(terms.map(x => x.ty), ty);
         switch(terms.length){
             case 0: {
-                super(name + "()", ty);
+                super(name + "()", collectType);
                 break;
             }   
             case 1: {
-                super(name + "(" + terms[0].name + ")")
+                super(name + "(" + terms[0].name + ")", collectType)
                 break;
             }
             default: {
-                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")");
+                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")", collectType);
                 break;  
             }
         }
         this.terms = terms;
+        FuncExpr.symbolTable.set(this.name, this.ty);
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -75,10 +88,12 @@ class FuncExpr extends TermExpr {
 }
 
 abstract class FormulaExpr {
-    static fsFormula = require('fs');
     readonly name : string;
-    constructor(name : string){
+    readonly ty : TypeExpr;
+    static readonly symbolTable : Map<string, TypeExpr> = new Map<string, TypeExpr>();
+    constructor(name : string, ty : TypeExpr){
         this.name = name;
+        this.ty = ty;
     }
     abstract toZ3(fd : number) : void;
 }
@@ -88,20 +103,20 @@ class PredicateExpr extends FormulaExpr {
     constructor(name : string, terms : TermExpr[]){
         switch(terms.length){
             case 0: {
-                super(name + "()");
+                super(name + "()", new BoolType());
                 break;
             }   
             case 1: {
-                super(name + "(" + terms[0].name + ")")
+                super(name + "(" + terms[0].name + ")", new BoolType())
                 break;
             }
             default: {
-                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")");
+                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")", new BoolType());
                 break;  
             }
         }
         this.terms = terms;
-        this.terms = terms;
+        FormulaExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -112,9 +127,10 @@ class EqualityExpr extends FormulaExpr {
     readonly leftHandSide : TermExpr;
     readonly rightHandSide : TermExpr;
     constructor(left : TermExpr, right : TermExpr){
-        super(left.name + "=" + right.name);
+        super(left.name + "=" + right.name, new BoolType());
         this.leftHandSide = left;
         this.rightHandSide = right;
+        EqualityExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -124,8 +140,9 @@ class EqualityExpr extends FormulaExpr {
 class NegExpr extends FormulaExpr {
     readonly formula : FormulaExpr;
     constructor(formula : FormulaExpr){
-        super("neg " + formula.name);
+        super("neg " + formula.name, new BoolType());
         this.formula = formula;
+        NegExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -136,9 +153,10 @@ class AndExpr extends FormulaExpr {
     readonly leftHandSide : FormulaExpr;
     readonly rightHandSide : FormulaExpr;
     constructor(left : FormulaExpr, right : FormulaExpr){
-        super(left.name + " and " + right.name);
+        super(left.name + " and " + right.name, new BoolType());
         this.leftHandSide = left;
         this.rightHandSide = right;
+        AndExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -149,9 +167,10 @@ class OrExpr extends FormulaExpr {
     readonly leftHandSide : FormulaExpr;
     readonly rightHandSide : FormulaExpr;
     constructor(left : FormulaExpr, right : FormulaExpr){
-        super(left.name + " or " + right.name);
+        super(left.name + " or " + right.name, new BoolType());
         this.leftHandSide = left;
         this.rightHandSide = right;
+        OrExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -162,9 +181,10 @@ class ImplExpr extends FormulaExpr {
     readonly leftHandSide : FormulaExpr;
     readonly rightHandSide : FormulaExpr;
     constructor(left : FormulaExpr, right : FormulaExpr){
-        super(left.name + " implies " + right.name);
+        super(left.name + " implies " + right.name, new BoolType());
         this.leftHandSide = left;
         this.rightHandSide = right;
+        ImplExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -175,9 +195,10 @@ class ForAllExpr extends FormulaExpr {
     readonly nameBinder : VarExpr;
     readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
-        super("forall " + nameBinder.name + ".(" + formula.name + ")");
+        super("forall " + nameBinder.name + ".(" + formula.name + ")", new BoolType());
         this.nameBinder = nameBinder;
         this.formula = formula;
+        ForAllExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -188,9 +209,10 @@ class ExistsExpr extends FormulaExpr {
     readonly nameBinder : VarExpr;
     readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
-        super("exists " + nameBinder.name + ".(" + formula.name + ")");
+        super("exists " + nameBinder.name + ".(" + formula.name + ")", new BoolType());
         this.nameBinder = nameBinder;
         this.formula = formula;
+        ExistsExpr.symbolTable.set(this.name, new BoolType());
     }
     toZ3(fd : number) : void {
        fs.writeSync(fd, this.name + '\n');  
@@ -198,30 +220,17 @@ class ExistsExpr extends FormulaExpr {
 }
 
 // Testing
-let x = new VarExpr("x");
-let x2 = new VarExpr("x");
-let y = new VarExpr("y");
-let p = new PredicateExpr("p", [x, y]);
-let not_p = new NegExpr(p);
-let fxy = new FuncExpr("f", [x, y]);
-let extraLong = new ForAllExpr(x, new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x])));
+let x = new VarExpr("x", new IntType());
+let y = new VarExpr("y", new IntType());
+let pxy = new PredicateExpr("p", [x, y]);
+let fxy = new FuncExpr("f", new StringType(), [x, y]);
+let extraLong = new ForAllExpr(x, 
+    new AndExpr( 
+        pxy, 
+        new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))
+    ));
 
-// console.log("Examples---");
-// console.log(x);
-// console.log(p);
-// console.log(not_p);
-// console.log(fxy);
-// console.log(new FuncExpr("g", [x, y, x, x, x]));
-// console.log(new FuncExpr("g", [x]));
-// console.log(new FuncExpr("g", []));
-// console.log(new ForAllExpr(x, p));
-// console.log("Ok---");
-
-// // Testing equality
-// console.log("is x equal to x2?");
-// console.log(deepEqual(x, x2));
-// console.log("is forall x . p equal to forall x2 . p");
-// console.log(deepEqual(new ForAllExpr(x, p), new ForAllExpr(x2, p)));
+console.log(extraLong);
 
 // // Writing on a file
 // // So we can use Z3 
@@ -229,4 +238,7 @@ let extraLong = new ForAllExpr(x, new ForAllExpr(y, new PredicateExpr("p", [fxy,
 // let fd = fs.openSync('file.z3', 'w');
 // extraLong.toZ3(fd);
 // fs.closeSync(fd);
-// // Passed tests!
+// // Passed!
+
+console.log(FormulaExpr.symbolTable)
+console.log(TermExpr.symbolTable)
