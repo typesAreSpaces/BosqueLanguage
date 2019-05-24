@@ -7,30 +7,33 @@
 import * as fs from "fs"
 
 abstract class TypeExpr {
+    abstract readonly isPrimitiveType : boolean;
     abstract getType() : string;
 }
 
 class IntType extends TypeExpr {
+    isPrimitiveType = true;
     getType() {
         return "Int";
     }
 }
 
-
 class BoolType extends TypeExpr {
-    getType() {
+    isPrimitiveType = true;
+    getType(){
         return "Bool";
     }
 }
 
-
 class StringType extends TypeExpr {
+    isPrimitiveType = true;
     getType() {
         return "String";
     }
 }
 
 class FuncType extends TypeExpr {
+    isPrimitiveType = false;
     readonly domain : TypeExpr[];
     readonly image : TypeExpr;
     constructor(domain : TypeExpr[], image  : TypeExpr){
@@ -40,10 +43,13 @@ class FuncType extends TypeExpr {
     }
     getType(){
         if(this.domain.length == 0){
-            return "() " + this.image;
+            return "() " + this.image.getType();
         }
         else{
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " + b.getType(), this.domain[0].getType()) + ") (" + this.image.getType() + ")";
+            return "(" + this.domain.slice(1).reduce((a, b) => 
+            a + " " + (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()), 
+            this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
+            + ") " + this.image.getType();
         }
     }
 }
@@ -61,7 +67,7 @@ class FuncType extends TypeExpr {
 abstract class TermExpr {
     readonly name: string;
     readonly ty : TypeExpr;
-    static readonly symbolTable : Map<string, TypeExpr> = new Map<string, TypeExpr>();
+    static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
     constructor(name : string, ty : TypeExpr){
         this.name = name;
         this.ty = ty;
@@ -73,13 +79,16 @@ abstract class TermExpr {
 class VarExpr extends TermExpr {
     constructor(name : string, ty : TypeExpr){
         super(name, ty);
-        VarExpr.symbolTable.set(this.name, this.ty);
+        VarExpr.symbolTable.set(this.name, false);
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
     }
     toZ3Declarations(fd : number) : void {
-        fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
+        if(!VarExpr.symbolTable.get(this.name)){
+            fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
+            VarExpr.symbolTable.set(this.name, true);
+        }
     }
 }
 
@@ -89,20 +98,20 @@ class FuncExpr extends TermExpr {
         let collectType = new FuncType(terms.map(x => x.ty), ty);
         switch(terms.length){
             case 0: {
-                super(name + "()", collectType);
+                super(name + "l__r", collectType);
                 break;
             }   
             case 1: {
-                super(name + "(" + terms[0].name + ")", collectType)
+                super(name + "l_" + terms[0].name + "_r", collectType)
                 break;
             }
             default: {
-                super(name + "_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_", collectType);
+                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_r", collectType);
                 break;  
             }
         }
         this.terms = terms;
-        FuncExpr.symbolTable.set(this.name, this.ty);
+        FuncExpr.symbolTable.set(this.name, false);
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
@@ -111,7 +120,10 @@ class FuncExpr extends TermExpr {
         for (let item of this.terms){
             item.toZ3Declarations(fd);
         }
-        fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
+        if(!FuncExpr.symbolTable.get(this.name)){
+            fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
+            FuncExpr.symbolTable.set(this.name, true);
+        }
     }
 }
 
@@ -131,15 +143,15 @@ class PredicateExpr extends FormulaExpr {
     constructor(name : string, terms : TermExpr[]){
         switch(terms.length){
             case 0: {
-                super(name + "__", new BoolType());
+                super(name + "l__r", new BoolType());
                 break;
             }   
             case 1: {
-                super(name + "_" + terms[0].name + "_", new BoolType())
+                super(name + "l_" + terms[0].name + "_r", new BoolType())
                 break;
             }
             default: {
-                super(name + "_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_", new BoolType());
+                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_r", new BoolType());
                 break;  
             }
         }
@@ -223,7 +235,7 @@ class ForAllExpr extends FormulaExpr {
     readonly nameBinder : VarExpr;
     readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
-        super("forall " + nameBinder.name + ".(" + formula.name + ")", new BoolType());
+        super("forall " + nameBinder.name + ".l_" + formula.name + "_r", new BoolType());
         this.nameBinder = nameBinder;
         this.formula = formula;
         ForAllExpr.symbolTable.set(this.name, new BoolType());
@@ -237,7 +249,7 @@ class ExistsExpr extends FormulaExpr {
     readonly nameBinder : VarExpr;
     readonly formula : FormulaExpr;
     constructor(nameBinder : VarExpr, formula : FormulaExpr){
-        super("exists " + nameBinder.name + ".(" + formula.name + ")", new BoolType());
+        super("exists " + nameBinder.name + ".l_" + formula.name + "_r", new BoolType());
         this.nameBinder = nameBinder;
         this.formula = formula;
         ExistsExpr.symbolTable.set(this.name, new BoolType());
@@ -272,5 +284,7 @@ let extraLong = new ForAllExpr(x,
 // console.log(TermExpr.symbolTable)
 
 let fd = fs.openSync('file.z3', 'w');
-fxy.toZ3Declarations(fd);
+(new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declarations(fd);
+(new FuncExpr("h", new IntType(), [])).toZ3Declarations(fd);
+(new FuncExpr("k", new IntType(), [fxy])).toZ3Declarations(fd);
 fs.closeSync(fd);

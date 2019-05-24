@@ -1,4 +1,6 @@
 (declare-fun x () Int)
-(declare-fun x () Int)
 (declare-fun y () Int)
-(declare-fun f_x,y_ (Int Int) (String))
+(declare-fun fl_x,y_r (Int Int) String)
+(declare-fun gl_fl_x,y_r,fl_x,y_r_r (String String) Int)
+(declare-fun hl__r () Int)
+(declare-fun kl_fl_x,y_r_r (String) Int)

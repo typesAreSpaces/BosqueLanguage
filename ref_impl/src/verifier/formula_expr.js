@@ -27,7 +27,9 @@ var TypeExpr = /** @class */ (function () {
 var IntType = /** @class */ (function (_super) {
     __extends(IntType, _super);
     function IntType() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.isPrimitiveType = true;
+        return _this;
     }
     IntType.prototype.getType = function () {
         return "Int";
@@ -37,7 +39,9 @@ var IntType = /** @class */ (function (_super) {
 var BoolType = /** @class */ (function (_super) {
     __extends(BoolType, _super);
     function BoolType() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.isPrimitiveType = true;
+        return _this;
     }
     BoolType.prototype.getType = function () {
         return "Bool";
@@ -47,7 +51,9 @@ var BoolType = /** @class */ (function (_super) {
 var StringType = /** @class */ (function (_super) {
     __extends(StringType, _super);
     function StringType() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.isPrimitiveType = true;
+        return _this;
     }
     StringType.prototype.getType = function () {
         return "String";
@@ -58,16 +64,20 @@ var FuncType = /** @class */ (function (_super) {
     __extends(FuncType, _super);
     function FuncType(domain, image) {
         var _this = _super.call(this) || this;
+        _this.isPrimitiveType = false;
         _this.domain = domain;
         _this.image = image;
         return _this;
     }
     FuncType.prototype.getType = function () {
         if (this.domain.length == 0) {
-            return "() " + this.image;
+            return "() " + this.image.getType();
         }
         else {
-            return "(" + this.domain.slice(1).reduce(function (a, b) { return a + " " + b.getType(); }, this.domain[0].getType()) + ") (" + this.image.getType() + ")";
+            return "(" + this.domain.slice(1).reduce(function (a, b) {
+                return a + " " + (b.isPrimitiveType ? b.getType() : b.image.getType());
+            }, this.domain[0].isPrimitiveType ? this.domain[0].getType() : this.domain[0].image.getType())
+                + ") " + this.image.getType();
         }
     };
     return FuncType;
@@ -93,14 +103,17 @@ var VarExpr = /** @class */ (function (_super) {
     __extends(VarExpr, _super);
     function VarExpr(name, ty) {
         var _this = _super.call(this, name, ty) || this;
-        VarExpr.symbolTable.set(_this.name, _this.ty);
+        VarExpr.symbolTable.set(_this.name, false);
         return _this;
     }
     VarExpr.prototype.toZ3 = function (fd) {
         fs.writeSync(fd, this.name + '\n');
     };
     VarExpr.prototype.toZ3Declarations = function (fd) {
-        fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
+        if (!VarExpr.symbolTable.get(this.name)) {
+            fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
+            VarExpr.symbolTable.set(this.name, true);
+        }
     };
     return VarExpr;
 }(TermExpr));
@@ -111,20 +124,20 @@ var FuncExpr = /** @class */ (function (_super) {
         var collectType = new FuncType(terms.map(function (x) { return x.ty; }), ty);
         switch (terms.length) {
             case 0: {
-                _this = _super.call(this, name + "()", collectType) || this;
+                _this = _super.call(this, name + "l__r", collectType) || this;
                 break;
             }
             case 1: {
-                _this = _super.call(this, name + "(" + terms[0].name + ")", collectType) || this;
+                _this = _super.call(this, name + "l_" + terms[0].name + "_r", collectType) || this;
                 break;
             }
             default: {
-                _this = _super.call(this, name + "_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_", collectType) || this;
+                _this = _super.call(this, name + "l_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_r", collectType) || this;
                 break;
             }
         }
         _this.terms = terms;
-        FuncExpr.symbolTable.set(_this.name, _this.ty);
+        FuncExpr.symbolTable.set(_this.name, false);
         return _this;
     }
     FuncExpr.prototype.toZ3 = function (fd) {
@@ -135,7 +148,10 @@ var FuncExpr = /** @class */ (function (_super) {
             var item = _a[_i];
             item.toZ3Declarations(fd);
         }
-        fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
+        if (!FuncExpr.symbolTable.get(this.name)) {
+            fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
+            FuncExpr.symbolTable.set(this.name, true);
+        }
     };
     return FuncExpr;
 }(TermExpr));
@@ -153,15 +169,15 @@ var PredicateExpr = /** @class */ (function (_super) {
         var _this = this;
         switch (terms.length) {
             case 0: {
-                _this = _super.call(this, name + "__", new BoolType()) || this;
+                _this = _super.call(this, name + "l__r", new BoolType()) || this;
                 break;
             }
             case 1: {
-                _this = _super.call(this, name + "_" + terms[0].name + "_", new BoolType()) || this;
+                _this = _super.call(this, name + "l_" + terms[0].name + "_r", new BoolType()) || this;
                 break;
             }
             default: {
-                _this = _super.call(this, name + "_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_", new BoolType()) || this;
+                _this = _super.call(this, name + "l_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_r", new BoolType()) || this;
                 break;
             }
         }
@@ -246,7 +262,7 @@ var ImplExpr = /** @class */ (function (_super) {
 var ForAllExpr = /** @class */ (function (_super) {
     __extends(ForAllExpr, _super);
     function ForAllExpr(nameBinder, formula) {
-        var _this = _super.call(this, "forall " + nameBinder.name + ".(" + formula.name + ")", new BoolType()) || this;
+        var _this = _super.call(this, "forall " + nameBinder.name + ".l_" + formula.name + "_r", new BoolType()) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         ForAllExpr.symbolTable.set(_this.name, new BoolType());
@@ -260,7 +276,7 @@ var ForAllExpr = /** @class */ (function (_super) {
 var ExistsExpr = /** @class */ (function (_super) {
     __extends(ExistsExpr, _super);
     function ExistsExpr(nameBinder, formula) {
-        var _this = _super.call(this, "exists " + nameBinder.name + ".(" + formula.name + ")", new BoolType()) || this;
+        var _this = _super.call(this, "exists " + nameBinder.name + ".l_" + formula.name + "_r", new BoolType()) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         ExistsExpr.symbolTable.set(_this.name, new BoolType());
@@ -288,6 +304,7 @@ var extraLong = new ForAllExpr(x, new AndExpr(pxy, new ForAllExpr(y, new Predica
 // console.log(FormulaExpr.symbolTable)
 // console.log(TermExpr.symbolTable)
 var fd = fs.openSync('file.z3', 'w');
-x.toZ3Declarations(fd);
-fxy.toZ3Declarations(fd);
+(new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declarations(fd);
+(new FuncExpr("h", new IntType(), [])).toZ3Declarations(fd);
+(new FuncExpr("k", new IntType(), [fxy])).toZ3Declarations(fd);
 fs.closeSync(fd);
