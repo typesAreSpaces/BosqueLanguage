@@ -17,7 +17,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var deepEqual = require("deep-equal");
+// import * as deepEqual from "deep-equal"
+var fs = require("fs");
 var TypeExpr = /** @class */ (function () {
     function TypeExpr() {
     }
@@ -44,6 +45,15 @@ var StringType = /** @class */ (function (_super) {
     }
     return StringType;
 }(TypeExpr));
+// TODO: Add more elements to the 
+// abstract class TypeExpr once we 
+// have formalized the type system
+// for Bosque. Actually, it is already
+// established on the documentation,
+// however, it needs additional formalization
+// to deal with some rules and inference
+// (Current approach to accomplish the latter: take 
+// the grouded ast and build a `table' using
 var TermExpr = /** @class */ (function () {
     function TermExpr(name) {
         this.name = name;
@@ -55,6 +65,9 @@ var VarExpr = /** @class */ (function (_super) {
     function VarExpr(name) {
         return _super.call(this, name) || this;
     }
+    VarExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return VarExpr;
 }(TermExpr));
 var FuncExpr = /** @class */ (function (_super) {
@@ -78,12 +91,16 @@ var FuncExpr = /** @class */ (function (_super) {
         _this.terms = terms;
         return _this;
     }
+    FuncExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return FuncExpr;
 }(TermExpr));
 var FormulaExpr = /** @class */ (function () {
     function FormulaExpr(name) {
         this.name = name;
     }
+    FormulaExpr.fsFormula = require('fs');
     return FormulaExpr;
 }());
 var PredicateExpr = /** @class */ (function (_super) {
@@ -108,6 +125,9 @@ var PredicateExpr = /** @class */ (function (_super) {
         _this.terms = terms;
         return _this;
     }
+    PredicateExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return PredicateExpr;
 }(FormulaExpr));
 var EqualityExpr = /** @class */ (function (_super) {
@@ -118,6 +138,9 @@ var EqualityExpr = /** @class */ (function (_super) {
         _this.rightHandSide = right;
         return _this;
     }
+    EqualityExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return EqualityExpr;
 }(FormulaExpr));
 var NegExpr = /** @class */ (function (_super) {
@@ -127,6 +150,9 @@ var NegExpr = /** @class */ (function (_super) {
         _this.formula = formula;
         return _this;
     }
+    NegExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return NegExpr;
 }(FormulaExpr));
 var AndExpr = /** @class */ (function (_super) {
@@ -137,6 +163,9 @@ var AndExpr = /** @class */ (function (_super) {
         _this.rightHandSide = right;
         return _this;
     }
+    AndExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return AndExpr;
 }(FormulaExpr));
 var OrExpr = /** @class */ (function (_super) {
@@ -147,6 +176,9 @@ var OrExpr = /** @class */ (function (_super) {
         _this.rightHandSide = right;
         return _this;
     }
+    OrExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return OrExpr;
 }(FormulaExpr));
 var ImplExpr = /** @class */ (function (_super) {
@@ -157,6 +189,9 @@ var ImplExpr = /** @class */ (function (_super) {
         _this.rightHandSide = right;
         return _this;
     }
+    ImplExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return ImplExpr;
 }(FormulaExpr));
 var ForAllExpr = /** @class */ (function (_super) {
@@ -167,6 +202,9 @@ var ForAllExpr = /** @class */ (function (_super) {
         _this.formula = formula;
         return _this;
     }
+    ForAllExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return ForAllExpr;
 }(FormulaExpr));
 var ExistsExpr = /** @class */ (function (_super) {
@@ -177,6 +215,9 @@ var ExistsExpr = /** @class */ (function (_super) {
         _this.formula = formula;
         return _this;
     }
+    ExistsExpr.prototype.toZ3 = function (fd) {
+        fs.writeSync(fd, this.name + '\n');
+    };
     return ExistsExpr;
 }(FormulaExpr));
 // Testing
@@ -186,16 +227,26 @@ var y = new VarExpr("y");
 var p = new PredicateExpr("p", [x, y]);
 var not_p = new NegExpr(p);
 var fxy = new FuncExpr("f", [x, y]);
-console.log("Examples---");
-console.log(x);
-console.log(p);
-console.log(not_p);
-console.log(fxy);
-console.log(new FuncExpr("g", [x, y, x, x, x]));
-console.log(new FuncExpr("g", [x]));
-console.log(new FuncExpr("g", []));
-console.log(new ForAllExpr(x, p));
-console.log("Ok---");
-// Testing equality
-console.log(deepEqual(x, x2));
-console.log(deepEqual(new ForAllExpr(x, p), new ForAllExpr(x2, p)));
+var extraLong = new ForAllExpr(x, new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x])));
+// console.log("Examples---");
+// console.log(x);
+// console.log(p);
+// console.log(not_p);
+// console.log(fxy);
+// console.log(new FuncExpr("g", [x, y, x, x, x]));
+// console.log(new FuncExpr("g", [x]));
+// console.log(new FuncExpr("g", []));
+// console.log(new ForAllExpr(x, p));
+// console.log("Ok---");
+// // Testing equality
+// console.log("is x equal to x2?");
+// console.log(deepEqual(x, x2));
+// console.log("is forall x . p equal to forall x2 . p");
+// console.log(deepEqual(new ForAllExpr(x, p), new ForAllExpr(x2, p)));
+// // Writing on a file
+// // So we can use Z3 
+// console.log('Testing writing on file');
+// let fd = fs.openSync('file.z3', 'w');
+// extraLong.toZ3(fd);
+// fs.closeSync(fd);
+// // Passed tests!
