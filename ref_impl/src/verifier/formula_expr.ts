@@ -106,7 +106,7 @@ class FuncExpr extends TermExpr {
                 break;
             }
             default: {
-                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_r", collectType);
+                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", collectType);
                 break;  
             }
         }
@@ -151,7 +151,7 @@ class PredicateExpr extends FormulaExpr {
                 break;
             }
             default: {
-                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_r", new BoolType());
+                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", new BoolType());
                 break;  
             }
         }
@@ -282,6 +282,10 @@ let extraLong = new ForAllExpr(x,
 
 // console.log(FormulaExpr.symbolTable)
 // console.log(TermExpr.symbolTable)
+
+// IMPORTANT: Names cannot include `,'
+// or any other symbol that Z3 cannot
+// parse as a valid char for a name expression
 
 let fd = fs.openSync('file.z3', 'w');
 (new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declarations(fd);
