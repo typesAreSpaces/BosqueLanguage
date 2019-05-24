@@ -29,6 +29,9 @@ var IntType = /** @class */ (function (_super) {
     function IntType() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    IntType.prototype.getType = function () {
+        return "Int";
+    };
     return IntType;
 }(TypeExpr));
 var BoolType = /** @class */ (function (_super) {
@@ -36,6 +39,9 @@ var BoolType = /** @class */ (function (_super) {
     function BoolType() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    BoolType.prototype.getType = function () {
+        return "Bool";
+    };
     return BoolType;
 }(TypeExpr));
 var StringType = /** @class */ (function (_super) {
@@ -43,6 +49,9 @@ var StringType = /** @class */ (function (_super) {
     function StringType() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    StringType.prototype.getType = function () {
+        return "String";
+    };
     return StringType;
 }(TypeExpr));
 var FuncType = /** @class */ (function (_super) {
@@ -53,6 +62,14 @@ var FuncType = /** @class */ (function (_super) {
         _this.image = image;
         return _this;
     }
+    FuncType.prototype.getType = function () {
+        if (this.domain.length == 0) {
+            return "() " + this.image;
+        }
+        else {
+            return "(" + this.domain.slice(1).reduce(function (a, b) { return a + " " + b.getType(); }, this.domain[0].getType()) + ") (" + this.image.getType() + ")";
+        }
+    };
     return FuncType;
 }(TypeExpr));
 // TODO: Add more elements to the 
@@ -82,6 +99,9 @@ var VarExpr = /** @class */ (function (_super) {
     VarExpr.prototype.toZ3 = function (fd) {
         fs.writeSync(fd, this.name + '\n');
     };
+    VarExpr.prototype.toZ3Declarations = function (fd) {
+        fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
+    };
     return VarExpr;
 }(TermExpr));
 var FuncExpr = /** @class */ (function (_super) {
@@ -99,7 +119,7 @@ var FuncExpr = /** @class */ (function (_super) {
                 break;
             }
             default: {
-                _this = _super.call(this, name + "(" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + ")", collectType) || this;
+                _this = _super.call(this, name + "_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_", collectType) || this;
                 break;
             }
         }
@@ -109,6 +129,13 @@ var FuncExpr = /** @class */ (function (_super) {
     }
     FuncExpr.prototype.toZ3 = function (fd) {
         fs.writeSync(fd, this.name + '\n');
+    };
+    FuncExpr.prototype.toZ3Declarations = function (fd) {
+        for (var _i = 0, _a = this.terms; _i < _a.length; _i++) {
+            var item = _a[_i];
+            item.toZ3Declarations(fd);
+        }
+        fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
     };
     return FuncExpr;
 }(TermExpr));
@@ -126,15 +153,15 @@ var PredicateExpr = /** @class */ (function (_super) {
         var _this = this;
         switch (terms.length) {
             case 0: {
-                _this = _super.call(this, name + "()", new BoolType()) || this;
+                _this = _super.call(this, name + "__", new BoolType()) || this;
                 break;
             }
             case 1: {
-                _this = _super.call(this, name + "(" + terms[0].name + ")", new BoolType()) || this;
+                _this = _super.call(this, name + "_" + terms[0].name + "_", new BoolType()) || this;
                 break;
             }
             default: {
-                _this = _super.call(this, name + "(" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + ")", new BoolType()) || this;
+                _this = _super.call(this, name + "_" + terms.slice(1).reduce(function (a, b) { return a + "," + b.name; }, terms[0].name) + "_", new BoolType()) || this;
                 break;
             }
         }
@@ -250,7 +277,7 @@ var y = new VarExpr("y", new IntType());
 var pxy = new PredicateExpr("p", [x, y]);
 var fxy = new FuncExpr("f", new StringType(), [x, y]);
 var extraLong = new ForAllExpr(x, new AndExpr(pxy, new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))));
-console.log(extraLong);
+//console.log(extraLong);
 // // Writing on a file
 // // So we can use Z3 
 // console.log('Testing writing on file');
@@ -258,5 +285,9 @@ console.log(extraLong);
 // extraLong.toZ3(fd);
 // fs.closeSync(fd);
 // // Passed!
-console.log(FormulaExpr.symbolTable);
-console.log(TermExpr.symbolTable);
+// console.log(FormulaExpr.symbolTable)
+// console.log(TermExpr.symbolTable)
+var fd = fs.openSync('file.z3', 'w');
+x.toZ3Declarations(fd);
+fxy.toZ3Declarations(fd);
+fs.closeSync(fd);

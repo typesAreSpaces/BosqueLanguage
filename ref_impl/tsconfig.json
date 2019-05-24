@@ -15,7 +15,6 @@
         "./src/interpreter/*.ts",
         "./src/type_checker/*.ts",
         "./src/compiler/*.ts",
-        "./src/test/*.ts",
-        "./src/verifier/*.ts"
+        "./src/test/*.ts"
     ]
 }

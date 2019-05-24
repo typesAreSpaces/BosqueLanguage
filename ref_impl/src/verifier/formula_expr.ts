@@ -7,17 +7,27 @@
 import * as fs from "fs"
 
 abstract class TypeExpr {
+    abstract getType() : string;
 }
 
 class IntType extends TypeExpr {
+    getType() {
+        return "Int";
+    }
 }
 
 
 class BoolType extends TypeExpr {
+    getType() {
+        return "Bool";
+    }
 }
 
 
 class StringType extends TypeExpr {
+    getType() {
+        return "String";
+    }
 }
 
 class FuncType extends TypeExpr {
@@ -27,6 +37,14 @@ class FuncType extends TypeExpr {
         super();
         this.domain = domain;
         this.image = image;
+    }
+    getType(){
+        if(this.domain.length == 0){
+            return "() " + this.image;
+        }
+        else{
+            return "(" + this.domain.slice(1).reduce((a, b) => a + " " + b.getType(), this.domain[0].getType()) + ") (" + this.image.getType() + ")";
+        }
     }
 }
 
@@ -49,6 +67,7 @@ abstract class TermExpr {
         this.ty = ty;
     }
     abstract toZ3(fd : number) : void;
+    abstract toZ3Declarations(fd : number) : void;
 }
 
 class VarExpr extends TermExpr {
@@ -58,6 +77,9 @@ class VarExpr extends TermExpr {
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
+    }
+    toZ3Declarations(fd : number) : void {
+        fs.writeSync(fd, "(declare-fun " + this.name + " () " + this.ty.getType() + ")\n");
     }
 }
 
@@ -75,7 +97,7 @@ class FuncExpr extends TermExpr {
                 break;
             }
             default: {
-                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")", collectType);
+                super(name + "_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_", collectType);
                 break;  
             }
         }
@@ -84,6 +106,12 @@ class FuncExpr extends TermExpr {
     }
     toZ3(fd : number) : void {
         fs.writeSync(fd, this.name + '\n');
+    }
+    toZ3Declarations(fd : number) : void {
+        for (let item of this.terms){
+            item.toZ3Declarations(fd);
+        }
+        fs.writeSync(fd, "(declare-fun " + this.name + " " + this.ty.getType() + ")\n");
     }
 }
 
@@ -103,15 +131,15 @@ class PredicateExpr extends FormulaExpr {
     constructor(name : string, terms : TermExpr[]){
         switch(terms.length){
             case 0: {
-                super(name + "()", new BoolType());
+                super(name + "__", new BoolType());
                 break;
             }   
             case 1: {
-                super(name + "(" + terms[0].name + ")", new BoolType())
+                super(name + "_" + terms[0].name + "_", new BoolType())
                 break;
             }
             default: {
-                super(name + "(" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + ")", new BoolType());
+                super(name + "_" + terms.slice(1).reduce((a, b) => a + "," + b.name, terms[0].name) + "_", new BoolType());
                 break;  
             }
         }
@@ -230,7 +258,7 @@ let extraLong = new ForAllExpr(x,
         new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))
     ));
 
-console.log(extraLong);
+//console.log(extraLong);
 
 // // Writing on a file
 // // So we can use Z3 
@@ -240,5 +268,9 @@ console.log(extraLong);
 // fs.closeSync(fd);
 // // Passed!
 
-console.log(FormulaExpr.symbolTable)
-console.log(TermExpr.symbolTable)
+// console.log(FormulaExpr.symbolTable)
+// console.log(TermExpr.symbolTable)
+
+let fd = fs.openSync('file.z3', 'w');
+fxy.toZ3Declarations(fd);
+fs.closeSync(fd);

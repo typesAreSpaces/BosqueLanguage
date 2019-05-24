@@ -1,1 +1,4 @@
-forall x.(forall y.(p(f(x,y),x,x,y,f(x,y),x)))
+(declare-fun x () Int)
+(declare-fun x () Int)
+(declare-fun y () Int)
+(declare-fun f_x,y_ (Int Int) (String))
