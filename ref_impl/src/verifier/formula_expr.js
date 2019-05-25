@@ -168,24 +168,22 @@ var FormulaExpr = /** @class */ (function () {
     FormulaExpr.symbolTable = new Map();
     return FormulaExpr;
 }());
-// PredicateExpr always takes a BoolType
-// since we won't encode PARAMETRIZED 
-// logical formulas
 var PredicateExpr = /** @class */ (function (_super) {
     __extends(PredicateExpr, _super);
     function PredicateExpr(name, terms) {
         var _this = this;
+        var collectType = new FuncType(terms.map(function (x) { return x.ty; }), new BoolType());
         switch (terms.length) {
             case 0: {
-                _this = _super.call(this, name + "l__r", name, new BoolType()) || this;
+                _this = _super.call(this, name + "l__r", name, collectType) || this;
                 break;
             }
             case 1: {
-                _this = _super.call(this, name + "l_" + terms[0].name + "_r", name, new BoolType()) || this;
+                _this = _super.call(this, name + "l_" + terms[0].name + "_r", name, collectType) || this;
                 break;
             }
             default: {
-                _this = _super.call(this, name + "l_" + terms.slice(1).reduce(function (a, b) { return a + "_" + b.name; }, terms[0].name) + "_r", name, new BoolType()) || this;
+                _this = _super.call(this, name + "l_" + terms.slice(1).reduce(function (a, b) { return a + "_" + b.name; }, terms[0].name) + "_r", name, collectType) || this;
                 break;
             }
         }
@@ -202,7 +200,7 @@ var PredicateExpr = /** @class */ (function (_super) {
             item.toZ3Declaration(fd);
         }
         if (!PredicateExpr.symbolTable.get(this.symbolName)) {
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
+            fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
             PredicateExpr.symbolTable.set(this.symbolName, true);
         }
     };
@@ -211,7 +209,7 @@ var PredicateExpr = /** @class */ (function (_super) {
 var EqualityExpr = /** @class */ (function (_super) {
     __extends(EqualityExpr, _super);
     function EqualityExpr(left, right) {
-        var _this = _super.call(this, left.name + "=" + right.name, "=", new BoolType()) || this;
+        var _this = _super.call(this, left.name + "=" + right.name, "=", new FuncType([left.ty, right.ty], new BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -228,7 +226,7 @@ var EqualityExpr = /** @class */ (function (_super) {
 var NegExpr = /** @class */ (function (_super) {
     __extends(NegExpr, _super);
     function NegExpr(formula) {
-        var _this = _super.call(this, "neg " + formula.name, "not", new BoolType()) || this;
+        var _this = _super.call(this, "neg " + formula.name, "not", new FuncType([formula.ty], new BoolType())) || this;
         _this.formula = formula;
         return _this;
     }
@@ -243,7 +241,7 @@ var NegExpr = /** @class */ (function (_super) {
 var AndExpr = /** @class */ (function (_super) {
     __extends(AndExpr, _super);
     function AndExpr(left, right) {
-        var _this = _super.call(this, left.name + " and " + right.name, "and", new BoolType()) || this;
+        var _this = _super.call(this, left.name + " and " + right.name, "and", new FuncType([left.ty, right.ty], new BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -260,7 +258,7 @@ var AndExpr = /** @class */ (function (_super) {
 var OrExpr = /** @class */ (function (_super) {
     __extends(OrExpr, _super);
     function OrExpr(left, right) {
-        var _this = _super.call(this, left.name + " or " + right.name, "or", new BoolType()) || this;
+        var _this = _super.call(this, left.name + " or " + right.name, "or", new FuncType([left.ty, right.ty], new BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -277,7 +275,7 @@ var OrExpr = /** @class */ (function (_super) {
 var ImplExpr = /** @class */ (function (_super) {
     __extends(ImplExpr, _super);
     function ImplExpr(left, right) {
-        var _this = _super.call(this, left.name + " implies " + right.name, "=>", new BoolType()) || this;
+        var _this = _super.call(this, left.name + " implies " + right.name, "=>", new FuncType([left.ty, right.ty], new BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -294,13 +292,13 @@ var ImplExpr = /** @class */ (function (_super) {
 var ForAllExpr = /** @class */ (function (_super) {
     __extends(ForAllExpr, _super);
     function ForAllExpr(nameBinder, formula) {
-        var _this = _super.call(this, "forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new BoolType()) || this;
+        var _this = _super.call(this, "forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new FuncType([nameBinder.ty, formula.ty], new BoolType())) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
     }
     ForAllExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     };
     ForAllExpr.prototype.toZ3Declaration = function (fd) {
         this.formula.toZ3Declaration(fd);
@@ -310,13 +308,13 @@ var ForAllExpr = /** @class */ (function (_super) {
 var ExistsExpr = /** @class */ (function (_super) {
     __extends(ExistsExpr, _super);
     function ExistsExpr(nameBinder, formula) {
-        var _this = _super.call(this, "exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new BoolType()) || this;
+        var _this = _super.call(this, "exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new FuncType([nameBinder.ty, formula.ty], new BoolType())) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
     }
     ExistsExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + " (" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ") " + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     };
     ExistsExpr.prototype.toZ3Declaration = function (fd) {
         this.formula.toZ3Declaration(fd);
@@ -329,8 +327,8 @@ var ExistsExpr = /** @class */ (function (_super) {
 // Testing
 var x = new VarExpr("x", new IntType());
 var y = new VarExpr("y", new IntType());
-var pxy = new PredicateExpr("p", [x, y]);
-var fxy = new FuncExpr("f", new StringType(), [x, y]);
+var pxy = new PredicateExpr("p", [x, y, x, y, x, y]);
+var fxy = new FuncExpr("f", new IntType(), [x, y]);
 var extraLong = new ForAllExpr(x, new AndExpr(pxy, new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))));
 var fd = fs.openSync('file.z3', 'w');
 // (new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declaration(fd);
