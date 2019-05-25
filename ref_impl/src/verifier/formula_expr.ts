@@ -4,131 +4,13 @@
 //-------------------------------------------------------------------------------------------------------
 
 // import * as deepEqual from "deep-equal"
+import { TypeExpr, BoolType, FuncType } from "./type_expr";
+import { TermExpr, VarExpr } from "./term_expr";
 import * as fs from "fs";
 
-
-abstract class TypeExpr {
-    abstract readonly isPrimitiveType : boolean;
-    abstract getType() : string;
-}
-
-class IntType extends TypeExpr {
-    isPrimitiveType = true;
-    getType() {
-        return "Int";
-    }
-}
-
-class BoolType extends TypeExpr {
-    isPrimitiveType = true;
-    getType(){
-        return "Bool";
-    }
-}
-
-class StringType extends TypeExpr {
-    isPrimitiveType = true;
-    getType() {
-        return "String";
-    }
-}
-
-class FuncType extends TypeExpr {
-    isPrimitiveType = false;
-    readonly domain : TypeExpr[];
-    readonly image : TypeExpr;
-    constructor(domain : TypeExpr[], image  : TypeExpr){
-        super();
-        this.domain = domain;
-        this.image = image;
-    }
-    getType(){
-        if(this.domain.length == 0){
-            return "() " + this.image.getType();
-        }
-        else{
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " + 
-            (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()), 
-            this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
-            + ") " + this.image.getType();
-        }
-    }
-}
-
-// TODO: Add more elements to the 
-// abstract class TypeExpr once we 
-// have formalized the type system
-// for Bosque. Actually, it is already
-// established on the documentation,
-// however, it needs additional formalization
-// to deal with some rules and inference
-// (Current approach to accomplish the latter: take 
-// the grouded ast and build a `table' using
-
-abstract class TermExpr {
-    readonly name : string;
-    readonly symbolName : string;
-    readonly ty : TypeExpr;
-    static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
-    constructor(name : string, symbolName : string, ty : TypeExpr){
-        this.name = name;
-        this.symbolName = symbolName;
-        this.ty = ty;
-    }
-    abstract toZ3Declaration(fd : number) : void;
-    abstract sexpr() : string;
-}
-
-class VarExpr extends TermExpr {
-    constructor(name : string, ty : TypeExpr){
-        super(name, name, ty);
-        VarExpr.symbolTable.set(this.name, false);
-    }
-    toZ3Declaration(fd : number){
-        if(!VarExpr.symbolTable.get(this.symbolName)){
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            VarExpr.symbolTable.set(this.symbolName, true);
-        }
-    }
-    sexpr(){
-        return this.symbolName;
-    }
-}
-
-class FuncExpr extends TermExpr {
-    readonly terms : TermExpr[];
-    constructor(name : string, ty : TypeExpr, terms : TermExpr[]){
-        let collectType = new FuncType(terms.map(x => x.ty), ty);
-        switch(terms.length){
-            case 0: {
-                super(name + "l__r", name, collectType);
-                break;
-            }   
-            case 1: {
-                super(name + "l_" + terms[0].name + "_r", name, collectType)
-                break;
-            }
-            default: {
-                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", name, collectType);
-                break;  
-            }
-        }
-        this.terms = terms;
-        FuncExpr.symbolTable.set(this.symbolName, false);
-    }
-    toZ3Declaration(fd : number){
-        for (let item of this.terms){
-            item.toZ3Declaration(fd);
-        }
-        if(!FuncExpr.symbolTable.get(this.symbolName)){
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
-            FuncExpr.symbolTable.set(this.symbolName, true);
-        }
-    }
-    sexpr(){
-        return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
-    }
-}
+// REMARK: Names cannot include `,'
+// or any other symbol that Z3 cannot
+// parse as a valid char for a name expression
 
 abstract class FormulaExpr {
     readonly name : string;
@@ -297,26 +179,4 @@ class ExistsExpr extends FormulaExpr {
     }
 }
 
-// IMPORTANT: Names cannot include `,'
-// or any other symbol that Z3 cannot
-// parse as a valid char for a name expression
-
-// Testing
-let x = new VarExpr("x", new IntType());
-let y = new VarExpr("y", new IntType());
-let pxy = new PredicateExpr("p", [x, y, x, y, x, y]);
-let fxy = new FuncExpr("f", new IntType(), [x, y]);
-let extraLong = new ForAllExpr(x, 
-    new AndExpr( 
-        pxy, 
-        new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))
-    ));
-
-let fd = fs.openSync('file.z3', 'w');
-// (new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declaration(fd);
-// (new FuncExpr("h", new IntType(), [])).toZ3Declaration(fd);
-// (new FuncExpr("k", new IntType(), [fxy])).toZ3Declaration(fd);
-extraLong.toZ3(fd);
-pxy.toZ3(fd);
-
-fs.closeSync(fd);
+export { FormulaExpr, PredicateExpr, EqualityExpr, NegExpr, AndExpr, OrExpr, ImplExpr, ForAllExpr, ExistsExpr };

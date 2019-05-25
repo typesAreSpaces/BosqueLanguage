@@ -18,143 +18,11 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 // import * as deepEqual from "deep-equal"
+var type_expr_1 = require("./type_expr");
 var fs = require("fs");
-var TypeExpr = /** @class */ (function () {
-    function TypeExpr() {
-    }
-    return TypeExpr;
-}());
-var IntType = /** @class */ (function (_super) {
-    __extends(IntType, _super);
-    function IntType() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isPrimitiveType = true;
-        return _this;
-    }
-    IntType.prototype.getType = function () {
-        return "Int";
-    };
-    return IntType;
-}(TypeExpr));
-var BoolType = /** @class */ (function (_super) {
-    __extends(BoolType, _super);
-    function BoolType() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isPrimitiveType = true;
-        return _this;
-    }
-    BoolType.prototype.getType = function () {
-        return "Bool";
-    };
-    return BoolType;
-}(TypeExpr));
-var StringType = /** @class */ (function (_super) {
-    __extends(StringType, _super);
-    function StringType() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isPrimitiveType = true;
-        return _this;
-    }
-    StringType.prototype.getType = function () {
-        return "String";
-    };
-    return StringType;
-}(TypeExpr));
-var FuncType = /** @class */ (function (_super) {
-    __extends(FuncType, _super);
-    function FuncType(domain, image) {
-        var _this = _super.call(this) || this;
-        _this.isPrimitiveType = false;
-        _this.domain = domain;
-        _this.image = image;
-        return _this;
-    }
-    FuncType.prototype.getType = function () {
-        if (this.domain.length == 0) {
-            return "() " + this.image.getType();
-        }
-        else {
-            return "(" + this.domain.slice(1).reduce(function (a, b) { return a + " " +
-                (b.isPrimitiveType ? b.getType() : b.image.getType()); }, this.domain[0].isPrimitiveType ? this.domain[0].getType() : this.domain[0].image.getType())
-                + ") " + this.image.getType();
-        }
-    };
-    return FuncType;
-}(TypeExpr));
-// TODO: Add more elements to the 
-// abstract class TypeExpr once we 
-// have formalized the type system
-// for Bosque. Actually, it is already
-// established on the documentation,
-// however, it needs additional formalization
-// to deal with some rules and inference
-// (Current approach to accomplish the latter: take 
-// the grouded ast and build a `table' using
-var TermExpr = /** @class */ (function () {
-    function TermExpr(name, symbolName, ty) {
-        this.name = name;
-        this.symbolName = symbolName;
-        this.ty = ty;
-    }
-    TermExpr.symbolTable = new Map();
-    return TermExpr;
-}());
-var VarExpr = /** @class */ (function (_super) {
-    __extends(VarExpr, _super);
-    function VarExpr(name, ty) {
-        var _this = _super.call(this, name, name, ty) || this;
-        VarExpr.symbolTable.set(_this.name, false);
-        return _this;
-    }
-    VarExpr.prototype.toZ3Declaration = function (fd) {
-        if (!VarExpr.symbolTable.get(this.symbolName)) {
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
-            VarExpr.symbolTable.set(this.symbolName, true);
-        }
-    };
-    VarExpr.prototype.sexpr = function () {
-        return this.symbolName;
-    };
-    return VarExpr;
-}(TermExpr));
-var FuncExpr = /** @class */ (function (_super) {
-    __extends(FuncExpr, _super);
-    function FuncExpr(name, ty, terms) {
-        var _this = this;
-        var collectType = new FuncType(terms.map(function (x) { return x.ty; }), ty);
-        switch (terms.length) {
-            case 0: {
-                _this = _super.call(this, name + "l__r", name, collectType) || this;
-                break;
-            }
-            case 1: {
-                _this = _super.call(this, name + "l_" + terms[0].name + "_r", name, collectType) || this;
-                break;
-            }
-            default: {
-                _this = _super.call(this, name + "l_" + terms.slice(1).reduce(function (a, b) { return a + "_" + b.name; }, terms[0].name) + "_r", name, collectType) || this;
-                break;
-            }
-        }
-        _this.terms = terms;
-        FuncExpr.symbolTable.set(_this.symbolName, false);
-        return _this;
-    }
-    FuncExpr.prototype.toZ3Declaration = function (fd) {
-        for (var _i = 0, _a = this.terms; _i < _a.length; _i++) {
-            var item = _a[_i];
-            item.toZ3Declaration(fd);
-        }
-        if (!FuncExpr.symbolTable.get(this.symbolName)) {
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
-            FuncExpr.symbolTable.set(this.symbolName, true);
-        }
-    };
-    FuncExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + this.terms.reduce(function (a, b) { return a + " " + b.sexpr(); }, "") + ")";
-    };
-    return FuncExpr;
-}(TermExpr));
+// REMARK: Names cannot include `,'
+// or any other symbol that Z3 cannot
+// parse as a valid char for a name expression
 var FormulaExpr = /** @class */ (function () {
     function FormulaExpr(name, symbolName, ty) {
         this.name = name;
@@ -168,11 +36,12 @@ var FormulaExpr = /** @class */ (function () {
     FormulaExpr.symbolTable = new Map();
     return FormulaExpr;
 }());
+exports.FormulaExpr = FormulaExpr;
 var PredicateExpr = /** @class */ (function (_super) {
     __extends(PredicateExpr, _super);
     function PredicateExpr(name, terms) {
         var _this = this;
-        var collectType = new FuncType(terms.map(function (x) { return x.ty; }), new BoolType());
+        var collectType = new type_expr_1.FuncType(terms.map(function (x) { return x.ty; }), new type_expr_1.BoolType());
         switch (terms.length) {
             case 0: {
                 _this = _super.call(this, name + "l__r", name, collectType) || this;
@@ -206,10 +75,11 @@ var PredicateExpr = /** @class */ (function (_super) {
     };
     return PredicateExpr;
 }(FormulaExpr));
+exports.PredicateExpr = PredicateExpr;
 var EqualityExpr = /** @class */ (function (_super) {
     __extends(EqualityExpr, _super);
     function EqualityExpr(left, right) {
-        var _this = _super.call(this, left.name + "=" + right.name, "=", new FuncType([left.ty, right.ty], new BoolType())) || this;
+        var _this = _super.call(this, left.name + "=" + right.name, "=", new type_expr_1.FuncType([left.ty, right.ty], new type_expr_1.BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -223,10 +93,11 @@ var EqualityExpr = /** @class */ (function (_super) {
     };
     return EqualityExpr;
 }(FormulaExpr));
+exports.EqualityExpr = EqualityExpr;
 var NegExpr = /** @class */ (function (_super) {
     __extends(NegExpr, _super);
     function NegExpr(formula) {
-        var _this = _super.call(this, "neg " + formula.name, "not", new FuncType([formula.ty], new BoolType())) || this;
+        var _this = _super.call(this, "neg " + formula.name, "not", new type_expr_1.FuncType([formula.ty], new type_expr_1.BoolType())) || this;
         _this.formula = formula;
         return _this;
     }
@@ -238,10 +109,11 @@ var NegExpr = /** @class */ (function (_super) {
     };
     return NegExpr;
 }(FormulaExpr));
+exports.NegExpr = NegExpr;
 var AndExpr = /** @class */ (function (_super) {
     __extends(AndExpr, _super);
     function AndExpr(left, right) {
-        var _this = _super.call(this, left.name + " and " + right.name, "and", new FuncType([left.ty, right.ty], new BoolType())) || this;
+        var _this = _super.call(this, left.name + " and " + right.name, "and", new type_expr_1.FuncType([left.ty, right.ty], new type_expr_1.BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -255,10 +127,11 @@ var AndExpr = /** @class */ (function (_super) {
     };
     return AndExpr;
 }(FormulaExpr));
+exports.AndExpr = AndExpr;
 var OrExpr = /** @class */ (function (_super) {
     __extends(OrExpr, _super);
     function OrExpr(left, right) {
-        var _this = _super.call(this, left.name + " or " + right.name, "or", new FuncType([left.ty, right.ty], new BoolType())) || this;
+        var _this = _super.call(this, left.name + " or " + right.name, "or", new type_expr_1.FuncType([left.ty, right.ty], new type_expr_1.BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -272,10 +145,11 @@ var OrExpr = /** @class */ (function (_super) {
     };
     return OrExpr;
 }(FormulaExpr));
+exports.OrExpr = OrExpr;
 var ImplExpr = /** @class */ (function (_super) {
     __extends(ImplExpr, _super);
     function ImplExpr(left, right) {
-        var _this = _super.call(this, left.name + " implies " + right.name, "=>", new FuncType([left.ty, right.ty], new BoolType())) || this;
+        var _this = _super.call(this, left.name + " implies " + right.name, "=>", new type_expr_1.FuncType([left.ty, right.ty], new type_expr_1.BoolType())) || this;
         _this.leftHandSide = left;
         _this.rightHandSide = right;
         return _this;
@@ -289,10 +163,11 @@ var ImplExpr = /** @class */ (function (_super) {
     };
     return ImplExpr;
 }(FormulaExpr));
+exports.ImplExpr = ImplExpr;
 var ForAllExpr = /** @class */ (function (_super) {
     __extends(ForAllExpr, _super);
     function ForAllExpr(nameBinder, formula) {
-        var _this = _super.call(this, "forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new FuncType([nameBinder.ty, formula.ty], new BoolType())) || this;
+        var _this = _super.call(this, "forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new type_expr_1.FuncType([nameBinder.ty, formula.ty], new type_expr_1.BoolType())) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
@@ -305,10 +180,11 @@ var ForAllExpr = /** @class */ (function (_super) {
     };
     return ForAllExpr;
 }(FormulaExpr));
+exports.ForAllExpr = ForAllExpr;
 var ExistsExpr = /** @class */ (function (_super) {
     __extends(ExistsExpr, _super);
     function ExistsExpr(nameBinder, formula) {
-        var _this = _super.call(this, "exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new FuncType([nameBinder.ty, formula.ty], new BoolType())) || this;
+        var _this = _super.call(this, "exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new type_expr_1.FuncType([nameBinder.ty, formula.ty], new type_expr_1.BoolType())) || this;
         _this.nameBinder = nameBinder;
         _this.formula = formula;
         return _this;
@@ -321,19 +197,4 @@ var ExistsExpr = /** @class */ (function (_super) {
     };
     return ExistsExpr;
 }(FormulaExpr));
-// IMPORTANT: Names cannot include `,'
-// or any other symbol that Z3 cannot
-// parse as a valid char for a name expression
-// Testing
-var x = new VarExpr("x", new IntType());
-var y = new VarExpr("y", new IntType());
-var pxy = new PredicateExpr("p", [x, y, x, y, x, y]);
-var fxy = new FuncExpr("f", new IntType(), [x, y]);
-var extraLong = new ForAllExpr(x, new AndExpr(pxy, new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))));
-var fd = fs.openSync('file.z3', 'w');
-// (new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declaration(fd);
-// (new FuncExpr("h", new IntType(), [])).toZ3Declaration(fd);
-// (new FuncExpr("k", new IntType(), [fxy])).toZ3Declaration(fd);
-extraLong.toZ3(fd);
-pxy.toZ3(fd);
-fs.closeSync(fd);
+exports.ExistsExpr = ExistsExpr;
