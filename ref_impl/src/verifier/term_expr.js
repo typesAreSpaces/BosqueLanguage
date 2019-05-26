@@ -24,7 +24,17 @@ var TermExpr = /** @class */ (function () {
         this.name = name;
         this.symbolName = symbolName;
         this.ty = ty;
+        if (!TermExpr.symbolTable.has(this.name)) {
+            TermExpr.symbolTable.set(this.name, false);
+        }
     }
+    TermExpr.prototype.toZ3DeclarationSort = function (fd) {
+        var thisTypeTemp = this.ty.getType();
+        if (this.ty.isUninterpreted && !type_expr_1.UninterpretedType.symbolTable.get(thisTypeTemp)) {
+            fs.writeSync(fd, "(declare-sort " + this.ty.name + ")\n");
+            type_expr_1.UninterpretedType.symbolTable.set(thisTypeTemp, true);
+        }
+    };
     TermExpr.symbolTable = new Map();
     return TermExpr;
 }());
@@ -32,11 +42,10 @@ exports.TermExpr = TermExpr;
 var VarExpr = /** @class */ (function (_super) {
     __extends(VarExpr, _super);
     function VarExpr(name, ty) {
-        var _this = _super.call(this, name, name, ty) || this;
-        VarExpr.symbolTable.set(_this.name, false);
-        return _this;
+        return _super.call(this, name, name, ty) || this;
     }
     VarExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
@@ -68,10 +77,10 @@ var FuncExpr = /** @class */ (function (_super) {
             }
         }
         _this.terms = terms;
-        FuncExpr.symbolTable.set(_this.symbolName, false);
         return _this;
     }
     FuncExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         for (var _i = 0, _a = this.terms; _i < _a.length; _i++) {
             var item = _a[_i];
             item.toZ3Declaration(fd);

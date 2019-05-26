@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as fs from "fs";
-import { TypeExpr, FuncType } from "./type_expr";
+import { TypeExpr, FuncType, UninterpretedType } from "./type_expr";
 
 abstract class TermExpr {
     readonly name : string;
@@ -15,6 +15,16 @@ abstract class TermExpr {
         this.name = name;
         this.symbolName = symbolName;
         this.ty = ty;
+        if(!TermExpr.symbolTable.has(this.name)){
+            TermExpr.symbolTable.set(this.name, false);
+        }
+    }
+    toZ3DeclarationSort(fd : number) : void {
+        let thisTypeTemp = this.ty.getType();
+        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)){
+            fs.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
+            UninterpretedType.symbolTable.set(thisTypeTemp, true);
+        }
     }
     abstract toZ3Declaration(fd : number) : void;
     abstract sexpr() : string;
@@ -23,9 +33,9 @@ abstract class TermExpr {
 class VarExpr extends TermExpr {
     constructor(name : string, ty : TypeExpr){
         super(name, name, ty);
-        VarExpr.symbolTable.set(this.name, false);
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         if(!VarExpr.symbolTable.get(this.symbolName)){
             fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
@@ -55,9 +65,9 @@ class FuncExpr extends TermExpr {
             }
         }
         this.terms = terms;
-        FuncExpr.symbolTable.set(this.symbolName, false);
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         for (let item of this.terms){
             item.toZ3Declaration(fd);
         }

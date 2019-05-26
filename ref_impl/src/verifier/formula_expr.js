@@ -22,13 +22,16 @@ var type_expr_1 = require("./type_expr");
 var fs = require("fs");
 // REMARK: Names cannot include `,'
 // or any other symbol that Z3 cannot
-// parse as a valid char for a name expression
+// parse as a valid char for a named expression
 var FormulaExpr = /** @class */ (function () {
     function FormulaExpr(name, symbolName, ty) {
         this.name = name;
         this.symbolName = symbolName;
         this.ty = ty;
     }
+    // Setting optionalGetModel to true
+    // will include a (get-model) command
+    // to the Z3 file; otherwise it wont    
     FormulaExpr.prototype.toZ3 = function (fd, optionalGetModel) {
         this.toZ3Declaration(fd);
         fs.writeSync(fd, "(push)\n");
@@ -37,6 +40,13 @@ var FormulaExpr = /** @class */ (function () {
             fs.writeSync(fd, "(get-model)\n");
         }
         fs.writeSync(fd, "(pop)\n");
+    };
+    FormulaExpr.prototype.toZ3DeclarationSort = function (fd) {
+        var thisTypeTemp = this.ty.getType();
+        if (this.ty.isUninterpreted && !type_expr_1.UninterpretedType.symbolTable.get(thisTypeTemp)) {
+            fs.writeSync(fd, "(declare-sort " + this.ty.name + ")\n");
+            type_expr_1.UninterpretedType.symbolTable.set(thisTypeTemp, true);
+        }
     };
     FormulaExpr.fd = fs.openSync('file.z3', 'w');
     FormulaExpr.symbolTable = new Map();
@@ -63,7 +73,9 @@ var PredicateExpr = /** @class */ (function (_super) {
             }
         }
         _this.terms = terms;
-        PredicateExpr.symbolTable.set(_this.symbolName, false);
+        if (!PredicateExpr.symbolTable.has(_this.symbolName)) {
+            PredicateExpr.symbolTable.set(_this.symbolName, false);
+        }
         return _this;
     }
     PredicateExpr.prototype.sexpr = function () {
@@ -77,6 +89,7 @@ var PredicateExpr = /** @class */ (function (_super) {
         }
     };
     PredicateExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         for (var _i = 0, _a = this.terms; _i < _a.length; _i++) {
             var item = _a[_i];
             item.toZ3Declaration(fd);
@@ -101,6 +114,7 @@ var EqualityExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     };
     EqualityExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     };
@@ -118,6 +132,7 @@ var NegExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
     };
     NegExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     };
     return NegExpr;
@@ -135,6 +150,7 @@ var AndExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     };
     AndExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     };
@@ -153,6 +169,7 @@ var OrExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     };
     OrExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     };
@@ -171,6 +188,7 @@ var ImplExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     };
     ImplExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     };
@@ -189,6 +207,7 @@ var ForAllExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     };
     ForAllExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     };
     return ForAllExpr;
@@ -206,6 +225,7 @@ var ExistsExpr = /** @class */ (function (_super) {
         return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     };
     ExistsExpr.prototype.toZ3Declaration = function (fd) {
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     };
     return ExistsExpr;

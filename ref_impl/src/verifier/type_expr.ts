@@ -15,11 +15,13 @@
 
 abstract class TypeExpr {
     abstract readonly isPrimitiveType : boolean;
+    abstract readonly isUninterpreted : boolean;
     abstract getType() : string;
 }
 
 class IntType extends TypeExpr {
     isPrimitiveType = true;
+    isUninterpreted = false;
     getType() {
         return "Int";
     }
@@ -27,6 +29,7 @@ class IntType extends TypeExpr {
 
 class BoolType extends TypeExpr {
     isPrimitiveType = true;
+    isUninterpreted = false;
     getType(){
         return "Bool";
     }
@@ -34,6 +37,7 @@ class BoolType extends TypeExpr {
 
 class StringType extends TypeExpr {
     isPrimitiveType = true;
+    isUninterpreted = false;
     getType() {
         return "String";
     }
@@ -41,6 +45,7 @@ class StringType extends TypeExpr {
 
 class FuncType extends TypeExpr {
     isPrimitiveType = false;
+    isUninterpreted = false;
     readonly domain : TypeExpr[];
     readonly image : TypeExpr;
     constructor(domain : TypeExpr[], image  : TypeExpr){
@@ -60,5 +65,24 @@ class FuncType extends TypeExpr {
         }
     }
 }
+// REMARK: Names cannot include `,'
+// or any other symbol that Z3 cannot
+// parse as a valid char for a named expression
+class UninterpretedType extends TypeExpr {
+    isPrimitiveType = true; // ? Yes, for the moment..
+    isUninterpreted = true;
+    readonly name : string;
+    static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
+    constructor(name : string){
+        super();
+        this.name = name;
+        if(!UninterpretedType.symbolTable.has(this.name)){
+            UninterpretedType.symbolTable.set(this.name, false);
+        }
+    }
+    getType(){
+        return this.name;
+    }
+}
 
-export { TypeExpr, IntType, BoolType, StringType, FuncType };
+export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType };

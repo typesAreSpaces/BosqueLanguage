@@ -4,14 +4,13 @@
 //-------------------------------------------------------------------------------------------------------
 
 // import * as deepEqual from "deep-equal"
-import { TypeExpr, BoolType, FuncType } from "./type_expr";
+import { TypeExpr, BoolType, FuncType, UninterpretedType } from "./type_expr";
 import { TermExpr, VarExpr } from "./term_expr";
 import * as fs from "fs";
 
 // REMARK: Names cannot include `,'
 // or any other symbol that Z3 cannot
-// parse as a valid char for a name expression
-
+// parse as a valid char for a named expression
 abstract class FormulaExpr {
     readonly name : string;
     readonly symbolName : string;
@@ -24,6 +23,9 @@ abstract class FormulaExpr {
         this.ty = ty;
     }
     abstract sexpr() : string;
+    // Setting optionalGetModel to true
+    // will include a (get-model) command
+    // to the Z3 file; otherwise it wont    
     toZ3(fd : number, optionalGetModel : boolean) : void {
         this.toZ3Declaration(fd);
         fs.writeSync(fd, "(push)\n");
@@ -32,6 +34,13 @@ abstract class FormulaExpr {
             fs.writeSync(fd, "(get-model)\n");
         }
         fs.writeSync(fd, "(pop)\n");
+    }
+    toZ3DeclarationSort(fd : number) : void {
+        let thisTypeTemp = this.ty.getType();
+        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)){
+            fs.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
+            UninterpretedType.symbolTable.set(thisTypeTemp, true);
+        }
     }
     abstract toZ3Declaration(fd : number) : void;
 }
@@ -55,7 +64,9 @@ class PredicateExpr extends FormulaExpr {
             }
         }
         this.terms = terms;
-        PredicateExpr.symbolTable.set(this.symbolName, false);
+        if(!PredicateExpr.symbolTable.has(this.symbolName)){
+            PredicateExpr.symbolTable.set(this.symbolName, false);
+        }
     }
     sexpr(){
         switch(this.terms.length){
@@ -68,6 +79,7 @@ class PredicateExpr extends FormulaExpr {
         }
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         for (let item of this.terms){
             item.toZ3Declaration(fd);
         }
@@ -90,6 +102,7 @@ class EqualityExpr extends FormulaExpr {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     }
@@ -105,6 +118,7 @@ class NegExpr extends FormulaExpr {
         return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     }
 }
@@ -121,6 +135,7 @@ class AndExpr extends FormulaExpr {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     }
@@ -138,6 +153,7 @@ class OrExpr extends FormulaExpr {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     }
@@ -155,6 +171,7 @@ class ImplExpr extends FormulaExpr {
         return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.leftHandSide.toZ3Declaration(fd);
         this.rightHandSide.toZ3Declaration(fd);
     }
@@ -172,6 +189,7 @@ class ForAllExpr extends FormulaExpr {
         return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     }
 }
@@ -188,6 +206,7 @@ class ExistsExpr extends FormulaExpr {
         return "(" + this.symbolName + " ((" + this.nameBinder.symbolName + " " + this.nameBinder.ty.getType() + ")) " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
+        this.toZ3DeclarationSort(fd);
         this.formula.toZ3Declaration(fd);
     }
 }

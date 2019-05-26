@@ -37,6 +37,7 @@ var IntType = /** @class */ (function (_super) {
     function IntType() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isPrimitiveType = true;
+        _this.isUninterpreted = false;
         return _this;
     }
     IntType.prototype.getType = function () {
@@ -50,6 +51,7 @@ var BoolType = /** @class */ (function (_super) {
     function BoolType() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isPrimitiveType = true;
+        _this.isUninterpreted = false;
         return _this;
     }
     BoolType.prototype.getType = function () {
@@ -63,6 +65,7 @@ var StringType = /** @class */ (function (_super) {
     function StringType() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isPrimitiveType = true;
+        _this.isUninterpreted = false;
         return _this;
     }
     StringType.prototype.getType = function () {
@@ -76,6 +79,7 @@ var FuncType = /** @class */ (function (_super) {
     function FuncType(domain, image) {
         var _this = _super.call(this) || this;
         _this.isPrimitiveType = false;
+        _this.isUninterpreted = false;
         _this.domain = domain;
         _this.image = image;
         return _this;
@@ -93,3 +97,25 @@ var FuncType = /** @class */ (function (_super) {
     return FuncType;
 }(TypeExpr));
 exports.FuncType = FuncType;
+// REMARK: Names cannot include `,'
+// or any other symbol that Z3 cannot
+// parse as a valid char for a named expression
+var UninterpretedType = /** @class */ (function (_super) {
+    __extends(UninterpretedType, _super);
+    function UninterpretedType(name) {
+        var _this = _super.call(this) || this;
+        _this.isPrimitiveType = true; // ? Yes, for the moment..
+        _this.isUninterpreted = true;
+        _this.name = name;
+        if (!UninterpretedType.symbolTable.has(_this.name)) {
+            UninterpretedType.symbolTable.set(_this.name, false);
+        }
+        return _this;
+    }
+    UninterpretedType.prototype.getType = function () {
+        return this.name;
+    };
+    UninterpretedType.symbolTable = new Map();
+    return UninterpretedType;
+}(TypeExpr));
+exports.UninterpretedType = UninterpretedType;
