@@ -29,10 +29,16 @@ var FormulaExpr = /** @class */ (function () {
         this.symbolName = symbolName;
         this.ty = ty;
     }
-    FormulaExpr.prototype.toZ3 = function (fd) {
+    FormulaExpr.prototype.toZ3 = function (fd, optionalGetModel) {
         this.toZ3Declaration(fd);
-        fs.writeSync(fd, "(assert " + this.sexpr() + ")\n");
+        fs.writeSync(fd, "(push)\n");
+        fs.writeSync(fd, "(assert " + this.sexpr() + ")\n(check-sat)\n");
+        if (optionalGetModel) {
+            fs.writeSync(fd, "(get-model)\n");
+        }
+        fs.writeSync(fd, "(pop)\n");
     };
+    FormulaExpr.fd = fs.openSync('file.z3', 'w');
     FormulaExpr.symbolTable = new Map();
     return FormulaExpr;
 }());
@@ -61,7 +67,14 @@ var PredicateExpr = /** @class */ (function (_super) {
         return _this;
     }
     PredicateExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + this.terms.reduce(function (a, b) { return a + " " + b.sexpr(); }, "") + ")";
+        switch (this.terms.length) {
+            case 0: {
+                return this.symbolName;
+            }
+            default: {
+                return "(" + this.symbolName + this.terms.reduce(function (a, b) { return a + " " + b.sexpr(); }, "") + ")";
+            }
+        }
     };
     PredicateExpr.prototype.toZ3Declaration = function (fd) {
         for (var _i = 0, _a = this.terms; _i < _a.length; _i++) {
@@ -102,7 +115,7 @@ var NegExpr = /** @class */ (function (_super) {
         return _this;
     }
     NegExpr.prototype.sexpr = function () {
-        return "(" + this.symbolName + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
     };
     NegExpr.prototype.toZ3Declaration = function (fd) {
         this.formula.toZ3Declaration(fd);

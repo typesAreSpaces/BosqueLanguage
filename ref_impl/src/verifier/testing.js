@@ -11,13 +11,19 @@ var fs = require("fs");
 // Testing
 var x = new term_expr_1.VarExpr("x", new type_expr_1.IntType());
 var y = new term_expr_1.VarExpr("y", new type_expr_1.IntType());
+var a = new formula_expr_1.PredicateExpr("a", []);
+var b = new formula_expr_1.PredicateExpr("b", []);
 var pxy = new formula_expr_1.PredicateExpr("p", [x, y, x, y, x, y]);
 var fxy = new term_expr_1.FuncExpr("f", new type_expr_1.IntType(), [x, y]);
 var extraLong = new formula_expr_1.ForAllExpr(x, new formula_expr_1.AndExpr(pxy, new formula_expr_1.ForAllExpr(y, new formula_expr_1.PredicateExpr("p", [fxy, x, x, y, fxy, x]))));
 var fd = fs.openSync('file.z3', 'w');
-// (new FuncExpr("g", new IntType(), [fxy, fxy])).toZ3Declaration(fd);
-// (new FuncExpr("h", new IntType(), [])).toZ3Declaration(fd);
-// (new FuncExpr("k", new IntType(), [fxy])).toZ3Declaration(fd);
-extraLong.toZ3(fd);
-pxy.toZ3(fd);
+// Setting optionalGetModel to true
+// will include a (get-model) command
+// to the Z3 file; otherwise it wont
+pxy.toZ3(fd, false);
+pxy.toZ3(fd, true);
+// Encoding DeMorgan's law
+(new formula_expr_1.NegExpr(new formula_expr_1.EqualityExpr(new formula_expr_1.AndExpr(a, b), new formula_expr_1.NegExpr(new formula_expr_1.OrExpr(new formula_expr_1.NegExpr(a), new formula_expr_1.NegExpr(b)))))).toZ3(fd, false);
+// Testing a predicate
+(new formula_expr_1.PredicateExpr("narda", [pxy, x])).toZ3(fd, false);
 fs.closeSync(fd);

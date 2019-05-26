@@ -16,6 +16,7 @@ abstract class FormulaExpr {
     readonly name : string;
     readonly symbolName : string;
     readonly ty : TypeExpr;
+    static fd = fs.openSync('file.z3', 'w');
     static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
     constructor(name : string, symbolName : string, ty : TypeExpr){
         this.name = name;
@@ -23,9 +24,14 @@ abstract class FormulaExpr {
         this.ty = ty;
     }
     abstract sexpr() : string;
-    toZ3(fd : number) : void {
+    toZ3(fd : number, optionalGetModel : boolean) : void {
         this.toZ3Declaration(fd);
-        fs.writeSync(fd, "(assert " + this.sexpr() + ")\n");
+        fs.writeSync(fd, "(push)\n");
+        fs.writeSync(fd, "(assert " + this.sexpr() + ")\n(check-sat)\n");
+        if(optionalGetModel){
+            fs.writeSync(fd, "(get-model)\n");
+        }
+        fs.writeSync(fd, "(pop)\n");
     }
     abstract toZ3Declaration(fd : number) : void;
 }
@@ -52,7 +58,14 @@ class PredicateExpr extends FormulaExpr {
         PredicateExpr.symbolTable.set(this.symbolName, false);
     }
     sexpr(){
-        return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
+        switch(this.terms.length){
+            case 0 : {
+                return this.symbolName;
+            }
+            default : {
+                return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
+            }
+        }
     }
     toZ3Declaration(fd : number){
         for (let item of this.terms){
@@ -89,7 +102,7 @@ class NegExpr extends FormulaExpr {
         this.formula = formula;
     }
     sexpr(){
-        return "(" + this.symbolName + this.formula.sexpr() + ")";
+        return "(" + this.symbolName + " " + this.formula.sexpr() + ")";
     }
     toZ3Declaration(fd : number){
         this.formula.toZ3Declaration(fd);
