@@ -14,7 +14,12 @@ function max(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if (x >= y) {
-        return x; 
+        if(x >= 0) {
+            return x;
+        }
+        else {
+            return x;
+        }
     } else {
         return y;
     }
