@@ -3,80 +3,80 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import * as fs from "fs";
+import * as FS from "fs";
 import { TypeExpr, FuncType, UninterpretedType } from "./type_expr";
 
 abstract class TermExpr {
-    readonly name : string;
-    readonly symbolName : string;
-    readonly ty : TypeExpr;
-    static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
-    constructor(name : string, symbolName : string, ty : TypeExpr){
+    readonly name: string;
+    readonly symbolName: string;
+    readonly ty: TypeExpr;
+    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
+    constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
         this.symbolName = symbolName;
         this.ty = ty;
-        if(!TermExpr.symbolTable.has(this.name)){
+        if (!TermExpr.symbolTable.has(this.name)) {
             TermExpr.symbolTable.set(this.name, false);
         }
     }
-    toZ3DeclarationSort(fd : number) : void {
+    toZ3DeclarationSort(fd: number): void {
         let thisTypeTemp = this.ty.getType();
-        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)){
-            fs.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
+        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
+            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);
         }
     }
-    abstract toZ3Declaration(fd : number) : void;
-    abstract sexpr() : string;
+    abstract toZ3Declaration(fd: number): void;
+    abstract sexpr(): string;
 }
 
 class VarExpr extends TermExpr {
-    constructor(name : string, ty : TypeExpr){
+    constructor(name: string, ty: TypeExpr) {
         super(name, name, ty);
     }
-    toZ3Declaration(fd : number){
+    toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
-        if(!VarExpr.symbolTable.get(this.symbolName)){
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
+        if (!VarExpr.symbolTable.get(this.symbolName)) {
+            FS.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
-    sexpr(){
+    sexpr() {
         return this.symbolName;
     }
 }
 
 class FuncExpr extends TermExpr {
-    readonly terms : TermExpr[];
-    constructor(name : string, ty : TypeExpr, terms : TermExpr[]){
+    readonly terms: TermExpr[];
+    constructor(name: string, ty: TypeExpr, terms: TermExpr[]) {
         let collectType = new FuncType(terms.map(x => x.ty), ty);
-        switch(terms.length){
+        switch (terms.length) {
             case 0: {
                 super(name + "l__r", name, collectType);
                 break;
-            }   
+            }
             case 1: {
                 super(name + "l_" + terms[0].name + "_r", name, collectType)
                 break;
             }
             default: {
                 super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", name, collectType);
-                break;  
+                break;
             }
         }
         this.terms = terms;
     }
-    toZ3Declaration(fd : number){
+    toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
-        for (let item of this.terms){
+        for (let item of this.terms) {
             item.toZ3Declaration(fd);
         }
-        if(!FuncExpr.symbolTable.get(this.symbolName)){
-            fs.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
+        if (!FuncExpr.symbolTable.get(this.symbolName)) {
+            FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
             FuncExpr.symbolTable.set(this.symbolName, true);
         }
     }
-    sexpr(){
+    sexpr() {
         return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
     }
 }
