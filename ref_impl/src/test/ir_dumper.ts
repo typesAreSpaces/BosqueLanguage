@@ -6,10 +6,9 @@
 import * as FS from "fs";
 import * as Path from "path";
 import chalk from "chalk";
-import { Interpreter } from "../interpreter/interpreter";
-import { ValueOps } from "../interpreter/value";
 import { MIREmitter } from "../compiler/mir_emitter";
-import { PackageConfig, MIRAssembly } from "../compiler/mir_assembly";
+import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
+import { MIRBody } from "../compiler/mir_ops";
 
 function runApp(app: string) {
     process.stdout.write("Reading app code...\n");
@@ -43,24 +42,26 @@ function runApp(app: string) {
         process.exit(1);
     }
 
-    process.stdout.write("Executing app code...\n");
+    process.stdout.write("Emitting IR...\n");
 
-    const ip = new Interpreter(masm as MIRAssembly, true, true, true);
-    let res: any = undefined;
     try {
-        res = ValueOps.diagnosticPrintValue(ip.evaluateRootNamespaceCall("NSMain", "main", []));
+        const irv = (masm as MIRAssembly).functionDecls.get(process.argv[3]) as MIRFunctionDecl;
+        const dgml = (irv.invoke.body as MIRBody).dgmlify(irv.fkey);
+
+        process.stdout.write("Emitting IR...\n");
+        FS.writeFileSync("mir_ir.dgml", dgml);
     }
     catch (ex) {
         process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
         process.exit(1);
     }
 
-    process.stdout.write(`Done with -- ${res}\n`);
+    process.stdout.write("Success, ir output in mir_ir.dgml\n");
     process.exit(0);
 }
 
-if (!process.argv[2]) {
-    process.stdout.write(chalk.red("Error -- Please specify a source file as an argument"));
+if (!process.argv[3]) {
+    process.stdout.write(chalk.red("Error -- Please specify a source file and invokeid as arguments"));
     process.exit(1);
 }
 
