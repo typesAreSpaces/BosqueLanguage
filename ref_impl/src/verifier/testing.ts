@@ -3,9 +3,9 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { IntType, BoolType, UninterpretedType } from "./type_expr";
+import { IntType, UninterpretedType } from "./type_expr";
 import { VarExpr, FuncExpr } from "./term_expr"
-import { PredicateExpr, ForAllExpr, AndExpr, NegExpr, OrExpr, EqualityExpr } from "./formula_expr"
+import { PredicateExpr, AndExpr, NegExpr, OrExpr, EqualityExpr } from "./formula_expr"
 import * as fs from "fs";
 
 let fd = fs.openSync('file.z3', 'w');
@@ -16,12 +16,12 @@ let y = new VarExpr("y", new IntType());
 let a = new PredicateExpr("a", []);
 let b = new PredicateExpr("b", []);
 let pxy = new PredicateExpr("p", [x, y, x, y, x, y]);
-let fxy = new FuncExpr("f", new IntType(), [x, y]);
-let extraLong = new ForAllExpr(x, 
-    new AndExpr( 
-        pxy, 
-        new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))
-    ));
+// let fxy = new FuncExpr("f", new IntType(), [x, y]);
+// let extraLong = new ForAllExpr(x, 
+//     new AndExpr( 
+//         pxy, 
+//         new ForAllExpr(y, new PredicateExpr("p", [fxy, x, x, y, fxy, x]))
+//     ));
 
 // Repeating the same formula
 // wont produce repeated declarations
@@ -33,7 +33,7 @@ pxy.toZ3(fd, true);
 new NegExpr(new EqualityExpr(new AndExpr(a, b), new NegExpr(new OrExpr(new NegExpr(a), new NegExpr(b))))).toZ3(fd, false);
 
 // Testing a predicate
-new PredicateExpr("narda", [pxy, x]).toZ3(fd, false); 
+new PredicateExpr("narda", [pxy, x]).toZ3(fd, false);
 new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd, true);
 new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd, true);
 new PredicateExpr("p", [x, y, x, y, x, y]).toZ3(fd, true);

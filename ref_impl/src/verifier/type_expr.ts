@@ -14,9 +14,9 @@
 // the grouded ast and build a `table' using
 
 abstract class TypeExpr {
-    abstract readonly isPrimitiveType : boolean;
-    abstract readonly isUninterpreted : boolean;
-    abstract getType() : string;
+    abstract readonly isPrimitiveType: boolean;
+    abstract readonly isUninterpreted: boolean;
+    abstract getType(): string;
 }
 
 class IntType extends TypeExpr {
@@ -30,7 +30,7 @@ class IntType extends TypeExpr {
 class BoolType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
-    getType(){
+    getType() {
         return "Bool";
     }
 }
@@ -46,22 +46,22 @@ class StringType extends TypeExpr {
 class FuncType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
-    readonly domain : TypeExpr[];
-    readonly image : TypeExpr;
-    constructor(domain : TypeExpr[], image  : TypeExpr){
+    readonly domain: TypeExpr[];
+    readonly image: TypeExpr;
+    constructor(domain: TypeExpr[], image: TypeExpr) {
         super();
         this.domain = domain;
         this.image = image;
     }
-    getType(){
-        if(this.domain.length == 0){
+    getType(): string {
+        if (this.domain.length == 0) {
             return "() " + this.image.getType();
         }
-        else{
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " + 
-            (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()), 
-            this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
-            + ") " + this.image.getType();
+        else {
+            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
+                (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()),
+                this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
+                + ") " + this.image.getType();
         }
     }
 }
@@ -71,16 +71,16 @@ class FuncType extends TypeExpr {
 class UninterpretedType extends TypeExpr {
     isPrimitiveType = true; // ? Yes, for the moment..
     isUninterpreted = true;
-    readonly name : string;
-    static readonly symbolTable : Map<string, boolean> = new Map<string, boolean>();
-    constructor(name : string){
+    readonly name: string;
+    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
+    constructor(name: string) {
         super();
         this.name = name;
-        if(!UninterpretedType.symbolTable.has(this.name)){
+        if (!UninterpretedType.symbolTable.has(this.name)) {
             UninterpretedType.symbolTable.set(this.name, false);
         }
     }
-    getType(){
+    getType() {
         return this.name;
     }
 }
