@@ -8,12 +8,14 @@ import * as Path from "path";
 import chalk from "chalk";
 import { MIREmitter } from "../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
-import { MIRBody, MIRBasicBlock, MIROpTag } from "../compiler/mir_ops";
-import { } from "../compiler/mir_ssa";
+import { MIRBody, MIRBasicBlock, MIROpTag, MIRBinCmp, MIRVarParameter } from "../compiler/mir_ops";
+import { } from "../compiler/mir_ssa"; // We might need somethings from there, eventually!
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
-import assert = require("assert");
+import { } from "../verifier/type_expr";
+import { } from "../verifier/term_expr";
+import { PredicateExpr, FormulaExpr, AndExpr } from "../verifier/formula_expr";
 
-function getControlFlow(app: string, section: string): void {
+function getControlFlow(app: string, section: string, fd : number) : void {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
 
@@ -52,7 +54,7 @@ function getControlFlow(app: string, section: string): void {
             process.exit(0);
         }
         else {
-            gatherFormulas(ibody);
+            collectFormulas(ibody).toZ3(fd, false);
             process.stdout.write("Success as blocks!\n");
             process.exit(0);
         }
@@ -63,7 +65,7 @@ function getControlFlow(app: string, section: string): void {
     }
 }
 
-function gatherFormulas(ibody: Map<string, MIRBasicBlock>) {
+function collectFormulas(ibody: Map<string, MIRBasicBlock>) : FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
     console.log("Blocks:-----------------------------------------------------------------------");
@@ -75,161 +77,172 @@ function gatherFormulas(ibody: Map<string, MIRBasicBlock>) {
     console.log("Flow:-------------------------------------------------------------------------");
     console.log(flow);
 
-    blocks.map(block => block.ops.map(op => {
+    // I need to do something with this 
+    // array of formulas -- make a huge conjuction!
+
+    let formulass = blocks.map(block => block.ops.map(op => {
         switch (op.tag) {
             case MIROpTag.LoadConst:
             case MIROpTag.LoadConstTypedString:
             case MIROpTag.AccessNamespaceConstant:
             case MIROpTag.AccessConstField:
             case MIROpTag.LoadFieldDefaultValue: {
-                break;
+                return new PredicateExpr("notdone", []);
             }
             case MIROpTag.AccessCapturedVariable: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.AccessArgVariable: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.AccessLocalVariable: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorPrimary: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorPrimaryCollectionEmpty: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorPrimaryCollectionSingletons: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorPrimaryCollectionCopies: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorPrimaryCollectionMixed: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorTuple: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorRecord: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.ConstructorLambda: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.CallNamespaceFunction: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.CallStaticFunction: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRAccessFromIndex: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromIndecies: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRAccessFromProperty: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromProperties: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRAccessFromField: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromFields: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromTypeTuple: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromTypeRecord: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRProjectFromTypeConcept: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRModifyWithIndecies: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRModifyWithProperties: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRModifyWithFields: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRStructuredExtendTuple: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRStructuredExtendRecord: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRStructuredExtendObject: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRInvokeKnownTarget: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRInvokeVirtualTarget: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRCallLambda: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRPrefixOp: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRBinOp: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRBinEq: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRBinCmp: {
-                break;
+                // Currently working here
+                console.log(op);
+                let opBinCmp = op as MIRBinCmp;
+                // new PredicateExpr(opBinCmp.op, [opToFormula((opBinCmp.lhs as MIRVarParameter)), opToFormula()]);
+                new PredicateExpr(opBinCmp.op, []);
+                opBinCmp.lhs as MIRVarParameter;
+                // opToFormula(op);
+                return new PredicateExpr("notdone", []);
             }
             case MIROpTag.MIRRegAssign: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRTruthyConvert: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRVarStore: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRReturnAssign: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRAssert: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRCheck: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRDebug: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRJump: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRJumpCond: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRJumpNone: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             case MIROpTag.MIRVarLifetimeStart:
             case MIROpTag.MIRVarLifetimeEnd: {
-                break;
+                return new PredicateExpr("notdone", []);;
             }
             default:
-                assert(false);
-                break;
+                return new PredicateExpr("thismightbeaproblem", []);;
         }
-    }
-    ));
-
+    }));
+    return (formulass as FormulaExpr[][])
+    .map(formulas => formulas
+        .reduce((a, b) => new AndExpr(a, b)))
+        .reduce((a, b) => new AndExpr(a, b));
 }
 
 ////
@@ -237,9 +250,12 @@ function gatherFormulas(ibody: Map<string, MIRBasicBlock>) {
 
 // Mac Machine
 // let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
-
 // Windows Machine
 let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
 
 let section = "NSMain::max";
-setImmediate(() => getControlFlow(bosqueFile, section));
+let fd = FS.openSync('file.z3', 'w');
+setImmediate(() => {
+    getControlFlow(bosqueFile, section, fd);
+    FS.closeSync(fd);
+});

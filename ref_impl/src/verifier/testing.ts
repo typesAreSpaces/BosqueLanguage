@@ -52,4 +52,7 @@ p4.toZ3(fd, false);
 (new FuncExpr("f", new IntType(), [y, x])).toZ3Declaration(fd);
 (new FuncExpr("f", new IntType(), [y, y])).toZ3Declaration(fd);
 
+let newOne = new AndExpr(pxy, pxy);
+newOne.toZ3(fd, false);
+
 fs.closeSync(fd);
