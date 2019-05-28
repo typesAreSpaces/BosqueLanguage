@@ -8,8 +8,10 @@ import * as Path from "path";
 import chalk from "chalk";
 import { MIREmitter } from "../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
-import { MIRBody, MIRBasicBlock } from "../compiler/mir_ops";
+import { MIRBody, MIRBasicBlock, MIROpTag } from "../compiler/mir_ops";
+import { } from "../compiler/mir_ssa";
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
+import assert = require("assert");
 
 function getControlFlow(app: string, section: string): void {
 
@@ -72,9 +74,172 @@ function gatherFormulas(ibody: Map<string, MIRBasicBlock>) {
     blocks.map(x => console.log(x.jsonify()));
     console.log("Flow:-------------------------------------------------------------------------");
     console.log(flow);
+
+    blocks.map(block => block.ops.map(op => {
+        switch (op.tag) {
+            case MIROpTag.LoadConst:
+            case MIROpTag.LoadConstTypedString:
+            case MIROpTag.AccessNamespaceConstant:
+            case MIROpTag.AccessConstField:
+            case MIROpTag.LoadFieldDefaultValue: {
+                break;
+            }
+            case MIROpTag.AccessCapturedVariable: {
+                break;
+            }
+            case MIROpTag.AccessArgVariable: {
+                break;
+            }
+            case MIROpTag.AccessLocalVariable: {
+                break;
+            }
+            case MIROpTag.ConstructorPrimary: {
+                break;
+            }
+            case MIROpTag.ConstructorPrimaryCollectionEmpty: {
+                break;
+            }
+            case MIROpTag.ConstructorPrimaryCollectionSingletons: {
+                break;
+            }
+            case MIROpTag.ConstructorPrimaryCollectionCopies: {
+                break;
+            }
+            case MIROpTag.ConstructorPrimaryCollectionMixed: {
+                break;
+            }
+            case MIROpTag.ConstructorTuple: {
+                break;
+            }
+            case MIROpTag.ConstructorRecord: {
+                break;
+            }
+            case MIROpTag.ConstructorLambda: {
+                break;
+            }
+            case MIROpTag.CallNamespaceFunction: {
+                break;
+            }
+            case MIROpTag.CallStaticFunction: {
+                break;
+            }
+            case MIROpTag.MIRAccessFromIndex: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromIndecies: {
+                break;
+            }
+            case MIROpTag.MIRAccessFromProperty: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromProperties: {
+                break;
+            }
+            case MIROpTag.MIRAccessFromField: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromFields: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromTypeTuple: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromTypeRecord: {
+                break;
+            }
+            case MIROpTag.MIRProjectFromTypeConcept: {
+                break;
+            }
+            case MIROpTag.MIRModifyWithIndecies: {
+                break;
+            }
+            case MIROpTag.MIRModifyWithProperties: {
+                break;
+            }
+            case MIROpTag.MIRModifyWithFields: {
+                break;
+            }
+            case MIROpTag.MIRStructuredExtendTuple: {
+                break;
+            }
+            case MIROpTag.MIRStructuredExtendRecord: {
+                break;
+            }
+            case MIROpTag.MIRStructuredExtendObject: {
+                break;
+            }
+            case MIROpTag.MIRInvokeKnownTarget: {
+                break;
+            }
+            case MIROpTag.MIRInvokeVirtualTarget: {
+                break;
+            }
+            case MIROpTag.MIRCallLambda: {
+                break;
+            }
+            case MIROpTag.MIRPrefixOp: {
+                break;
+            }
+            case MIROpTag.MIRBinOp: {
+                break;
+            }
+            case MIROpTag.MIRBinEq: {
+                break;
+            }
+            case MIROpTag.MIRBinCmp: {
+                break;
+            }
+            case MIROpTag.MIRRegAssign: {
+                break;
+            }
+            case MIROpTag.MIRTruthyConvert: {
+                break;
+            }
+            case MIROpTag.MIRVarStore: {
+                break;
+            }
+            case MIROpTag.MIRReturnAssign: {
+                break;
+            }
+            case MIROpTag.MIRAssert: {
+                break;
+            }
+            case MIROpTag.MIRCheck: {
+                break;
+            }
+            case MIROpTag.MIRDebug: {
+                break;
+            }
+            case MIROpTag.MIRJump: {
+                break;
+            }
+            case MIROpTag.MIRJumpCond: {
+                break;
+            }
+            case MIROpTag.MIRJumpNone: {
+                break;
+            }
+            case MIROpTag.MIRVarLifetimeStart:
+            case MIROpTag.MIRVarLifetimeEnd: {
+                break;
+            }
+            default:
+                assert(false);
+                break;
+        }
+    }
+    ));
+
 }
 
 ////
 //Entrypoint
 
-setImmediate(() => getControlFlow("/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq", "NSMain::max"));
+// Mac Machine
+// let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
+
+// Windows Machine
+let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
+
+let section = "NSMain::max";
+setImmediate(() => getControlFlow(bosqueFile, section));
