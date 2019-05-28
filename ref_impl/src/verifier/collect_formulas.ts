@@ -3,21 +3,15 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-// Idea: Take a MIRBody and
-// gather the formulas from the blocks
-// But MIRBody is a class!
-
-// import { SourceInfo } from "../ast/parser";
-// import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/ir_info";
 import * as FS from "fs";
 import * as Path from "path";
+import chalk from "chalk";
 import { MIREmitter } from "../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
 import { MIRBody, MIRBasicBlock } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
 
-function getIRV(app: string, section: string): MIRBody | void {
-    process.stdout.write("Reading app code...\n");
+function getControlFlow(app: string, section: string): void {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
 
@@ -30,35 +24,57 @@ function getIRV(app: string, section: string): MIRBody | void {
         const collectionsdata = FS.readFileSync(collectionsdir).toString();
 
         const appdir = app;
+        console.log(appdir);
         const appdata = FS.readFileSync(appdir).toString();
 
         files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];
     }
     catch (ex) {
+        process.stdout.write(chalk.red(`Read failed with exception -- ${ex}\n`));
         process.exit(1);
     }
 
     const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), files);
 
     if (errors.length !== 0) {
+        for (let i = 0; i < errors.length; ++i) {
+            process.stdout.write(chalk.red(`Parse error -- ${errors[i]}\n`));
+        }
         process.exit(1);
     }
-
-    process.stdout.write("Emitting IR...\n");
 
     try {
         const ibody = (((masm as MIRAssembly).functionDecls.get(section) as MIRFunctionDecl).invoke.body as MIRBody).body;
-        const blocks = topologicalOrder(ibody as Map<string, MIRBasicBlock>);
-        const flow = computeBlockLinks(ibody as Map<string, MIRBasicBlock>);
-        console.log("Blocks:\n");
-        console.log(blocks);
-        console.log("Flow:\n");
-        console.log(flow);
-        process.exit(1);
+        if (typeof (ibody) === "string") {
+            process.stdout.write("Success as string!\n");
+            process.exit(0);
+        }
+        else {
+            gatherFormulas(ibody);
+            process.stdout.write("Success as blocks!\n");
+            process.exit(0);
+        }
     }
     catch (ex) {
+        process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
         process.exit(1);
     }
 }
 
-getIRV("../test/apps/max/main.bsq", "NSMain::max");
+function gatherFormulas(ibody: Map<string, MIRBasicBlock>) {
+    const blocks = topologicalOrder(ibody);
+    const flow = computeBlockLinks(ibody);
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
+    console.log("Flow:-------------------------------------------------------------------------");
+    console.log(flow);
+}
+
+////
+//Entrypoint
+
+setImmediate(() => getControlFlow("/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq", "NSMain::max"));
