@@ -18,7 +18,7 @@ abstract class FormulaExpr {
     static fd = FS.openSync('file.z3', 'w');
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        [["<", true], ["<=", true], [">", true], [">=", true]]
+        [">", ">=", "<", "<=", "="].map(x => [x, true])
     );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;

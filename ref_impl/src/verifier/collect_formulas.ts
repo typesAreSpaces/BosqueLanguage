@@ -13,7 +13,7 @@ import { } from "../compiler/mir_ssa"; // We might need somethings from there, e
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr } from "../verifier/formula_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
 
 function resolveType(typeName: string): TypeExpr {
     switch (typeName) {
@@ -85,6 +85,8 @@ function getControlFlow(app: string, section: string, fd: number): void {
     }
 }
 
+// params is a sorted array of MIRFunctionParameter
+// i.e. the first element corresponds to the first argument, ... and so on.
 function collectFormulas(ibody: Map<string, MIRBasicBlock>, params: MIRFunctionParameter[]): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
@@ -104,157 +106,157 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, params: MIRFunctionP
             case MIROpTag.AccessNamespaceConstant:
             case MIROpTag.AccessConstField:
             case MIROpTag.LoadFieldDefaultValue: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone1", []);
             }
             case MIROpTag.AccessCapturedVariable: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone2", []);
             }
             case MIROpTag.AccessArgVariable: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone3", []);
             }
             case MIROpTag.AccessLocalVariable: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone4", []);
             }
             case MIROpTag.ConstructorPrimary: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone5", []);
             }
             case MIROpTag.ConstructorPrimaryCollectionEmpty: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone6", []);
             }
             case MIROpTag.ConstructorPrimaryCollectionSingletons: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone7", []);
             }
             case MIROpTag.ConstructorPrimaryCollectionCopies: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone8", []);
             }
             case MIROpTag.ConstructorPrimaryCollectionMixed: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone9", []);
             }
             case MIROpTag.ConstructorTuple: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone10", []);
             }
             case MIROpTag.ConstructorRecord: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone11", []);
             }
             case MIROpTag.ConstructorLambda: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone12", []);
             }
             case MIROpTag.CallNamespaceFunction: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone13", []);
             }
             case MIROpTag.CallStaticFunction: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone14", []);
             }
             case MIROpTag.MIRAccessFromIndex: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone15", []);
             }
             case MIROpTag.MIRProjectFromIndecies: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone16", []);
             }
             case MIROpTag.MIRAccessFromProperty: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone17", []);
             }
             case MIROpTag.MIRProjectFromProperties: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone18", []);
             }
             case MIROpTag.MIRAccessFromField: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone19", []);
             }
             case MIROpTag.MIRProjectFromFields: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone20", []);
             }
             case MIROpTag.MIRProjectFromTypeTuple: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone21", []);
             }
             case MIROpTag.MIRProjectFromTypeRecord: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone22", []);
             }
             case MIROpTag.MIRProjectFromTypeConcept: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone23", []);
             }
             case MIROpTag.MIRModifyWithIndecies: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone24", []);
             }
             case MIROpTag.MIRModifyWithProperties: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone25", []);
             }
             case MIROpTag.MIRModifyWithFields: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone26", []);
             }
             case MIROpTag.MIRStructuredExtendTuple: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone27", []);
             }
             case MIROpTag.MIRStructuredExtendRecord: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone28", []);
             }
             case MIROpTag.MIRStructuredExtendObject: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone29", []);
             }
             case MIROpTag.MIRInvokeKnownTarget: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone30", []);
             }
             case MIROpTag.MIRInvokeVirtualTarget: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone31", []);
             }
             case MIROpTag.MIRCallLambda: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone32", []);
             }
             case MIROpTag.MIRPrefixOp: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone33", []);
             }
             case MIROpTag.MIRBinOp: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone34", []);
             }
             case MIROpTag.MIRBinEq: {
-                return new PredicateExpr("notdone", []);
+                return new PredicateExpr("notdone35", []);
             }
             case MIROpTag.MIRBinCmp: {
-                // Currently working here
                 let opBinCmp = op as MIRBinCmp;
-                // Is it ok to assume types[0] == typeOf(lhs) and types[1] == typeOf(rhs)?
                 let types = params.map(x => x.type.trkey);
-                return new PredicateExpr(opBinCmp.op,
-                    [
-                        new VarExpr((opBinCmp.lhs as MIRVarParameter).nameID, resolveType(types[0])),
-                        new VarExpr((opBinCmp.rhs as MIRVarParameter).nameID, resolveType(types[1]))
-                    ]);
+                let opFormula = new PredicateExpr(opBinCmp.op, [
+                    new VarExpr((opBinCmp.lhs as MIRVarParameter).nameID, resolveType(types[0])),
+                    new VarExpr((opBinCmp.rhs as MIRVarParameter).nameID, resolveType(types[1]))
+                ]);
+                let regName = opBinCmp.trgt.nameID[0] == "#" ? opBinCmp.trgt.nameID.slice(1) : opBinCmp.trgt.nameID;
+                let regFormula = new EqualityExpr(new VarExpr(regName, new BoolType()), opFormula);
+                return new AndExpr(opFormula, regFormula);
             }
             case MIROpTag.MIRRegAssign: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone37", []);
             }
             case MIROpTag.MIRTruthyConvert: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone38", []);
             }
             case MIROpTag.MIRVarStore: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone39", []);
             }
             case MIROpTag.MIRReturnAssign: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone40", []);
             }
             case MIROpTag.MIRAssert: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone41", []);
             }
             case MIROpTag.MIRCheck: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone42", []);
             }
             case MIROpTag.MIRDebug: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone43", []);
             }
             case MIROpTag.MIRJump: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone44", []);
             }
             case MIROpTag.MIRJumpCond: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone45", []);
             }
             case MIROpTag.MIRJumpNone: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone46", []);
             }
             case MIROpTag.MIRVarLifetimeStart:
             case MIROpTag.MIRVarLifetimeEnd: {
-                return new PredicateExpr("notdone", []);;
+                return new PredicateExpr("notdone47", []);
             }
             default:
-                return new PredicateExpr("thismightbeaproblem", []);;
+                return new PredicateExpr("thismightbeaproblem", []);
         }
     }));
     return (formulass as FormulaExpr[][])
@@ -267,9 +269,9 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, params: MIRFunctionP
 //Entrypoint
 
 // Mac Machine
-let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
+// let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
 // Windows Machine
-// let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
+let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
 
 let section = "NSMain::max";
 let fd = FS.openSync('file.z3', 'w');
