@@ -11,11 +11,28 @@ import { PackageConfig, MIRAssembly, MIRFunctionDecl, MIRFunctionParameter } fro
 import { MIRBody, MIRBasicBlock, MIROpTag, MIRBinCmp, MIRVarParameter } from "../compiler/mir_ops";
 import { } from "../compiler/mir_ssa"; // We might need somethings from there, eventually!
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
-import { IntType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr } from "../verifier/formula_expr";
 
-function getControlFlow(app: string, section: string, fd : number) : void {
+function resolveType(typeName: string): TypeExpr {
+    switch (typeName) {
+        case "NSCore::Int": {
+            return new IntType();
+        }
+        case "NSCore::Bool": {
+            return new BoolType();
+        }
+        case "NSCore::String": {
+            return new StringType();
+        }
+        default: {
+            return new UninterpretedType(typeName);
+        }
+    }
+}
+
+function getControlFlow(app: string, section: string, fd: number): void {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
 
@@ -68,7 +85,7 @@ function getControlFlow(app: string, section: string, fd : number) : void {
     }
 }
 
-function collectFormulas(ibody: Map<string, MIRBasicBlock>, params : MIRFunctionParameter[]) : FormulaExpr {
+function collectFormulas(ibody: Map<string, MIRBasicBlock>, params: MIRFunctionParameter[]): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
     console.log("Blocks:-----------------------------------------------------------------------");
@@ -194,13 +211,13 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, params : MIRFunction
             case MIROpTag.MIRBinCmp: {
                 // Currently working here
                 let opBinCmp = op as MIRBinCmp;
-                console.log("The whole operation------------------------------");
-                console.log(op);
-                console.log("LHS----------------------------------------------");
-                console.log(opBinCmp.lhs as MIRVarParameter);
-                console.log("Parameters---------------------------------------");
-                console.log(params);
-                return new PredicateExpr(opBinCmp.op, [new VarExpr((opBinCmp.lhs as MIRVarParameter).nameID, new IntType()), new VarExpr((opBinCmp.rhs as MIRVarParameter).nameID, new IntType())]);
+                // Is it ok to assume types[0] == typeOf(lhs) and types[1] == typeOf(rhs)?
+                let types = params.map(x => x.type.trkey);
+                return new PredicateExpr(opBinCmp.op,
+                    [
+                        new VarExpr((opBinCmp.lhs as MIRVarParameter).nameID, resolveType(types[0])),
+                        new VarExpr((opBinCmp.rhs as MIRVarParameter).nameID, resolveType(types[1]))
+                    ]);
             }
             case MIROpTag.MIRRegAssign: {
                 return new PredicateExpr("notdone", []);;
@@ -241,8 +258,8 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, params : MIRFunction
         }
     }));
     return (formulass as FormulaExpr[][])
-    .map(formulas => formulas
-        .reduce((a, b) => new AndExpr(a, b)))
+        .map(formulas => formulas
+            .reduce((a, b) => new AndExpr(a, b)))
         .reduce((a, b) => new AndExpr(a, b));
 }
 
@@ -250,9 +267,9 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, params : MIRFunction
 //Entrypoint
 
 // Mac Machine
-// let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
+let bosqueFile = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq"
 // Windows Machine
-let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
+// let bosqueFile = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq";
 
 let section = "NSMain::max";
 let fd = FS.openSync('file.z3', 'w');

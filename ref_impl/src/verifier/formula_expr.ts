@@ -16,7 +16,10 @@ abstract class FormulaExpr {
     readonly symbolName: string;
     readonly ty: TypeExpr;
     static fd = FS.openSync('file.z3', 'w');
-    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
+    // TODO: Add more reserved words from Z3
+    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
+        [["<", true], ["<=", true], [">", true], [">=", true]]
+    );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
         this.symbolName = symbolName;

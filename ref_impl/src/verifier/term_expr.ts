@@ -10,7 +10,10 @@ abstract class TermExpr {
     readonly name: string;
     readonly symbolName: string;
     readonly ty: TypeExpr;
-    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
+    // TODO: Add more reserved words from Z3
+    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
+        [["+", true], ["*", true]]
+    );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
         this.symbolName = symbolName;
