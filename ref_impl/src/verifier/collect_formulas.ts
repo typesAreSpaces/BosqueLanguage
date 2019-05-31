@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
-import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/ir_info";
+import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
@@ -283,12 +283,8 @@ function opToFormula(op: MIROp, section: string, formula : FormulaExpr): Formula
             //     argumentToVarExpr(opReturnAssign.src, section));
             return formula;
         }
-        case MIROpTag.MIRAssert: {
-            console.log("MIRAssert Not implemented yet");
-            return formula;
-        }
-        case MIROpTag.MIRCheck: {
-            console.log("MIRCheck Not implemented yet");
+        case MIROpTag.MIRAbort: {
+            console.log("MIRAbort Not implemented yet");
             return formula;
         }
         case MIROpTag.MIRDebug: {
