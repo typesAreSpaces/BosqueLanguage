@@ -6,7 +6,7 @@
 import { Value, TypedStringValue, EntityValueSimple, ValueOps, ListValue, HashSetValue, HashMapValue, TupleValue, RecordValue, LambdaValue } from "./value";
 import { Environment, PrePostError, raiseRuntimeError, FunctionScope, InvariantError, NotImplementedRuntimeError } from "./interpreter_environment";
 import { MIRAssembly, MIRTupleType, MIRTupleTypeEntry, MIRRecordTypeEntry, MIRRecordType, MIREntityType, MIREntityTypeDecl, MIRFieldDecl, MIROOTypeDecl, MIRType, MIRGlobalDecl, MIRConstDecl, MIRFunctionDecl, MIRStaticDecl, MIRConceptTypeDecl, MIRMethodDecl, MIRInvokeDecl, MIRFunctionType } from "../compiler/mir_assembly";
-import { MIRBody, MIROp, MIROpTag, MIRLoadConst, MIRArgument, MIRTempRegister, MIRRegisterArgument, MIRConstantTrue, MIRConstantString, MIRConstantInt, MIRConstantNone, MIRConstantFalse, MIRLoadConstTypedString, MIRAccessNamespaceConstant, MIRAccessConstField, MIRLoadFieldDefaultValue, MIRAccessCapturedVariable, MIRAccessArgVariable, MIRAccessLocalVariable, MIRConstructorPrimary, MIRConstructorPrimaryCollectionEmpty, MIRConstructorPrimaryCollectionSingletons, MIRConstructorPrimaryCollectionCopies, MIRConstructorPrimaryCollectionMixed, MIRConstructorTuple, MIRConstructorRecord, MIRConstructorLambda, MIRCallNamespaceFunction, MIRCallStaticFunction, MIRAccessFromIndex, MIRProjectFromIndecies, MIRAccessFromProperty, MIRAccessFromField, MIRProjectFromProperties, MIRProjectFromFields, MIRProjectFromTypeTuple, MIRProjectFromTypeRecord, MIRProjectFromTypeConcept, MIRModifyWithIndecies, MIRModifyWithProperties, MIRModifyWithFields, MIRStructuredExtendTuple, MIRStructuredExtendRecord, MIRStructuredExtendObject, MIRInvokeKnownTarget, MIRInvokeVirtualTarget, MIRCallLambda, MIRPrefixOp, MIRBinOp, MIRBinCmp, MIRBinEq, MIRRegAssign, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRJumpNone, MIRVarLifetimeStart, MIRVarLifetimeEnd, MIRCheck, MIRAssert, MIRTruthyConvert, MIRDebug, MIRPhi, MIRVarLocal } from "../compiler/mir_ops";
+import { MIRBody, MIROp, MIROpTag, MIRLoadConst, MIRArgument, MIRTempRegister, MIRRegisterArgument, MIRConstantTrue, MIRConstantString, MIRConstantInt, MIRConstantNone, MIRConstantFalse, MIRLoadConstTypedString, MIRAccessNamespaceConstant, MIRAccessConstField, MIRLoadFieldDefaultValue, MIRAccessCapturedVariable, MIRAccessArgVariable, MIRAccessLocalVariable, MIRConstructorPrimary, MIRConstructorPrimaryCollectionEmpty, MIRConstructorPrimaryCollectionSingletons, MIRConstructorPrimaryCollectionCopies, MIRConstructorPrimaryCollectionMixed, MIRConstructorTuple, MIRConstructorRecord, MIRConstructorLambda, MIRCallNamespaceFunction, MIRCallStaticFunction, MIRAccessFromIndex, MIRProjectFromIndecies, MIRAccessFromProperty, MIRAccessFromField, MIRProjectFromProperties, MIRProjectFromFields, MIRProjectFromTypeTuple, MIRProjectFromTypeRecord, MIRProjectFromTypeConcept, MIRModifyWithIndecies, MIRModifyWithProperties, MIRModifyWithFields, MIRStructuredExtendTuple, MIRStructuredExtendRecord, MIRStructuredExtendObject, MIRInvokeKnownTarget, MIRInvokeVirtualTarget, MIRCallLambda, MIRPrefixOp, MIRBinOp, MIRBinCmp, MIRBinEq, MIRRegAssign, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRJumpNone, MIRVarLifetimeStart, MIRVarLifetimeEnd, MIRTruthyConvert, MIRDebug, MIRPhi, MIRVarLocal, MIRIsTypeOfNone, MIRIsTypeOfSome, MIRIsTypeOf, MIRLogicStore, MIRAbort } from "../compiler/mir_ops";
 
 import * as assert from "assert";
 import { BuiltinCalls, BuiltinCallSig } from "./builtins";
@@ -684,6 +684,25 @@ class Interpreter {
                 }
                 break;
             }
+            case MIROpTag.MIRIsTypeOfNone: {
+                const ton = op as MIRIsTypeOfNone;
+                const argv = this.getArgValue(fscope, ton.arg);
+                fscope.assignTmpReg(ton.trgt.regID, argv === undefined);
+                break;
+            }
+            case MIROpTag.MIRIsTypeOfSome: {
+                const tos = op as MIRIsTypeOfSome;
+                const argv = this.getArgValue(fscope, tos.arg);
+                fscope.assignTmpReg(tos.trgt.regID, argv !== undefined);
+                break;
+            }
+            case MIROpTag.MIRIsTypeOf: {
+                const tog = op as MIRIsTypeOf;
+                const argv = this.getArgValue(fscope, tog.arg);
+                const istype = this.m_env.assembly.typeMap.get(tog.oftype) as MIRType;
+                fscope.assignTmpReg(tog.trgt.regID, this.m_env.assembly.subtypeOf(ValueOps.getValueType(argv), istype));
+                break;
+            }
             case MIROpTag.MIRRegAssign: {
                 const regop = op as MIRRegAssign;
                 fscope.assignTmpReg(regop.trgt.regID, this.getArgValue(fscope, regop.src));
@@ -692,6 +711,13 @@ class Interpreter {
             case MIROpTag.MIRTruthyConvert: {
                 const tcop = op as MIRTruthyConvert;
                 fscope.assignTmpReg(tcop.trgt.regID, ValueOps.convertBoolOrNoneToBool(this.getArgValue(fscope, tcop.src)));
+                break;
+            }
+            case MIROpTag.MIRLogicStore: {
+                const llop = op as MIRLogicStore;
+                const lhv = this.getArgValue(fscope, llop.lhs) as boolean;
+                const rhv = this.getArgValue(fscope, llop.rhs) as boolean;
+                fscope.assignTmpReg(llop.trgt.regID, llop.op === "&" ? (lhv && rhv) : (lhv || rhv));
                 break;
             }
             case MIROpTag.MIRVarStore: {
@@ -704,16 +730,9 @@ class Interpreter {
                 fscope.assignVar(ra.name.nameID, this.getArgValue(fscope, ra.src));
                 break;
             }
-            case MIROpTag.MIRAssert: {
-                const asrt = op as MIRAssert;
-                if (this.m_doAssertCheck && !this.getArgValue(fscope, asrt.cond)) {
-                    raiseRuntimeError();
-                }
-                break;
-            }
-            case MIROpTag.MIRCheck: {
-                const chk = op as MIRCheck;
-                if (!this.getArgValue(fscope, chk.cond)) {
+            case MIROpTag.MIRAbort: {
+                const abrt = op as MIRAbort;
+                if (this.m_doAssertCheck || abrt.releaseEnable) {
                     raiseRuntimeError();
                 }
                 break;
