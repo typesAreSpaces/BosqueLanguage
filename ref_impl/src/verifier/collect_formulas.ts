@@ -5,7 +5,7 @@
 
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
-import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, UnionType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
 
@@ -40,20 +40,20 @@ function resolveType(typeName: string): TypeExpr {
             return new BoolType();
         }
         default: {
-            if(typeName.length > 3){
-                switch(typeName.substr(0, 4)) {
-                    case "=int" : {
+            if (typeName.length > 3) {
+                switch (typeName.substr(0, 4)) {
+                    case "=int": {
                         return new IntType();
                     }
-                    case "=str" : {
+                    case "=str": {
                         return new StringType();
                     }
-                    default : {
+                    default: {
                         return new UninterpretedType(typeName);
                     }
                 }
-            }   
-            else{
+            }
+            else {
                 return new UninterpretedType(typeName);
             }
         }
@@ -188,8 +188,8 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // the type of the lhs element in the operation
             let typeOfrhsTerm = resolveType(typesSeen.get(section + "__" + opBinOp.lhs.nameID) as string);
             let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
-                argumentToVarExpr(opBinOp.lhs, section), 
-                argumentToVarExpr(opBinOp.rhs, section) 
+                argumentToVarExpr(opBinOp.lhs, section),
+                argumentToVarExpr(opBinOp.rhs, section)
             ]);
             let opFormula = new EqualityExpr(new VarExpr(regName, typeOfrhsTerm), rhsOfAssignmentTerm);
             return opFormula;
@@ -243,7 +243,7 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // type of the src Variable
             typesSeen.set(regName, typesSeen.get(srcName) as string);
             return new EqualityExpr(
-                argumentToVarExpr(opReturnAssign.name, section), 
+                argumentToVarExpr(opReturnAssign.name, section),
                 argumentToVarExpr(opReturnAssign.src, section));
         }
         case MIROpTag.MIRAssert: {
@@ -292,11 +292,11 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             typesSeen.set(targetName, "NSCore::Int");
             opPhi.src.forEach((value, key) => {
                 console.log(value);
-
+                
 
 
             });
-            let targetExpr = argumentToVarExpr(opPhi.trgt, section);
+            // let targetExpr = argumentToVarExpr(opPhi.trgt, section);
 
             return new PredicateExpr("notdone49", []);
         }
@@ -325,8 +325,6 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     // TODO: This is wrong and the logical formula should 
     // be built by traversing the flow graph in a breadth
     // first search manner
-
-    
 
     return (formulass as FormulaExpr[][])
         .map(formulas => formulas
