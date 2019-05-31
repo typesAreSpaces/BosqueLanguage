@@ -3,10 +3,10 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
-import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
-import { VarExpr } from "../verifier/term_expr";
+import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, UnionType } from "../verifier/type_expr";
+import { VarExpr, FuncExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
 
 // TODO: Probably we dont need to instantiate
@@ -181,12 +181,26 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             return new PredicateExpr("notdone33", []);
         }
         case MIROpTag.MIRBinOp: {
-            return new PredicateExpr("notdone34", []);
+            let opBinOp = op as MIRBinOp;
+            let regName = opBinOp.trgt.nameID[0] == "#" ? "__" + opBinOp.trgt.nameID.slice(1) : opBinOp.trgt.nameID;
+            // We assume the expressions are well-typed.
+            // So we assign the type of the register
+            // the type of the lhs element in the operation
+            let typeOfrhsTerm = resolveType(typesSeen.get(section + "__" + opBinOp.lhs.nameID) as string);
+            let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
+                argumentToVarExpr(opBinOp.lhs, section), 
+                argumentToVarExpr(opBinOp.rhs, section) 
+            ]);
+            let opFormula = new EqualityExpr(new VarExpr(regName, typeOfrhsTerm), rhsOfAssignmentTerm);
+            return opFormula;
         }
         case MIROpTag.MIRBinEq: {
             return new PredicateExpr("notdone35", []);
         }
         case MIROpTag.MIRBinCmp: {
+            // The predicate returned is of type Bool
+            // because the operations to arrive at this
+            // point are <, <=, >, >= only
             let opBinCmp = op as MIRBinCmp;
             let opFormula = new PredicateExpr(opBinCmp.op, [
                 argumentToVarExpr(opBinCmp.lhs, section),
@@ -207,7 +221,13 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             let opVarStore = op as MIRVarStore;
             console.log("Implementing MIRVarStore--------------------------------------");
             console.log(opVarStore);
-
+            console.log("The types seen so far");
+            console.log(typesSeen);
+            // TODO: Currently, the commented code, 
+            // which is the right implementation,
+            // doesn't work as expected due to 
+            // some issues with the global 
+            // variable typesSeen
             // return new EqualityExpr(
             //     argumentToVarExpr(opVarStore.src, section), 
             //     argumentToVarExpr(opVarStore.name, section));
@@ -217,7 +237,14 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             let opReturnAssign = op as MIRReturnAssign;
             console.log("Implementing MIRReturnAssign--------------------------------------");
             console.log(opReturnAssign);
-            return new PredicateExpr("notdone40", []);
+            let regName = section + "__" + opReturnAssign.name.nameID;
+            let srcName = section + "__" + opReturnAssign.src.nameID;
+            // The register Variable will have the same
+            // type of the src Variable
+            typesSeen.set(regName, typesSeen.get(srcName) as string);
+            return new EqualityExpr(
+                argumentToVarExpr(opReturnAssign.name, section), 
+                argumentToVarExpr(opReturnAssign.src, section));
         }
         case MIROpTag.MIRAssert: {
             return new PredicateExpr("notdone41", []);
@@ -253,6 +280,26 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
         case MIROpTag.MIRVarLifetimeEnd: {
             return new PredicateExpr("notdone48", []);
         }
+        case MIROpTag.MIRPhi: {
+            let opPhi = op as MIRPhi;
+            console.log("Implementing MIRPhi-----------------------------");
+            console.log(opPhi);
+            let targetName = section + "__" + opPhi.trgt.nameID;
+            // TODO: Fix this using UnionType or a
+            // clever approach. Currently is just set to 
+            // be the IntType for the purpose of the 
+            // max function demo
+            typesSeen.set(targetName, "NSCore::Int");
+            opPhi.src.forEach((value, key) => {
+                console.log(value);
+
+
+
+            });
+            let targetExpr = argumentToVarExpr(opPhi.trgt, section);
+
+            return new PredicateExpr("notdone49", []);
+        }
         default:
             return new PredicateExpr("thismightbeaproblem", []);
     }
@@ -278,6 +325,9 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     // TODO: This is wrong and the logical formula should 
     // be built by traversing the flow graph in a breadth
     // first search manner
+
+    
+
     return (formulass as FormulaExpr[][])
         .map(formulas => formulas
             .reduce((a, b) => new AndExpr(a, b)))

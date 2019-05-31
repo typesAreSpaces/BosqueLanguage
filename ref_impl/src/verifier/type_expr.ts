@@ -65,6 +65,33 @@ class FuncType extends TypeExpr {
         }
     }
 }
+
+// The getType() of UnionType
+// might have a collition name
+// problem
+// getType() implements idempotency
+class UnionType extends TypeExpr {
+    isPrimitiveType = false;
+    isUninterpreted = false;
+    readonly lhs : TypeExpr;
+    readonly rhs : TypeExpr;
+    constructor(lhs : TypeExpr, rhs : TypeExpr){
+        super();
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+    getType() {
+        let lhsType = this.lhs.getType();
+        let rhsType = this.rhs.getType();
+        if(lhsType === rhsType){
+            return lhsType;
+        }
+        else{
+            return lhsType + "_" + rhsType;
+        }
+    }
+}
+
 // REMARK: Names cannot include `,'
 // or any other symbol that Z3 cannot
 // parse as a valid char for a named expression
@@ -85,4 +112,4 @@ class UninterpretedType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType };
+export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType, UnionType };
