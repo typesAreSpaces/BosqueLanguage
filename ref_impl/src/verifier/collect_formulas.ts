@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
-import { topologicalOrder, computeBlockLinks } from "../compiler/ir_info";
+import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/ir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
@@ -75,110 +75,143 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
     }
 }
 
-function opToFormula(op: MIROp, section: string): FormulaExpr {
+function opToFormula(op: MIROp, section: string, formula : FormulaExpr): FormulaExpr {
     switch (op.tag) {
         case MIROpTag.LoadConst:
         case MIROpTag.LoadConstTypedString:
         case MIROpTag.AccessNamespaceConstant:
         case MIROpTag.AccessConstField:
         case MIROpTag.LoadFieldDefaultValue: {
-            return new PredicateExpr("notdone1", []);
+            console.log("LoadFieldDefaultValue Not implemented yet");
+            return formula;
         }
         case MIROpTag.AccessCapturedVariable: {
-            return new PredicateExpr("notdone2", []);
+            console.log("AcessCapturedVariable Not implemented yet");
+            return formula;
         }
         case MIROpTag.AccessArgVariable: {
-            return new PredicateExpr("notdone3", []);
+            console.log("AccessArgVariable Not implemented yet");
+            return formula;
         }
         case MIROpTag.AccessLocalVariable: {
-            return new PredicateExpr("notdone4", []);
+            console.log("AcessLocalVariable Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorPrimary: {
-            return new PredicateExpr("notdone5", []);
+            console.log("ConstructorPrimary Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorPrimaryCollectionEmpty: {
-            return new PredicateExpr("notdone6", []);
+            console.log("ConstructorPrimaryCollectionEmpty Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorPrimaryCollectionSingletons: {
-            return new PredicateExpr("notdone7", []);
+            console.log("ConstructorPrimaryCollectionSingletons Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorPrimaryCollectionCopies: {
-            return new PredicateExpr("notdone8", []);
+            console.log("ConstructorPrimaryCollectionCopies Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorPrimaryCollectionMixed: {
-            return new PredicateExpr("notdone9", []);
+            console.log("ConstructorPrimaryCollectionMixed Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorTuple: {
-            return new PredicateExpr("notdone10", []);
+            console.log("ConstructorTuple Not implemented yet");
+            return formula
         }
         case MIROpTag.ConstructorRecord: {
-            return new PredicateExpr("notdone11", []);
+            console.log("ConstructorRecord Not implemented yet");
+            return formula;
         }
         case MIROpTag.ConstructorLambda: {
-            return new PredicateExpr("notdone12", []);
+            console.log("ConstructorLambda Not implemented yet");
+            return formula;
         }
         case MIROpTag.CallNamespaceFunction: {
-            return new PredicateExpr("notdone13", []);
+            console.log("CallNamespaceFunction Not implemented yet");
+            return formula;
         }
         case MIROpTag.CallStaticFunction: {
-            return new PredicateExpr("notdone14", []);
+            console.log("CallStaticFunction Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRAccessFromIndex: {
-            return new PredicateExpr("notdone15", []);
+            console.log("MIRAccessFromIndex Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromIndecies: {
-            return new PredicateExpr("notdone16", []);
+            console.log("MIRProjectFromIndecies Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRAccessFromProperty: {
-            return new PredicateExpr("notdone17", []);
+            console.log("MIRAcessFromProperty Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromProperties: {
-            return new PredicateExpr("notdone18", []);
+            console.log("MIRProjectFromProperties Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRAccessFromField: {
-            return new PredicateExpr("notdone19", []);
+            console.log("MIRAccessFromField Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromFields: {
-            return new PredicateExpr("notdone20", []);
+            console.log("MIRProjectFromFields Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromTypeTuple: {
-            return new PredicateExpr("notdone21", []);
+            console.log("MIRProjectFromTypeTuple Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromTypeRecord: {
-            return new PredicateExpr("notdone22", []);
+            console.log("MIRProjectFromTypeRecord Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRProjectFromTypeConcept: {
-            return new PredicateExpr("notdone23", []);
+            console.log("MIRProjectFromTypeConcept Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRModifyWithIndecies: {
-            return new PredicateExpr("notdone24", []);
+            console.log("MIRModifyWithIndecies Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRModifyWithProperties: {
-            return new PredicateExpr("notdone25", []);
+            console.log("MIRModifyWithProperties Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRModifyWithFields: {
-            return new PredicateExpr("notdone26", []);
+            console.log("MIRModifyWithFields Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRStructuredExtendTuple: {
-            return new PredicateExpr("notdone27", []);
+            console.log("MIRStructuredExtendedTuple Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRStructuredExtendRecord: {
-            return new PredicateExpr("notdone28", []);
+            console.log("MIRStructuredExtendRecord Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRStructuredExtendObject: {
-            return new PredicateExpr("notdone29", []);
+            console.log("MIRStructuredExtendObject Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRInvokeKnownTarget: {
-            return new PredicateExpr("notdone30", []);
+            console.log("MIRInvokeKnownTarget Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRInvokeVirtualTarget: {
-            return new PredicateExpr("notdone31", []);
+            console.log("MIRInvokeVirtualTarget Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRCallLambda: {
-            return new PredicateExpr("notdone32", []);
+            console.log("MIRCallLambda Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRPrefixOp: {
-            return new PredicateExpr("notdone33", []);
+            console.log("MIRPrefixOp Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRBinOp: {
             let opBinOp = op as MIRBinOp;
@@ -195,7 +228,8 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             return opFormula;
         }
         case MIROpTag.MIRBinEq: {
-            return new PredicateExpr("notdone35", []);
+            console.log("MIRBinEq Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRBinCmp: {
             // The predicate returned is of type Bool
@@ -212,10 +246,12 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             return new AndExpr(opFormula, regFormula);
         }
         case MIROpTag.MIRRegAssign: {
-            return new PredicateExpr("notdone37", []);
+            console.log("MIRRegAssign Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRTruthyConvert: {
-            return new PredicateExpr("notdone38", []);
+            console.log("MIRTruthyConvert Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRVarStore: {
             let opVarStore = op as MIRVarStore;
@@ -231,7 +267,7 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // return new EqualityExpr(
             //     argumentToVarExpr(opVarStore.src, section), 
             //     argumentToVarExpr(opVarStore.name, section));
-            return new PredicateExpr("notdone39", []);
+            return formula;
         }
         case MIROpTag.MIRReturnAssign: {
             let opReturnAssign = op as MIRReturnAssign;
@@ -242,43 +278,49 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // The register Variable will have the same
             // type of the src Variable
             typesSeen.set(regName, typesSeen.get(srcName) as string);
-            return new EqualityExpr(
-                argumentToVarExpr(opReturnAssign.name, section),
-                argumentToVarExpr(opReturnAssign.src, section));
+            // return new EqualityExpr(
+            //     argumentToVarExpr(opReturnAssign.name, section),
+            //     argumentToVarExpr(opReturnAssign.src, section));
+            return formula;
         }
         case MIROpTag.MIRAssert: {
-            return new PredicateExpr("notdone41", []);
+            console.log("MIRAssert Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRCheck: {
-            return new PredicateExpr("notdone42", []);
+            console.log("MIRCheck Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRDebug: {
-            return new PredicateExpr("notdone43", []);
+            console.log("MIRDDebug Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRJump: {
             let opJump = op as MIRJump;
             console.log("Implementing MIRJump--------------------------------------------------");
             console.log(opJump);
-            return new PredicateExpr("notdone44", []);
+            return formula;
         }
         case MIROpTag.MIRJumpCond: {
             let opJumpCond = op as MIRJumpCond;
             console.log("Implementing MIRJumpCond----------------------------------------------");
             console.log(opJumpCond);
-            return new PredicateExpr("notdone45", []);
+            return formula;
         }
         case MIROpTag.MIRJumpNone: {
-            return new PredicateExpr("notdone46", []);
+            console.log("MIRJumpNone Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRVarLifetimeStart: {
             let opVarLifetimeStart = op as MIRVarLifetimeStart;
             typesSeen.set(section + "__" + opVarLifetimeStart.name, opVarLifetimeStart.rtype);
             // TODO: Here is where we include the type relation 
             // of variables
-            return new PredicateExpr("almostdone47", []);
+            return formula;
         }
         case MIROpTag.MIRVarLifetimeEnd: {
-            return new PredicateExpr("notdone48", []);
+            console.log("MIRVarLifetimeEnd Not implemented yet");
+            return formula;
         }
         case MIROpTag.MIRPhi: {
             let opPhi = op as MIRPhi;
@@ -292,16 +334,13 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             typesSeen.set(targetName, "NSCore::Int");
             opPhi.src.forEach((value, key) => {
                 console.log(value);
-                
-
-
             });
             // let targetExpr = argumentToVarExpr(opPhi.trgt, section);
-
-            return new PredicateExpr("notdone49", []);
+            return formula;
         }
         default:
-            return new PredicateExpr("thismightbeaproblem", []);
+            console.log("This might be a problem");
+            return formula;
     }
 }
 
@@ -311,6 +350,10 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
 function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
+    const mapBlocks = new Map<string, MIRBasicBlock>();
+    blocks.map(x => mapBlocks.set(x.label, x));
+    var initialFormula = (new PredicateExpr("true", []) as FormulaExpr);
+    PredicateExpr.symbolTable.set("true", true);
 
     console.log("Blocks:-----------------------------------------------------------------------");
     console.log(blocks);
@@ -321,15 +364,31 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     console.log("Flow:-------------------------------------------------------------------------");
     console.log(flow);
 
-    let formulass = blocks.map(block => block.ops.map(x => opToFormula(x, section)));
+    for(let currentBlock of blocks){
+        let currentBlockName = currentBlock.label;
+        currentBlock.ops.reverse();
+        let blockFormula = currentBlock.ops.reduce((a, b) => opToFormula(b, section, a), initialFormula);
+        currentBlock.ops.reverse();
+        let flowBlock = (flow.get(currentBlockName) as FlowLink);
+        if(flowBlock.preds.size !== 0){
+            flowBlock.preds.forEach(labelPred => {
+                let lastIndex = (mapBlocks.get(labelPred) as MIRBasicBlock).ops.length - 1;
+                (mapBlocks.get(labelPred) as MIRBasicBlock).ops[lastIndex].tag
+            });
+        }
+        initialFormula = new AndExpr(initialFormula, blockFormula);
+    }
+
+    return initialFormula;
+
+    // let formulass = blocks.map(block => block.ops.map(x => opToFormula(x, section, initialFormula)));
     // TODO: This is wrong and the logical formula should 
     // be built by traversing the flow graph in a breadth
     // first search manner
-
-    return (formulass as FormulaExpr[][])
-        .map(formulas => formulas
-            .reduce((a, b) => new AndExpr(a, b)))
-        .reduce((a, b) => new AndExpr(a, b));
+    // return (formulass as FormulaExpr[][])
+    //     .map(formulas => formulas
+    //         .reduce((a, b) => new AndExpr(a, b)))
+    //     .reduce((a, b) => new AndExpr(a, b));
 }
 
-export { collectFormulas, typesSeen } 
+export { collectFormulas, typesSeen }
