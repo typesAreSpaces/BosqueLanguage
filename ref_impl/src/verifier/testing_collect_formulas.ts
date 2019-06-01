@@ -77,9 +77,9 @@ function getControlFlow(app: string, section: string, fd: number): void {
 
 setImmediate(() => {
     // Mac Machine
-    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
     let bosqueFile = dirMachine + "/max/main.bsq";
     let section = "NSMain::max";
