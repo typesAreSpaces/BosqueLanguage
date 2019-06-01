@@ -53,7 +53,6 @@ function getControlFlow(app: string, section: string, fd: number): void {
         // variable typesSeen
         invokeDecl.params.map(x => typesSeen.set(sectionName + "__" + x.name, x.type.trkey));
         if (typeof (ibody) === "string") {
-            process.stdout.write("Success as string!\n");
             FS.closeSync(fd);
             process.exit(0);
         }
@@ -62,7 +61,6 @@ function getControlFlow(app: string, section: string, fd: number): void {
             // Since for Z3 is invalid a name with ":",
             // we replace it with a "_"
             collectFormulas(ibody, sectionName).toZ3(fd, false);
-            process.stdout.write("Success as blocks!\n");
             FS.closeSync(fd);
             process.exit(0);
         }
