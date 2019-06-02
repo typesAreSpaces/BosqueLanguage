@@ -13,19 +13,17 @@ namespace NSMain;
 function max(x: Int, y: Int): Int
 {
     var! z = 10;
+    var! z2 = 2;
+
     if(x > 0){
         z = z + 1;
+        z2 = z + z2;
     }
     else {
         z = z + 2;
+        z2 = z;
     }
-
-    switch(x) {
-        case 0 => { z = 1; }
-        case 1 => { z = 2; }
-        case 2 => { z = 3; }
-        case 3 => { z = z + 4; }
-    }
+    z = z + z2 + 1;
 
     return z;
 }

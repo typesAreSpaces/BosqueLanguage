@@ -77,7 +77,6 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
 
 function opToFormula(op: MIROp, section: string): FormulaExpr {
     let formula = new PredicateExpr("ahhh", []);
-    PredicateExpr.symbolTable.set("true", true);
     switch (op.tag) {
         case MIROpTag.LoadConst:
         case MIROpTag.LoadConstTypedString:
@@ -355,14 +354,14 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     blocks.map(x => mapBlocks.set(x.label, x));
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(blocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // blocks.map(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // blocks.map(x => console.log(x.jsonify()));
-    // console.log("Flow:-------------------------------------------------------------------------");
-    // console.log(flow);
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
+    console.log("Flow:-------------------------------------------------------------------------");
+    console.log(flow);
 
     let changeFormula = false;
     for (let currentBlock of blocks) {
@@ -374,7 +373,6 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
         // Process the formula for the individual block
         changeFormula = false
         let blockFormula = new PredicateExpr("true", []) as FormulaExpr;
-        PredicateExpr.symbolTable.set("true", true);
         for (let op of currentBlock.ops) {
             if (!changeFormula) {
                 changeFormula = true;
@@ -385,9 +383,10 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
             }
         }
         //---------------------------------------------------------------------------------------------
-        // Extends to above formula with previous conditions
-        let fixedBlockFormula = (new PredicateExpr("ihhh", []) as FormulaExpr);
-        let flowBlock = (flow.get(currentBlockName) as FlowLink);
+        //---------------------------------------------------------------------------------------------
+        // Extend to above formula with previous conditions
+        let extendedBlockFormula = new PredicateExpr("true", []) as FormulaExpr;
+        let flowBlock = flow.get(currentBlockName) as FlowLink;
         changeFormula = false;
         if (flowBlock.preds.size !== 0) {
             let flowBlockPred = Array.from(flowBlock.preds);
@@ -401,10 +400,10 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
                         changeFormula = true;
                         let regName = lastOp.arg.nameID[0] == "#" ? "__" + lastOp.arg.nameID.slice(1) : lastOp.arg.nameID;
                         if (currentBlockName === lastOp.trueblock) {
-                            fixedBlockFormula = new ImplExpr(new PredicateExpr(regName, []), blockFormula);
+                            extendedBlockFormula = new ImplExpr(new PredicateExpr(regName, []), blockFormula);
                         }
                         else {
-                            fixedBlockFormula = new ImplExpr(new NegExpr(new PredicateExpr(regName, [])), blockFormula);
+                            extendedBlockFormula = new ImplExpr(new NegExpr(new PredicateExpr(regName, [])), blockFormula);
                         }
                     }
                     if (lastOp instanceof MIRJump) {
@@ -415,19 +414,18 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
                         let regName = lastOp.arg.nameID[0] == "#" ? "__" + lastOp.arg.nameID.slice(1) : lastOp.arg.nameID;
                         let regPredicate = new PredicateExpr(regName, []);
                         if (currentBlockName === lastOp.trueblock) {
-                            fixedBlockFormula = new AndExpr(fixedBlockFormula, new ImplExpr(regPredicate, blockFormula));
+                            extendedBlockFormula = new AndExpr(extendedBlockFormula, new ImplExpr(regPredicate, blockFormula));
                         }
                         else {
-                            fixedBlockFormula = new AndExpr(fixedBlockFormula, new ImplExpr(new NegExpr(regPredicate), blockFormula));
+                            extendedBlockFormula = new AndExpr(extendedBlockFormula, new ImplExpr(new NegExpr(regPredicate), blockFormula));
                         }
                     }
                     if (lastOp instanceof MIRJump) {
                     }
                 }
             }
-            // TODO: There is a bug here
             if(changeFormula){
-                mapFormulas.set(currentBlockName, fixedBlockFormula);
+                mapFormulas.set(currentBlockName, extendedBlockFormula);
             }
         }
         else{
@@ -439,7 +437,6 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     // Collects all the formulas
     changeFormula = false;
     let result: FormulaExpr = new PredicateExpr("true", []);
-    // console.log(mapFormulas);
     for (let formula of mapFormulas.values()) {
         if (!changeFormula) {
             changeFormula = true;

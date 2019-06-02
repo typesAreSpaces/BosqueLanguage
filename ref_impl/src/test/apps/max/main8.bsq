@@ -21,9 +21,9 @@ function max(x: Int, y: Int): Int
     }
 
     switch(x) {
-        case 0 => { z = 1; }
-        case 1 => { z = 2; }
-        case 2 => { z = 3; }
+        case 0 => { z = z + 1; }
+        case 1 => { z = z + 2; }
+        case 2 => { z = z + 3; }
         case 3 => { z = z + 4; }
     }
 
