@@ -243,8 +243,7 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             ]);
 
             let regName = opBinCmp.trgt.nameID[0] == "#" ? "__" + opBinCmp.trgt.nameID.slice(1) : opBinCmp.trgt.nameID;
-            let regFormula = new EqualityExpr(new PredicateExpr(regName, []), opFormula);
-            return new AndExpr(opFormula, regFormula);
+            return new EqualityExpr(new PredicateExpr(regName, []), opFormula);
         }
         case MIROpTag.MIRRegAssign: {
             console.log("MIRRegAssign Not implemented yet");
@@ -324,8 +323,8 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
         }
         case MIROpTag.MIRPhi: {
             let opPhi = op as MIRPhi;
-            // console.log("Implementing MIRPhi-----------------------------");
-            // console.log(opPhi);
+            console.log("Implementing MIRPhi-----------------------------");
+            console.log(opPhi);
             let targetName = section + "__" + opPhi.trgt.nameID;
             // TODO: Fix this using UnionType or a
             // clever approach. Currently is just set to 
@@ -424,11 +423,11 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
                     }
                 }
             }
-            if(changeFormula){
+            if (changeFormula) {
                 mapFormulas.set(currentBlockName, extendedBlockFormula);
             }
         }
-        else{
+        else {
             mapFormulas.set(currentBlockName, blockFormula);
         }
         //---------------------------------------------------------------------------------------------
