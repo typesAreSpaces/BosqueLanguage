@@ -11,7 +11,7 @@ import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_ass
 import { MIRBody } from "../compiler/mir_ops";
 import { collectFormulas, typesSeen } from "./collect_formulas_2"
 
-function getControlFlow(app: string, section: string, fd: number): void {
+function getControlFlow(app: string, section: string, fd: number, getModel : boolean): void {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
 
@@ -60,7 +60,7 @@ function getControlFlow(app: string, section: string, fd: number): void {
             // Here we generate the file.z3, essentially
             // Since for Z3 is invalid a name with ":",
             // we replace it with a "_"
-            collectFormulas(ibody, sectionName).toZ3(fd, false);
+            collectFormulas(ibody, sectionName).toZ3(fd, getModel);
             FS.closeSync(fd);
             process.exit(0);
         }
@@ -77,12 +77,12 @@ function getControlFlow(app: string, section: string, fd: number): void {
 
 setImmediate(() => {
     // Mac Machine
-    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
-    let bosqueFile = dirMachine + "/max/main.bsq";
+    let bosqueFile = dirMachine + "/max/main2.bsq";
     let section = "NSMain::max";
     let fd = FS.openSync('file.z3', 'w');
-    getControlFlow(bosqueFile, section, fd);
+    getControlFlow(bosqueFile, section, fd, false);
 });

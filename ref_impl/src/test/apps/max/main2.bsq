@@ -15,13 +15,14 @@ function max(x: Int, y: Int): Int
 {
     if (x >= y) {
 	   return x;
-    } else {
+    } 
+    else {
       	if (x >= 0){
-	    return y;
-	}
-	else {
-	    return y;
-	}
+	      return y;
+	    }
+	    else {
+	        return y;
+	    }
     }
 }
 

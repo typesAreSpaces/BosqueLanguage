@@ -1,0 +1,8 @@
+(declare-sort Term)
+(declare-sort BType)
+(declare-const BInt BType)
+(declare-const BBool BType)
+(declare-const BString BType)
+(declare-const BNone BType)
+(declare-fun HasType (Term BType) Bool)
+
