@@ -7,7 +7,7 @@ import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgu
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr } from "../verifier/formula_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -397,68 +397,46 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     // blocks.map(x => console.log(x));
     // console.log("More detailed++ Blocks:-------------------------------------------------------");
     // blocks.map(x => console.log(x.jsonify()));
-    // console.log("Flow:-------------------------------------------------------------------------");
-    // console.log(flow);
-
+    console.log("Flow:-------------------------------------------------------------------------");
+    console.log(flow);
     for (let currentBlock of blocks) {
         let currentBlockName = currentBlock.label;
-        //---------------------------------------------------------------------------------------------        
-        // Important: according to the weakest precondition 
-        // semantics currentBlocks.ops should be in reverse
-        // let blockFormula = currentBlock.ops.reduce((a, b) => opToFormula(b, section, a), initialFormula);
-        //---------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------
         // Process the formula for the individual block
+        // Assumption currentBlocks.ops is
+        // a non-empty array. Hence, blockFormula
+        // cannot be the true constant
         let blockFormula = makeConjunction(currentBlock.ops.map(x => opToFormula(x, section)));
-
-        //--------------------------------------------------------------------------------------------
+        blockFormula;
         //---------------------------------------------------------------------------------------------
-        // Extend to above formula with previous conditions
-        let extendedBlockFormula = new PredicateExpr("true", []) as FormulaExpr;
+        //---------------------------------------------------------------------------------------------
+        // TODO: Add some description of the following block
+        // of code
         let flowBlock = flow.get(currentBlockName) as FlowLink;
-        let changeFormula = false;
-        if (flowBlock.preds.size !== 0) {
-            let flowBlockPred = Array.from(flowBlock.preds);
-            for (let predLabel of flowBlockPred) {
-                let predBlock = (mapBlocks.get(predLabel) as MIRBasicBlock);
-                let lastIndex = predBlock.ops.length - 1;
-                let lastOp = predBlock.ops[lastIndex];
-                changeFormula = false;
-                if (!changeFormula) {
-                    if (lastOp instanceof MIRJumpCond) {
-                        changeFormula = true;
-                        let regName = lastOp.arg.nameID[0] == "#" ? "__" + lastOp.arg.nameID.slice(1) : lastOp.arg.nameID;
-                        if (currentBlockName === lastOp.trueblock) {
-                            extendedBlockFormula = new ImplExpr(new PredicateExpr(regName, []), blockFormula);
-                        }
-                        else {
-                            extendedBlockFormula = new ImplExpr(new NegExpr(new PredicateExpr(regName, [])), blockFormula);
-                        }
-                    }
-                    if (lastOp instanceof MIRJump) {
-                    }
-                }
-                else {
-                    if (lastOp instanceof MIRJumpCond) {
-                        let regName = lastOp.arg.nameID[0] == "#" ? "__" + lastOp.arg.nameID.slice(1) : lastOp.arg.nameID;
-                        let regPredicate = new PredicateExpr(regName, []);
-                        if (currentBlockName === lastOp.trueblock) {
-                            extendedBlockFormula = new AndExpr(extendedBlockFormula, new ImplExpr(regPredicate, blockFormula));
-                        }
-                        else {
-                            extendedBlockFormula = new AndExpr(extendedBlockFormula, new ImplExpr(new NegExpr(regPredicate), blockFormula));
-                        }
-                    }
-                    if (lastOp instanceof MIRJump) {
-                    }
-                }
+        switch(flowBlock.preds.size){
+            case 0: {
+                break;
             }
-            if (changeFormula) {
-                mapFormulas.set(currentBlockName, extendedBlockFormula);
+            case 1: {
+                break;
+            }
+            default: {
+                break;
             }
         }
-        else {
-            mapFormulas.set(currentBlockName, blockFormula);
+        switch(flowBlock.succs.size){
+            case 0: {
+                break;
+            }
+            case 1: {
+                break;
+            }
+            case 2: {
+                break;
+            }
+            default: {
+                throw new Error("Wrong Control Flow graph. A node cannot have out-degree more than 2!");
+            }
         }
         //---------------------------------------------------------------------------------------------
     }

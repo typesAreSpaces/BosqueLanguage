@@ -1,0 +1,48 @@
+//-------------------------------------------------------------------------------------------------------
+// Copyright (C) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+//-------------------------------------------------------------------------------------------------------
+
+//
+//This is a bosque test/benchmark for a simple max function.
+//Expected output is: 20
+//
+
+namespace NSMain;
+
+function max(x: Int, y: Int): Int
+{
+    var! z = x;
+    if(x > 0){
+        z = z + 1;
+    }
+    else {
+        z = z + 2;
+    }
+
+    if(z > 0){
+        switch(x) {
+            case 0 => { z = 1; }
+            case 1 => { z = 2; }
+            case 2 => { z = 3; }
+            case 3 => { z = z + 4; }
+        }
+    }
+    else {
+        switch(x) {
+            case 0 => { z = 0; }
+            case 1 => { z = z + 2; }
+            case 2 => { z = 1; }
+            case 3 => { z = z + 212; }
+        }
+    }
+
+    return z;
+}
+
+entrypoint function main(): Int {
+    var x = 10;
+    var y = 20;
+
+    return max(x, y);
+}
