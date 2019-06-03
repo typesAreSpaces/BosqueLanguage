@@ -3,19 +3,17 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock } from "../compiler/mir_ops";
-
-export class QueueBlock {
-    items: MIRBasicBlock[] = [];
+export class Queue<T> {
+    items: T[] = [];
     numberOfElements = 0;
     constructor() {
     }
-    enqueue(x: MIRBasicBlock): void {
+    enqueue(x: T): void {
         if (this.items.length === 0) {
             this.items.push(x);
         }
         if (this.items.length == this.numberOfElements) {
-            let newTable: MIRBasicBlock[] = [];
+            let newTable: T[] = [];
             newTable.length = 2 * this.items.length;
             for (var i in this.items) {
                 newTable[i] = this.items[i];
@@ -25,7 +23,7 @@ export class QueueBlock {
         this.items[this.numberOfElements] = x;
         this.numberOfElements++;
     }
-    dequeue(): MIRBasicBlock {
+    dequeue(): T {
         if (this.items.length === 0) {
             throw new Error("No items to dequeue");
         }
@@ -37,7 +35,7 @@ export class QueueBlock {
             }
             else {
                 if (this.items.length > 2 * this.numberOfElements) {
-                    let newTable: MIRBasicBlock[] = [];
+                    let newTable: T[] = [];
                     newTable.length = this.items.length / 2;
                     var i = 0;
                     while (i < this.numberOfElements) {
@@ -54,4 +52,3 @@ export class QueueBlock {
         return this.numberOfElements === 0;
     }
 }
-

@@ -3,11 +3,11 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJump, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/formula_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr } from "../verifier/formula_expr";
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -20,12 +20,12 @@ import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr } from "../verifier/f
 // we introduce inconsistency in the types
 // of a well-typed program
 let typesSeen: Map<string, string> = new Map<string, string>();
-let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
+let mapBlockCondition: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
 let DEBUGGING = false;
 
-function debugging(x : any, flag : boolean){
-    if(flag){
+function debugging(x: any, flag: boolean) {
+    if (flag) {
         console.log(x);
     }
 }
@@ -55,7 +55,7 @@ function resolveTypeUsingValue(value: string): string {
         case "false": {
             return "NSCore::Bool";
         }
-        default : {
+        default: {
             if (value.length > 3) {
                 switch (value.substr(1, 3)) {
                     case "int": {
@@ -93,7 +93,7 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
 }
 
 function opToFormula(op: MIROp, section: string): FormulaExpr {
-    let formula = new PredicateExpr("ahhh", []);
+    let formula = new PredicateExpr("true", []) as FormulaExpr;
     switch (op.tag) {
         case MIROpTag.LoadConst:
         case MIROpTag.LoadConstTypedString:
@@ -258,7 +258,6 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
                 argumentToVarExpr(opBinCmp.lhs, section),
                 argumentToVarExpr(opBinCmp.rhs, section)
             ]);
-
             let regName = opBinCmp.trgt.nameID[0] == "#" ? "__" + opBinCmp.trgt.nameID.slice(1) : opBinCmp.trgt.nameID;
             return new EqualityExpr(new PredicateExpr(regName, []), opFormula);
         }
@@ -274,11 +273,11 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             let opVarStore = op as MIRVarStore;
             let regName = section + "__" + opVarStore.name.nameID;
             let srcName = opVarStore.src.nameID;
-            if(opVarStore.src instanceof MIRRegisterArgument){
+            if (opVarStore.src instanceof MIRRegisterArgument) {
                 srcName = section + "__" + srcName;
                 typesSeen.set(regName, typesSeen.get(srcName) as string);
             }
-            else{
+            else {
                 typesSeen.set(regName, resolveTypeUsingValue(srcName));
             }
             let opFormula = new EqualityExpr(
@@ -292,11 +291,11 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             let srcName = opReturnAssign.src.nameID;
             // The register Variable will have the same
             // type of the src Variable
-            if(opReturnAssign.src instanceof MIRRegisterArgument){
+            if (opReturnAssign.src instanceof MIRRegisterArgument) {
                 srcName = section + "__" + srcName;
                 typesSeen.set(regName, typesSeen.get(srcName) as string);
             }
-            else{
+            else {
                 typesSeen.set(regName, resolveTypeUsingValue(srcName));
             }
             let opFormula = new EqualityExpr(
@@ -313,17 +312,16 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             return formula;
         }
         case MIROpTag.MIRJump: {
-            let opJump = op as MIRJump;
-            opJump;
-            // console.log("Implementing MIRJump--------------------------------------------------");
-            // console.log(opJump);
+            formula = new PredicateExpr("MIRJumpFormula", []);
             return formula;
         }
         case MIROpTag.MIRJumpCond: {
             let opJumpCond = op as MIRJumpCond;
-            opJumpCond;
-            // console.log("Implementing MIRJumpCond----------------------------------------------");
-            // console.log(opJumpCond);
+            formula = new PredicateExpr("MIRJumpCondFormula", []);
+            let regName = opJumpCond.arg.nameID[0] == "#" ? "__" + opJumpCond.arg.nameID.slice(1) : opJumpCond.arg.nameID;
+            let conditionFormula = new PredicateExpr(regName, []);
+            mapBlockCondition.set(opJumpCond.trueblock, conditionFormula);
+            mapBlockCondition.set(opJumpCond.falseblock, new NegExpr(conditionFormula));
             return formula;
         }
         case MIROpTag.MIRJumpNone: {
@@ -346,16 +344,25 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
         }
         case MIROpTag.MIRPhi: {
             let opPhi = op as MIRPhi;
-            console.log("Implementing MIRPhi-----------------------------");
-            console.log(opPhi);
             let targetName = section + "__" + opPhi.trgt.nameID;
+
             // TODO: Fix this using UnionType or a
             // clever approach. Currently is just set to 
             // be the IntType for the purpose of the 
             // max function demo
             typesSeen.set(targetName, "NSCore::Int");
+            
+            let changeFormula = false;
             opPhi.src.forEach((value, key) => {
-                value;
+                let consequence = new EqualityExpr(argumentToVarExpr(opPhi.trgt, section), argumentToVarExpr(value, section));
+                if(!changeFormula){
+                    changeFormula = true;
+                    formula = new ImplExpr(mapBlockCondition.get(key) as FormulaExpr, consequence);
+                }
+                else{
+                    formula = new AndExpr(formula, 
+                        new ImplExpr(mapBlockCondition.get(key) as FormulaExpr, consequence));
+                }
             });
             // let targetExpr = argumentToVarExpr(opPhi.trgt, section);
             return formula;
@@ -387,9 +394,7 @@ function makeConjunction(formulas: FormulaExpr[]): FormulaExpr {
 function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
-
-    const mapBlocks = new Map<string, MIRBasicBlock>();
-    blocks.map(x => mapBlocks.set(x.label, x));
+    let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
     // console.log("Blocks:-----------------------------------------------------------------------");
     // console.log(blocks);
@@ -397,52 +402,40 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     // blocks.map(x => console.log(x));
     // console.log("More detailed++ Blocks:-------------------------------------------------------");
     // blocks.map(x => console.log(x.jsonify()));
-    console.log("Flow:-------------------------------------------------------------------------");
-    console.log(flow);
-    for (let currentBlock of blocks) {
-        let currentBlockName = currentBlock.label;
-        //---------------------------------------------------------------------------------------------
-        // Process the formula for the individual block
-        // Assumption currentBlocks.ops is
-        // a non-empty array. Hence, blockFormula
-        // cannot be the true constant
-        let blockFormula = makeConjunction(currentBlock.ops.map(x => opToFormula(x, section)));
-        blockFormula;
-        //---------------------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------------------
-        // TODO: Add some description of the following block
-        // of code
-        let flowBlock = flow.get(currentBlockName) as FlowLink;
-        switch(flowBlock.preds.size){
+
+    blocks.map(block =>
+        mapFormulas.set(block.label,
+            makeConjunction(block.ops.map(op => opToFormula(op, section)))));
+
+    function traverse(block: MIRBasicBlock): FormulaExpr {
+        let currentFlow = flow.get(block.label) as FlowLink;
+        let currentBlockFormula = mapFormulas.get(block.label) as FormulaExpr;
+        switch (currentFlow.succs.size) {
             case 0: {
-                break;
+                return currentBlockFormula;
             }
             case 1: {
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        switch(flowBlock.succs.size){
-            case 0: {
-                break;
-            }
-            case 1: {
-                break;
+                let successorLabel = currentFlow.succs.values().next().value;
+                return new AndExpr(currentBlockFormula, traverse(ibody.get(successorLabel) as MIRBasicBlock));
             }
             case 2: {
-                break;
+                let jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
+                let regName = jumpCondOp.arg.nameID[0] == "#" ? "__" + jumpCondOp.arg.nameID.slice(1) : jumpCondOp.arg.nameID;
+                let conditionFormula = new PredicateExpr(regName, []);
+                let branchTrue = new ImplExpr(conditionFormula, traverse(ibody.get(jumpCondOp.trueblock) as MIRBasicBlock));
+                let branchFalse = new ImplExpr(new NegExpr(conditionFormula), traverse(ibody.get(jumpCondOp.falseblock) as MIRBasicBlock));
+                return new AndExpr(currentBlockFormula, new AndExpr(branchTrue, branchFalse));
+
             }
             default: {
-                throw new Error("Wrong Control Flow graph. A node cannot have out-degree more than 2!");
+                throw new Error("Wrong Control-Flow graph. The out-degree of any node cannot be more than 2.");
             }
         }
-        //---------------------------------------------------------------------------------------------
     }
+
     //---------------------------------------------------------------------------------------------
     // Collects all the formulas
-    return makeConjunction(Array.from(mapFormulas.values()));
+    return traverse(ibody.get("entry") as MIRBasicBlock);
     //---------------------------------------------------------------------------------------------
 }
 
