@@ -364,7 +364,6 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
                         new ImplExpr(mapBlockCondition.get(key) as FormulaExpr, consequence));
                 }
             });
-            // let targetExpr = argumentToVarExpr(opPhi.trgt, section);
             return formula;
         }
         default:

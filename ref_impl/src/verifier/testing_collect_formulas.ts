@@ -77,12 +77,12 @@ function getControlFlow(app: string, section: string, fd: number, getModel : boo
 
 setImmediate(() => {
     // Mac Machine
-    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
-    let bosqueFile = dirMachine + "/max/main2.bsq";
+    let bosqueFile = "/max/main6_3.bsq";
     let section = "NSMain::max";
-    let fd = FS.openSync('file.z3', 'w');
-    getControlFlow(bosqueFile, section, fd, false);
+    let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
+    getControlFlow(dirMachine + bosqueFile, section, fd, false);
 });
