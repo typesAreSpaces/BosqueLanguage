@@ -18,7 +18,14 @@ abstract class FormulaExpr {
     static fd = FS.openSync('file.z3', 'w');
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        [">", ">=", "<", "<=", "=", "true", "false"].map(x => [x, true])
+        ([">", ">=", "<", "<=", "=", "true", "false"].map(x => {
+            if (x === "true" || x === "false" || x === "=") {
+                return [x, true];
+            }
+            else {
+                return ["op_" + x, true];
+            }
+        }))
     );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
@@ -26,21 +33,72 @@ abstract class FormulaExpr {
         this.ty = ty;
     }
     abstract sexpr(): string;
-    // Setting optionalGetModel to true
-    // will include a (get-model) command
-    // to the Z3 file; otherwise it wont    
-    toZ3(fd: number, optionalGetModel: boolean): void {
+    initialDeclarationZ3(fd: number) {
+        FS.writeSync(fd, "(set-option :smt.auto-config false) ; disable automatic self configuration\n");
+        FS.writeSync(fd, "(set-option :smt.mbqi false) ; disable model-based quantifier instantiation\n\n");
+
+        FS.writeSync(fd, "(declare-sort Term)\n");
+        // TODO: Add more BTypes if needed
+        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
+
+        FS.writeSync(fd, "(declare-fun HasType (Term BType) Bool)\n");
+        FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
+        FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
+        FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
+
+        // TODO: Add more operations 
+        FS.writeSync(fd, "(define-fun op_> ((@x Term) (@y Term)) Bool (implies (and (HasType @x BInt) (HasType @y BInt)) (> (UnboxInt @x) (UnboxInt @y))))\n");
+        FS.writeSync(fd, "(define-fun op_< ((@x Term) (@y Term)) Bool (implies (and (HasType @x BInt) (HasType @y BInt)) (< (UnboxInt @x) (UnboxInt @y))))\n");
+        FS.writeSync(fd, "(define-fun op_>= ((@x Term) (@y Term)) Bool (or (op_> @x @y) (= @x @y)))\n");
+        FS.writeSync(fd, "(define-fun op_<= ((@x Term) (@y Term)) Bool (or (op_< @x @y) (= @x @y)))\n\n");
+    }
+    toZ3(fd: number): void {
         this.toZ3Declaration(fd);
-        FS.writeSync(fd, "(push)\n");
-        FS.writeSync(fd, "(assert " + this.sexpr() + ")\n(check-sat)\n");
-        if (optionalGetModel) {
-            FS.writeSync(fd, "(get-model)\n");
+        let assertingZ3 = function (formula: FormulaExpr) {
+            if (formula instanceof AndExpr) {
+                let lhsName = formula.leftHandSide.name;
+                let rhsName = formula.rightHandSide.name;
+                if (lhsName !== "MIRJumpCondFormulal__r" && lhsName !== "MIRJumpFormulal__r") {
+                    assertingZ3(formula.leftHandSide);
+                    if (rhsName !== "MIRJumpCondFormulal__r" && rhsName !== "MIRJumpFormulal__r") {
+                        assertingZ3(formula.rightHandSide);
+                    }
+                }
+                else {
+                    if (rhsName !== "MIRJumpCondFormulal__r" && rhsName !== "MIRJumpFormulal__r") {
+                        assertingZ3(formula.rightHandSide);
+                    }
+                }
+            }
+            else {
+                let formulaName = formula.name;
+                if (formulaName != "MIRJumpCondFormulal__r" && formulaName != "MIRJumpFormulal__r") {
+                    FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
+                }
+            }
         }
+        assertingZ3(this);
+    }
+    checkSatZ3(fd: number) {
+        FS.writeSync(fd, "(check-sat)\n");
+    }
+    pushZ3(fd: number) {
+        FS.writeSync(fd, "(push)\n");
+    }
+    popZ3(fd: number) {
         FS.writeSync(fd, "(pop)\n");
+    }
+    getModelZ3(fd: number) {
+        FS.writeSync(fd, "(get-model)\n");
     }
     toZ3DeclarationSort(fd: number): void {
         let thisTypeTemp = this.ty.getType();
-        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
+        // Second part of the following conjunction avoids repetitions
+        // in the declaration section
+        if (this.ty instanceof UninterpretedType && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
             FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);
         }
@@ -87,7 +145,12 @@ class PredicateExpr extends FormulaExpr {
             item.toZ3Declaration(fd);
         }
         if (!PredicateExpr.symbolTable.get(this.symbolName)) {
-            FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
+            let declarationName = this.symbolName;
+            let declarationNameConcrete = this.symbolName + "_Concrete";
+            FS.writeSync(fd, "(declare-fun " + declarationNameConcrete + " " + this.ty.getType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " () Term)\n");
+            FS.writeSync(fd, "(assert (= (UnboxBool " + declarationName + ") " + declarationNameConcrete + "))\n");
+            FS.writeSync(fd, "(assert (= (BoxBool " + declarationNameConcrete + ") " + declarationName + "))\n");
             PredicateExpr.symbolTable.set(this.symbolName, true);
         }
     }

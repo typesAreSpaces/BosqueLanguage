@@ -11,7 +11,7 @@ import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_ass
 import { MIRBody } from "../compiler/mir_ops";
 import { collectFormulas, typesSeen } from "./collect_formulas_3"
 
-function getControlFlow(app: string, section: string, fd: number, getModel : boolean): void {
+function getControlFlow(app: string, section: string, fd: number): void {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
 
@@ -57,10 +57,16 @@ function getControlFlow(app: string, section: string, fd: number, getModel : boo
             process.exit(0);
         }
         else {
+            // --------------------------------------------------
             // Here we generate the file.z3, essentially
             // Since for Z3 is invalid a name with ":",
             // we replace it with a "_"
-            collectFormulas(ibody, sectionName).toZ3(fd, getModel);
+            let formula = collectFormulas(ibody, sectionName);
+            formula.initialDeclarationZ3(fd);
+            formula.toZ3(fd);
+            formula.checkSatZ3(fd);
+            // formula.getModelZ3(fd);
+            // --------------------------------------------------
             FS.closeSync(fd);
             process.exit(0);
         }
@@ -77,12 +83,12 @@ function getControlFlow(app: string, section: string, fd: number, getModel : boo
 
 setImmediate(() => {
     // Mac Machine
-    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
     let bosqueFile = "/max/main.bsq";
     let section = "NSMain::max";
     let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
-    getControlFlow(dirMachine + bosqueFile, section, fd, false);
+    getControlFlow(dirMachine + bosqueFile, section, fd);
 });

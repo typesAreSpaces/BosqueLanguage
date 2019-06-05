@@ -69,7 +69,8 @@ class FuncType extends TypeExpr {
 // The getType() of UnionType
 // might have a collition name
 // problem
-// getType() implements idempotency
+// getType() implements idempotency --> Not really.
+// TODO: Fix idempotecy using a Set structure
 class UnionType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;

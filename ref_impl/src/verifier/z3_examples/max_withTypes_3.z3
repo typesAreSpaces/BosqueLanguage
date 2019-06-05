@@ -12,10 +12,10 @@
 
 ;; (declare-fun op_>= (Term Term) Bool)
 ;; (assert (forall ((@x Term) (@y Term)) (! (implies (and (HasType @x BInt) (HasType @y BInt)) (= (op_>= @x @y) (>= (UnboxInt @x) (UnboxInt @y)))) :pattern (op_>= @x @y))))
-(define-fun op_> ((@x Term) (@y Term)) Bool (implies (and (HasType @x BInt) (HasType @y BInt)) (> (UnboxInt @x) (UnboxInt @y))))
-(define-fun op_< ((@x Term) (@y Term)) Bool (implies (and (HasType @x BInt) (HasType @y BInt)) (< (UnboxInt @x) (UnboxInt @y))))
-(define-fun op_>= ((@x Term) (@y Term)) Bool (or (op_> @x @y) (= @x @y)))
-(define-fun op_<= ((@x Term) (@y Term)) Bool (or (op_< @x @y) (= @x @y)))
+(define-fun op_> ((@x Term) (@y Term)) Term (BoxBool (> (UnboxInt @x) (UnboxInt @y))))
+(define-fun op_< ((@x Term) (@y Term)) Term (BoxBool (< (UnboxInt @x) (UnboxInt @y))))
+(define-fun op_>= ((@x Term) (@y Term)) Term (BoxBool (or (UnboxBool (op_> @x @y)) (= @x @y))))
+(define-fun op_<= ((@x Term) (@y Term)) Term (BoxBool (or (UnboxBool (op_< @x @y)) (= @x @y))))
 
 ;;-------------------------------------------
 ;; Example
@@ -38,10 +38,9 @@
 (declare-const y_int Int)
 (assert (= (UnboxInt y) y_int))
 (assert (= (BoxInt y_int) y))
-;;(declare-const y_int Int)
 ;;(assert (= (UnboxInt (BoxInt y_int)) y_int))
 
-(define-fun maxTerm ((@x Term) (@y Term)) Term (ite (op_>= @x @y) @x @y))
+(define-fun maxTerm ((@x Term) (@y Term)) Term (ite (UnboxBool (op_>= @x @y)) @x @y))
 
 (assert (HasType x BInt))
 (assert (HasType y BInt))
@@ -49,8 +48,8 @@
 (define-const flag Bool false)
 (define-const example Bool
   (ite flag
-       (op_>=  (maxTerm x y) x)
-       (not (op_>=  (maxTerm x y) x))
+       (UnboxBool (op_>= (maxTerm x y) x))
+       (not (UnboxBool (op_>= (maxTerm x y) x)))
        )
   )
 

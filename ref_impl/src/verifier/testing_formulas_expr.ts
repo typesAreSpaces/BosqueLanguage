@@ -25,27 +25,27 @@ let pxy = new PredicateExpr("p", [x, y, x, y, x, y]);
 
 // Repeating the same formula
 // wont produce repeated declarations
-pxy.toZ3(fd, false);
-pxy.toZ3(fd, true);
-// extraLong.toZ3(fd, true);
+pxy.toZ3(fd);
+pxy.toZ3(fd);
+// extraLong.toZ3(fd);
 
 // Encoding DeMorgan's law
-new NegExpr(new EqualityExpr(new AndExpr(a, b), new NegExpr(new OrExpr(new NegExpr(a), new NegExpr(b))))).toZ3(fd, false);
+new NegExpr(new EqualityExpr(new AndExpr(a, b), new NegExpr(new OrExpr(new NegExpr(a), new NegExpr(b))))).toZ3(fd);
 
 // Testing a predicate
-new PredicateExpr("narda", [pxy, x]).toZ3(fd, false);
-new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd, true);
-new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd, true);
-new PredicateExpr("p", [x, y, x, y, x, y]).toZ3(fd, true);
+new PredicateExpr("narda", [pxy, x]).toZ3(fd);
+new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd);
+new PredicateExpr("g", [new VarExpr("z", new UninterpretedType("List_Int_"))]).toZ3(fd);
+new PredicateExpr("p", [x, y, x, y, x, y]).toZ3(fd);
 
 let p1 = new PredicateExpr("p", [x, x, x, x, x, x])
-p1.toZ3(fd, false);
+p1.toZ3(fd);
 let p2 = new PredicateExpr("p", [x, x, x, x, x, y])
-p2.toZ3(fd, false);
+p2.toZ3(fd);
 let p3 = new PredicateExpr("p", [x, x, x, x, y, x])
-p3.toZ3(fd, false);
+p3.toZ3(fd);
 let p4 = new PredicateExpr("p", [x, x, x, y, x, x])
-p4.toZ3(fd, false);
+p4.toZ3(fd);
 
 (new FuncExpr("f", new IntType(), [x, x])).toZ3Declaration(fd);
 (new FuncExpr("f", new IntType(), [x, y])).toZ3Declaration(fd);
@@ -53,6 +53,9 @@ p4.toZ3(fd, false);
 (new FuncExpr("f", new IntType(), [y, y])).toZ3Declaration(fd);
 
 let newOne = new AndExpr(pxy, pxy);
-newOne.toZ3(fd, false);
+newOne.toZ3(fd);
+
+let secondRound = new VarExpr("sdffafd", new UninterpretedType("List_Int"));
+(new EqualityExpr(secondRound, secondRound)).toZ3(fd);
 
 fs.closeSync(fd);

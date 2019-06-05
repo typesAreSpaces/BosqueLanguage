@@ -40,7 +40,6 @@ function resolveType(typeName: string): TypeExpr {
         case "NSCore::String": {
             return new StringType();
         }
-
         default: {
             return new UninterpretedType(typeName);
         }
@@ -238,7 +237,9 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // So we assign the type of the register
             // the type of the lhs element in the operation
             let typeOfrhsTerm = resolveType(typesSeen.get(section + "__" + opBinOp.lhs.nameID) as string);
-            let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
+            // We add the prefix op_ so the encoding in Z3 uses the
+            // boxed operation
+            let rhsOfAssignmentTerm = new FuncExpr("op_" + opBinOp.op, typeOfrhsTerm, [
                 argumentToVarExpr(opBinOp.lhs, section),
                 argumentToVarExpr(opBinOp.rhs, section)
             ]);
@@ -254,7 +255,9 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // because the operations to arrive at this
             // point are <, <=, >, >= only
             let opBinCmp = op as MIRBinCmp;
-            let opFormula = new PredicateExpr(opBinCmp.op, [
+            // We add the prefix op_ so the encoding in Z3 uses the
+            // boxed operation
+            let opFormula = new PredicateExpr("op_" + opBinCmp.op, [
                 argumentToVarExpr(opBinCmp.lhs, section),
                 argumentToVarExpr(opBinCmp.rhs, section)
             ]);
@@ -333,7 +336,8 @@ function opToFormula(op: MIROp, section: string): FormulaExpr {
             // We don't check if opVarLifetimeStart
             // is an instance of MIRRegisterArgument
             // because it always is a variable
-            typesSeen.set(section + "__" + opVarLifetimeStart.name, opVarLifetimeStart.rtype);
+            let sectionName = section + "__" + opVarLifetimeStart.name;
+            typesSeen.set(sectionName, opVarLifetimeStart.rtype);
             // TODO: Here is where we include the type relation 
             // of variables
             return formula;

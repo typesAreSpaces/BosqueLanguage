@@ -12,7 +12,7 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%"].map(x => [x, true])
+        ["+", "-", "*", "/", "%"].map(x => ["op_" + x, true])
     );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
@@ -40,7 +40,31 @@ class VarExpr extends TermExpr {
     toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
-            FS.writeSync(fd, "(declare-fun " + this.symbolName + " () " + this.ty.getType() + ")\n");
+            let declarationName = this.symbolName;
+            let declarationNameConcrete = this.symbolName + "_Concrete";
+            FS.writeSync(fd, "(declare-fun " + declarationNameConcrete + " () " + this.ty.getType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " () Term)\n");
+            switch(this.ty.getType()){
+                case "Int" : {
+                    FS.writeSync(fd, "(assert (= (UnboxInt " + declarationName + ") " + declarationNameConcrete +"))\n");
+                    FS.writeSync(fd, "(assert (= (BoxInt " + declarationNameConcrete + ") " + declarationName +"))\n");
+                    break;
+                }
+                case "Bool" : {
+                    FS.writeSync(fd, "(assert (= (UnboxBool " + declarationName + ") " + declarationNameConcrete +"))\n");
+                    FS.writeSync(fd, "(assert (= (BoxBool " + declarationNameConcrete + ") " + declarationName +"))\n");
+                    break;
+                }
+                case "String" : {
+                    FS.writeSync(fd, "(assert (= (UnboxString " + declarationName + ") " + declarationNameConcrete +"))\n");
+                    FS.writeSync(fd, "(assert (= (BoxString " + declarationNameConcrete + ") " + declarationName +"))\n");
+                    break;
+                }
+                default : {
+                    break;
+                }
+            }
+
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
@@ -49,6 +73,8 @@ class VarExpr extends TermExpr {
     }
 }
 
+// TODO: FuncExpr might need changes to 
+// include the type TermType, it might not
 class FuncExpr extends TermExpr {
     readonly terms: TermExpr[];
     constructor(name: string, ty: TypeExpr, terms: TermExpr[]) {
