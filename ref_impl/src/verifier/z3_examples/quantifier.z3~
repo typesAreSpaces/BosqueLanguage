@@ -1,0 +1,3 @@
+(declare-fun f (Int) Int)
+(declare-fun g (Int) Int)
+(assert (forall ((x Int)) (= (g (f x)) x)))

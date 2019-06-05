@@ -1,0 +1,10 @@
+(declare-fun f (Int) Int)
+(declare-fun g (Int) Int)
+(assert
+ (forall ((@x Int))
+	 (! (= (f (g @x)) @x)
+	    :pattern ((g @x))
+	    )
+  )
+ )
+(check-sat)

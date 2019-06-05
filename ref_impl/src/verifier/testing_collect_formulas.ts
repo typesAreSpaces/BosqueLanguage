@@ -9,7 +9,7 @@ import chalk from "chalk";
 import { MIREmitter } from "../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
 import { MIRBody } from "../compiler/mir_ops";
-import { collectFormulas, typesSeen } from "./collect_formulas_2"
+import { collectFormulas, typesSeen } from "./collect_formulas_3"
 
 function getControlFlow(app: string, section: string, fd: number, getModel : boolean): void {
 
@@ -77,11 +77,11 @@ function getControlFlow(app: string, section: string, fd: number, getModel : boo
 
 setImmediate(() => {
     // Mac Machine
-    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
-    let bosqueFile = "/max/main6_3.bsq";
+    let bosqueFile = "/max/main.bsq";
     let section = "NSMain::max";
     let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
     getControlFlow(dirMachine + bosqueFile, section, fd, false);

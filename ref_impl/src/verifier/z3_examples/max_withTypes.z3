@@ -1,12 +1,8 @@
 (set-option :smt.auto-config false) ; disable automatic self configuration
 (set-option :smt.mbqi false) ; disable model-based quantifier instantiation
-(set-option :model true)
 
 (declare-sort Term)
-
 (declare-datatypes () ((BType BInt BBool)))
-
-;; All elements of type BType are different
 
 (declare-fun HasType (Term BType) Bool)
 (declare-fun BoxInt (Int) Term)
@@ -14,14 +10,16 @@
 
 (assert
  (forall ((@x Term))
-	 (! (= (BoxInt (UnboxInt @x)) @x)
+	 (! (implies
+	     (HasType @x BInt)
+	     (= (BoxInt (UnboxInt @x)) @x))
 	    :pattern ((UnboxInt @x))
 	    )
 	 )
  )
 
-;; (assert (= (UnboxInt (BoxInt 14)) 14))
-;; (assert (= (UnboxInt (BoxInt 11)) 11))
+(declare-fun op_>= (Term Term) Bool)
+(assert (forall ((@x Term) (@y Term)) (! (implies (and (HasType @x BInt) (HasType @y BInt)) (= (op_>= @x @y) (>= (UnboxInt @x) (UnboxInt @y)))) :pattern (op_>= @x @y))))
 
 ;;-------------------------------------------
 ;; Example
@@ -29,17 +27,14 @@
 (declare-const x Term)
 (declare-const y Term)
 
+(define-fun maxTerm ((@x Term) (@y Term)) Term (ite (op_>= @x @y) @x @y))
+
 (assert (HasType x BInt))
 (assert (HasType y BInt))
 
-(assert (= x (BoxInt 14)))
-(assert (= y (BoxInt 11)))
+(define-const example Bool (op_>= (maxTerm x y) x))
 
-(define-const example Bool
-  (= (UnboxInt x) (UnboxInt y))
-  )
-
-(assert example)
+(assert (not example))
 ;;(assert (not example))
 
 (check-sat)
