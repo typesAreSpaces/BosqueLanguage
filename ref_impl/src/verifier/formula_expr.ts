@@ -42,7 +42,7 @@ abstract class FormulaExpr {
         // TODO: Add more BTypes if needed
         FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
 
-        FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
+        FS.writeSync(fd, "(declare-fun HasType (Term BType) Bool)\n");
         FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
         FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
@@ -167,7 +167,7 @@ class EqualityExpr extends FormulaExpr {
     readonly leftHandSide: TermExpr;
     readonly rightHandSide: TermExpr;
     constructor(left: TermExpr, right: TermExpr) {
-        super(left.name + "=" + right.name, "op_=", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " op_= " + right.name, "op_=", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -184,7 +184,7 @@ class EqualityExpr extends FormulaExpr {
 class NegExpr extends FormulaExpr {
     readonly formula: FormulaExpr;
     constructor(formula: FormulaExpr) {
-        super("neg " + formula.name, "op_not", new FuncType([formula.ty], new BoolType()));
+        super("op_not " + formula.name, "op_not", new FuncType([formula.ty], new BoolType()));
         this.formula = formula;
     }
     sexpr() {
@@ -200,7 +200,7 @@ class AndExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " and " + right.name, "op_and", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " op_and " + right.name, "op_and", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -218,7 +218,7 @@ class OrExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " or " + right.name, "op_or", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " op_or " + right.name, "op_or", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -236,7 +236,7 @@ class ImplExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " implies " + right.name, "op_=>", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " op_=> " + right.name, "op_=>", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -254,7 +254,7 @@ class ForAllExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("forall " + nameBinder.name + ".l_" + formula.name + "_r", "op_forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("op_forall " + nameBinder.name + ".l_" + formula.name + "_r", "op_forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }
@@ -271,7 +271,7 @@ class ExistsExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("exists " + nameBinder.name + ".l_" + formula.name + "_r", "op_exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("op_exists " + nameBinder.name + ".l_" + formula.name + "_r", "op_exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }

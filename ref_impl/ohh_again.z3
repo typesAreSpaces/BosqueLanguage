@@ -1,6 +1,5 @@
 (set-option :smt.auto-config false) ; disable automatic self configuration
-(set-option :smt.mbqi false) ; disable model-based quantifier instantiation
-(set-option :model true)
+(set-option :smt.mbqi true) ; disable model-based quantifier instantiation
 
 (declare-sort Term)
 (declare-datatypes () ((BType BInt BBool BString)))
@@ -13,13 +12,14 @@
 (declare-fun BoxString (String) Term)
 (declare-fun UnboxString (Term) String)
 
-(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))
-(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))
-(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))
+(assert (forall ((@x Term)) (! (= (BoxInt (UnboxInt @x)) @x) :pattern ((BoxInt (UnboxInt @x))))))
+(assert (forall ((@x Term)) (! (= (BoxBool (UnboxBool @x)) @x) :pattern ((BoxBool (UnboxBool @x))))))
+(assert (forall ((@x Term)) (! (= (BoxString (UnboxString @x)) @x) :pattern ((BoxString (UnboxString @x))))))
 
 (define-fun op_=> ((@x Term) (@y Term)) Term (BoxBool (=> (UnboxBool @x) (UnboxBool @y))))
 (define-fun op_or ((@x Term) (@y Term)) Term (BoxBool (or (UnboxBool @x) (UnboxBool @y))))
 (define-fun op_and ((@x Term) (@y Term)) Term (BoxBool (and (UnboxBool @x) (UnboxBool @y))))
+(define-fun op_= ((@x Term) (@y Term)) Term (BoxBool (= @x @y)))
 (define-fun op_not ((@x Term)) Term (BoxBool (not (UnboxBool @x))))
 (define-fun op_> ((@x Term) (@y Term)) Term (BoxBool (> (UnboxInt @x) (UnboxInt @y))))
 (define-fun op_< ((@x Term) (@y Term)) Term (BoxBool (< (UnboxInt @x) (UnboxInt @y))))
@@ -36,6 +36,6 @@
 (declare-fun NSMain__max___ir_ret_ () Term)
 (declare-fun NSMain__max___return_ () Term)
 (assert (UnboxBool (op_= __tmp_0 (op_>= NSMain__max__x NSMain__max__y))))
-(assert (op_=> __tmp_0 (op_and (op_and (BoxBool (= NSMain__max___ir_ret_$1 NSMain__max__x)) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1))) (op_=> (op_not __tmp_0) (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_)))) (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
-(assert (op_=> (op_not __tmp_0) (op_and (op_and (BoxBool (= NSMain__max___ir_ret_ NSMain__max__y)) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1))) (op_=> (op_not __tmp_0) (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_)))) (BoxBool (= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
+(assert (UnboxBool (op_=> __tmp_0 (op_and (op_and (op_= NSMain__max___ir_ret_$1 NSMain__max__x) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1)) (op_=> (op_not __tmp_0) (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_))) (op_= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
+(assert (UnboxBool (op_=> (op_not __tmp_0) (op_and (op_and (op_= NSMain__max___ir_ret_ NSMain__max__y) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1)) (op_=> (op_not __tmp_0) (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_))) (op_= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
 (check-sat)

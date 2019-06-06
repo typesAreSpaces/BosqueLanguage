@@ -39,4 +39,5 @@
 (assert (UnboxBool (op_= __tmp_0 (op_>= NSMain__max__x NSMain__max__y))))
 (assert (UnboxBool (op_=> __tmp_0 (op_and (op_and (op_= NSMain__max___ir_ret_$1 NSMain__max__x) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1)) (op_=> (op_not __tmp_0) (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_))) (op_= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
 (assert (UnboxBool (op_=> (op_not __tmp_0) (op_and (op_and (op_= NSMain__max___ir_ret_ NSMain__max__y) MIRJumpFormula) (op_and (op_and (op_=> __tmp_0 (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_$1)) (op_=> (op_not __tmp_0) (op_= NSMain__max___ir_ret_$2 NSMain__max___ir_ret_))) (op_= NSMain__max___ir_ret_$2 NSMain__max___return_))))))
+(assert (UnboxBool (op_>  NSMain__max__x NSMain__max___return_  )))
 (check-sat)
