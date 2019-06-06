@@ -19,7 +19,7 @@ abstract class FormulaExpr {
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ([">", ">=", "<", "<=", "=", "true", "false"].map(x => {
-            if (x === "true" || x === "false" || x === "=") {
+            if (x === "true" || x === "false") {
                 return [x, true];
             }
             else {
@@ -58,6 +58,7 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(define-fun op_=> ((@x Term) (@y Term)) Term (BoxBool (=> (UnboxBool @x) (UnboxBool @y))))\n");
         FS.writeSync(fd, "(define-fun op_or ((@x Term) (@y Term)) Term (BoxBool (or (UnboxBool @x) (UnboxBool @y))))\n");
         FS.writeSync(fd, "(define-fun op_and ((@x Term) (@y Term)) Term (BoxBool (and (UnboxBool @x) (UnboxBool @y))))\n");
+        FS.writeSync(fd, "(define-fun op_= ((@x Term) (@y Term)) Term (BoxBool (= @x @y)))\n");
         FS.writeSync(fd, "(define-fun op_not ((@x Term)) Term (BoxBool (not (UnboxBool @x))))\n");
         FS.writeSync(fd, "(define-fun op_> ((@x Term) (@y Term)) Term (BoxBool (> (UnboxInt @x) (UnboxInt @y))))\n");
         FS.writeSync(fd, "(define-fun op_< ((@x Term) (@y Term)) Term (BoxBool (< (UnboxInt @x) (UnboxInt @y))))\n");
@@ -85,7 +86,7 @@ abstract class FormulaExpr {
             else {
                 let formulaName = formula.name;
                 if (formulaName != "MIRJumpCondFormulal__r" && formulaName != "MIRJumpFormulal__r") {
-                    FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
+                    FS.writeSync(fd, "(assert (UnboxBool " + formula.sexpr() + "))\n");
                 }
             }
         }
@@ -166,7 +167,7 @@ class EqualityExpr extends FormulaExpr {
     readonly leftHandSide: TermExpr;
     readonly rightHandSide: TermExpr;
     constructor(left: TermExpr, right: TermExpr) {
-        super(left.name + "=" + right.name, "=", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + "=" + right.name, "op_=", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
