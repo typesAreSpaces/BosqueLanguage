@@ -23,7 +23,7 @@ abstract class TermExpr {
         }
     }
     toZ3DeclarationSort(fd: number): void {
-        let thisTypeTemp = this.ty.getType();
+        let thisTypeTemp = this.ty.getAbstractType();
         if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
             FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);
@@ -41,30 +41,9 @@ class VarExpr extends TermExpr {
         this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            let declarationNameConcrete = this.symbolName + "_Concrete";
-            FS.writeSync(fd, "(declare-fun " + declarationNameConcrete + " () " + this.ty.getType() + ")\n");
-            FS.writeSync(fd, "(declare-fun " + declarationName + " () Term)\n");
-            switch(this.ty.getType()){
-                case "Int" : {
-                    FS.writeSync(fd, "(assert (= (UnboxInt " + declarationName + ") " + declarationNameConcrete +"))\n");
-                    FS.writeSync(fd, "(assert (= (BoxInt " + declarationNameConcrete + ") " + declarationName +"))\n");
-                    break;
-                }
-                case "Bool" : {
-                    FS.writeSync(fd, "(assert (= (UnboxBool " + declarationName + ") " + declarationNameConcrete +"))\n");
-                    FS.writeSync(fd, "(assert (= (BoxBool " + declarationNameConcrete + ") " + declarationName +"))\n");
-                    break;
-                }
-                case "String" : {
-                    FS.writeSync(fd, "(assert (= (UnboxString " + declarationName + ") " + declarationNameConcrete +"))\n");
-                    FS.writeSync(fd, "(assert (= (BoxString " + declarationNameConcrete + ") " + declarationName +"))\n");
-                    break;
-                }
-                default : {
-                    break;
-                }
-            }
-
+            // let declarationNameConcrete = this.symbolName + "_Concrete";
+            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
+            // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
@@ -101,7 +80,8 @@ class FuncExpr extends TermExpr {
             item.toZ3Declaration(fd);
         }
         if (!FuncExpr.symbolTable.get(this.symbolName)) {
-            FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getAbstractType() + ")\n");
+            // FS.writeSync(fd, "(HasType " + this.symbolName + " " + this.ty.getType() + ")\n");
             FuncExpr.symbolTable.set(this.symbolName, true);
         }
     }

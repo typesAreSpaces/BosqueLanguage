@@ -17,6 +17,7 @@ abstract class TypeExpr {
     abstract readonly isPrimitiveType: boolean;
     abstract readonly isUninterpreted: boolean;
     abstract getType(): string;
+    abstract getAbstractType() : string;
 }
 
 class IntType extends TypeExpr {
@@ -24,6 +25,9 @@ class IntType extends TypeExpr {
     isUninterpreted = false;
     getType() {
         return "Int";
+    }
+    getAbstractType() {
+        return "Term";
     }
 }
 
@@ -33,6 +37,9 @@ class BoolType extends TypeExpr {
     getType() {
         return "Bool";
     }
+    getAbstractType() {
+        return "Term";
+    }
 }
 
 class StringType extends TypeExpr {
@@ -40,6 +47,9 @@ class StringType extends TypeExpr {
     isUninterpreted = false;
     getType() {
         return "String";
+    }
+    getAbstractType() {
+        return "Term";
     }
 }
 
@@ -62,6 +72,17 @@ class FuncType extends TypeExpr {
                 (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()),
                 this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
                 + ") " + this.image.getType();
+        }
+    }
+    getAbstractType() : string{
+        if (this.domain.length == 0) {
+            return "() " + this.image.getAbstractType();
+        }
+        else {
+            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
+                (b.isPrimitiveType ? b.getAbstractType() : (b as FuncType).image.getAbstractType()),
+                this.domain[0].isPrimitiveType ? this.domain[0].getAbstractType() : (this.domain[0] as FuncType).image.getAbstractType())
+                + ") " + this.image.getAbstractType();
         }
     }
 }
@@ -91,6 +112,16 @@ class UnionType extends TypeExpr {
             return lhsType + "_" + rhsType;
         }
     }
+    getAbstractType() {
+        let lhsType = this.lhs.getAbstractType();
+        let rhsType = this.rhs.getAbstractType();
+        if(lhsType === rhsType){
+            return lhsType;
+        }
+        else{
+            return lhsType + "_" + rhsType;
+        }
+    }
 }
 
 // REMARK: Names cannot include `,'
@@ -110,6 +141,9 @@ class UninterpretedType extends TypeExpr {
     }
     getType() {
         return this.name;
+    }
+    getAbstractType() {
+        return "Term";
     }
 }
 
