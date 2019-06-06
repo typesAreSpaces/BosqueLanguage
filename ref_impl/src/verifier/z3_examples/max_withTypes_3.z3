@@ -33,7 +33,7 @@
 
 (define-fun maxTerm ((@x Term) (@y Term)) Term (ite (UnboxBool (op_> @x @y)) @x @y))
 
-(define-const flag Bool true)
+(define-const flag Bool false)
 (define-const example Bool
   (ite flag
        (UnboxBool (op_>= (maxTerm x y) x))
