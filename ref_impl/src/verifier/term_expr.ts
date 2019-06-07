@@ -12,7 +12,7 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%"].map(x => ["op_" + x, true])
+        ["+", "-", "*", "/", "%"].map(x => [x, true])
     );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
@@ -41,14 +41,26 @@ class VarExpr extends TermExpr {
         this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            // let declarationNameConcrete = this.symbolName + "_Concrete";
             FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
     sexpr() {
-        return this.symbolName;
+        switch (this.ty.getType()) {
+            case "Int": {
+                return "(UnboxInt " + this.symbolName + ")";
+            }
+            case "Bool": {
+                return "(UnboxBool " + this.symbolName + ")";
+            }
+            case "String": {
+                return "(UnboxString " + this.symbolName + ")";
+            }
+            default: {
+                return this.symbolName;
+            }
+        }
     }
 }
 

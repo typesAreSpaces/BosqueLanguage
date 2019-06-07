@@ -9,7 +9,7 @@ import chalk from "chalk";
 import { MIREmitter } from "../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
 import { MIRBody } from "../compiler/mir_ops";
-import { collectFormulas, typesSeen } from "./collect_formulas_4"
+import { collectFormulas, typesSeen } from "./collect_formulas_5";
 
 function getControlFlow(app: string, section: string, fd: number): void {
 

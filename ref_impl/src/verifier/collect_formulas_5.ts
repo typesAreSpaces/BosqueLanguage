@@ -9,7 +9,7 @@ import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../v
 import { VarExpr, FuncExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, OrExpr } from "../verifier/formula_expr";
 
-let DEBUGGING = false;
+let DEBUGGING = true;
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -231,15 +231,15 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.MIRBinOp: {
-            let opBinOp = op as MIRBinOp;
-            let regName = opBinOp.trgt.nameID[0] == "#" ? "__" + opBinOp.trgt.nameID.slice(1) : opBinOp.trgt.nameID;
+            let opBinOp = op as MIRBinOp; 
+            let regName = section + "__" + opBinOp.trgt.nameID;
             // We assume the expressions are well-typed.
             // So we assign the type of the register
             // the type of the lhs element in the operation
-            let typeOfrhsTerm = resolveType(typesSeen.get(section + "__" + opBinOp.lhs.nameID) as string);
-            // We add the prefix op_ so the encoding in Z3 uses the
-            // boxed operation
-            let rhsOfAssignmentTerm = new FuncExpr("op_" + opBinOp.op, typeOfrhsTerm, [
+            let typeOfLHS = typesSeen.get(section + "__" + opBinOp.lhs.nameID) as string;
+            typesSeen.set(regName, typeOfLHS);
+            let typeOfrhsTerm = resolveType(typeOfLHS);
+            let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
                 argumentToVarExpr(opBinOp.lhs, section),
                 argumentToVarExpr(opBinOp.rhs, section)
             ]);
@@ -255,13 +255,11 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // because the operations to arrive at this
             // point are <, <=, >, >= only
             let opBinCmp = op as MIRBinCmp;
-            // We add the prefix op_ so the encoding in Z3 uses the
-            // boxed operation
-            let opFormula = new PredicateExpr("op_" + opBinCmp.op, [
+            let opFormula = new PredicateExpr(opBinCmp.op, [
                 argumentToVarExpr(opBinCmp.lhs, section),
                 argumentToVarExpr(opBinCmp.rhs, section)
             ]);
-            let regName = opBinCmp.trgt.nameID[0] == "#" ? "__" + opBinCmp.trgt.nameID.slice(1) : opBinCmp.trgt.nameID;
+            let regName = section + "__" + opBinCmp.trgt.nameID;
             return new EqualityExpr(new PredicateExpr(regName, []), opFormula);
         }
         case MIROpTag.MIRRegAssign: {
@@ -325,7 +323,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
         case MIROpTag.MIRJumpCond: {
             let opJumpCond = op as MIRJumpCond;
             formula = new PredicateExpr("MIRJumpCondFormula", []);
-            let regName = opJumpCond.arg.nameID[0] == "#" ? "__" + opJumpCond.arg.nameID.slice(1) : opJumpCond.arg.nameID;
+            let regName = section + "__" + opJumpCond.arg.nameID;
             let conditionFormula = new PredicateExpr(regName, []);
             // mapBlockCondition.set(opJumpCond.trueblock, conditionFormula);
             (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(conditionFormula);
@@ -457,7 +455,7 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
             }
             case 2: {
                 let jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
-                let regName = jumpCondOp.arg.nameID[0] == "#" ? "__" + jumpCondOp.arg.nameID.slice(1) : jumpCondOp.arg.nameID;
+                let regName = section + "__" + jumpCondOp.arg.nameID;
                 let conditionFormula = new PredicateExpr(regName, []);
                 let branchTrue = new ImplExpr(conditionFormula, traverse(ibody.get(jumpCondOp.trueblock) as MIRBasicBlock));
                 let branchFalse = new ImplExpr(new NegExpr(conditionFormula), traverse(ibody.get(jumpCondOp.falseblock) as MIRBasicBlock));

@@ -15,17 +15,9 @@ abstract class FormulaExpr {
     readonly name: string;
     readonly symbolName: string;
     readonly ty: TypeExpr;
-    static fd = FS.openSync('file.z3', 'w');
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ([">", ">=", "<", "<=", "=", "true", "false"].map(x => {
-            if (x === "true" || x === "false") {
-                return [x, true];
-            }
-            else {
-                return ["op_" + x, true];
-            }
-        }))
+        ([">", ">=", "<", "<=", "=", "true", "false"].map(x => [x, true]))
     );
     constructor(name: string, symbolName: string, ty: TypeExpr) {
         this.name = name;
@@ -43,30 +35,20 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
 
         FS.writeSync(fd, "(declare-fun HasType (Term BType) Bool)\n");
-        FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
+        // FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
-        FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
+        // FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
-        FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
+        // FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
 
-        FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
-        FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
-        FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
-
-        // TODO: Add more operations 
-        FS.writeSync(fd, "(define-fun op_=> ((@x Term) (@y Term)) Term (BoxBool (=> (UnboxBool @x) (UnboxBool @y))))\n");
-        FS.writeSync(fd, "(define-fun op_or ((@x Term) (@y Term)) Term (BoxBool (or (UnboxBool @x) (UnboxBool @y))))\n");
-        FS.writeSync(fd, "(define-fun op_and ((@x Term) (@y Term)) Term (BoxBool (and (UnboxBool @x) (UnboxBool @y))))\n");
-        FS.writeSync(fd, "(define-fun op_= ((@x Term) (@y Term)) Term (BoxBool (= @x @y)))\n");
-        FS.writeSync(fd, "(define-fun op_not ((@x Term)) Term (BoxBool (not (UnboxBool @x))))\n");
-        FS.writeSync(fd, "(define-fun op_> ((@x Term) (@y Term)) Term (BoxBool (> (UnboxInt @x) (UnboxInt @y))))\n");
-        FS.writeSync(fd, "(define-fun op_< ((@x Term) (@y Term)) Term (BoxBool (< (UnboxInt @x) (UnboxInt @y))))\n");
-        FS.writeSync(fd, "(define-fun op_>= ((@x Term) (@y Term)) Term (BoxBool (>= (UnboxInt @x) (UnboxInt @y))))\n");
-        FS.writeSync(fd, "(define-fun op_<= ((@x Term) (@y Term)) Term (BoxBool (<= (UnboxInt @x) (UnboxInt @y))))\n\n");
+        // FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
+        // FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
+        // FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
     }
     toZ3(fd: number): void {
         this.toZ3Declaration(fd);
+        FS.writeSync(fd, "\n");
         let assertingZ3 = function (formula: FormulaExpr) {
             if (formula instanceof AndExpr) {
                 let lhsName = formula.leftHandSide.name;
@@ -86,7 +68,7 @@ abstract class FormulaExpr {
             else {
                 let formulaName = formula.name;
                 if (formulaName != "MIRJumpCondFormulal__r" && formulaName != "MIRJumpFormulal__r") {
-                    FS.writeSync(fd, "(assert (UnboxBool " + formula.sexpr() + "))\n");
+                    FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
                 }
             }
         }
@@ -142,7 +124,7 @@ class PredicateExpr extends FormulaExpr {
     sexpr() {
         switch (this.terms.length) {
             case 0: {
-                return this.symbolName;
+                return "(UnboxBool " + this.symbolName + ")";
             }
             default: {
                 return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
@@ -167,7 +149,7 @@ class EqualityExpr extends FormulaExpr {
     readonly leftHandSide: TermExpr;
     readonly rightHandSide: TermExpr;
     constructor(left: TermExpr, right: TermExpr) {
-        super(left.name + " op_= " + right.name, "op_=", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " = " + right.name, "=", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -184,7 +166,7 @@ class EqualityExpr extends FormulaExpr {
 class NegExpr extends FormulaExpr {
     readonly formula: FormulaExpr;
     constructor(formula: FormulaExpr) {
-        super("op_not " + formula.name, "op_not", new FuncType([formula.ty], new BoolType()));
+        super("not " + formula.name, "not", new FuncType([formula.ty], new BoolType()));
         this.formula = formula;
     }
     sexpr() {
@@ -200,7 +182,7 @@ class AndExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " op_and " + right.name, "op_and", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " and " + right.name, "and", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -218,7 +200,7 @@ class OrExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " op_or " + right.name, "op_or", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " or " + right.name, "or", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -236,7 +218,7 @@ class ImplExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " op_=> " + right.name, "op_=>", new FuncType([left.ty, right.ty], new BoolType()));
+        super(left.name + " => " + right.name, "=>", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -254,7 +236,7 @@ class ForAllExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("op_forall " + nameBinder.name + ".l_" + formula.name + "_r", "op_forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }
@@ -271,7 +253,7 @@ class ExistsExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("op_exists " + nameBinder.name + ".l_" + formula.name + "_r", "op_exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }
