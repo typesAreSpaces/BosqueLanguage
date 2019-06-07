@@ -7,25 +7,23 @@ import * as FS from "fs";
 import { TypeExpr, FuncType, UninterpretedType } from "./type_expr";
 
 abstract class TermExpr {
-    readonly name: string;
     readonly symbolName: string;
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%"].map(x => [x, true])
+        ["+", "-", "*", "/", "%", "UnboxInt", "UnboxBool", "UnboxString", "HasType"].map(x => [x, true])
     );
-    constructor(name: string, symbolName: string, ty: TypeExpr) {
-        this.name = name;
+    constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
         this.ty = ty;
-        if (!TermExpr.symbolTable.has(this.name)) {
-            TermExpr.symbolTable.set(this.name, false);
+        if (!TermExpr.symbolTable.has(this.symbolName)) {
+            TermExpr.symbolTable.set(this.symbolName, false);
         }
     }
     toZ3DeclarationSort(fd: number): void {
         let thisTypeTemp = this.ty.getAbstractType();
         if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
-            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
+            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).symbolName + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);
         }
     }
@@ -34,33 +32,21 @@ abstract class TermExpr {
 }
 
 class VarExpr extends TermExpr {
-    constructor(name: string, ty: TypeExpr) {
-        super(name, name, ty);
+    constructor(symbolName: string, ty: TypeExpr) {
+        super(symbolName, ty);
     }
     toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getType() + ")\n");
+            // FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
     sexpr() {
-        switch (this.ty.getType()) {
-            case "Int": {
-                return "(UnboxInt " + this.symbolName + ")";
-            }
-            case "Bool": {
-                return "(UnboxBool " + this.symbolName + ")";
-            }
-            case "String": {
-                return "(UnboxString " + this.symbolName + ")";
-            }
-            default: {
-                return this.symbolName;
-            }
-        }
+        return this.symbolName;
     }
 }
 
@@ -68,19 +54,19 @@ class VarExpr extends TermExpr {
 // include the type TermType, it might not
 class FuncExpr extends TermExpr {
     readonly terms: TermExpr[];
-    constructor(name: string, ty: TypeExpr, terms: TermExpr[]) {
+    constructor(symbolName: string, ty: TypeExpr, terms: TermExpr[]) {
         let collectType = new FuncType(terms.map(x => x.ty), ty);
         switch (terms.length) {
             case 0: {
-                super(name + "l__r", name, collectType);
+                super(symbolName, collectType);
                 break;
             }
             case 1: {
-                super(name + "l_" + terms[0].name + "_r", name, collectType)
+                super(symbolName, collectType)
                 break;
             }
             default: {
-                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", name, collectType);
+                super(symbolName, collectType);
                 break;
             }
         }

@@ -12,15 +12,13 @@ import * as FS from "fs";
 // or any other symbol that Z3 cannot
 // parse as a valid char for a named expression
 abstract class FormulaExpr {
-    readonly name: string;
     readonly symbolName: string;
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ([">", ">=", "<", "<=", "=", "true", "false"].map(x => [x, true]))
     );
-    constructor(name: string, symbolName: string, ty: TypeExpr) {
-        this.name = name;
+    constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
         this.ty = ty;
     }
@@ -48,8 +46,8 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "\n");
         let assertingZ3 = function (formula: FormulaExpr) {
             if (formula instanceof AndExpr) {
-                let lhsName = formula.leftHandSide.name;
-                let rhsName = formula.rightHandSide.name;
+                let lhsName = formula.leftHandSide.symbolName;
+                let rhsName = formula.rightHandSide.symbolName;
                 if (lhsName !== "MIRJumpCondFormulal__r" && lhsName !== "MIRJumpFormulal__r") {
                     assertingZ3(formula.leftHandSide);
                     if (rhsName !== "MIRJumpCondFormulal__r" && rhsName !== "MIRJumpFormulal__r") {
@@ -63,13 +61,14 @@ abstract class FormulaExpr {
                 }
             }
             else {
-                let formulaName = formula.name;
+                let formulaName = formula.symbolName;
                 if (formulaName != "MIRJumpCondFormulal__r" && formulaName != "MIRJumpFormulal__r") {
                     FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
                 }
             }
         }
         assertingZ3(this);
+        // FS.writeSync(fd, "(assert " + this.sexpr() + ")\n");
     }
     static checkSatZ3(fd: number) {
         FS.writeSync(fd, "(check-sat)\n");
@@ -88,7 +87,7 @@ abstract class FormulaExpr {
         // Second part of the following conjunction avoids repetitions
         // in the declaration section
         if (this.ty instanceof UninterpretedType && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
-            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).name + ")\n");
+            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).symbolName + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);
         }
     }
@@ -97,19 +96,19 @@ abstract class FormulaExpr {
 
 class PredicateExpr extends FormulaExpr {
     readonly terms: TermExpr[];
-    constructor(name: string, terms: TermExpr[]) {
+    constructor(symbolName: string, terms: TermExpr[]) {
         let collectType = new FuncType(terms.map(x => x.ty), new BoolType())
         switch (terms.length) {
             case 0: {
-                super(name + "l__r", name, collectType);
+                super(symbolName, collectType);
                 break;
             }
             case 1: {
-                super(name + "l_" + terms[0].name + "_r", name, collectType)
+                super(symbolName, collectType)
                 break;
             }
             default: {
-                super(name + "l_" + terms.slice(1).reduce((a, b) => a + "_" + b.name, terms[0].name) + "_r", name, collectType);
+                super(symbolName, collectType);
                 break;
             }
         }
@@ -121,7 +120,7 @@ class PredicateExpr extends FormulaExpr {
     sexpr() {
         switch (this.terms.length) {
             case 0: {
-                return "(UnboxBool " + this.symbolName + ")";
+                return this.symbolName;
             }
             default: {
                 return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
@@ -135,7 +134,8 @@ class PredicateExpr extends FormulaExpr {
         }
         if (!PredicateExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getType() + ")\n");
+            // FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             PredicateExpr.symbolTable.set(this.symbolName, true);
         }
@@ -146,7 +146,25 @@ class EqualityExpr extends FormulaExpr {
     readonly leftHandSide: TermExpr;
     readonly rightHandSide: TermExpr;
     constructor(left: TermExpr, right: TermExpr) {
-        super(left.name + " = " + right.name, "=", new FuncType([left.ty, right.ty], new BoolType()));
+        super("=", new FuncType([left.ty, right.ty], new BoolType()));
+        this.leftHandSide = left;
+        this.rightHandSide = right;
+    }
+    sexpr() {
+        return "(" + this.symbolName + " " + this.leftHandSide.sexpr() + " " + this.rightHandSide.sexpr() + ")";
+    }
+    toZ3Declaration(fd: number) {
+        this.toZ3DeclarationSort(fd);
+        this.leftHandSide.toZ3Declaration(fd);
+        this.rightHandSide.toZ3Declaration(fd);
+    }
+}
+
+class EqualityFormula extends FormulaExpr {
+    readonly leftHandSide: FormulaExpr;
+    readonly rightHandSide: FormulaExpr;
+    constructor(left: FormulaExpr, right: FormulaExpr) {
+        super("=", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -163,7 +181,7 @@ class EqualityExpr extends FormulaExpr {
 class NegExpr extends FormulaExpr {
     readonly formula: FormulaExpr;
     constructor(formula: FormulaExpr) {
-        super("not " + formula.name, "not", new FuncType([formula.ty], new BoolType()));
+        super("not", new FuncType([formula.ty], new BoolType()));
         this.formula = formula;
     }
     sexpr() {
@@ -179,7 +197,7 @@ class AndExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " and " + right.name, "and", new FuncType([left.ty, right.ty], new BoolType()));
+        super("and", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -197,7 +215,7 @@ class OrExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " or " + right.name, "or", new FuncType([left.ty, right.ty], new BoolType()));
+        super("or", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -215,7 +233,7 @@ class ImplExpr extends FormulaExpr {
     readonly leftHandSide: FormulaExpr;
     readonly rightHandSide: FormulaExpr;
     constructor(left: FormulaExpr, right: FormulaExpr) {
-        super(left.name + " => " + right.name, "=>", new FuncType([left.ty, right.ty], new BoolType()));
+        super("=>", new FuncType([left.ty, right.ty], new BoolType()));
         this.leftHandSide = left;
         this.rightHandSide = right;
     }
@@ -233,7 +251,7 @@ class ForAllExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("forall " + nameBinder.name + ".l_" + formula.name + "_r", "forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("forall", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }
@@ -250,7 +268,7 @@ class ExistsExpr extends FormulaExpr {
     readonly nameBinder: VarExpr;
     readonly formula: FormulaExpr;
     constructor(nameBinder: VarExpr, formula: FormulaExpr) {
-        super("exists " + nameBinder.name + ".l_" + formula.name + "_r", "exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
+        super("exists", new FuncType([nameBinder.ty, formula.ty], new BoolType()));
         this.nameBinder = nameBinder;
         this.formula = formula;
     }
@@ -263,4 +281,34 @@ class ExistsExpr extends FormulaExpr {
     }
 }
 
-export { FormulaExpr, PredicateExpr, EqualityExpr, NegExpr, AndExpr, OrExpr, ImplExpr, ForAllExpr, ExistsExpr };
+function makeConjunction(formulas: FormulaExpr[]): FormulaExpr {
+    let changeFormula = false;
+    let result = new PredicateExpr("true", []) as FormulaExpr;
+    for (let formula of formulas) {
+        if (!changeFormula) {
+            changeFormula = true;
+            result = formula;
+        }
+        else {
+            result = new AndExpr(result, formula);
+        }
+    }
+    return result;
+}
+
+function makeDisjuction(formulas: Set<FormulaExpr>): FormulaExpr {
+    let changeFormula = false;
+    let result = new PredicateExpr("false", []) as FormulaExpr;
+    for (let formula of formulas) {
+        if (!changeFormula) {
+            changeFormula = true;
+            result = formula;
+        }
+        else {
+            result = new OrExpr(result, formula);
+        }
+    }
+    return result;
+}
+
+export { FormulaExpr, PredicateExpr, EqualityExpr, EqualityFormula, NegExpr, AndExpr, OrExpr, ImplExpr, ForAllExpr, ExistsExpr, makeConjunction, makeDisjuction };

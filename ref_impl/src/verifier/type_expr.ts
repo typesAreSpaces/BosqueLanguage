@@ -88,7 +88,7 @@ class FuncType extends TypeExpr {
 }
 
 // The getType() of UnionType
-// might have a collition name
+// might have a collition symbolName
 // problem
 // getType() implements idempotency --> Not really.
 // TODO: Fix idempotecy using a Set structure
@@ -124,27 +124,30 @@ class UnionType extends TypeExpr {
     }
 }
 
-// REMARK: Names cannot include `,'
+// REMARK: symbolNames cannot include `,'
 // or any other symbol that Z3 cannot
-// parse as a valid char for a named expression
+// parse as a valid char for a symbolNamed expression
 class UninterpretedType extends TypeExpr {
     isPrimitiveType = true; // ? Yes, for the moment..
     isUninterpreted = true;
-    readonly name: string;
+    readonly symbolName: string;
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
-    constructor(name: string) {
+    constructor(symbolName: string) {
         super();
-        this.name = name;
-        if (!UninterpretedType.symbolTable.has(this.name)) {
-            UninterpretedType.symbolTable.set(this.name, false);
+        this.symbolName = symbolName;
+        if (!UninterpretedType.symbolTable.has(this.symbolName)) {
+            UninterpretedType.symbolTable.set(this.symbolName, false);
         }
     }
     getType() {
-        return this.name;
+        return this.symbolName;
     }
-    getAbstractType() {
+    getAbstractType() { 
         return "Term";
     }
 }
 
 export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType, UnionType };
+
+
+

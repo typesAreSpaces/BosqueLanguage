@@ -92,4 +92,5 @@ setImmediate(() => {
     let section = "NSMain::max";
     let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
     getControlFlow(dirMachine + bosqueFile, section, fd);
+    console.log("Yay");
 });
