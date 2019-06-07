@@ -25,15 +25,13 @@ abstract class FormulaExpr {
         this.ty = ty;
     }
     abstract sexpr(): string;
-    initialDeclarationZ3(fd: number) {
+    static initialDeclarationZ3(fd: number) {
         FS.writeSync(fd, "(set-option :smt.auto-config false) ; disable automatic self configuration\n");
         FS.writeSync(fd, "(set-option :smt.mbqi false) ; disable model-based quantifier instantiation\n");
         FS.writeSync(fd, "(set-option :model true)\n\n");
-
         FS.writeSync(fd, "(declare-sort Term)\n");
         // TODO: Add more BTypes if needed
         FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
-
         FS.writeSync(fd, "(declare-fun HasType (Term BType) Bool)\n");
         // FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
@@ -41,7 +39,6 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
         // FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
-
         // FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         // FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
         // FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
@@ -74,16 +71,16 @@ abstract class FormulaExpr {
         }
         assertingZ3(this);
     }
-    checkSatZ3(fd: number) {
+    static checkSatZ3(fd: number) {
         FS.writeSync(fd, "(check-sat)\n");
     }
-    pushZ3(fd: number) {
+    static pushZ3(fd: number) {
         FS.writeSync(fd, "(push)\n");
     }
-    popZ3(fd: number) {
+    static popZ3(fd: number) {
         FS.writeSync(fd, "(pop)\n");
     }
-    getModelZ3(fd: number) {
+    static getModelZ3(fd: number) {
         FS.writeSync(fd, "(get-model)\n");
     }
     toZ3DeclarationSort(fd: number): void {

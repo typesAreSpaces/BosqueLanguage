@@ -16,6 +16,7 @@
         "./src/type_checker/*.ts",
         "./src/compiler/*.ts",
         "./src/test/*.ts",
-		"./src/verifier/*.ts"
+        "./src/verifier/*.ts",
+        "./src/verifier/testing/*.ts"
     ]
 }

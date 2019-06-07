@@ -325,7 +325,9 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             formula = new PredicateExpr("MIRJumpCondFormula", []);
             let regName = section + "_" + opJumpCond.arg.nameID;
             let conditionFormula = new PredicateExpr(regName, []);
+            // mapBlockCondition.set(opJumpCond.trueblock, conditionFormula);
             (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(conditionFormula);
+            // mapBlockCondition.set(opJumpCond.falseblock, new NegExpr(conditionFormula));
             (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(new NegExpr(conditionFormula));
             return formula;
         }
@@ -337,10 +339,10 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let opVarLifetimeStart = op as MIRVarLifetimeStart;
             // We don't check if opVarLifetimeStart
             // is an instance of MIRRegisterArgument
-            // because we know it is always a variable
+            // because it always is a variable
             let sectionName = section + "_" + opVarLifetimeStart.name;
             typesSeen.set(sectionName, opVarLifetimeStart.rtype);
-            // TODO: Here is where we include the type relation
+            // TODO: Here is where we include the type relation 
             // of variables
             return formula;
         }

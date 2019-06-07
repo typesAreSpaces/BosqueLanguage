@@ -6,14 +6,15 @@
 import * as FS from "fs";
 import * as Path from "path";
 import chalk from "chalk";
-import { MIREmitter } from "../compiler/mir_emitter";
-import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../compiler/mir_assembly";
-import { MIRBody } from "../compiler/mir_ops";
-import { collectFormulas, typesSeen } from "./collect_formulas_5";
+import { MIREmitter } from "../../compiler/mir_emitter";
+import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../../compiler/mir_assembly";
+import { MIRBody } from "../../compiler/mir_ops";
+import { collectFormulas, typesSeen } from "../collect_formulas";
+import { FormulaExpr } from "../formula_expr";
 
 function getControlFlow(app: string, section: string, fd: number): void {
 
-    let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
+    let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../../"));
 
     let files: { relativePath: string, contents: string }[] = [];
     try {
@@ -51,7 +52,7 @@ function getControlFlow(app: string, section: string, fd: number): void {
         // If this is a FunctionDecl then the array of parameters,
         // if it is not empty, will add more elements to the
         // variable typesSeen
-        invokeDecl.params.map(x => typesSeen.set(sectionName + "__" + x.name, x.type.trkey));
+        invokeDecl.params.map(x => typesSeen.set(sectionName + "_" + x.name, x.type.trkey));
         if (typeof (ibody) === "string") {
             FS.closeSync(fd);
             process.exit(0);
@@ -62,10 +63,10 @@ function getControlFlow(app: string, section: string, fd: number): void {
             // Since for Z3 is invalid a name with ":",
             // we replace it with a "_"
             let formula = collectFormulas(ibody, sectionName);
-            formula.initialDeclarationZ3(fd);
+            FormulaExpr.initialDeclarationZ3(fd);
             formula.toZ3(fd);
-            formula.checkSatZ3(fd);
-            // formula.getModelZ3(fd);
+            FormulaExpr.checkSatZ3(fd);
+            // FormulaExpr.getModelZ3(fd);
             // --------------------------------------------------
             FS.closeSync(fd);
             process.exit(0);

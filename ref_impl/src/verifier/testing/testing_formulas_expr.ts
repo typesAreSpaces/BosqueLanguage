@@ -3,9 +3,9 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { IntType, UninterpretedType } from "./type_expr";
-import { VarExpr, FuncExpr } from "./term_expr"
-import { PredicateExpr, AndExpr, NegExpr, OrExpr, EqualityExpr } from "./formula_expr"
+import { IntType, UninterpretedType } from "../type_expr";
+import { VarExpr, FuncExpr } from "../term_expr"
+import { PredicateExpr, AndExpr, NegExpr, OrExpr, EqualityExpr } from "../formula_expr"
 import * as fs from "fs";
 
 let fd = fs.openSync('file.z3', 'w');
