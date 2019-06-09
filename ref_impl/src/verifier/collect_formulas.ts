@@ -3,11 +3,11 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, UninterpretedType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, FuncType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, OrExpr, ForAllExpr, ExistsExpr, EqualityFormula, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, EqualityFormula, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
 
 let DEBUGGING = false;
 
@@ -78,13 +78,15 @@ function resolveTypeUsingValue(value: string): string {
 }
 
 function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
+    // This branch handles variables
     if (arg instanceof MIRRegisterArgument) {
         let argName = section + "_" + arg.nameID;
         return new VarExpr(argName, resolveType(typesSeen.get(argName) as string));
     }
+    // This branch handles constants
     else {
         let argName = arg.stringify();
-        let result = new VarExpr(argName, resolveType(arg.nameID));
+        let result = new VarExpr(argName, resolveType(resolveTypeUsingValue(arg.nameID)));
         // With this we prevent printing constant argument
         // as declarations in Z3
         // TODO: Or should we remove it?
@@ -93,93 +95,89 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
     }
 }
 
-function UnboxVariable(v : VarExpr) : TermExpr {
-    switch(typesSeen.get(v.symbolName)){
-        case "NSCore::Int" : {
-            return new FuncExpr("UnboxInt", new IntType(), [v]);
+function UnboxTermExpr(x: TermExpr, isConstant: boolean): TermExpr {
+    switch (x.ty.getType()) {
+        case "Int": {
+            if (isConstant) {
+                return x
+            }
+            else {
+                return new FuncExpr("UnboxInt", new IntType(), [x]);
+            }
         }
-        case "NSCore::Bool" : {
-            return new FuncExpr("UnboxBool", new BoolType(), [v]);
+        case "Bool": {
+            if (isConstant) {
+                return x;
+            }
+            else {
+                return new FuncExpr("UnboxBool", new BoolType(), [x]);
+            }
         }
-        case "NSCore::String" : {
-            return new FuncExpr("UnboxString", new StringType(), [v]);
+        case "String": {
+            if (isConstant) {
+                return x;
+            }
+            else {
+                return new FuncExpr("UnboxString", new StringType(), [x]);
+            }
         }
         // TODO: This is not right, we need to unwrap the variable
-        // But it's a good idea for constants
-        default : {
-            return v;
-        }
-    }
-}
-
-function UnboxProposition(p : PredicateExpr) : FormulaExpr {
-    switch(p.terms.length){
-        case 0 : {
-            if(typesSeen.has(p.symbolName)){
-                return new PredicateExpr("UnboxBool", [p]);
+        default: {
+            if (x instanceof FuncExpr) {
+                switch ((x.ty as FuncType).image.getType()) {
+                    case "Int": {
+                        return new FuncExpr("UnboxInt", new IntType(), [x]);
+                    }
+                    case "Bool": {
+                        return new FuncExpr("UnboxBool", new BoolType(), [x]);
+                    }
+                    case "String": {
+                        return new FuncExpr("UnboxString", new StringType(), [x]);
+                    }
+                }
             }
-            // This works for constants
-            else{
-                return p;
+            return x;
+        }
+    }
+}
+
+function BoxTermExpr(x: TermExpr): TermExpr {
+    switch (x.ty.getType()) {
+        case "Int": {
+            return new FuncExpr("BoxInt", new IntType(), [x]);
+        }
+        case "Bool": {
+            return new FuncExpr("BoxBool", new BoolType(), [x]);
+        }
+        case "String": {
+            return new FuncExpr("BoxString", new StringType(), [x]);
+        }
+        // TODO: This is not right, we need to unwrap the variable
+        default: {
+            if (x instanceof FuncExpr) {
+                switch ((x.ty as FuncType).image.getType()) {
+                    case "Int": {
+                        return new FuncExpr("BoxInt", new IntType(), [x]);
+                    }
+                    case "Bool": {
+                        return new FuncExpr("BoxBool", new BoolType(), [x]);
+                    }
+                    case "String": {
+                        return new FuncExpr("BoxString", new StringType(), [x]);
+                    }
+                }
             }
-        }
-        default : {
-            throw new Error("This is not a proposition.");
+            return x;
         }
     }
 }
 
-function unboxifyTerm(term : TermExpr) : TermExpr {
-    if(term instanceof VarExpr){
-        return UnboxVariable(term);
-    }
-    if(term instanceof FuncExpr){
-        return new FuncExpr(term.symbolName, term.ty, term.terms.map(unboxifyTerm));
-    }
-    else {
-        console.log(term);
-        throw new Error("I dont think we can reach this point in unboxifyTerm");
-    }
+function UnboxFormulaExpr(x: FormulaExpr): FormulaExpr {
+    return new PredicateExpr("UnboxBool", [x]);
 }
 
-function unboxifyFormula(formula : FormulaExpr) : FormulaExpr {
-    if(formula instanceof PredicateExpr){
-        if (formula.terms.length === 0){
-            return UnboxProposition(formula);
-        }
-        else{
-            return new PredicateExpr(formula.symbolName, formula.terms.map(unboxifyTerm));
-        }
-    }
-    if(formula instanceof EqualityExpr){
-        return new EqualityExpr(unboxifyTerm(formula.leftHandSide), unboxifyTerm(formula.rightHandSide));
-    }
-    if(formula instanceof EqualityFormula){
-        return new EqualityFormula(unboxifyFormula(formula.leftHandSide), unboxifyFormula(formula.rightHandSide));
-    }
-    if(formula instanceof NegExpr){
-        return new NegExpr(unboxifyFormula(formula.formula))
-    }
-    if(formula instanceof AndExpr){
-        return new AndExpr(unboxifyFormula(formula.leftHandSide), unboxifyFormula(formula.rightHandSide));
-    }
-    if(formula instanceof OrExpr){
-        return new OrExpr(unboxifyFormula(formula.leftHandSide), unboxifyFormula(formula.rightHandSide));
-    }
-    if(formula instanceof ImplExpr){
-        return new ImplExpr(unboxifyFormula(formula.leftHandSide), unboxifyFormula(formula.rightHandSide));
-    }
-    if(formula instanceof ForAllExpr){
-        // TODO: This needs to be tested
-        return new ForAllExpr(formula.nameBinder, unboxifyFormula(formula.formula));
-    }
-    if(formula instanceof ExistsExpr){
-        // TODO: This needs to be tested
-        return new ExistsExpr(formula.nameBinder, unboxifyFormula(formula.formula));
-    }
-    else{
-        throw new Error("I don't think we can reach this step in unboxifyFormula");
-    }
+function BoxFormulaExpr(x: FormulaExpr): TermExpr {
+    return new FuncExpr("BoxBool", new BoolType(), [x]);
 }
 
 function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr {
@@ -322,7 +320,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.MIRBinOp: {
-            let opBinOp = op as MIRBinOp; 
+            let opBinOp = op as MIRBinOp;
             let regName = section + "_" + opBinOp.trgt.nameID;
             // We assume the expressions are well-typed.
             // So we assign the type of the register
@@ -331,12 +329,12 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             typesSeen.set(regName, typeOfLHSOfRHS);
             let typeOfrhsTerm = resolveType(typeOfLHSOfRHS);
             let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
-                argumentToVarExpr(opBinOp.lhs, section),
-                argumentToVarExpr(opBinOp.rhs, section)
+                UnboxTermExpr(argumentToVarExpr(opBinOp.lhs, section), opBinOp.lhs instanceof MIRConstantArgument),
+                UnboxTermExpr(argumentToVarExpr(opBinOp.rhs, section), opBinOp.rhs instanceof MIRConstantArgument)
             ]);
             let opFormula = new EqualityExpr(
-                new VarExpr(regName, typeOfrhsTerm), 
-                rhsOfAssignmentTerm);
+                new VarExpr(regName, typeOfrhsTerm),
+                BoxTermExpr(rhsOfAssignmentTerm));
             return opFormula;
         }
         case MIROpTag.MIRBinEq: {
@@ -349,12 +347,13 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // point are <, <=, >, >= only
             let opBinCmp = op as MIRBinCmp;
             let opFormula = new PredicateExpr(opBinCmp.op, [
-                argumentToVarExpr(opBinCmp.lhs, section),
-                argumentToVarExpr(opBinCmp.rhs, section)
+                UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
+                UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
             ]);
             let regName = section + "_" + opBinCmp.trgt.nameID;
             typesSeen.set(regName, "NSCore::Bool");
-            return new EqualityFormula(new PredicateExpr(regName, []), opFormula);
+            // TODO: Needs testing
+            return new EqualityExpr(new VarExpr(regName, new BoolType()), BoxFormulaExpr(opFormula));
         }
         case MIROpTag.MIRRegAssign: {
             debugging("MIRRegAssign Not implemented yet", DEBUGGING);
@@ -369,15 +368,14 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let regName = section + "_" + opVarStore.name.nameID;
             let srcName = opVarStore.src.nameID;
             if (opVarStore.src instanceof MIRRegisterArgument) {
-                srcName = section + "_" + srcName;
-                typesSeen.set(regName, typesSeen.get(srcName) as string);
+                typesSeen.set(regName, typesSeen.get(section + "_" + srcName) as string);
             }
             else {
                 typesSeen.set(regName, resolveTypeUsingValue(srcName));
             }
             let opFormula = new EqualityExpr(
-                argumentToVarExpr(opVarStore.src, section),
-                argumentToVarExpr(opVarStore.name, section));
+                argumentToVarExpr(opVarStore.name, section),
+                BoxTermExpr(UnboxTermExpr(argumentToVarExpr(opVarStore.src, section), opVarStore.src instanceof MIRConstantArgument)));
             return opFormula;
         }
         case MIROpTag.MIRReturnAssign: {
@@ -395,7 +393,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             }
             let opFormula = new EqualityExpr(
                 argumentToVarExpr(opReturnAssign.name, section),
-                argumentToVarExpr(opReturnAssign.src, section));
+                BoxTermExpr(UnboxTermExpr(argumentToVarExpr(opReturnAssign.src, section), opReturnAssign.src instanceof MIRConstantArgument)));
             return opFormula;
         }
         case MIROpTag.MIRAbort: {
@@ -531,4 +529,4 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     return traverse(ibody.get("entry") as MIRBasicBlock);
 }
 
-export { collectFormulas, typesSeen, unboxifyFormula }
+export { collectFormulas, typesSeen, UnboxTermExpr, BoxTermExpr, UnboxFormulaExpr, BoxFormulaExpr }

@@ -147,7 +147,21 @@ class UninterpretedType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType, UnionType };
+class TermType extends TypeExpr {
+    isPrimitiveType = true;
+    isUninterpreted = false;
+    constructor(){
+        super();
+    }
+    getType() {
+        return "Term";
+    }
+    getAbstractType() { 
+        return "Term";
+    }
+}
+
+export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType, UnionType, TermType };
 
 
 

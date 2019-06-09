@@ -13,8 +13,9 @@ namespace NSMain;
 function max(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
+    var z = 5;
     if (x >= y) {
-	   return x;
+	   return x + y + x;
     } else {
         return y;
     }

@@ -11,7 +11,9 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%", "UnboxInt", "UnboxBool", "UnboxString", "HasType"].map(x => [x, true])
+        ["+", "-", "*", "/", "%", "HasType", 
+        "UnboxInt", "UnboxBool", "UnboxString", 
+        "BoxInt", "BoxBool", "BoxString"].map(x => [x, true])
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -39,8 +41,8 @@ class VarExpr extends TermExpr {
         this.toZ3DeclarationSort(fd);
         if (!VarExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getType() + ")\n");
-            // FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
+            // FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             VarExpr.symbolTable.set(this.symbolName, true);
         }

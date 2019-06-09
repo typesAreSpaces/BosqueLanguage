@@ -53,7 +53,7 @@ function getControlFlow(app: string, section: string, fd: number): void {
         // if it is not empty, will add more elements to the
         // variable typesSeen
         invokeDecl.params.map(x => typesSeen.set(sectionName + "_" + x.name, x.type.trkey));
-        if (typeof (ibody) === "string") {
+        if (typeof(ibody) === "string") {
             FS.closeSync(fd);
             process.exit(0);
         }

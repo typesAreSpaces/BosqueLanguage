@@ -24,22 +24,26 @@ abstract class FormulaExpr {
     }
     abstract sexpr(): string;
     static initialDeclarationZ3(fd: number) {
+        // -----------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(set-option :smt.auto-config false) ; disable automatic self configuration\n");
         FS.writeSync(fd, "(set-option :smt.mbqi false) ; disable model-based quantifier instantiation\n");
         FS.writeSync(fd, "(set-option :model true)\n\n");
+        // -----------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
-        // TODO: Add more BTypes if needed
+        // TODO: Add more BTypes if needed ---------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
-        FS.writeSync(fd, "(declare-fun HasType (Term BType) Bool)\n");
-        // FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
+        FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
+        FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
-        // FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
+        FS.writeSync(fd, "(declare-fun BoxBool (Bool) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
-        // FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
+        FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
-        // FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
-        // FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
-        // FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
+        // -----------------------------------------------------------------------------------------------------------------------
+        FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
+        FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
+        FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
+        // -----------------------------------------------------------------------------------------------------------------------
     }
     toZ3(fd: number): void {
         this.toZ3Declaration(fd);
@@ -134,8 +138,8 @@ class PredicateExpr extends FormulaExpr {
         }
         if (!PredicateExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getType() + ")\n");
-            // FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");
+            // FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getType() + ")\n");
+            FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             PredicateExpr.symbolTable.set(this.symbolName, true);
         }
