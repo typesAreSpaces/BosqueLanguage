@@ -91,12 +91,12 @@ function stringConstantToStringType(value: string): string {
                         return "NSCore::String";
                     }
                     default: {
-                        return "NSCore::Any";
+                        return "NSCore::Some";
                     }
                 }
             }
             else {
-                return "NSCore::Any";
+                return "NSCore::Some";
             }
         }
     }
