@@ -49,26 +49,8 @@ abstract class FormulaExpr {
         this.toZ3Declaration(fd);
         FS.writeSync(fd, "\n");
         let assertingZ3 = function (formula: FormulaExpr) {
-            if (formula instanceof AndExpr) {
-                let lhsName = formula.leftHandSide.symbolName;
-                let rhsName = formula.rightHandSide.symbolName;
-                if (lhsName !== "MIRJumpCondFormulal__r" && lhsName !== "MIRJumpFormulal__r") {
-                    assertingZ3(formula.leftHandSide);
-                    if (rhsName !== "MIRJumpCondFormulal__r" && rhsName !== "MIRJumpFormulal__r") {
-                        assertingZ3(formula.rightHandSide);
-                    }
-                }
-                else {
-                    if (rhsName !== "MIRJumpCondFormulal__r" && rhsName !== "MIRJumpFormulal__r") {
-                        assertingZ3(formula.rightHandSide);
-                    }
-                }
-            }
-            else {
-                let formulaName = formula.symbolName;
-                if (formulaName != "MIRJumpCondFormulal__r" && formulaName != "MIRJumpFormulal__r") {
-                    FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
-                }
+            if (formula.symbolName !== "true") {
+                FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
             }
         }
         assertingZ3(this);
@@ -136,7 +118,8 @@ class PredicateExpr extends FormulaExpr {
         for (let item of this.terms) {
             item.toZ3Declaration(fd);
         }
-        if (!PredicateExpr.symbolTable.get(this.symbolName)) {
+        // This also checks the term symbols because some functions can return Boolean types
+        if (!PredicateExpr.symbolTable.get(this.symbolName) && !TermExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
             // FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getType() + ")\n");
             FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");

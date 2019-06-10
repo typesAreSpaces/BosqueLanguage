@@ -7,9 +7,9 @@ import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgu
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, FuncType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, EqualityFormula, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
 
-let DEBUGGING = false;
+let DEBUGGING = true;
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -24,7 +24,7 @@ let DEBUGGING = false;
 let typesSeen: Map<string, string> = new Map<string, string>();
 // Example : typesSeen = Map { x => 'NSCore::Int', y => 'NSCore::Bool', z => new_type, ... }
 let mapBlockCondition: Map<string, Set<FormulaExpr>> = new Map<string, Set<FormulaExpr>>();
-let TrueProposition = new PredicateExpr("true", []);
+let BoxTrue = BoxFormulaExpr(new PredicateExpr("true", []));
 
 function debugging(x: any, flag: boolean) {
     if (flag) {
@@ -406,17 +406,20 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
         }
         case MIROpTag.MIRJump: {
             let opJump = op as MIRJump;
-            formula = new PredicateExpr("MIRJumpFormula", []);
-            for (let _formula of mapBlockCondition.get(nameBlock) as Set<FormulaExpr>) {
-                (mapBlockCondition.get(opJump.trgtblock) as Set<FormulaExpr>).add(_formula);
+            formula = UnboxFormulaExpr(new PredicateExpr("MIRJumpFormula", []));
+            let conditions = mapBlockCondition.get(nameBlock) as Set<FormulaExpr>;
+            if (conditions.size > 0) {
+                for (let _formula of conditions) {
+                    (mapBlockCondition.get(opJump.trgtblock) as Set<FormulaExpr>).add(_formula);
+                }
             }
             return formula;
         }
         case MIROpTag.MIRJumpCond: {
             let opJumpCond = op as MIRJumpCond;
-            formula = new PredicateExpr("MIRJumpCondFormula", []);
+            formula = UnboxFormulaExpr(new PredicateExpr("MIRJumpCondFormula", []));
             let regName = section + "_" + opJumpCond.arg.nameID;
-            let conditionFormula = new EqualityFormula(new PredicateExpr(regName, []), TrueProposition);
+            let conditionFormula = new EqualityExpr(new PredicateExpr(regName, []), BoxTrue);
             (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(conditionFormula);
             (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(new NegExpr(conditionFormula));
             return formula;
@@ -515,7 +518,7 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
             case 2: {
                 let jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
                 let regName = section + "_" + jumpCondOp.arg.nameID;
-                let conditionFormula = new PredicateExpr(regName, []);
+                let conditionFormula = UnboxFormulaExpr(new PredicateExpr(regName, []));
                 let branchTrue = new ImplExpr(conditionFormula, traverse(ibody.get(jumpCondOp.trueblock) as MIRBasicBlock));
                 let branchFalse = new ImplExpr(new NegExpr(conditionFormula), traverse(ibody.get(jumpCondOp.falseblock) as MIRBasicBlock));
                 return new AndExpr(currentBlockFormula, new AndExpr(branchTrue, branchFalse));

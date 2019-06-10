@@ -14,8 +14,9 @@ function max(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     var z = 5;
+    var z2 = x;
     if (x >= y) {
-	   return x + y + x;
+	   return x;
     } else {
         return y;
     }

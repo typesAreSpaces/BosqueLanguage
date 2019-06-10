@@ -5,6 +5,7 @@
 
 import * as FS from "fs";
 import { TypeExpr, FuncType, UninterpretedType } from "./type_expr";
+import { PredicateExpr } from "./formula_expr"
 
 abstract class TermExpr {
     readonly symbolName: string;
@@ -39,7 +40,8 @@ class VarExpr extends TermExpr {
     }
     toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
-        if (!VarExpr.symbolTable.get(this.symbolName)) {
+        // This also checks predicate symbols because a variable can have boolean type
+        if (!VarExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
             // FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getType() + ")\n");
             FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
@@ -79,7 +81,8 @@ class FuncExpr extends TermExpr {
         for (let item of this.terms) {
             item.toZ3Declaration(fd);
         }
-        if (!FuncExpr.symbolTable.get(this.symbolName)) {
+        // This also checks predicate symbols because a function can return a boolean type
+        if (!FuncExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
             FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getAbstractType() + ")\n");
             // FS.writeSync(fd, "(HasType " + this.symbolName + " " + this.ty.getType() + ")\n");
             FuncExpr.symbolTable.set(this.symbolName, true);
