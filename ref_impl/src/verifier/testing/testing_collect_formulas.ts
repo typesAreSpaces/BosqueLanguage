@@ -9,7 +9,7 @@ import chalk from "chalk";
 import { MIREmitter } from "../../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../../compiler/mir_assembly";
 import { MIRBody } from "../../compiler/mir_ops";
-import { collectFormulas, typesSeen } from "../collect_formulas";
+import { collectFormulas, stringVariableToStringType } from "../collect_formulas";
 import { FormulaExpr } from "../formula_expr";
 
 function getControlFlow(app: string, section: string, fd: number): void {
@@ -51,8 +51,8 @@ function getControlFlow(app: string, section: string, fd: number): void {
         const ibody = (invokeDecl.body as MIRBody).body;
         // If this is a FunctionDecl then the array of parameters,
         // if it is not empty, will add more elements to the
-        // variable typesSeen
-        invokeDecl.params.map(x => typesSeen.set(sectionName + "_" + x.name, x.type.trkey));
+        // variable stringVariableToStringType
+        invokeDecl.params.map(x => stringVariableToStringType.set(sectionName + "_" + x.name, x.type.trkey));
         if (typeof(ibody) === "string") {
             FS.closeSync(fd);
             process.exit(0);
@@ -84,11 +84,11 @@ function getControlFlow(app: string, section: string, fd: number): void {
 
 setImmediate(() => {
     // Mac Machine
-    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
-    let bosqueFile = "/max/main2.bsq";
+    let bosqueFile = "/max/main.bsq";
     let section = "NSMain::max";
     let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
     getControlFlow(dirMachine + bosqueFile, section, fd);

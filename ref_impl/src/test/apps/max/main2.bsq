@@ -13,9 +13,13 @@ namespace NSMain;
 function max(x: Int | Bool, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
-    var z : Int | Bool | String = 3;
+    var z1 : Int | Bool | String = 3;
     var z2 : Int? = 2;
-    if (z >= 0) {
+    var z3 : Any = 3;
+    var z4 = none;
+
+
+    if (z1 >= 0) {
 	   return y;
     } 
     else {

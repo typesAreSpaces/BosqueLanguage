@@ -48,9 +48,13 @@ abstract class FormulaExpr {
     toZ3(fd: number): void {
         this.toZ3Declaration(fd);
         FS.writeSync(fd, "\n");
-        let assertingZ3 = function (formula: FormulaExpr) {
-            if (formula.symbolName !== "true") {
-                FS.writeSync(fd, "(assert " + formula.sexpr() + ")\n");
+        let assertingZ3 = function (formula_: FormulaExpr) {
+            if (formula_ instanceof AndExpr) {
+                assertingZ3(formula_.leftHandSide);
+                assertingZ3(formula_.rightHandSide);
+            }
+            else{
+                FS.writeSync(fd, "(assert " + formula_.sexpr() + ")\n");
             }
         }
         assertingZ3(this);

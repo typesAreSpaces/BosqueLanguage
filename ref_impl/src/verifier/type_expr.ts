@@ -17,7 +17,7 @@ abstract class TypeExpr {
     abstract readonly isPrimitiveType: boolean;
     abstract readonly isUninterpreted: boolean;
     abstract getType(): string;
-    abstract getAbstractType() : string;
+    abstract getAbstractType(): string;
 }
 
 class IntType extends TypeExpr {
@@ -53,6 +53,39 @@ class StringType extends TypeExpr {
     }
 }
 
+class NoneType extends TypeExpr {
+    isPrimitiveType = true;
+    isUninterpreted = false;
+    getType() {
+        return "None";
+    }
+    getAbstractType() {
+        return "Term";
+    }
+}
+
+class AnyType extends TypeExpr {
+    isPrimitiveType = true;
+    isUninterpreted = false;
+    getType() {
+        return "Any";
+    }
+    getAbstractType() {
+        return "Term";
+    }
+}
+
+class SomeType extends TypeExpr {
+    isPrimitiveType = true;
+    isUninterpreted = false;
+    getType() {
+        return "Some";
+    }
+    getAbstractType() {
+        return "Term";
+    }
+}
+
 class FuncType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
@@ -74,7 +107,7 @@ class FuncType extends TypeExpr {
                 + ") " + this.image.getType();
         }
     }
-    getAbstractType() : string{
+    getAbstractType(): string {
         if (this.domain.length == 0) {
             return "() " + this.image.getAbstractType();
         }
@@ -95,27 +128,27 @@ class FuncType extends TypeExpr {
 class UnionType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
-    readonly elements : Set<TypeExpr> = new Set<TypeExpr>();
-    constructor(elements : Set<TypeExpr>){
+    readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
+    constructor(elements: Set<TypeExpr>) {
         super();
         this.elements = elements;
     }
     getType() {
         let result = "";
-        if(this.elements.size === 0){
+        if (this.elements.size === 0) {
             return "Empty";
         }
-        else{
+        else {
             this.elements.forEach(element => { result = element.getType() + " | " + result; });
             return result;
         }
     }
     getAbstractType() {
         let result = "";
-        if(this.elements.size === 0){
+        if (this.elements.size === 0) {
             return "Empty";
         }
-        else{
+        else {
             this.elements.forEach(element => { result = element.getAbstractType() + " | " + result; });
             return result;
         }
@@ -140,7 +173,7 @@ class UninterpretedType extends TypeExpr {
     getType() {
         return this.symbolName;
     }
-    getAbstractType() { 
+    getAbstractType() {
         return "Term";
     }
 }
@@ -148,18 +181,15 @@ class UninterpretedType extends TypeExpr {
 class TermType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
-    constructor(){
+    constructor() {
         super();
     }
     getType() {
         return "Term";
     }
-    getAbstractType() { 
+    getAbstractType() {
         return "Term";
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, FuncType, UninterpretedType, UnionType, TermType };
-
-
-
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType };
