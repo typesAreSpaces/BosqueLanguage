@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
@@ -23,11 +23,12 @@ let DEBUGGING = true;
 // of a well-typed program
 
 // The following variables deserve to be explained:
-// stringVariableToStringType : String[Variable] -> String[Type]
-// resolveType : String[Type] -> TypeExpr
-// stringValueToStringType : String[Value] -> String[Type]
-let stringVariableToStringType: Map<string, string> = new Map<string, string>();
+// stringVariableToStringType : String[Variable] -> String[CoreType | Type]
+// resolveType : String[CoreType | Type] -> TypeExpr
+// stringConstantToStringType : String[Constant] -> String[CoreType | Type]
 // Example : stringVariableToStringType = Map { x => 'NSCore::Int', y => 'NSCore::Bool', z => new_type, ... }
+let stringVariableToStringType: Map<string, string> = new Map<string, string>();
+// mapBlockCondition : String[Block] -> Set<FormulasExpr>
 let mapBlockCondition: Map<string, Set<FormulaExpr>> = new Map<string, Set<FormulaExpr>>();
 let BoxTrue = BoxFormulaExpr(new PredicateExpr("true", []));
 
@@ -69,13 +70,16 @@ function resolveType(typeName: string): TypeExpr {
     }
 }
 // I agree, this looks extremely dirty
-function stringValueToStringType(value: string): string {
+function stringConstantToStringType(value: string): string {
     switch (value) {
         case "true": {
             return "NSCore::Bool";
         }
         case "false": {
             return "NSCore::Bool";
+        }
+        case "none" : {
+            return "NSCore::None"
         }
         default: {
             if (value.length > 3) {
@@ -87,12 +91,12 @@ function stringValueToStringType(value: string): string {
                         return "NSCore::String";
                     }
                     default: {
-                        return "unknown";
+                        return "NSCore::Any";
                     }
                 }
             }
             else {
-                return "unknown";
+                return "NSCore::Any";
             }
         }
     }
@@ -107,7 +111,7 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
     // This branch handles constants
     else {
         let argName = arg.stringify();
-        let result = new VarExpr(argName, resolveType(stringValueToStringType(arg.nameID)));
+        let result = new VarExpr(argName, resolveType(stringConstantToStringType(arg.nameID)));
         // With this we prevent printing constant argument
         // as declarations in Z3
         // TODO: Or should we remove it?
@@ -392,7 +396,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 stringVariableToStringType.set(regName, stringVariableToStringType.get(section + "_" + srcName) as string);
             }
             else {
-                stringVariableToStringType.set(regName, stringValueToStringType(srcName));
+                stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
             let opFormula = new EqualityExpr(
                 argumentToVarExpr(opVarStore.name, section),
@@ -407,7 +411,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 stringVariableToStringType.set(regName, stringVariableToStringType.get(section + "_" + srcName) as string);
             }
             else {
-                stringVariableToStringType.set(regName, stringValueToStringType(srcName));
+                stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
             let opFormula = new EqualityExpr(
                 argumentToVarExpr(opReturnAssign.name, section),
@@ -495,6 +499,22 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             });
             return formula;
         }
+        case MIROpTag.MIRIsTypeOfNone : {
+            debugging("MIRIsTypeOfNone Not implemented yet", DEBUGGING);
+            let opIsTypeOfNone = op as MIRIsTypeOfNone;
+            console.log(opIsTypeOfNone);
+            return formula;
+        }
+        case MIROpTag.MIRIsTypeOfSome : {
+            debugging("MIRIsTypeOfSome Not implemented yet", DEBUGGING);
+            let opIsTypeOfSome = op as MIRIsTypeOfSome;
+            console.log(opIsTypeOfSome);
+            return formula;
+        }
+        case MIROpTag.MIRIsTypeOf : {
+            debugging("MIRIsTypeOf Not implemented yet", DEBUGGING);
+            return formula;
+        }
         default:
             debugging("This might be a problem", DEBUGGING);
             return formula;
@@ -509,12 +529,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(blocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // blocks.map(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // blocks.map(x => console.log(x.jsonify()));
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

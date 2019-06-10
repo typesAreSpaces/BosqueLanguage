@@ -10,22 +10,41 @@
 
 namespace NSMain;
 
-function max(x: Int, y: Int): Int
+function max(x: Int?, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
-    var z = 5;
-    var z2 = x;
-    if (x >= y) {
-	   return x;
-    } else {
-        return y;
+    if (x == none) {
+	   return y;   
+    } 
+    else {
+        if(x >= y){
+            return x;
+        }
+        else{
+            return y;
+        }
+    }
+}
+
+function max2(x: Int?, y: Int): Int
+    ensures _return_ == x || _return_ == y;
+{
+    if (x != none) {
+	   if(x >= y){
+            return x;
+        }
+        else{
+            return y;
+        }
+    } 
+    else {
+        return y;   
     }
 }
 
 entrypoint function main(): Int {
-    var! x = 10;
+    var x = 10;
     var y = 20;
-    x = 11;
 
     return max(x, y);
 }
