@@ -5,7 +5,7 @@
 
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, FuncType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, UninterpretedType, FuncType, UnionType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
 
@@ -43,7 +43,12 @@ function resolveType(typeName: string): TypeExpr {
             return new StringType();
         }
         default: {
-            return new UninterpretedType(typeName);
+            if(typeName.indexOf("|") > -1){
+                return new UnionType(new Set<TypeExpr>(typeName.split(" | ").map(resolveType)));
+            }
+            else{
+                return new UninterpretedType(typeName);
+            }
         }
     }
 }
@@ -492,12 +497,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(blocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // blocks.map(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // blocks.map(x => console.log(x.jsonify()));
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

@@ -10,14 +10,16 @@
 
 namespace NSMain;
 
-function max(x: Int, y: Int): Int
+function max(x: Int | Bool, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
-    if (x >= y) {
-	   return x;
+    var z : Int | Bool | String = 3;
+    var z2 : Int? = 2;
+    if (z >= 0) {
+	   return y;
     } 
     else {
-      	if (x >= 0){
+      	if (y >= 0){
 	      return y;
 	    }
 	    else {

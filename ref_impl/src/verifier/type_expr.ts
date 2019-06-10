@@ -95,31 +95,29 @@ class FuncType extends TypeExpr {
 class UnionType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
-    readonly lhs : TypeExpr;
-    readonly rhs : TypeExpr;
-    constructor(lhs : TypeExpr, rhs : TypeExpr){
+    readonly elements : Set<TypeExpr> = new Set<TypeExpr>();
+    constructor(elements : Set<TypeExpr>){
         super();
-        this.lhs = lhs;
-        this.rhs = rhs;
+        this.elements = elements;
     }
     getType() {
-        let lhsType = this.lhs.getType();
-        let rhsType = this.rhs.getType();
-        if(lhsType === rhsType){
-            return lhsType;
+        let result = "";
+        if(this.elements.size === 0){
+            return "Empty";
         }
         else{
-            return lhsType + "_" + rhsType;
+            this.elements.forEach(element => { result = element.getType() + " | " + result; });
+            return result;
         }
     }
     getAbstractType() {
-        let lhsType = this.lhs.getAbstractType();
-        let rhsType = this.rhs.getAbstractType();
-        if(lhsType === rhsType){
-            return lhsType;
+        let result = "";
+        if(this.elements.size === 0){
+            return "Empty";
         }
         else{
-            return lhsType + "_" + rhsType;
+            this.elements.forEach(element => { result = element.getAbstractType() + " | " + result; });
+            return result;
         }
     }
 }
