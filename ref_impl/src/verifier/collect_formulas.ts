@@ -5,11 +5,11 @@
 
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, EqualityExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction } from "../verifier/formula_expr";
 
-let DEBUGGING = true;
+let DEBUGGING = false;
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -53,17 +53,17 @@ function resolveType(typeName: string): TypeExpr {
         case "NSCore::None": {
             return new NoneType();
         }
-        case "NSCore::Any" : {
+        case "NSCore::Any": {
             return new AnyType();
         }
-        case "NSCore::Some" : {
+        case "NSCore::Some": {
             return new SomeType();
         }
         default: {
-            if(typeName.indexOf("|") > -1){
+            if (typeName.indexOf("|") > -1) {
                 return new UnionType(new Set<TypeExpr>(typeName.split(" | ").map(resolveType)));
             }
-            else{
+            else {
                 return new UninterpretedType(typeName);
             }
         }
@@ -78,7 +78,7 @@ function stringConstantToStringType(value: string): string {
         case "false": {
             return "NSCore::Bool";
         }
-        case "none" : {
+        case "none": {
             return "NSCore::None"
         }
         default: {
@@ -112,89 +112,113 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
     else {
         let argName = arg.stringify();
         let result = new VarExpr(argName, resolveType(stringConstantToStringType(arg.nameID)));
-        // With this we prevent printing constant argument
-        // as declarations in Z3
-        // TODO: Or should we remove it?
-        VarExpr.symbolTable.set(argName, true);
         return result;
     }
 }
 
 function UnboxTermExpr(x: TermExpr, isConstant: boolean): TermExpr {
-    switch (x.ty.getType()) {
-        case "Int": {
-            if (isConstant) {
-                return x
-            }
-            else {
-                return new FuncExpr("UnboxInt", new IntType(), [x]);
-            }
-        }
-        case "Bool": {
-            if (isConstant) {
-                return x;
-            }
-            else {
-                return new FuncExpr("UnboxBool", new BoolType(), [x]);
-            }
-        }
-        case "String": {
-            if (isConstant) {
-                return x;
-            }
-            else {
-                return new FuncExpr("UnboxString", new StringType(), [x]);
-            }
-        }
-        // TODO: This is not right, we need to unwrap the variable
-        default: {
-            if (x instanceof FuncExpr) {
-                switch ((x.ty as FuncType).image.getType()) {
-                    case "Int": {
-                        return new FuncExpr("UnboxInt", new IntType(), [x]);
-                    }
-                    case "Bool": {
-                        return new FuncExpr("UnboxBool", new BoolType(), [x]);
-                    }
-                    case "String": {
-                        return new FuncExpr("UnboxString", new StringType(), [x]);
-                    }
+    if (isConstant) {
+        return x;
+    }
+    else {
+        if (x instanceof VarExpr) {
+            switch (x.ty.getType()) {
+                case "Int": {
+                    return new FuncExpr("UnboxInt", new IntType(), [x]);
+                }
+                case "Bool": {
+                    return new FuncExpr("UnboxBool", new BoolType(), [x]);
+                }
+                case "String": {
+                    return new FuncExpr("UnboxString", new StringType(), [x]);
+                }
+                case "None": {
+                    return new FuncExpr("UnboxNone", new NoneType(), [x]);
+                }
+                case "Any": {
+                    return new FuncExpr("UnboxAny", new AnyType(), [x]);
+                }
+                case "Some": {
+                    return new FuncExpr("UnboxSome", new SomeType(), [x]);
                 }
             }
-            return x;
         }
+        if (x instanceof FuncExpr) {
+            let typeOfX = x.ty as FuncType;
+            switch (typeOfX.image.getType()) {
+                case "Int": {
+                    return new FuncExpr("UnboxInt", new IntType(), [x]);
+                }
+                case "Bool": {
+                    return new FuncExpr("UnboxBool", new BoolType(), [x]);
+                }
+                case "String": {
+                    return new FuncExpr("UnboxString", new StringType(), [x]);
+                }
+                case "None": {
+                    return new FuncExpr("UnboxNone", new NoneType(), [x]);
+                }
+                case "Any": {
+                    return new FuncExpr("UnboxAny", new AnyType(), [x]);
+                }
+                case "Some": {
+                    return new FuncExpr("UnboxSome", new SomeType(), [x]);
+                }
+            }
+        }
+        console.log(x);
+        throw new Error(`Problem Unboxing ${x.sexpr()}`);
     }
 }
 
 function BoxTermExpr(x: TermExpr): TermExpr {
-    switch (x.ty.getType()) {
-        case "Int": {
-            return new FuncExpr("BoxInt", new IntType(), [x]);
-        }
-        case "Bool": {
-            return new FuncExpr("BoxBool", new BoolType(), [x]);
-        }
-        case "String": {
-            return new FuncExpr("BoxString", new StringType(), [x]);
-        }
-        // TODO: This is not right, we need to unwrap the variable
-        default: {
-            if (x instanceof FuncExpr) {
-                switch ((x.ty as FuncType).image.getType()) {
-                    case "Int": {
-                        return new FuncExpr("BoxInt", new IntType(), [x]);
-                    }
-                    case "Bool": {
-                        return new FuncExpr("BoxBool", new BoolType(), [x]);
-                    }
-                    case "String": {
-                        return new FuncExpr("BoxString", new StringType(), [x]);
-                    }
-                }
+    if (x instanceof VarExpr) {
+        switch (x.ty.getType()) {
+            case "Int": {
+                return new FuncExpr("BoxInt", new TermType(), [x]);
             }
-            return x;
+            case "Bool": {
+                return new FuncExpr("BoxBool", new TermType(), [x]);
+            }
+            case "String": {
+                return new FuncExpr("BoxString", new TermType(), [x]);
+            }
+            case "None": {
+                return new FuncExpr("BoxNone", new TermType(), [x]);
+            }
+            case "Any": {
+                return new FuncExpr("BoxAny", new TermType(), [x]);
+            }
+            case "Some": {
+                return new FuncExpr("BoxSome", new TermType(), [x]);
+            }
         }
     }
+    if (x instanceof FuncExpr) {
+        let typeOfX = x.ty as FuncType;
+        switch (typeOfX.image.getType()) {
+            case "Int": {
+                return new FuncExpr("BoxInt", new TermType(), [x]);
+            }
+            case "Bool": {
+                return new FuncExpr("BoxBool", new TermType(), [x]);
+            }
+            case "String": {
+                return new FuncExpr("BoxString", new TermType(), [x]);
+            }
+            case "None": {
+                return new FuncExpr("BoxNone", new TermType(), [x]);
+            }
+            case "Any": {
+                return new FuncExpr("BoxAny", new TermType(), [x]);
+            }
+            case "Some": {
+                return new FuncExpr("BoxSome", new TermType(), [x]);
+            }
+        }
+    }
+    throw new Error(`Problem Boxing this expression: ${x.sexpr()}`);
+
 }
 
 function UnboxFormulaExpr(x: FormulaExpr): FormulaExpr {
@@ -202,7 +226,7 @@ function UnboxFormulaExpr(x: FormulaExpr): FormulaExpr {
 }
 
 function BoxFormulaExpr(x: FormulaExpr): TermExpr {
-    return new FuncExpr("BoxBool", new BoolType(), [x]);
+    return new FuncExpr("BoxBool", new FuncType([x.ty], new TermType()), [x]);
 }
 
 function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr {
@@ -350,15 +374,15 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // We assume the expressions are well-typed.
             // So we assign the type of the register
             // the type of the lhs element in the operation
-            let typeOfRHS = stringVariableToStringType.get(section + "_" + opBinOp.lhs.nameID) as string;
-            stringVariableToStringType.set(regName, typeOfRHS);
-            let typeOfrhsTerm = resolveType(typeOfRHS);
-            let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, typeOfrhsTerm, [
+            let stringTypeOfRHS = stringVariableToStringType.get(section + "_" + opBinOp.lhs.nameID) as string;
+            stringVariableToStringType.set(regName, stringTypeOfRHS);
+            let typeOfRHS = resolveType(stringTypeOfRHS);
+            let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, new FuncType([typeOfRHS, typeOfRHS], typeOfRHS), [
                 UnboxTermExpr(argumentToVarExpr(opBinOp.lhs, section), opBinOp.lhs instanceof MIRConstantArgument),
                 UnboxTermExpr(argumentToVarExpr(opBinOp.rhs, section), opBinOp.rhs instanceof MIRConstantArgument)
             ]);
             let opFormula = new EqualityExpr(
-                new VarExpr(regName, typeOfrhsTerm),
+                new VarExpr(regName, typeOfRHS),
                 BoxTermExpr(rhsOfAssignmentTerm));
             return opFormula;
         }
@@ -405,6 +429,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
         }
         case MIROpTag.MIRReturnAssign: {
             let opReturnAssign = op as MIRReturnAssign;
+            console.log(opReturnAssign);
             let regName = section + "_" + opReturnAssign.name.nameID;
             let srcName = opReturnAssign.src.nameID;
             if (opReturnAssign.src instanceof MIRRegisterArgument) {
@@ -499,19 +524,19 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             });
             return formula;
         }
-        case MIROpTag.MIRIsTypeOfNone : {
+        case MIROpTag.MIRIsTypeOfNone: {
             debugging("MIRIsTypeOfNone Not implemented yet", DEBUGGING);
             let opIsTypeOfNone = op as MIRIsTypeOfNone;
-            console.log(opIsTypeOfNone);
+            console.log(opIsTypeOfNone)
             return formula;
         }
-        case MIROpTag.MIRIsTypeOfSome : {
+        case MIROpTag.MIRIsTypeOfSome: {
             debugging("MIRIsTypeOfSome Not implemented yet", DEBUGGING);
             let opIsTypeOfSome = op as MIRIsTypeOfSome;
             console.log(opIsTypeOfSome);
             return formula;
         }
-        case MIROpTag.MIRIsTypeOf : {
+        case MIROpTag.MIRIsTypeOf: {
             debugging("MIRIsTypeOf Not implemented yet", DEBUGGING);
             return formula;
         }
@@ -529,12 +554,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    console.log("Blocks:-----------------------------------------------------------------------");
-    console.log(blocks);
-    console.log("More detailed Blocks:---------------------------------------------------------");
-    blocks.map(x => console.log(x));
-    console.log("More detailed++ Blocks:-------------------------------------------------------");
-    blocks.map(x => console.log(x.jsonify()));
+    // console.log("Blocks:-----------------------------------------------------------------------");
+    // console.log(blocks);
+    // console.log("More detailed Blocks:---------------------------------------------------------");
+    // blocks.map(x => console.log(x));
+    // console.log("More detailed++ Blocks:-------------------------------------------------------");
+    // blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

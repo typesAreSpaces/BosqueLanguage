@@ -14,7 +14,7 @@ abstract class TermExpr {
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ["+", "-", "*", "/", "%", "HasType", 
         "UnboxInt", "UnboxBool", "UnboxString", 
-        "BoxInt", "BoxBool", "BoxString"].map(x => [x, true])
+        "BoxInt", "BoxBool", "BoxString", "none"].map(x => [x, true])
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -58,8 +58,8 @@ class VarExpr extends TermExpr {
 // include the type TermType, it might not
 class FuncExpr extends TermExpr {
     readonly terms: TermExpr[];
-    constructor(symbolName: string, ty: TypeExpr, terms: TermExpr[]) {
-        let collectType = new FuncType(terms.map(x => x.ty), ty);
+    constructor(symbolName: string, tyDomain: TypeExpr, terms: TermExpr[]) {
+        let collectType = new FuncType(terms.map(x => x.ty), tyDomain);
         switch (terms.length) {
             case 0: {
                 super(symbolName, collectType);
