@@ -162,7 +162,9 @@ class UninterpretedType extends TypeExpr {
     isPrimitiveType = true; // ? Yes, for the moment..
     isUninterpreted = true;
     readonly symbolName: string;
-    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
+    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
+        [["BType", true]]
+        );
     constructor(symbolName: string) {
         super();
         this.symbolName = symbolName;

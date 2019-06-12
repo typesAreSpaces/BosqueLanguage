@@ -5,7 +5,7 @@
 
 import { IntType, UninterpretedType } from "../type_expr";
 import { VarExpr, FuncExpr } from "../term_expr"
-import { PredicateExpr, AndExpr, NegExpr, OrExpr, EqualityExpr } from "../formula_expr"
+import { PredicateExpr, AndExpr, NegExpr, OrExpr, EqualityTerm } from "../formula_expr"
 import * as fs from "fs";
 
 let fd = fs.openSync('file.z3', 'w');
@@ -30,7 +30,7 @@ pxy.toZ3(fd);
 // extraLong.toZ3(fd);
 
 // Encoding DeMorgan's law
-new NegExpr(new EqualityExpr(new AndExpr(a, b), new NegExpr(new OrExpr(new NegExpr(a), new NegExpr(b))))).toZ3(fd);
+new NegExpr(new EqualityTerm(new AndExpr(a, b), new NegExpr(new OrExpr(new NegExpr(a), new NegExpr(b))))).toZ3(fd);
 
 // Testing a predicate
 new PredicateExpr("narda", [pxy, x]).toZ3(fd);
@@ -56,6 +56,6 @@ let newOne = new AndExpr(pxy, pxy);
 newOne.toZ3(fd);
 
 let secondRound = new VarExpr("sdffafd", new UninterpretedType("List_Int"));
-(new EqualityExpr(secondRound, secondRound)).toZ3(fd);
+(new EqualityTerm(secondRound, secondRound)).toZ3(fd);
 
 fs.closeSync(fd);

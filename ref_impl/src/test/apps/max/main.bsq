@@ -10,7 +10,7 @@
 
 namespace NSMain;
 
-function max(x: Int?, y: Int): Int
+function max2(x: Int?, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if (x == none) {
@@ -42,7 +42,7 @@ function max3(x: Int?, y: Int): Int
     }
 }
 
-function max2(x: Int, y: Int): Int
+function max(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if(x >= y){

@@ -12,9 +12,15 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%", "HasType", 
-        "UnboxInt", "UnboxBool", "UnboxString", 
-        "BoxInt", "BoxBool", "BoxString", "none"].map(x => [x, true])
+        ["+", "-", "*", "/", "%",
+            "HasType", "BInt", "BBool", "BString", "BAny", "BSome", "BNone",
+            "BoxInt", "UnboxInt",
+            "BoxBool", "UnboxBool",
+            "BoxString", "UnboxString",
+            "BoxAny", "UnboxAny",
+            "BoxSome", "UnboxSome",
+            "BoxNone", "UnboxNone",
+            "none"].map(x => [x, true])
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -24,7 +30,7 @@ abstract class TermExpr {
         }
     }
     toZ3DeclarationSort(fd: number): void {
-        let thisTypeTemp = this.ty.getAbstractType();
+        let thisTypeTemp = this.ty.getType();
         if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
             FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).symbolName + ")\n");
             UninterpretedType.symbolTable.set(thisTypeTemp, true);

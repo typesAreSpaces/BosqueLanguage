@@ -31,7 +31,7 @@ abstract class FormulaExpr {
         // -----------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
         // TODO: Add more BTypes if needed ---------------------------------------------------------------------------------------
-        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString)))\n\n");
+        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone)))\n\n");
         FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
         FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxInt (Term) Int)\n");
@@ -39,6 +39,12 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
         FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
+        // FS.writeSync(fd, "(declare-fun BoxAny (BAny) Term)\n");
+        // FS.writeSync(fd, "(declare-fun UnboxAny (Term) BAny)\n");
+        // FS.writeSync(fd, "(declare-fun BoxSome (BSome) Term)\n");
+        // FS.writeSync(fd, "(declare-fun UnboxSome (Term) BSome)\n");
+        // FS.writeSync(fd, "(declare-fun BoxNone (BNone) Term)\n");
+        // FS.writeSync(fd, "(declare-fun UnboxNone (Term) BNone)\n\n");
         // -----------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
@@ -73,7 +79,7 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(get-model)\n");
     }
     toZ3DeclarationSort(fd: number): void {
-        let thisTypeTemp = this.ty.getAbstractType();
+        let thisTypeTemp = this.ty.getType();
         // Second part of the following conjunction avoids repetitions
         // in the declaration section
         if (this.ty instanceof UninterpretedType && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
@@ -133,7 +139,7 @@ class PredicateExpr extends FormulaExpr {
     }
 }
 
-class EqualityExpr extends FormulaExpr {
+class EqualityTerm extends FormulaExpr {
     readonly leftHandSide: TermExpr;
     readonly rightHandSide: TermExpr;
     constructor(left: TermExpr, right: TermExpr) {
@@ -302,4 +308,4 @@ function makeDisjuction(formulas: Set<FormulaExpr>): FormulaExpr {
     return result;
 }
 
-export { FormulaExpr, PredicateExpr, EqualityExpr, EqualityFormula, NegExpr, AndExpr, OrExpr, ImplExpr, ForAllExpr, ExistsExpr, makeConjunction, makeDisjuction };
+export { FormulaExpr, PredicateExpr, EqualityTerm, EqualityFormula, NegExpr, AndExpr, OrExpr, ImplExpr, ForAllExpr, ExistsExpr, makeConjunction, makeDisjuction };
