@@ -637,4 +637,4 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     return traverse(ibody.get("entry") as MIRBasicBlock);
 }
 
-export { collectFormulas, stringVariableToStringType, UnboxTermExpr, BoxTermExpr, UnboxFormulaExpr, BoxFormulaExpr }
+export { collectFormulas, stringVariableToStringType, resolveType, UnboxTermExpr, BoxTermExpr, UnboxFormulaExpr, BoxFormulaExpr }

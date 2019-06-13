@@ -9,7 +9,7 @@ import chalk from "chalk";
 import { MIREmitter } from "../../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../../compiler/mir_assembly";
 import { MIRBody } from "../../compiler/mir_ops";
-import { collectFormulas, stringVariableToStringType } from "../collect_formulas";
+import { collectFormulas, stringVariableToStringType, resolveType } from "../collect_formulas";
 import { FormulaExpr } from "../formula_expr";
 
 function getControlFlow(app: string, section: string, fd: number): void {
@@ -64,6 +64,9 @@ function getControlFlow(app: string, section: string, fd: number): void {
             // we replace it with a "_"
             let formula = collectFormulas(ibody, sectionName);
             FormulaExpr.initialDeclarationZ3(fd);
+            stringVariableToStringType.forEach((sType, sVariable) => { 
+                FS.writeSync(fd, "(assert (= (HasType " + sVariable + ") " + resolveType(sType).getBosqueType() + "))\n"); 
+            });
             formula.toZ3(fd);
             FormulaExpr.checkSatZ3(fd);
             // FormulaExpr.getModelZ3(fd);
@@ -84,9 +87,9 @@ function getControlFlow(app: string, section: string, fd: number): void {
 
 setImmediate(() => {
     // Mac Machine
-    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
+    // let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
     let bosqueFile = "/max/main.bsq";
     let section = "NSMain::max";

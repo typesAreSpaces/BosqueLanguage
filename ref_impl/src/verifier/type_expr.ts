@@ -17,6 +17,7 @@ abstract class TypeExpr {
     abstract readonly isPrimitiveType: boolean;
     abstract readonly isUninterpreted: boolean;
     abstract getType(): string;
+    abstract getBosqueType(): string;
     abstract getAbstractType(): string;
 }
 
@@ -25,6 +26,9 @@ class IntType extends TypeExpr {
     isUninterpreted = false;
     getType() {
         return "Int";
+    }
+    getBosqueType() {
+        return "BInt"
     }
     getAbstractType() {
         return "Term";
@@ -37,6 +41,9 @@ class BoolType extends TypeExpr {
     getType() {
         return "Bool";
     }
+    getBosqueType() {
+        return "BBol";
+    }
     getAbstractType() {
         return "Term";
     }
@@ -47,6 +54,9 @@ class StringType extends TypeExpr {
     isUninterpreted = false;
     getType() {
         return "String";
+    }
+    getBosqueType() {
+        return "BString";
     }
     getAbstractType() {
         return "Term";
@@ -59,6 +69,9 @@ class NoneType extends TypeExpr {
     getType() {
         return "None";
     }
+    getBosqueType() {
+        return "BNone";
+    }
     getAbstractType() {
         return "Term";
     }
@@ -70,6 +83,9 @@ class AnyType extends TypeExpr {
     getType() {
         return "Any";
     }
+    getBosqueType() {
+        return "BAny";
+    }
     getAbstractType() {
         return "Term";
     }
@@ -80,6 +96,9 @@ class SomeType extends TypeExpr {
     isUninterpreted = false;
     getType() {
         return "Some";
+    }
+    getBosqueType() {
+        return "BSome";
     }
     getAbstractType() {
         return "Term";
@@ -105,6 +124,17 @@ class FuncType extends TypeExpr {
                 (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()),
                 this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
                 + ") " + this.image.getType();
+        }
+    }
+    getBosqueType(): string {
+        if (this.domain.length == 0) {
+            return "() " + this.image.getBosqueType();
+        }
+        else {
+            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
+                (b.isPrimitiveType ? b.getBosqueType() : (b as FuncType).image.getBosqueType()),
+                this.domain[0].isPrimitiveType ? this.domain[0].getBosqueType() : (this.domain[0] as FuncType).image.getBosqueType())
+                + ") " + this.image.getBosqueType();
         }
     }
     getAbstractType(): string {
@@ -143,6 +173,16 @@ class UnionType extends TypeExpr {
             return result;
         }
     }
+    getBosqueType() {
+        let result = "";
+        if (this.elements.size === 0) {
+            return "Empty";
+        }
+        else {
+            this.elements.forEach(element => { result = element.getBosqueType() + " | " + result; });
+            return result;
+        }
+    }
     getAbstractType() {
         let result = "";
         if (this.elements.size === 0) {
@@ -164,7 +204,7 @@ class UninterpretedType extends TypeExpr {
     readonly symbolName: string;
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         [["BType", true]]
-        );
+    );
     constructor(symbolName: string) {
         super();
         this.symbolName = symbolName;
@@ -174,6 +214,9 @@ class UninterpretedType extends TypeExpr {
     }
     getType() {
         return this.symbolName;
+    }
+    getBosqueType() {
+        return "B" + this.symbolName;
     }
     getAbstractType() {
         return "Term";
@@ -188,6 +231,9 @@ class TermType extends TypeExpr {
     }
     getType() {
         return "Term";
+    }
+    getBosqueType() {
+        return "BTerm";
     }
     getAbstractType() {
         return "Term";
