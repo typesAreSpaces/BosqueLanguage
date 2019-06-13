@@ -1,0 +1,17 @@
+(define-const x String "asdf")
+(define-const y String "b")
+
+;; (declare-fun first (String) (_ BitVec 8))
+;; (assert (forall ((s String))
+;;            (! (or (= (seq.unit (first s)) (seq.at s 0))
+;;                   (= (as seq.empty String)  (seq.at s 0)))
+;;            :pattern (seq.at s 0)
+;;            )))
+
+(declare-fun first (String) (_ BitVec 8))
+(assert (forall ((s String))
+           (or (= (seq.unit (first s)) (seq.at s 0))
+               (= (as seq.empty String)  (seq.at s 0)))
+	   ))
+(assert (bvuge (first x) (first y)))
+(check-sat)

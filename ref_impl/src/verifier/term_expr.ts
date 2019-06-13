@@ -9,7 +9,7 @@ import { PredicateExpr } from "./formula_expr"
 
 abstract class TermExpr {
     readonly symbolName: string;
-    readonly ty: TypeExpr;
+    ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ["+", "-", "*", "/", "%",

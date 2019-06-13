@@ -4,8 +4,9 @@
 //-------------------------------------------------------------------------------------------------------
 
 // import * as deepEqual from "deep-equal"
-import { TypeExpr, BoolType, FuncType, UninterpretedType } from "./type_expr";
+import { TypeExpr, BoolType, FuncType, UninterpretedType, UnionType } from "./type_expr";
 import { TermExpr, VarExpr } from "./term_expr";
+import { stringVariableToStringType, resolveType } from "./collect_formulas"
 import * as FS from "fs";
 
 // REMARK: Names cannot include `,'
@@ -16,9 +17,9 @@ abstract class FormulaExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ([">", ">=", "<", "<=", 
-        ">_string", ">=_string", "<_string", "<=_string",
-        "=", "true", "false"].map(x => [x, true]))
+        ([">", ">=", "<", "<=",
+            ">_string", ">=_string", "<_string", "<=_string",
+            "=", "true", "false"].map(x => [x, true]))
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -52,12 +53,12 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(define-fun >_string ((x String) (y String)) Bool (not (<=_string x y)))\n");
         FS.writeSync(fd, "(define-fun >=_string ((x String) (y String)) Bool (not (<_string x y)))\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        // FS.writeSync(fd, "(declare-fun BoxAny (BAny) Term)\n");
-        // FS.writeSync(fd, "(declare-fun UnboxAny (Term) BAny)\n");
-        // FS.writeSync(fd, "(declare-fun BoxSome (BSome) Term)\n");
-        // FS.writeSync(fd, "(declare-fun UnboxSome (Term) BSome)\n");
-        // FS.writeSync(fd, "(declare-fun BoxNone (BNone) Term)\n");
-        // FS.writeSync(fd, "(declare-fun UnboxNone (Term) BNone)\n\n");
+        FS.writeSync(fd, "(declare-fun BoxAny (BAny) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxAny (Term) BAny)\n");
+        FS.writeSync(fd, "(declare-fun BoxSome (BSome) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxSome (Term) BSome)\n");
+        FS.writeSync(fd, "(declare-fun BoxNone (BNone) Term)\n");
+        FS.writeSync(fd, "(declare-fun UnboxNone (Term) BNone)\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
@@ -67,12 +68,25 @@ abstract class FormulaExpr {
     toZ3(fd: number): void {
         this.toZ3Declaration(fd);
         FS.writeSync(fd, "\n");
+        stringVariableToStringType.forEach((sType, sVariable) => {
+            if (sType.includes("|")) {
+                let unionType = resolveType(sType) as UnionType;
+                FS.writeSync(fd, "(assert (or " + Array.from(unionType.elements).map(element =>
+                    "(= (HasType " + sVariable + ") " + element.getBosqueType() + ")"
+                ).join(" ") + "))\n");
+
+            }
+            else {
+                FS.writeSync(fd, "(assert (= (HasType " + sVariable + ") " + resolveType(sType).getBosqueType() + "))\n");
+            }
+        });
+        FS.writeSync(fd, "\n");
         let assertingZ3 = function (formula_: FormulaExpr) {
             if (formula_ instanceof AndExpr) {
                 assertingZ3(formula_.leftHandSide);
                 assertingZ3(formula_.rightHandSide);
             }
-            else{
+            else {
                 FS.writeSync(fd, "(assert " + formula_.sexpr() + ")\n");
             }
         }

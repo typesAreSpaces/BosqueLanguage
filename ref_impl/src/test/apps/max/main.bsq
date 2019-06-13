@@ -40,6 +40,7 @@ function max2(x: Int, y: Int): Int
 entrypoint function main(): Int {
     var x = 10;
     var y = 20;
+    var z = max2(x, y);
 
     return max(x, y);
 }

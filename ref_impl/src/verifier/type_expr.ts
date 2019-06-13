@@ -42,7 +42,7 @@ class BoolType extends TypeExpr {
         return "Bool";
     }
     getBosqueType() {
-        return "BBol";
+        return "BBool";
     }
     getAbstractType() {
         return "Term";
@@ -120,9 +120,8 @@ class FuncType extends TypeExpr {
             return "() " + this.image.getType();
         }
         else {
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
-                (b.isPrimitiveType ? b.getType() : (b as FuncType).image.getType()),
-                this.domain[0].isPrimitiveType ? this.domain[0].getType() : (this.domain[0] as FuncType).image.getType())
+            return "("
+                + this.domain.map(x => (x instanceof FuncType) ? (x as FuncType).image.getType() : x.getType()).join(" ")
                 + ") " + this.image.getType();
         }
     }
@@ -131,9 +130,8 @@ class FuncType extends TypeExpr {
             return "() " + this.image.getBosqueType();
         }
         else {
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
-                (b.isPrimitiveType ? b.getBosqueType() : (b as FuncType).image.getBosqueType()),
-                this.domain[0].isPrimitiveType ? this.domain[0].getBosqueType() : (this.domain[0] as FuncType).image.getBosqueType())
+            return "("
+                + this.domain.map(x => (x instanceof FuncType) ? (x as FuncType).image.getBosqueType() : x.getBosqueType()).join(" ")
                 + ") " + this.image.getBosqueType();
         }
     }
@@ -142,19 +140,13 @@ class FuncType extends TypeExpr {
             return "() " + this.image.getAbstractType();
         }
         else {
-            return "(" + this.domain.slice(1).reduce((a, b) => a + " " +
-                (b.isPrimitiveType ? b.getAbstractType() : (b as FuncType).image.getAbstractType()),
-                this.domain[0].isPrimitiveType ? this.domain[0].getAbstractType() : (this.domain[0] as FuncType).image.getAbstractType())
+            return "("
+                + this.domain.map(x => (x instanceof FuncType) ? (x as FuncType).image.getAbstractType() : x.getAbstractType()).join(" ")
                 + ") " + this.image.getAbstractType();
         }
     }
 }
 
-// The getType() of UnionType
-// might have a collition symbolName
-// problem
-// getType() implements idempotency --> Not really.
-// TODO: Fix idempotecy using a Set structure
 class UnionType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
@@ -164,34 +156,23 @@ class UnionType extends TypeExpr {
         this.elements = elements;
     }
     getType() {
-        let result = "";
         if (this.elements.size === 0) {
             return "Empty";
         }
         else {
-            this.elements.forEach(element => { result = element.getType() + " | " + result; });
-            return result;
+            return Array.from(this.elements).map(x => x.getType()).join(" | ");;
         }
     }
     getBosqueType() {
-        let result = "";
         if (this.elements.size === 0) {
             return "Empty";
         }
         else {
-            this.elements.forEach(element => { result = element.getBosqueType() + " | " + result; });
-            return result;
+            return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");;
         }
     }
     getAbstractType() {
-        let result = "";
-        if (this.elements.size === 0) {
-            return "Empty";
-        }
-        else {
-            this.elements.forEach(element => { result = element.getAbstractType() + " | " + result; });
-            return result;
-        }
+       return "Term";
     }
 }
 
