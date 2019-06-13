@@ -436,7 +436,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.rhs, section)]), BString)),
                 new EqualityTerm(
                     new VarExpr(regName, new BoolType()),
-                    BoxFormulaExpr(new PredicateExpr(opBinCmp.op, [
+                    BoxFormulaExpr(new PredicateExpr(opBinCmp.op + "_string", [
                         UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
                         UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
                     ]))));

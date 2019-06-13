@@ -16,7 +16,9 @@ abstract class FormulaExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ([">", ">=", "<", "<=", "=", "true", "false"].map(x => [x, true]))
+        ([">", ">=", "<", "<=", 
+        ">_string", ">=_string", "<_string", "<=_string",
+        "=", "true", "false"].map(x => [x, true]))
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -24,13 +26,13 @@ abstract class FormulaExpr {
     }
     abstract sexpr(): string;
     static initialDeclarationZ3(fd: number) {
-        // -----------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(set-option :smt.auto-config false) ; disable automatic self configuration\n");
         FS.writeSync(fd, "(set-option :smt.mbqi false) ; disable model-based quantifier instantiation\n");
         FS.writeSync(fd, "(set-option :model true)\n\n");
-        // -----------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
-        // TODO: Add more BTypes if needed ---------------------------------------------------------------------------------------
+        // TODO: Add more BTypes if needed -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone)))\n\n");
         FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
         FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
@@ -39,17 +41,28 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
         FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n\n");
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        FS.writeSync(fd, "(define-fun head ((s String)) String (str.at s 0))\n");
+        FS.writeSync(fd, "(define-fun tail ((s String)) String (str.substr s 1 (- (str.len s) 1)))\n");
+        FS.writeSync(fd, "(declare-fun firstChar (String) (_ BitVec 8))\n");
+        FS.writeSync(fd, "(assert (forall ((s String)) (! (or (= (seq.unit (firstChar s)) (seq.at s 0)) (= (as seq.empty String)  (seq.at s 0))) :pattern (firstChar s) :pattern (seq.at s 0))))\n");
+        FS.writeSync(fd, "(declare-fun <_string (String String) Bool)\n");
+        FS.writeSync(fd, "(assert (forall ((x String) (y String)) (! (= (<_string x y) (ite (= (head x) (head y)) (<_string (tail x) (tail y)) (bvult (firstChar x) (firstChar y)))) :pattern ((<_string x y)))))\n");
+        FS.writeSync(fd, "(define-fun <=_string ((x String) (y String)) Bool (or (<_string x y) (= x y)))\n");
+        FS.writeSync(fd, "(define-fun >_string ((x String) (y String)) Bool (not (<=_string x y)))\n");
+        FS.writeSync(fd, "(define-fun >=_string ((x String) (y String)) Bool (not (<_string x y)))\n");
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // FS.writeSync(fd, "(declare-fun BoxAny (BAny) Term)\n");
         // FS.writeSync(fd, "(declare-fun UnboxAny (Term) BAny)\n");
         // FS.writeSync(fd, "(declare-fun BoxSome (BSome) Term)\n");
         // FS.writeSync(fd, "(declare-fun UnboxSome (Term) BSome)\n");
         // FS.writeSync(fd, "(declare-fun BoxNone (BNone) Term)\n");
         // FS.writeSync(fd, "(declare-fun UnboxNone (Term) BNone)\n\n");
-        // -----------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n\n");
-        // -----------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     }
     toZ3(fd: number): void {
         this.toZ3Declaration(fd);
