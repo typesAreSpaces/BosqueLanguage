@@ -648,7 +648,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
         }
         case MIROpTag.MIRReturnAssign: {
             let opReturnAssign = op as MIRReturnAssign;
-            console.log(opReturnAssign);
             let regName = section + "_" + opReturnAssign.name.nameID;
             let srcName = opReturnAssign.src.nameID;
             if (opReturnAssign.src instanceof MIRRegisterArgument) {
@@ -746,7 +745,11 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let opIsTypeOfNone = op as MIRIsTypeOfNone;
             console.log(opIsTypeOfNone);
 
-            return formula;
+            let regName = section + "_" + opIsTypeOfNone.trgt.nameID;
+            stringVariableToStringType.set(regName, "NSCore::Bool");
+
+            // TODO: Continue working here
+            return new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BNone);
         }
         case MIROpTag.MIRIsTypeOfSome: {
             debugging("MIRIsTypeOfSome Not implemented yet", DEBUGGING);
@@ -772,12 +775,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(blocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // blocks.map(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // blocks.map(x => console.log(x.jsonify()));
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

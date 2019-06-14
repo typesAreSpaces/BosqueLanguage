@@ -4,6 +4,9 @@
 
 (declare-sort Term)
 (declare-datatypes () ((BType BInt BBool BString BAny BSome BNone)))
+(declare-sort Any)
+(declare-sort Some)
+(declare-sort None)
 
 (declare-fun HasType (Term) BType)
 (declare-fun BoxInt (Int) Term)
@@ -12,6 +15,12 @@
 (declare-fun UnboxBool (Term) Bool)
 (declare-fun BoxString (String) Term)
 (declare-fun UnboxString (Term) String)
+(declare-fun BoxAny (Any) Term)
+(declare-fun UnboxAny (Term) Any)
+(declare-fun BoxSome (Some) Term)
+(declare-fun UnboxSome (Term) Some)
+(declare-fun BoxNone (None) Term)
+(declare-fun UnboxNone (Term) None)
 
 (define-fun head ((s String)) String (str.at s 0))
 (define-fun tail ((s String)) String (str.substr s 1 (- (str.len s) 1)))
@@ -22,17 +31,11 @@
 (define-fun <=_string ((x String) (y String)) Bool (or (<_string x y) (= x y)))
 (define-fun >_string ((x String) (y String)) Bool (not (<=_string x y)))
 (define-fun >=_string ((x String) (y String)) Bool (not (<_string x y)))
-(declare-fun BoxAny (BAny) Term)
-(declare-fun UnboxAny (Term) BAny)
-(declare-fun BoxSome (BSome) Term)
-(declare-fun UnboxSome (Term) BSome)
-(declare-fun BoxNone (BNone) Term)
-(declare-fun UnboxNone (Term) BNone)
-
 (assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))
 (assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))
 (assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))
 
+(declare-fun Ahhhh () Term)
 (declare-fun MIRJumpCondFormula () Term)
 (declare-fun NSMain__max_@tmp_0 () Term)
 (declare-fun NSMain__max__ir_ret_$2 () Term)
@@ -54,7 +57,7 @@
 (assert (= (HasType NSMain__max__ir_ret_$3) BInt))
 (assert (= (HasType NSMain__max__return_) BInt))
 
-(assert true)
+(assert (UnboxBool Ahhhh))
 (assert (UnboxBool MIRJumpCondFormula))
 (assert (=> (= NSMain__max_@tmp_0 (BoxBool true)) (and (and (= NSMain__max__ir_ret_$2 (BoxInt (UnboxInt NSMain__max_y))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))))))
 (assert (=> (not (= NSMain__max_@tmp_0 (BoxBool true))) (and (and (and (=> (and (= (HasType NSMain__max_x) BInt) (= (HasType NSMain__max_y) BInt)) (= NSMain__max_@tmp_4 (BoxBool (>= (UnboxInt NSMain__max_x) (UnboxInt NSMain__max_y))))) (=> (and (= (HasType NSMain__max_x) BString) (= (HasType NSMain__max_y) BString)) (= NSMain__max_@tmp_4 (BoxBool (>=_string (UnboxString NSMain__max_x) (UnboxString NSMain__max_y)))))) (UnboxBool MIRJumpCondFormula)) (and (=> (= NSMain__max_@tmp_4 (BoxBool true)) (and (and (and (=> (= (HasType NSMain__max_x) BInt) (= NSMain__max__ir_ret_$1 (BoxInt (UnboxInt NSMain__max_x)))) (=> (= (HasType NSMain__max_x) BNone) (= NSMain__max__ir_ret_$1 (BoxNone (UnboxNone NSMain__max_x))))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (and (and (= NSMain__max__ir_ret_ (BoxInt (UnboxInt NSMain__max_y))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3))))))))))
