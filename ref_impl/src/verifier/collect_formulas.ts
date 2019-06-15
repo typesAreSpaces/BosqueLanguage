@@ -14,20 +14,10 @@ let DEBUGGING = false;
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
 
-// Global variable to gather the types seen 
-// in the program
-// Keep in mind that blocks will be 
-// process in a topological order
-// Hence, it cannot be the case that
-// we introduce inconsistency in the types
-// of a well-typed program
-
-// The following variables deserve to be explained:
 // stringVariableToStringType : String[Variable] -> String[CoreType | Type]
-// resolveType : String[CoreType | Type] -> TypeExpr
-// stringConstantToStringType : String[Constant] -> String[CoreType | Type]
 // Example : stringVariableToStringType = Map { x => 'NSCore::Int', y => 'NSCore::Bool', z => new_type, ... }
 let stringVariableToStringType: Map<string, string> = new Map<string, string>();
+
 // mapBlockCondition : String[Block] -> Set<FormulasExpr>
 let mapBlockCondition: Map<string, Set<FormulaExpr>> = new Map<string, Set<FormulaExpr>>();
 let BoxTrue = BoxFormulaExpr(new PredicateExpr("true", []));
@@ -44,6 +34,8 @@ function debugging(x: any, flag: boolean) {
         console.log(x);
     }
 }
+
+// resolveType : String[CoreType | Type] -> TypeExpr
 function resolveType(typeName: string): TypeExpr {
     switch (typeName) {
         case "NSCore::Int": {
@@ -68,7 +60,14 @@ function resolveType(typeName: string): TypeExpr {
         }
         default: {
             if (typeName.includes("|")) {
-                return new UnionType(new Set<TypeExpr>(typeName.split(" | ").map(resolveType)));
+                let collectionOfTypes = new Set<TypeExpr>(typeName.split(" | ").map(resolveType));
+                // TODO: Is this extra singleton checking unnecessary?
+                if (collectionOfTypes.size === 1) {
+                    return Array.from(collectionOfTypes)[0];
+                }
+                else {
+                    return new UnionType(collectionOfTypes);
+                }
             }
             else {
                 return new UninterpretedType(typeName);
@@ -76,6 +75,8 @@ function resolveType(typeName: string): TypeExpr {
         }
     }
 }
+
+// stringConstantToStringType : String[Constant] -> String[CoreType | Type]
 // I agree, this looks extremely dirty
 function stringConstantToStringType(value: string): string {
     switch (value) {
@@ -108,6 +109,8 @@ function stringConstantToStringType(value: string): string {
         }
     }
 }
+
+// Convention:
 // name <- src
 function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaExpr {
     let srcName = src.symbolName;
@@ -188,8 +191,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         throw new Error("The src wasn't a VarExpr");
                     }
                 }
-            }
-            );
+            });
             return makeConjunction(assigments);
         }
         else {
@@ -271,8 +273,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         throw new Error("The src wasn't a VarExpr");
                     }
                 }
-            }
-            );
+            });
             return makeConjunction(assigments);
         }
         else {
@@ -557,7 +558,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             debugging("MIRPrefixOp Not implemented yet", DEBUGGING);
             return formula;
         }
-        case MIROpTag.MIRBinOp: { // Done
+        case MIROpTag.MIRBinOp: {
             let opBinOp = op as MIRBinOp;
             let regName = section + "_" + opBinOp.trgt.nameID;
             // We follow the semantics given by
@@ -576,7 +577,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             debugging("MIRBinEq Not implemented yet", DEBUGGING);
             return formula;
         }
-        case MIROpTag.MIRBinCmp: { // Done
+        case MIROpTag.MIRBinCmp: {
             // The predicate returned is of type Bool
             // because the operations to arrive at this
             // point are <, <=, >, >= only
@@ -592,7 +593,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             stringVariableToStringType.set(lhsName, "NSCore::Int");
             stringVariableToStringType.set(rhsName, "NSCore::Int");
-
             let opFormulaInt = new ImplExpr(
                 new AndExpr(
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BInt),
@@ -606,7 +606,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             stringVariableToStringType.set(lhsName, "NSCore::String");
             stringVariableToStringType.set(rhsName, "NSCore::String");
-
             let opFormulaString = new ImplExpr(
                 new AndExpr(
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BString),
@@ -620,7 +619,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             stringVariableToStringType.set(lhsName, originalTypeLHS);
             stringVariableToStringType.set(rhsName, originalTypeRHS);
-
             return new AndExpr(opFormulaInt, opFormulaString);
         }
         case MIROpTag.MIRRegAssign: {
@@ -641,9 +639,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             else {
                 stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
-            // let opFormula = new EqualityTerm(
-            //     argumentToVarExpr(opVarStore.name, section),
-            //     BoxTermExpr(UnboxTermExpr(argumentToVarExpr(opVarStore.src, section), opVarStore.src instanceof MIRConstantArgument)));
             return conditionalAssignment(argumentToVarExpr(opVarStore.name, section), argumentToVarExpr(opVarStore.src, section), opVarStore);
         }
         case MIROpTag.MIRReturnAssign: {
@@ -656,9 +651,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             else {
                 stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
-            // let opFormula = new EqualityTerm(
-            //     argumentToVarExpr(opReturnAssign.name, section),
-            //     BoxTermExpr(UnboxTermExpr(argumentToVarExpr(opReturnAssign.src, section), opReturnAssign.src instanceof MIRConstantArgument)));
             return conditionalAssignment(argumentToVarExpr(opReturnAssign.name, section), argumentToVarExpr(opReturnAssign.src, section), opReturnAssign);
         }
         case MIROpTag.MIRAbort: {
@@ -710,15 +702,21 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let opPhi = op as MIRPhi;
             let targetName = section + "_" + opPhi.trgt.nameID;
 
-            // TODO: Fix this using UnionType or a
-            // clever approach. Currently is just set to 
-            // be the IntType for the purpose of the 
-            // max function demo
+            // TODO: This one is wrong
             stringVariableToStringType.set(targetName, "NSCore::Int");
 
+            // let typePhi = new UnionType(new Set<TypeExpr>());
+            // let typePhiString : Set<string> = new Set<string>();
             let changeFormula = false;
             opPhi.src.forEach((value, key) => {
-                let consequence = new EqualityTerm(argumentToVarExpr(opPhi.trgt, section), argumentToVarExpr(value, section));
+
+                let valueExpr = argumentToVarExpr(value, section);
+                // stringVariableToStringType.set(targetName, stringVariableToStringType.get(valueExpr.symbolName) as string);
+                // typePhi.elements.add(valueExpr.ty);
+                // typePhiString.add(stringVariableToStringType.get(valueExpr.symbolName) as string);
+
+                let consequence = new EqualityTerm(argumentToVarExpr(opPhi.trgt, section), valueExpr);
+
                 let setOfConditions = mapBlockCondition.get(key) as Set<FormulaExpr>;
                 if (!changeFormula) {
                     changeFormula = true;
@@ -738,18 +736,22 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                     }
                 }
             });
+
+            // TODO: This one is right but doesn't working
+            // stringVariableToStringType.set(targetName, Array.from(typePhiString).join(" | "));
+
             return formula;
         }
         case MIROpTag.MIRIsTypeOfNone: {
             debugging("MIRIsTypeOfNone Not implemented yet", DEBUGGING);
             let opIsTypeOfNone = op as MIRIsTypeOfNone;
-            console.log(opIsTypeOfNone);
 
             let regName = section + "_" + opIsTypeOfNone.trgt.nameID;
             stringVariableToStringType.set(regName, "NSCore::Bool");
 
-            // TODO: Continue working here
-            return new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BNone);
+            return new EqualityTerm(new VarExpr(regName, new BoolType()),
+                BoxFormulaExpr(new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"),
+                    [argumentToVarExpr(opIsTypeOfNone.arg, section)]), BNone)));
         }
         case MIROpTag.MIRIsTypeOfSome: {
             debugging("MIRIsTypeOfSome Not implemented yet", DEBUGGING);
@@ -769,18 +771,18 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
 // params is a sorted array of MIRFunctionParameter
 // i.e. the first element corresponds to the first argument, ... and so on.
-// Resolve names by prefixing section to every name encountered
+// We resolve nameing by prefixing the section variable to every name encountered
 function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    console.log("Blocks:-----------------------------------------------------------------------");
-    console.log(blocks);
-    console.log("More detailed Blocks:---------------------------------------------------------");
-    blocks.map(x => console.log(x));
-    console.log("More detailed++ Blocks:-------------------------------------------------------");
-    blocks.map(x => console.log(x.jsonify()));
+    // console.log("Blocks:-----------------------------------------------------------------------");
+    // console.log(blocks);
+    // console.log("More detailed Blocks:---------------------------------------------------------");
+    // blocks.map(x => console.log(x));
+    // console.log("More detailed++ Blocks:-------------------------------------------------------");
+    // blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>
@@ -801,7 +803,6 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
             case 2: {
                 let jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
                 let regName = section + "_" + jumpCondOp.arg.nameID;
-                // let condition = UnboxFormulaExpr(new PredicateExpr(regName, []));
                 let condition = new EqualityTerm(new PredicateExpr(regName, []), BoxTrue);
                 let branchTrue = new ImplExpr(condition, traverse(ibody.get(jumpCondOp.trueblock) as MIRBasicBlock));
                 let branchFalse = new ImplExpr(new NegExpr(condition), traverse(ibody.get(jumpCondOp.falseblock) as MIRBasicBlock));

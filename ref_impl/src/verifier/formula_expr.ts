@@ -3,7 +3,6 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-// import * as deepEqual from "deep-equal"
 import { TypeExpr, BoolType, FuncType, UninterpretedType, UnionType } from "./type_expr";
 import { TermExpr, VarExpr } from "./term_expr";
 import { stringVariableToStringType, resolveType } from "./collect_formulas"
@@ -161,9 +160,7 @@ class PredicateExpr extends FormulaExpr {
         // This also checks the term symbols because some functions can return Boolean types
         if (!PredicateExpr.symbolTable.get(this.symbolName) && !TermExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
-            // FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getType() + ")\n");
             FS.writeSync(fd, "(declare-fun " + declarationName + " " + this.ty.getAbstractType() + ")\n");
-            // FS.writeSync(fd, "(HasType " + declarationName + " " + this.ty.getType() + ")\n");
             PredicateExpr.symbolTable.set(this.symbolName, true);
         }
     }

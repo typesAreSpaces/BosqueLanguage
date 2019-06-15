@@ -58,9 +58,54 @@
 (assert (= (HasType NSMain__max__return_) BInt))
 
 (assert (= NSMain__max_@tmp_0 (BoxBool (= (HasType NSMain__max_x) BNone))))
+
 (assert (UnboxBool MIRJumpCondFormula))
-(assert (=> (= NSMain__max_@tmp_0 (BoxBool true)) (and (and (= NSMain__max__ir_ret_$2 (BoxInt (UnboxInt NSMain__max_y))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))))))
-(assert (=> (not (= NSMain__max_@tmp_0 (BoxBool true))) (and (and (and (=> (and (= (HasType NSMain__max_x) BInt) (= (HasType NSMain__max_y) BInt)) (= NSMain__max_@tmp_4 (BoxBool (>= (UnboxInt NSMain__max_x) (UnboxInt NSMain__max_y))))) (=> (and (= (HasType NSMain__max_x) BString) (= (HasType NSMain__max_y) BString)) (= NSMain__max_@tmp_4 (BoxBool (>=_string (UnboxString NSMain__max_x) (UnboxString NSMain__max_y)))))) (UnboxBool MIRJumpCondFormula)) (and (=> (= NSMain__max_@tmp_4 (BoxBool true)) (and (and (and (=> (= (HasType NSMain__max_x) BInt) (= NSMain__max__ir_ret_$1 (BoxInt (UnboxInt NSMain__max_x)))) (=> (= (HasType NSMain__max_x) BNone) (= NSMain__max__ir_ret_$1 (BoxNone (UnboxNone NSMain__max_x))))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (and (and (= NSMain__max__ir_ret_ (BoxInt (UnboxInt NSMain__max_y))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3))))))))))
+
+(assert (=>
+		(= NSMain__max_@tmp_0 (BoxBool true))
+		(and
+			(and
+				(= NSMain__max__ir_ret_$2 (BoxInt (UnboxInt NSMain__max_y)))
+				(UnboxBool MIRJumpFormula)
+			)
+			(and
+				(and
+					(and
+						(=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2))
+						(=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))
+					)
+					(=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))
+				)
+				(= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))
+			)
+		)
+	)
+)
+
+(assert
+	(=>
+		(not (= NSMain__max_@tmp_0 (BoxBool true)))
+		(and
+			(and
+				(and (=> (and (= (HasType NSMain__max_x) BInt) (= (HasType NSMain__max_y) BInt)) (= NSMain__max_@tmp_4 (BoxBool (>= (UnboxInt NSMain__max_x) (UnboxInt NSMain__max_y))))) (=> (and (= (HasType NSMain__max_x) BString) (= (HasType NSMain__max_y) BString)) (= NSMain__max_@tmp_4 (BoxBool (>=_string (UnboxString NSMain__max_x) (UnboxString NSMain__max_y)))))
+				)
+				(UnboxBool MIRJumpCondFormula)
+			)
+			(and
+				(=>
+					(= NSMain__max_@tmp_4 (BoxBool true))
+					(and (and (and (=> (= (HasType NSMain__max_x) BInt) (= NSMain__max__ir_ret_$1 (BoxInt (UnboxInt NSMain__max_x)))) (=> (= (HasType NSMain__max_x) BNone) (= NSMain__max__ir_ret_$1 (BoxNone (UnboxNone NSMain__max_x))))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3)))))
+				)
+
+				(=>
+					(not (= NSMain__max_@tmp_4 (BoxBool true)))
+					(and (and (= NSMain__max__ir_ret_ (BoxInt (UnboxInt NSMain__max_y))) (UnboxBool MIRJumpFormula)) (and (and (and (=> (= NSMain__max_@tmp_0 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$2)) (=> (= NSMain__max_@tmp_4 (BoxBool true)) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_$1))) (=> (not (= NSMain__max_@tmp_4 (BoxBool true))) (= NSMain__max__ir_ret_$3 NSMain__max__ir_ret_))) (= NSMain__max__return_ (BoxInt (UnboxInt NSMain__max__ir_ret_$3))))
+					)
+				)
+			)
+		)
+	)
+)
 
 (assert (< (UnboxInt NSMain__max__return_) (UnboxInt NSMain__max_y)))
 
