@@ -703,17 +703,17 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let targetName = section + "_" + opPhi.trgt.nameID;
 
             // TODO: This one is wrong
-            stringVariableToStringType.set(targetName, "NSCore::Int");
+            // stringVariableToStringType.set(targetName, "NSCore::Int");
 
-            // let typePhi = new UnionType(new Set<TypeExpr>());
-            // let typePhiString : Set<string> = new Set<string>();
+            let typePhi = new UnionType(new Set<TypeExpr>());
+            let typePhiString : Set<string> = new Set<string>();
             let changeFormula = false;
             opPhi.src.forEach((value, key) => {
 
                 let valueExpr = argumentToVarExpr(value, section);
-                // stringVariableToStringType.set(targetName, stringVariableToStringType.get(valueExpr.symbolName) as string);
-                // typePhi.elements.add(valueExpr.ty);
-                // typePhiString.add(stringVariableToStringType.get(valueExpr.symbolName) as string);
+                stringVariableToStringType.set(targetName, stringVariableToStringType.get(valueExpr.symbolName) as string);
+                typePhi.elements.add(valueExpr.ty);
+                typePhiString.add(stringVariableToStringType.get(valueExpr.symbolName) as string);
 
                 let consequence = new EqualityTerm(argumentToVarExpr(opPhi.trgt, section), valueExpr);
 
@@ -738,7 +738,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             });
 
             // TODO: This one is right but doesn't working
-            // stringVariableToStringType.set(targetName, Array.from(typePhiString).join(" | "));
+            stringVariableToStringType.set(targetName, Array.from(typePhiString).join(" | "));
 
             return formula;
         }
