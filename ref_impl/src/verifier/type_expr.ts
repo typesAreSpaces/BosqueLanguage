@@ -160,7 +160,7 @@ class UnionType extends TypeExpr {
             return "Empty";
         }
         else {
-            return Array.from(this.elements).map(x => x.getType()).join(" | ");;
+            return Array.from(this.elements).map(x => x.getType()).join(" | ");
         }
     }
     getBosqueType() {
@@ -168,11 +168,11 @@ class UnionType extends TypeExpr {
             return "Empty";
         }
         else {
-            return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");;
+            return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");
         }
     }
     getAbstractType() {
-       return "Term";
+        return "Term";
     }
 }
 
@@ -221,4 +221,38 @@ class TermType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType };
+class TupleType extends TypeExpr {
+    isPrimitiveType = false;
+    isUninterpreted = false;
+    readonly elements: TypeExpr[];
+    constructor(elements: TypeExpr[]) {
+        super();
+        this.elements = elements;
+    }
+    getType() {
+        if (this.elements.length === 0) {
+            return "Empty";
+        }
+        else {
+            return Array.from(this.elements).map(x => x.getType()).join(" * ");
+        }
+    }
+    getBosqueType() {
+        if (this.elements.length === 0) {
+            return "Empty";
+        }
+        else {
+            return Array.from(this.elements).map(x => x.getBosqueType()).join(" * ");
+        }
+    }
+    getAbstractType() {
+        if (this.elements.length === 0) {
+            return "Empty";
+        }
+        else {
+            return Array.from(this.elements).map(x => x.getAbstractType()).join(" * ");
+        }
+    }
+}
+
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType, TupleType };

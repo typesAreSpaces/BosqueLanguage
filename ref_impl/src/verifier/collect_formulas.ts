@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
@@ -500,6 +500,11 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
         }
         case MIROpTag.ConstructorTuple: {
             debugging("ConstructorTuple Not implemented yet", DEBUGGING);
+            let opConstructorTuple = op as MIRConstructorTuple;
+            console.log(opConstructorTuple);
+            
+            
+
             return formula
         }
         case MIROpTag.ConstructorRecord: {
@@ -823,12 +828,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(blocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // blocks.map(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // blocks.map(x => console.log(x.jsonify()));
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(blocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    blocks.map(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

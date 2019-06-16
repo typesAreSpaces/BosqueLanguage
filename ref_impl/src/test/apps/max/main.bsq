@@ -29,6 +29,8 @@ function max(x: Int?, y: Int): Int
 function max2(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
+    var z = @[x, y];
+    
     if(x >= y){
         return x;
     }
