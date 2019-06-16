@@ -126,7 +126,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new IntType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BInt),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BInt),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC
@@ -137,7 +140,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new BoolType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BBool),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BBool),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -148,7 +154,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new StringType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BString),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BString),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -159,7 +168,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new NoneType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BNone),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BNone),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -170,7 +182,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new AnyType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BAny),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BAny),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -181,7 +196,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new SomeType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BSome),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opVarStore.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BSome),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -208,7 +226,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new IntType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BInt),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BInt),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -219,7 +240,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new BoolType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BBool),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BBool),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -230,7 +254,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new StringType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BString),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BString),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -241,7 +268,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new NoneType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BNone),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BNone),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -252,7 +282,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new AnyType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BAny),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BAny),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -263,7 +296,10 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
                         src.ty = new SomeType();
                         let result = new ImplExpr(
                             new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BSome),
-                            new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument)))
+                            new AndExpr(
+                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src, opReturnAssign.src instanceof MIRConstantArgument))),
+                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BSome),
+                            )
                         )
                         stringVariableToStringType.set(srcName, originalTypeSRC);
                         src.ty = typeOfSRC;
@@ -597,12 +633,17 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 new AndExpr(
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BInt),
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.rhs, section)]), BInt)),
-                new EqualityTerm(
-                    new VarExpr(regName, new BoolType()),
-                    BoxFormulaExpr(new PredicateExpr(opBinCmp.op, [
-                        UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
-                        UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
-                    ]))));
+                new AndExpr(
+                    new EqualityTerm(
+                        new VarExpr(regName, new BoolType()),
+                        BoxFormulaExpr(new PredicateExpr(opBinCmp.op, [
+                            UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
+                            UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
+                        ]))
+                    ),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.trgt, section)]), BInt)
+                )
+            );
 
             stringVariableToStringType.set(lhsName, "NSCore::String");
             stringVariableToStringType.set(rhsName, "NSCore::String");
@@ -610,12 +651,17 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 new AndExpr(
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BString),
                     new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.rhs, section)]), BString)),
-                new EqualityTerm(
-                    new VarExpr(regName, new BoolType()),
-                    BoxFormulaExpr(new PredicateExpr(opBinCmp.op + "_string", [
-                        UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
-                        UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
-                    ]))));
+                new AndExpr(
+                    new EqualityTerm(
+                        new VarExpr(regName, new BoolType()),
+                        BoxFormulaExpr(new PredicateExpr(opBinCmp.op + "_string", [
+                            UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
+                            UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
+                        ]))
+                    ),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.trgt, section)]), BString)
+                )
+            );
 
             stringVariableToStringType.set(lhsName, originalTypeLHS);
             stringVariableToStringType.set(rhsName, originalTypeRHS);
@@ -706,7 +752,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // stringVariableToStringType.set(targetName, "NSCore::Int");
 
             let typePhi = new UnionType(new Set<TypeExpr>());
-            let typePhiString : Set<string> = new Set<string>();
+            let typePhiString: Set<string> = new Set<string>();
             let changeFormula = false;
             opPhi.src.forEach((value, key) => {
 
