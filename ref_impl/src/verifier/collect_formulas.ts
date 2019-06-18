@@ -527,6 +527,8 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                     return section + "_" + arg.nameID;
                 }).join(", ") + "]");
             
+            formula = 
+
             // Example z = @[x, y]
             // (assert (= (HasType z) _)) TODO: Work on the type encoding
             // (assert (= (lengthTuple z) 2))
