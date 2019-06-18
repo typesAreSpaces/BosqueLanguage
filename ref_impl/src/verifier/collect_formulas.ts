@@ -3,13 +3,13 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "../verifier/formula_expr";
 
-let DEBUGGING = false;
+let DEBUGGING = true;
 
 // TODO: Probably we dont need to instantiate
 // new elements from TypeExpr() ..
@@ -68,6 +68,24 @@ function resolveType(typeName: string): TypeExpr {
                 else {
                     return new UnionType(collectionOfTypes);
                 }
+            }
+            if (typeName.includes("[")) {
+                let collectionOfTypes = typeName.substr(1, typeName.length - 2).split(", ").map(resolveType);
+                return new TupleType(collectionOfTypes);
+            }
+            if (typeName.includes("{")) {
+                let collectionOfTypes = typeName.substr(1, typeName.length - 2).split(", ").map(pair => {
+                    let [key, typeString] = pair.split(": ");
+                    return ([key, resolveType(typeString)] as [string, TypeExpr]);
+                });
+                return new RecordType(collectionOfTypes);
+            } if (typeName.includes("(")) {
+                let [args, resultString] = typeName.split(" -> ");
+                let collectionOfTypesArgs = args.substr(1, args.length - 2).split(", ").map(pair => {
+                    let [key, typeString] = pair.split(": ");
+                    return ([key, resolveType(typeString)] as [string, TypeExpr]);
+                });
+                return new LambdaType(collectionOfTypesArgs, resolveType(resultString));
             }
             else {
                 return new UninterpretedType(typeName);
@@ -498,21 +516,36 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             debugging("ConstructorPrimaryCollectionMixed Not implemented yet", DEBUGGING);
             return formula;
         }
-        case MIROpTag.ConstructorTuple: {
+        case MIROpTag.ConstructorTuple: { // --------------------------------------------------------------------------------------------
             debugging("ConstructorTuple Not implemented yet", DEBUGGING);
             let opConstructorTuple = op as MIRConstructorTuple;
             console.log(opConstructorTuple);
+
+            let regName = section + "_" + opConstructorTuple.trgt.nameID;
+            stringVariableToStringType.set(regName,
+                "[" + opConstructorTuple.args.map(arg => {
+                    return section + "_" + arg.nameID;
+                }).join(", ") + "]");
             
+            // Example z = @[x, y]
+            // (assert (= (HasType z) _)) TODO: Work on the type encoding
+            // (assert (= (lengthTuple z) 2))
+            // (assert (= (elementTuple z 0) x))
+            // (assert (= (elementTuple z 1) y))
             
 
             return formula
         }
         case MIROpTag.ConstructorRecord: {
             debugging("ConstructorRecord Not implemented yet", DEBUGGING);
+            let opConstructorRecord = op as MIRConstructorRecord;
+            console.log(opConstructorRecord);
             return formula;
         }
         case MIROpTag.ConstructorLambda: {
             debugging("ConstructorLambda Not implemented yet", DEBUGGING);
+            let opConstructorLambda = op as MIRConstructorLambda;
+            console.log(opConstructorLambda);
             return formula;
         }
         case MIROpTag.CallNamespaceFunction: {
@@ -753,9 +786,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let opPhi = op as MIRPhi;
             let targetName = section + "_" + opPhi.trgt.nameID;
 
-            // TODO: This one is wrong
-            // stringVariableToStringType.set(targetName, "NSCore::Int");
-
             let typePhi = new UnionType(new Set<TypeExpr>());
             let typePhiString: Set<string> = new Set<string>();
             let changeFormula = false;
@@ -788,9 +818,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 }
             });
 
-            // TODO: This one is right but doesn't working
             stringVariableToStringType.set(targetName, Array.from(typePhiString).join(" | "));
-
             return formula;
         }
         case MIROpTag.MIRIsTypeOfNone: {

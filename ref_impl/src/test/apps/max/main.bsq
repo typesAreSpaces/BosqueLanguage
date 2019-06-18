@@ -29,8 +29,18 @@ function max(x: Int?, y: Int): Int
 function max2(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
+    // Tuple constructor
     var z = @[x, y];
-    
+    var z1 = z[0];
+
+    // Record constructor
+    var w = @{f = 23234, g = true};
+
+    // Lambda constructor
+    var lam = fn() : Int => 1;
+    var lam2 = fn(ahh : Int) : Int => ahh;
+    var lam3 = fn(ahh: Int, ahh2: Int, x : Int) : Int => { return x; };
+
     if(x >= y){
         return x;
     }

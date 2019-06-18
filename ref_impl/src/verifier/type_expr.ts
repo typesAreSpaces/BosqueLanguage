@@ -221,6 +221,7 @@ class TermType extends TypeExpr {
     }
 }
 
+// LambdaType type representation has "[", "]"
 class TupleType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
@@ -230,29 +231,56 @@ class TupleType extends TypeExpr {
         this.elements = elements;
     }
     getType() {
-        if (this.elements.length === 0) {
-            return "Empty";
-        }
-        else {
-            return Array.from(this.elements).map(x => x.getType()).join(" * ");
-        }
+        return "[" + this.elements.map(x => x.getType()).join(", ") + "]";
     }
     getBosqueType() {
-        if (this.elements.length === 0) {
-            return "Empty";
-        }
-        else {
-            return Array.from(this.elements).map(x => x.getBosqueType()).join(" * ");
-        }
+        return "[" + this.elements.map(x => x.getBosqueType()).join(", ") + "]";
     }
     getAbstractType() {
-        if (this.elements.length === 0) {
-            return "Empty";
-        }
-        else {
-            return Array.from(this.elements).map(x => x.getAbstractType()).join(" * ");
-        }
+        return "Term";
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType, TupleType };
+// LambdaType type representation has "{", "}"
+class RecordType extends TypeExpr {
+    isPrimitiveType = false;
+    isUninterpreted = false;
+    readonly elements: [string, TypeExpr][];
+    constructor(elements: [string,TypeExpr][]) {
+        super()
+        this.elements = elements;
+    }
+    getType() {
+        return "{" + this.elements.map(x => x[0] + ":" + x[1].getType()).join(", ") + "}";
+    }
+    getBosqueType() {
+        return "{" + this.elements.map(x => x[0] + ":" + x[1].getBosqueType()).join(", ") + "}";
+    }
+    getAbstractType() {
+        return "Term";
+    }
+}
+
+// LambdaType type representation has "->"
+class LambdaType extends TypeExpr {
+    isPrimitiveType = false;
+    isUninterpreted = false;
+    readonly args: [string, TypeExpr][];
+    readonly result : TypeExpr;
+    constructor(args: [string, TypeExpr][], result : TypeExpr) {
+        super()
+        this.args = args;
+        this.result = result;
+    }
+    getType() {
+        return "(" + this.args.map(x => x[0] + ":" + x[1].getType()).join(", ") + ")" + " -> " + this.result.getType();
+    }
+    getBosqueType() {
+        return "(" + this.args.map(x => x[0] + ":" + x[1].getBosqueType()).join(", ") + ")" + " -> " + this.result.getBosqueType();
+    }
+    getAbstractType() {
+        return "Term";
+    }
+}
+
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType, TupleType, RecordType, LambdaType };
