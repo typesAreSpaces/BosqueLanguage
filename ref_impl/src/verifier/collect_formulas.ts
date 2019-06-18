@@ -8,6 +8,7 @@ import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_i
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "../verifier/formula_expr";
+import { AccessNamespaceConstantExpression } from "../ast/body";
 
 let DEBUGGING = true;
 
@@ -28,6 +29,7 @@ let BString = new VarExpr("BString", new UninterpretedType("BType"));
 let BAny = new VarExpr("BAny", new UninterpretedType("BType"));
 let BSome = new VarExpr("BSome", new UninterpretedType("BType"));
 let BNone = new VarExpr("BNone", new UninterpretedType("BType"));
+let BTuple = new VarExpr("BTuple", new UninterpretedType("BType"));
 
 function debugging(x: any, flag: boolean) {
     if (flag) {
@@ -526,15 +528,28 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 "[" + opConstructorTuple.args.map(arg => {
                     return section + "_" + arg.nameID;
                 }).join(", ") + "]");
-            
-            formula = 
+
+
+            console.log(BTuple);
+            let regVar = argumentToVarExpr(opConstructorTuple.trgt, section);
+                
+            // formula = new EqualityTerm(
+            //     new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
+            //     BTuple);
+            // new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]), BTuple);
+            // new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar]), BTuple);
+            // new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar]), BTuple);
 
             // Example z = @[x, y]
-            // (assert (= (HasType z) _)) TODO: Work on the type encoding
+            // (assert (= (HasType z) )) TODO: Work on the type encoding
             // (assert (= (lengthTuple z) 2))
             // (assert (= (elementTuple z 0) x))
             // (assert (= (elementTuple z 1) y))
-            
+
+            opConstructorTuple.args.map(arg => formula = new AndExpr(formula, 
+                new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar, new ]), BTuple)
+                ));
+
 
             return formula
         }
@@ -824,7 +839,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.MIRIsTypeOfNone: {
-            debugging("MIRIsTypeOfNone Not implemented yet", DEBUGGING);
             let opIsTypeOfNone = op as MIRIsTypeOfNone;
 
             let regName = section + "_" + opIsTypeOfNone.trgt.nameID;

@@ -33,11 +33,8 @@ abstract class FormulaExpr {
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
         // TODO: Add more BTypes if needed -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone (BTuple (length Int)))))\n");
-        FS.writeSync(fd, "(declare-sort Any)\n");
-        FS.writeSync(fd, "(declare-sort Some)\n");
-        FS.writeSync(fd, "(declare-sort None)\n");
-        FS.writeSync(fd, "(declare-sort Tuple () Int)\n\n");
+        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone BTuple)))\n\n");
+        // FS.writeSync(fd, "(declare-sort None)\n"); // To BoxNone/UnboxNone
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
         FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
@@ -50,10 +47,12 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxAny (Term) Any)\n");
         FS.writeSync(fd, "(declare-fun BoxSome (Some) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxSome (Term) Some)\n");
-        FS.writeSync(fd, "(declare-fun BoxNone (None) Term)\n");
-        FS.writeSync(fd, "(declare-fun UnboxNone (Term) None)\n");
-        FS.writeSync(fd, "(declare-fun BoxTuple (Tuple) Term)\n");
-        FS.writeSync(fd, "(declare-fun UnboxTuple (Term) Tuple)\n\n");
+        FS.writeSync(fd, "(declare-fun TupleElement (Term Int) Term)");
+        FS.writeSync(fd, "(declare-fun TupleLength (Term) Int)");
+        FS.writeSync(fd, "(declare-fun RecordElement (Term String) Term)");
+        FS.writeSync(fd, "(declare-fun RecordLength (Term) Int)");
+        // FS.writeSync(fd, "(declare-fun BoxNone (None) Term)\n");
+        // FS.writeSync(fd, "(declare-fun UnboxNone (Term) None)\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(define-fun head ((s String)) String (str.at s 0))\n");
         FS.writeSync(fd, "(define-fun tail ((s String)) String (str.substr s 1 (- (str.len s) 1)))\n");
@@ -63,12 +62,12 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(assert (forall ((x String) (y String)) (! (= (<_string x y) (ite (= (head x) (head y)) (<_string (tail x) (tail y)) (bvult (firstChar x) (firstChar y)))) :pattern ((<_string x y)))))\n");
         FS.writeSync(fd, "(define-fun <=_string ((x String) (y String)) Bool (or (<_string x y) (= x y)))\n");
         FS.writeSync(fd, "(define-fun >_string ((x String) (y String)) Bool (not (<=_string x y)))\n");
-        FS.writeSync(fd, "(define-fun >=_string ((x String) (y String)) Bool (not (<_string x y)))\n");
+        FS.writeSync(fd, "(define-fun >=_string ((x String) (y String)) Bool (not (<_string x y)))\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n");
-        FS.writeSync(fd, "(assert (forall ((@x Tuple)) (! (= (UnboxTuple (BoxTuple @x)) @x) :pattern ((BoxTuple @x)))))\n\n");
+        // FS.writeSync(fd, "(assert (forall ((@x None)) (! (= (UnboxNone (BoxNone @x)) @x) :pattern ((BoxNone @x)))))\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     }
     toZ3(fd: number): void {

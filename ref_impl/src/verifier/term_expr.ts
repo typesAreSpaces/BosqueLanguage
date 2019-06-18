@@ -20,6 +20,8 @@ abstract class TermExpr {
             "BoxAny", "UnboxAny",
             "BoxSome", "UnboxSome",
             "BoxNone", "UnboxNone",
+            "TupleElement", "TupleLength",
+            "RecordElement", "RecordLength",
             "none"].map(x => [x, true])
     );
     constructor(symbolName: string, ty: TypeExpr) {
@@ -50,6 +52,22 @@ class VarExpr extends TermExpr {
         if (!VarExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
             let declarationName = this.symbolName;
             FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
+            VarExpr.symbolTable.set(this.symbolName, true);
+        }
+    }
+    sexpr() {
+        return this.symbolName;
+    }
+}
+
+class ConstExpr extends TermExpr {
+    constructor(symbolName: string, ty: TypeExpr) {
+        super(symbolName, ty);
+    }
+    toZ3Declaration(fd: number) {
+        this.toZ3DeclarationSort(fd);
+        // This also checks predicate symbols because a variable can have boolean type
+        if (!VarExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
             VarExpr.symbolTable.set(this.symbolName, true);
         }
     }
@@ -96,4 +114,4 @@ class FuncExpr extends TermExpr {
     }
 }
 
-export { TermExpr, VarExpr, FuncExpr };
+export { TermExpr, VarExpr, ConstExpr, FuncExpr };

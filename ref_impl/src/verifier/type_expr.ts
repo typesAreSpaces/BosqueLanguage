@@ -234,7 +234,7 @@ class TupleType extends TypeExpr {
         return "[" + this.elements.map(x => x.getType()).join(", ") + "]";
     }
     getBosqueType() {
-        return "[" + this.elements.map(x => x.getBosqueType()).join(", ") + "]";
+        return "BTuple";
     }
     getAbstractType() {
         return "Term";
@@ -254,7 +254,7 @@ class RecordType extends TypeExpr {
         return "{" + this.elements.map(x => x[0] + ":" + x[1].getType()).join(", ") + "}";
     }
     getBosqueType() {
-        return "{" + this.elements.map(x => x[0] + ":" + x[1].getBosqueType()).join(", ") + "}";
+        return "BRecord";
     }
     getAbstractType() {
         return "Term";
@@ -276,7 +276,7 @@ class LambdaType extends TypeExpr {
         return "(" + this.args.map(x => x[0] + ":" + x[1].getType()).join(", ") + ")" + " -> " + this.result.getType();
     }
     getBosqueType() {
-        return "(" + this.args.map(x => x[0] + ":" + x[1].getBosqueType()).join(", ") + ")" + " -> " + this.result.getBosqueType();
+        return "BLambda";
     }
     getAbstractType() {
         return "Term";
