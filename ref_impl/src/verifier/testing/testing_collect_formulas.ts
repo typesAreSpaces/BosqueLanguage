@@ -87,7 +87,7 @@ setImmediate(() => {
     let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
 
     let bosqueFile = "/max/main.bsq";
-    let section = "NSMain::max";
+    let section = "NSMain::main";
     let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
     getControlFlow(dirMachine + bosqueFile, section, fd);
 });

@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr, ConstExpr } from "../verifier/term_expr";
@@ -76,14 +76,18 @@ function resolveType(typeName: string): TypeExpr {
             }
             if (typeName.includes("{")) {
                 let collectionOfTypes = typeName.substr(1, typeName.length - 2).split(", ").map(pair => {
-                    let [key, typeString] = pair.split(": ");
+                    let indexColon = pair.indexOf(":"); 
+                    let key = pair.substr(0, indexColon);
+                    let typeString = pair.substr(indexColon + 1);
                     return ([key, resolveType(typeString)] as [string, TypeExpr]);
                 });
                 return new RecordType(collectionOfTypes);
             } if (typeName.includes("(")) {
                 let [args, resultString] = typeName.split(" -> ");
                 let collectionOfTypesArgs = args.substr(1, args.length - 2).split(", ").map(pair => {
-                    let [key, typeString] = pair.split(": ");
+                    let indexColon = pair.indexOf(":"); 
+                    let key = pair.substr(0, indexColon);
+                    let typeString = pair.substr(indexColon + 1);
                     return ([key, resolveType(typeString)] as [string, TypeExpr]);
                 });
                 return new LambdaType(collectionOfTypesArgs, resolveType(resultString));
@@ -404,14 +408,17 @@ function UnboxTermExpr(x: TermExpr): TermExpr {
                 }
             }
         }
-        console.log(x);
+        // This branch handles constructors
+        if (!x.ty.isPrimitiveType) {
+            return x;
+        }
         throw new Error(`Problem Unboxing ${x.sexpr()}`);
     }
 }
 
 // We currently only Box primitive types
 function BoxTermExpr(x: TermExpr): TermExpr {
-    if (x instanceof VarExpr) {
+    if (x instanceof VarExpr || x instanceof ConstExpr) {
         switch (x.ty.getType()) {
             case "Int": {
                 return new FuncExpr("BoxInt", new TermType(), [x]);
@@ -455,6 +462,10 @@ function BoxTermExpr(x: TermExpr): TermExpr {
                 return new FuncExpr("BoxSome", new TermType(), [x]);
             }
         }
+    }
+    // This branch handles constructors
+    if (!x.ty.isPrimitiveType) {
+        return x;
     }
     throw new Error(`Problem Boxing this expression: ${x.sexpr()}`);
 
@@ -511,28 +522,24 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             debugging("ConstructorPrimaryCollectionMixed Not implemented yet", DEBUGGING);
             return formula;
         }
-        case MIROpTag.ConstructorTuple: { // --------------------------------------------------------------------------------------------
-            debugging("ConstructorTuple Not implemented yet", DEBUGGING);
+        case MIROpTag.ConstructorTuple: {
             let opConstructorTuple = op as MIRConstructorTuple;
-            console.log(opConstructorTuple);
 
             let regName = section + "_" + opConstructorTuple.trgt.nameID;
             stringVariableToStringType.set(regName,
                 "[" + opConstructorTuple.args.map(arg => {
-                    return section + "_" + arg.nameID;
+                    if(arg instanceof MIRRegisterArgument){
+                        return stringVariableToStringType.get(section + "_" + arg.nameID);
+                    }
+                    else{
+                        return stringConstantToStringType(arg.nameID);
+                    }
                 }).join(", ") + "]");
 
             let regVar = argumentToTermExpr(opConstructorTuple.trgt, section);
             formula = new EqualityTerm(
                 new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
                 BTuple);
-
-            // Example z = @[x, y]
-            // (assert (= (HasType z) )) 
-            // (assert (= (lengthTuple z) 2))
-            // (assert (= (elementTuple z 0) x))
-            // (assert (= (elementTuple z 1) y))
-
 
             formula = new AndExpr(formula,
                 new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]),
@@ -544,15 +551,46 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 formula = new AndExpr(formula,
                     new EqualityTerm(
                         new FuncExpr("TupleElement", argExpr.ty, [regVar, new ConstExpr(index.toString(), new IntType())]),
-                        argExpr))
+                        BoxTermExpr(UnboxTermExpr(argExpr))))
             });
 
             return formula
         }
         case MIROpTag.ConstructorRecord: {
-            debugging("ConstructorRecord Not implemented yet", DEBUGGING);
             let opConstructorRecord = op as MIRConstructorRecord;
-            console.log(opConstructorRecord);
+
+            let regName = section + "_" + opConstructorRecord.trgt.nameID;
+            stringVariableToStringType.set(regName,
+                "{" + opConstructorRecord.args.map(arg => {
+                    stringVariableToStringType.set(arg[0], "NSCore::String");
+                    if(arg[1] instanceof MIRRegisterArgument){
+                        return arg[0] + ":" + stringVariableToStringType.get(section + "_" + arg[1].nameID);
+                    }
+                    else{
+                        return arg[0] + ":" + stringConstantToStringType(arg[1].nameID);
+                    }
+                }).join(", ") + "}");
+
+            let regVar = argumentToTermExpr(opConstructorRecord.trgt, section);
+            formula = new EqualityTerm(
+                new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
+                BTuple);
+
+            formula = new AndExpr(formula,
+                new EqualityTerm(new FuncExpr("RecordLength", new IntType(), [regVar]),
+                    new ConstExpr(opConstructorRecord.args.length.toString(), new IntType())
+                ));
+            
+            
+
+            opConstructorRecord.args.map((arg) => {
+                let argExpr = argumentToTermExpr(arg[1], section);
+                formula = new AndExpr(formula,
+                    new EqualityTerm(
+                        new FuncExpr("RecordElement", argExpr.ty, [regVar, new ConstExpr(arg[0], new StringType())]),
+                        BoxTermExpr(UnboxTermExpr(argExpr))))
+            });
+
             return formula;
         }
         case MIROpTag.ConstructorLambda: {
@@ -570,7 +608,23 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.MIRAccessFromIndex: {
-            debugging("MIRAccessFromIndex Not implemented yet", DEBUGGING);
+            let opMIRAccessFromIndex = op as MIRAccessFromIndex;
+
+            let regName = section + "_" + opMIRAccessFromIndex.trgt.nameID;
+            let srcName = section + "_" + opMIRAccessFromIndex.arg.nameID;
+            let tupleTyString = stringVariableToStringType.get(srcName) as string;
+            let srcTypeString = tupleTyString.substr(1, tupleTyString.length - 2).split(", ")[opMIRAccessFromIndex.idx];
+
+            stringVariableToStringType.set(regName, srcTypeString);
+            let regVar = argumentToTermExpr(opMIRAccessFromIndex.trgt, section);
+            formula = new EqualityTerm(
+                regVar,
+                BoxTermExpr(UnboxTermExpr(
+                    new FuncExpr("TupleElement", resolveType(srcTypeString),
+                        [argumentToTermExpr(opMIRAccessFromIndex.arg, section),
+                        new ConstExpr(opMIRAccessFromIndex.idx.toString(), new IntType())]
+                    ))));
+
             return formula;
         }
         case MIROpTag.MIRProjectFromIndecies: {
@@ -578,7 +632,33 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.MIRAccessFromProperty: {
-            debugging("MIRAcessFromProperty Not implemented yet", DEBUGGING);
+            let opMIRAccessFromProperty = op as MIRAccessFromProperty;
+
+            let regName = section + "_" + opMIRAccessFromProperty.trgt.nameID;
+            let srcName = section + "_" + opMIRAccessFromProperty.arg.nameID;
+            let tupleTyString = stringVariableToStringType.get(srcName) as string;
+            let srcTypeAll = tupleTyString.substr(1, tupleTyString.length - 2).split(", ");
+            
+            let srcTypeString : string = "";
+            for(let argString of srcTypeAll){
+                stringVariableToStringType.set(opMIRAccessFromProperty.property, "NSCore::String");
+                if(argString.startsWith(opMIRAccessFromProperty.property)){
+                    srcTypeString = argString;
+                    break;
+                }
+            }
+            srcTypeString = srcTypeString.slice(srcTypeString.indexOf(":") + 1);
+
+            stringVariableToStringType.set(regName, srcTypeString);
+            let regVar = argumentToTermExpr(opMIRAccessFromProperty.trgt, section);
+            formula = new EqualityTerm(
+                regVar,
+                BoxTermExpr(UnboxTermExpr(
+                    new FuncExpr("RecordElement", resolveType(srcTypeString),
+                        [argumentToTermExpr(opMIRAccessFromProperty.arg, section),
+                        new ConstExpr(opMIRAccessFromProperty.property, new StringType())]
+                    ))));
+
             return formula;
         }
         case MIROpTag.MIRProjectFromProperties: {
@@ -692,7 +772,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                             UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section))
                         ]))
                     ),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BInt)
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BBool)
                 )
             );
 
@@ -710,7 +790,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                             UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section))
                         ]))
                     ),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BString)
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BBool)
                 )
             );
 
@@ -868,12 +948,12 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    console.log("Blocks:-----------------------------------------------------------------------");
-    console.log(blocks);
-    console.log("More detailed Blocks:---------------------------------------------------------");
-    blocks.map(x => console.log(x));
-    console.log("More detailed++ Blocks:-------------------------------------------------------");
-    blocks.map(x => console.log(x.jsonify()));
+    // console.log("Blocks:-----------------------------------------------------------------------");
+    // console.log(blocks);
+    // console.log("More detailed Blocks:---------------------------------------------------------");
+    // blocks.map(x => console.log(x));
+    // console.log("More detailed++ Blocks:-------------------------------------------------------");
+    // blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>

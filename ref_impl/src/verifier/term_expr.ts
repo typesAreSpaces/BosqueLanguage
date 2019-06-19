@@ -13,7 +13,7 @@ abstract class TermExpr {
     // TODO: Add more reserved words from Z3
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ["+", "-", "*", "/", "%",
-            "HasType", "BInt", "BBool", "BString", "BAny", "BSome", "BNone",
+            "HasType", "BInt", "BBool", "BString", "BAny", "BSome", "BNone", "BTuple", "BRecord",
             "BoxInt", "UnboxInt",
             "BoxBool", "UnboxBool",
             "BoxString", "UnboxString",

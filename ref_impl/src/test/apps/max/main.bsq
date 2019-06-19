@@ -34,12 +34,12 @@ function max2(x: Int, y: Int): Int
     var z1 = z[0];
 
     // Record constructor
-    var w = @{f = 23234, g = true};
+    // var w = @{f = 23234, g = true};
 
     // Lambda constructor
-    var lam = fn() : Int => 1;
-    var lam2 = fn(ahh : Int) : Int => ahh;
-    var lam3 = fn(ahh: Int, ahh2: Int, x : Int) : Int => { return x; };
+    // var lam = fn() : Int => 1;
+    // var lam2 = fn(ahh : Int) : Int => ahh;
+    // var lam3 = fn(ahh: Int, ahh2: Int, x : Int) : Int => { return x; };
 
     if(x >= y){
         return x;
@@ -49,10 +49,34 @@ function max2(x: Int, y: Int): Int
     }
 }
 
+function max3(x: [Int, Int]): Int
+{
+    if(x[0] >= x[1]){
+        return x[0];
+    }
+    else{
+        return x[1];
+    }
+}
+
+function max4(x: {f: Int, g: Int}): Int
+{
+    var aa = @[1, 2];
+    var y = @{h = 1, i = 2};    
+            
+    if(x.f >= x.g){
+        return x.f;
+    }
+    else{
+        return x.g;
+    }
+}
+
 entrypoint function main(): Int {
     var x = 10;
     var y = 20;
-    var z = max2(x, y);
-
-    return max(x, y);
+    var zRecord = @{f = x, g = y};
+    return max4(zRecord);
+    //var zTuple = @[x, y];
+    //return max3(zTuple);
 }

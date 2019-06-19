@@ -33,7 +33,7 @@ abstract class FormulaExpr {
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
         // TODO: Add more BTypes if needed -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone BTuple)))\n\n");
+        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone BTuple BRecord)))\n\n");
         FS.writeSync(fd, "(declare-sort None)\n"); // To BoxNone/UnboxNone
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
@@ -43,10 +43,10 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxBool (Term) Bool)\n");
         FS.writeSync(fd, "(declare-fun BoxString (String) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n");
-        FS.writeSync(fd, "(declare-fun TupleElement (Term Int) Term)");
-        FS.writeSync(fd, "(declare-fun TupleLength (Term) Int)");
-        FS.writeSync(fd, "(declare-fun RecordElement (Term String) Term)");
-        FS.writeSync(fd, "(declare-fun RecordLength (Term) Int)");
+        FS.writeSync(fd, "(declare-fun TupleElement (Term Int) Term)\n");
+        FS.writeSync(fd, "(declare-fun TupleLength (Term) Int)\n");
+        FS.writeSync(fd, "(declare-fun RecordElement (Term String) Term)\n");
+        FS.writeSync(fd, "(declare-fun RecordLength (Term) Int)\n");
         FS.writeSync(fd, "(declare-fun BoxNone (None) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxNone (Term) None)\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(assert (forall ((@x Int)) (! (= (UnboxInt (BoxInt @x)) @x) :pattern ((BoxInt @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x Bool)) (! (= (UnboxBool (BoxBool @x)) @x) :pattern ((BoxBool @x)))))\n");
         FS.writeSync(fd, "(assert (forall ((@x String)) (! (= (UnboxString (BoxString @x)) @x) :pattern ((BoxString @x)))))\n");
-        FS.writeSync(fd, "(assert (forall ((@x None)) (! (= (UnboxNone (BoxNone @x)) @x) :pattern ((BoxNone @x)))))\n");
+        FS.writeSync(fd, "(assert (forall ((@x None)) (! (= (UnboxNone (BoxNone @x)) @x) :pattern ((BoxNone @x)))))\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     }
     toZ3(fd: number): void {
