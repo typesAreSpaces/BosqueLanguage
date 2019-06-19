@@ -6,9 +6,8 @@
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRConstantArgument, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType } from "../verifier/type_expr";
-import { VarExpr, FuncExpr, TermExpr } from "../verifier/term_expr";
+import { VarExpr, FuncExpr, TermExpr, ConstExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "../verifier/formula_expr";
-import { AccessNamespaceConstantExpression } from "../ast/body";
 
 let DEBUGGING = true;
 
@@ -343,7 +342,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
 
 
 
-function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
+function argumentToVarExpr(arg: MIRArgument, section: string): TermExpr {
     // This branch handles variables
     if (arg instanceof MIRRegisterArgument) {
         let argName = section + "_" + arg.nameID;
@@ -351,12 +350,7 @@ function argumentToVarExpr(arg: MIRArgument, section: string): VarExpr {
     }
     // This branch handles constants
     else {
-        let argName = arg.stringify();
-        let result = new VarExpr(argName, resolveType(stringConstantToStringType(arg.nameID)));
-        // With this we prevent printing constant argument
-        // as declarations in Z3
-        VarExpr.symbolTable.set(argName, true);
-        return result;
+        return new ConstExpr(arg.stringify(), resolveType(stringConstantToStringType(arg.nameID)));
     }
 }
 
@@ -532,6 +526,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             console.log(BTuple);
             let regVar = argumentToVarExpr(opConstructorTuple.trgt, section);
+            regVar;
                 
             // formula = new EqualityTerm(
             //     new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
@@ -546,9 +541,9 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // (assert (= (elementTuple z 0) x))
             // (assert (= (elementTuple z 1) y))
 
-            opConstructorTuple.args.map(arg => formula = new AndExpr(formula, 
-                new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar, new ]), BTuple)
-                ));
+            // opConstructorTuple.args.map(arg => formula = new AndExpr(formula, 
+            //     new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar, new ]), BTuple)
+            //     ));
 
 
             return formula

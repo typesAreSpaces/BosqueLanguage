@@ -66,10 +66,6 @@ class ConstExpr extends TermExpr {
     }
     toZ3Declaration(fd: number) {
         this.toZ3DeclarationSort(fd);
-        // This also checks predicate symbols because a variable can have boolean type
-        if (!VarExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
-            VarExpr.symbolTable.set(this.symbolName, true);
-        }
     }
     sexpr() {
         return this.symbolName;
