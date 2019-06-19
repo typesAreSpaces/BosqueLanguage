@@ -342,7 +342,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
 
 
 
-function argumentToVarExpr(arg: MIRArgument, section: string): TermExpr {
+function argumentToTermExpr(arg: MIRArgument, section: string): TermExpr {
     // This branch handles variables
     if (arg instanceof MIRRegisterArgument) {
         let argName = section + "_" + arg.nameID;
@@ -523,27 +523,33 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                     return section + "_" + arg.nameID;
                 }).join(", ") + "]");
 
-
-            console.log(BTuple);
-            let regVar = argumentToVarExpr(opConstructorTuple.trgt, section);
-            regVar;
-                
-            // formula = new EqualityTerm(
-            //     new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
-            //     BTuple);
+            let regVar = argumentToTermExpr(opConstructorTuple.trgt, section);
+            formula = new EqualityTerm(
+                new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
+                BTuple);
             // new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]), BTuple);
             // new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar]), BTuple);
             // new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar]), BTuple);
 
             // Example z = @[x, y]
-            // (assert (= (HasType z) )) TODO: Work on the type encoding
+            // (assert (= (HasType z) )) 
             // (assert (= (lengthTuple z) 2))
             // (assert (= (elementTuple z 0) x))
             // (assert (= (elementTuple z 1) y))
 
-            // opConstructorTuple.args.map(arg => formula = new AndExpr(formula, 
-            //     new EqualityTerm(new FuncExpr("TupleElement", new IntType(), [regVar, new ]), BTuple)
-            //     ));
+            // TODO: Change the IntType in the following two lines with
+            // the actual type needed
+
+            formula = new AndExpr(formula,
+                new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]),
+                    new ConstExpr(opConstructorTuple.args.length.toString(), new IntType())
+                ));
+
+            opConstructorTuple.args.map((arg, index) => formula = new AndExpr(formula,
+                new EqualityTerm(
+                    new FuncExpr("TupleElement", new IntType(), [regVar, new ConstExpr(index.toString(), new IntType())]),
+                    argumentToTermExpr(arg, section))
+            ));
 
 
             return formula
@@ -652,8 +658,8 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             // binary operation should be an Integer
             stringVariableToStringType.set(regName, "NSCore::Int");
             let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, new IntType(), [
-                UnboxTermExpr(argumentToVarExpr(opBinOp.lhs, section), opBinOp.lhs instanceof MIRConstantArgument),
-                UnboxTermExpr(argumentToVarExpr(opBinOp.rhs, section), opBinOp.rhs instanceof MIRConstantArgument)
+                UnboxTermExpr(argumentToTermExpr(opBinOp.lhs, section), opBinOp.lhs instanceof MIRConstantArgument),
+                UnboxTermExpr(argumentToTermExpr(opBinOp.rhs, section), opBinOp.rhs instanceof MIRConstantArgument)
             ]);
             return new EqualityTerm(
                 new VarExpr(regName, new IntType()),
@@ -681,17 +687,17 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             stringVariableToStringType.set(rhsName, "NSCore::Int");
             let opFormulaInt = new ImplExpr(
                 new AndExpr(
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BInt),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.rhs, section)]), BInt)),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.lhs, section)]), BInt),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.rhs, section)]), BInt)),
                 new AndExpr(
                     new EqualityTerm(
                         new VarExpr(regName, new BoolType()),
                         BoxFormulaExpr(new PredicateExpr(opBinCmp.op, [
-                            UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
-                            UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
+                            UnboxTermExpr(argumentToTermExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
+                            UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
                         ]))
                     ),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.trgt, section)]), BInt)
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BInt)
                 )
             );
 
@@ -699,17 +705,17 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             stringVariableToStringType.set(rhsName, "NSCore::String");
             let opFormulaString = new ImplExpr(
                 new AndExpr(
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.lhs, section)]), BString),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.rhs, section)]), BString)),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.lhs, section)]), BString),
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.rhs, section)]), BString)),
                 new AndExpr(
                     new EqualityTerm(
                         new VarExpr(regName, new BoolType()),
                         BoxFormulaExpr(new PredicateExpr(opBinCmp.op + "_string", [
-                            UnboxTermExpr(argumentToVarExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
-                            UnboxTermExpr(argumentToVarExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
+                            UnboxTermExpr(argumentToTermExpr(opBinCmp.lhs, section), opBinCmp.lhs instanceof MIRConstantArgument),
+                            UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section), opBinCmp.rhs instanceof MIRConstantArgument)
                         ]))
                     ),
-                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToVarExpr(opBinCmp.trgt, section)]), BString)
+                    new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BString)
                 )
             );
 
@@ -735,7 +741,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             else {
                 stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
-            return conditionalAssignment(argumentToVarExpr(opVarStore.name, section), argumentToVarExpr(opVarStore.src, section), opVarStore);
+            return conditionalAssignment(argumentToTermExpr(opVarStore.name, section), argumentToTermExpr(opVarStore.src, section), opVarStore);
         }
         case MIROpTag.MIRReturnAssign: {
             let opReturnAssign = op as MIRReturnAssign;
@@ -747,7 +753,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             else {
                 stringVariableToStringType.set(regName, stringConstantToStringType(srcName));
             }
-            return conditionalAssignment(argumentToVarExpr(opReturnAssign.name, section), argumentToVarExpr(opReturnAssign.src, section), opReturnAssign);
+            return conditionalAssignment(argumentToTermExpr(opReturnAssign.name, section), argumentToTermExpr(opReturnAssign.src, section), opReturnAssign);
         }
         case MIROpTag.MIRAbort: {
             debugging("MIRAbort Not implemented yet", DEBUGGING);
@@ -803,12 +809,12 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let changeFormula = false;
             opPhi.src.forEach((value, key) => {
 
-                let valueExpr = argumentToVarExpr(value, section);
+                let valueExpr = argumentToTermExpr(value, section);
                 stringVariableToStringType.set(targetName, stringVariableToStringType.get(valueExpr.symbolName) as string);
                 typePhi.elements.add(valueExpr.ty);
                 typePhiString.add(stringVariableToStringType.get(valueExpr.symbolName) as string);
 
-                let consequence = new EqualityTerm(argumentToVarExpr(opPhi.trgt, section), valueExpr);
+                let consequence = new EqualityTerm(argumentToTermExpr(opPhi.trgt, section), valueExpr);
 
                 let setOfConditions = mapBlockCondition.get(key) as Set<FormulaExpr>;
                 if (!changeFormula) {
@@ -841,7 +847,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             return new EqualityTerm(new VarExpr(regName, new BoolType()),
                 BoxFormulaExpr(new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"),
-                    [argumentToVarExpr(opIsTypeOfNone.arg, section)]), BNone)));
+                    [argumentToTermExpr(opIsTypeOfNone.arg, section)]), BNone)));
         }
         case MIROpTag.MIRIsTypeOfSome: {
             debugging("MIRIsTypeOfSome Not implemented yet", DEBUGGING);
