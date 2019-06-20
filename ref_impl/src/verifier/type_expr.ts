@@ -16,6 +16,7 @@
 abstract class TypeExpr {
     abstract readonly isPrimitiveType: boolean;
     abstract readonly isUninterpreted: boolean;
+    abstract readonly isConstructor: boolean;
     abstract getType(): string;
     abstract getBosqueType(): string;
     abstract getAbstractType(): string;
@@ -24,6 +25,7 @@ abstract class TypeExpr {
 class IntType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "Int";
     }
@@ -38,6 +40,7 @@ class IntType extends TypeExpr {
 class BoolType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "Bool";
     }
@@ -52,6 +55,7 @@ class BoolType extends TypeExpr {
 class StringType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "String";
     }
@@ -66,6 +70,7 @@ class StringType extends TypeExpr {
 class NoneType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "None";
     }
@@ -80,6 +85,7 @@ class NoneType extends TypeExpr {
 class AnyType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "Any";
     }
@@ -94,6 +100,7 @@ class AnyType extends TypeExpr {
 class SomeType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     getType() {
         return "Some";
     }
@@ -108,6 +115,7 @@ class SomeType extends TypeExpr {
 class FuncType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
+    isConstructor = false;
     readonly domain: TypeExpr[];
     readonly image: TypeExpr;
     constructor(domain: TypeExpr[], image: TypeExpr) {
@@ -150,6 +158,7 @@ class FuncType extends TypeExpr {
 class UnionType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
+    isConstructor = false;
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
     constructor(elements: Set<TypeExpr>) {
         super();
@@ -182,6 +191,7 @@ class UnionType extends TypeExpr {
 class UninterpretedType extends TypeExpr {
     isPrimitiveType = true; // ? Yes, for the moment..
     isUninterpreted = true;
+    isConstructor = false;
     readonly symbolName: string;
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         [["BType", true]]
@@ -207,6 +217,7 @@ class UninterpretedType extends TypeExpr {
 class TermType extends TypeExpr {
     isPrimitiveType = true;
     isUninterpreted = false;
+    isConstructor = false;
     constructor() {
         super();
     }
@@ -225,6 +236,7 @@ class TermType extends TypeExpr {
 class TupleType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
+    isConstructor = true;
     readonly elements: TypeExpr[];
     constructor(elements: TypeExpr[]) {
         super();
@@ -245,6 +257,7 @@ class TupleType extends TypeExpr {
 class RecordType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
+    isConstructor = true;
     readonly elements: [string, TypeExpr][];
     constructor(elements: [string,TypeExpr][]) {
         super()
@@ -265,6 +278,7 @@ class RecordType extends TypeExpr {
 class LambdaType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
+    isConstructor = true;
     readonly args: [string, TypeExpr][];
     readonly result : TypeExpr;
     constructor(args: [string, TypeExpr][], result : TypeExpr) {

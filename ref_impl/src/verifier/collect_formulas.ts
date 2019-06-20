@@ -12,7 +12,7 @@ import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction
 let DEBUGGING = true;
 
 // TODO: Probably we dont need to instantiate
-// new elements from TypeExpr() ..
+// new elements from TypeExpr() ...
 
 // stringVariableToStringType : String[Variable] -> String[CoreType | Type]
 // Example : stringVariableToStringType = Map { x => 'NSCore::Int', y => 'NSCore::Bool', z => new_type, ... }
@@ -20,8 +20,8 @@ let stringVariableToStringType: Map<string, string> = new Map<string, string>();
 
 // mapBlockCondition : String[Block] -> Set<FormulasExpr>
 let mapBlockCondition: Map<string, Set<FormulaExpr>> = new Map<string, Set<FormulaExpr>>();
-let BoxTrue = BoxFormulaExpr(new PredicateExpr("true", []));
 
+let BoxTrue = BoxFormulaExpr(new PredicateExpr("true", []));
 let BInt = new VarExpr("BInt", new UninterpretedType("BType"));
 let BBool = new VarExpr("BBool", new UninterpretedType("BType"));
 let BString = new VarExpr("BString", new UninterpretedType("BType"));
@@ -62,7 +62,6 @@ function resolveType(typeName: string): TypeExpr {
         default: {
             if (typeName.includes("|")) {
                 let collectionOfTypes = new Set<TypeExpr>(typeName.split(" | ").map(resolveType));
-                // TODO: Is this extra singleton checking unnecessary?
                 if (collectionOfTypes.size === 1) {
                     return Array.from(collectionOfTypes)[0];
                 }
@@ -76,7 +75,7 @@ function resolveType(typeName: string): TypeExpr {
             }
             if (typeName.includes("{")) {
                 let collectionOfTypes = typeName.substr(1, typeName.length - 2).split(", ").map(pair => {
-                    let indexColon = pair.indexOf(":"); 
+                    let indexColon = pair.indexOf(":");
                     let key = pair.substr(0, indexColon);
                     let typeString = pair.substr(indexColon + 1);
                     return ([key, resolveType(typeString)] as [string, TypeExpr]);
@@ -85,7 +84,7 @@ function resolveType(typeName: string): TypeExpr {
             } if (typeName.includes("(")) {
                 let [args, resultString] = typeName.split(" -> ");
                 let collectionOfTypesArgs = args.substr(1, args.length - 2).split(", ").map(pair => {
-                    let indexColon = pair.indexOf(":"); 
+                    let indexColon = pair.indexOf(":");
                     let key = pair.substr(0, indexColon);
                     let typeString = pair.substr(indexColon + 1);
                     return ([key, resolveType(typeString)] as [string, TypeExpr]);
@@ -139,7 +138,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
     let srcName = src.symbolName;
     let originalTypeSRC = stringVariableToStringType.get(srcName) as string;
     let typeOfSRC = src.ty;
-    if (op instanceof MIRVarStore) {
+    if (op instanceof MIRVarStore || op instanceof MIRReturnAssign) {
         if (typeOfSRC instanceof UnionType) {
             let assigments = Array.from((typeOfSRC as UnionType).elements).map(type => {
                 switch (type.getType()) {
@@ -236,113 +235,12 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
         }
         else {
             return new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src)));
-        }
-    }
-    if (op instanceof MIRReturnAssign) {
-        if (typeOfSRC instanceof UnionType) {
-            let assigments = Array.from((typeOfSRC as UnionType).elements).map(type => {
-                switch (type.getType()) {
-                    case "Int": {
-                        stringVariableToStringType.set(srcName, "NSCore::Int");
-                        src.ty = new IntType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BInt),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BInt),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    case "Bool": {
-                        stringVariableToStringType.set(srcName, "NSCore::Bool");
-                        src.ty = new BoolType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BBool),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BBool),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    case "String": {
-                        stringVariableToStringType.set(srcName, "NSCore::String");
-                        src.ty = new StringType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BString),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BString),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    case "None": {
-                        stringVariableToStringType.set(srcName, "NSCore::None");
-                        src.ty = new NoneType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BNone),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BNone),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    case "Any": {
-                        stringVariableToStringType.set(srcName, "NSCore::Any");
-                        src.ty = new AnyType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BAny),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BAny),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    case "Some": {
-                        stringVariableToStringType.set(srcName, "NSCore::Some");
-                        src.ty = new SomeType();
-                        let result = new ImplExpr(
-                            new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [src]), BSome),
-                            new AndExpr(
-                                new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src))),
-                                new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [name]), BSome),
-                            )
-                        )
-                        stringVariableToStringType.set(srcName, originalTypeSRC);
-                        src.ty = typeOfSRC;
-                        return result;
-                    }
-                    default: {
-                        throw new Error("The src wasn't a VarExpr");
-                    }
-                }
-            });
-            return makeConjunction(assigments);
-        }
-        else {
-            return new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src)));
-        }
+        }  
     }
     else {
         throw new Error("Not an assignment operation");
     }
 }
-
-
 
 function argumentToTermExpr(arg: MIRArgument, section: string): TermExpr {
     // This branch handles variables
@@ -361,59 +259,57 @@ function UnboxTermExpr(x: TermExpr): TermExpr {
     if (x instanceof ConstExpr) {
         return x;
     }
-    else {
-        if (x instanceof VarExpr) {
-            let typeOfX = x.ty.getType();
-            switch (typeOfX) {
-                case "Int": {
-                    return new FuncExpr("UnboxInt", new IntType(), [x]);
-                }
-                case "Bool": {
-                    return new FuncExpr("UnboxBool", new BoolType(), [x]);
-                }
-                case "String": {
-                    return new FuncExpr("UnboxString", new StringType(), [x]);
-                }
-                case "None": {
-                    return new FuncExpr("UnboxNone", new NoneType(), [x]);
-                }
-                case "Any": {
-                    return new FuncExpr("UnboxAny", new AnyType(), [x]);
-                }
-                case "Some": {
-                    return new FuncExpr("UnboxSome", new SomeType(), [x]);
-                }
+    if (x instanceof VarExpr) {
+        let typeOfX = x.ty.getType();
+        switch (typeOfX) {
+            case "Int": {
+                return new FuncExpr("UnboxInt", new IntType(), [x]);
+            }
+            case "Bool": {
+                return new FuncExpr("UnboxBool", new BoolType(), [x]);
+            }
+            case "String": {
+                return new FuncExpr("UnboxString", new StringType(), [x]);
+            }
+            case "None": {
+                return new FuncExpr("UnboxNone", new NoneType(), [x]);
+            }
+            case "Any": {
+                return new FuncExpr("UnboxAny", new AnyType(), [x]);
+            }
+            case "Some": {
+                return new FuncExpr("UnboxSome", new SomeType(), [x]);
             }
         }
-        if (x instanceof FuncExpr) {
-            let typeOfImageOfX = (x.ty as FuncType).image.getType();
-            switch (typeOfImageOfX) {
-                case "Int": {
-                    return new FuncExpr("UnboxInt", new IntType(), [x]);
-                }
-                case "Bool": {
-                    return new FuncExpr("UnboxBool", new BoolType(), [x]);
-                }
-                case "String": {
-                    return new FuncExpr("UnboxString", new StringType(), [x]);
-                }
-                case "None": {
-                    return new FuncExpr("UnboxNone", new NoneType(), [x]);
-                }
-                case "Any": {
-                    return new FuncExpr("UnboxAny", new AnyType(), [x]);
-                }
-                case "Some": {
-                    return new FuncExpr("UnboxSome", new SomeType(), [x]);
-                }
-            }
-        }
-        // This branch handles constructors
-        if (!x.ty.isPrimitiveType) {
-            return x;
-        }
-        throw new Error(`Problem Unboxing ${x.sexpr()}`);
     }
+    if (x instanceof FuncExpr) {
+        let typeOfImageOfX = (x.ty as FuncType).image.getType();
+        switch (typeOfImageOfX) {
+            case "Int": {
+                return new FuncExpr("UnboxInt", new IntType(), [x]);
+            }
+            case "Bool": {
+                return new FuncExpr("UnboxBool", new BoolType(), [x]);
+            }
+            case "String": {
+                return new FuncExpr("UnboxString", new StringType(), [x]);
+            }
+            case "None": {
+                return new FuncExpr("UnboxNone", new NoneType(), [x]);
+            }
+            case "Any": {
+                return new FuncExpr("UnboxAny", new AnyType(), [x]);
+            }
+            case "Some": {
+                return new FuncExpr("UnboxSome", new SomeType(), [x]);
+            }
+        }
+    }
+    // This branch handles constructors
+    if (!x.ty.isPrimitiveType) {
+        return x;
+    }
+    throw new Error(`Problem Unboxing ${x.sexpr()}`);
 }
 
 // We currently only Box primitive types
@@ -464,11 +360,10 @@ function BoxTermExpr(x: TermExpr): TermExpr {
         }
     }
     // This branch handles constructors
-    if (!x.ty.isPrimitiveType) {
+    if (x.ty.isConstructor) {
         return x;
     }
     throw new Error(`Problem Boxing this expression: ${x.sexpr()}`);
-
 }
 
 function UnboxFormulaExpr(x: FormulaExpr): FormulaExpr {
@@ -528,10 +423,10 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let regName = section + "_" + opConstructorTuple.trgt.nameID;
             stringVariableToStringType.set(regName,
                 "[" + opConstructorTuple.args.map(arg => {
-                    if(arg instanceof MIRRegisterArgument){
+                    if (arg instanceof MIRRegisterArgument) {
                         return stringVariableToStringType.get(section + "_" + arg.nameID);
                     }
-                    else{
+                    else {
                         return stringConstantToStringType(arg.nameID);
                     }
                 }).join(", ") + "]");
@@ -563,10 +458,10 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             stringVariableToStringType.set(regName,
                 "{" + opConstructorRecord.args.map(arg => {
                     stringVariableToStringType.set(arg[0], "NSCore::String");
-                    if(arg[1] instanceof MIRRegisterArgument){
+                    if (arg[1] instanceof MIRRegisterArgument) {
                         return arg[0] + ":" + stringVariableToStringType.get(section + "_" + arg[1].nameID);
                     }
-                    else{
+                    else {
                         return arg[0] + ":" + stringConstantToStringType(arg[1].nameID);
                     }
                 }).join(", ") + "}");
@@ -580,8 +475,8 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 new EqualityTerm(new FuncExpr("RecordLength", new IntType(), [regVar]),
                     new ConstExpr(opConstructorRecord.args.length.toString(), new IntType())
                 ));
-            
-            
+
+
 
             opConstructorRecord.args.map((arg) => {
                 let argExpr = argumentToTermExpr(arg[1], section);
@@ -638,11 +533,11 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let srcName = section + "_" + opMIRAccessFromProperty.arg.nameID;
             let tupleTyString = stringVariableToStringType.get(srcName) as string;
             let srcTypeAll = tupleTyString.substr(1, tupleTyString.length - 2).split(", ");
-            
-            let srcTypeString : string = "";
-            for(let argString of srcTypeAll){
+
+            let srcTypeString: string = "";
+            for (let argString of srcTypeAll) {
                 stringVariableToStringType.set(opMIRAccessFromProperty.property, "NSCore::String");
-                if(argString.startsWith(opMIRAccessFromProperty.property)){
+                if (argString.startsWith(opMIRAccessFromProperty.property)) {
                     srcTypeString = argString;
                     break;
                 }
