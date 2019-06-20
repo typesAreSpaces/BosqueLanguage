@@ -72,26 +72,11 @@ class ConstExpr extends TermExpr {
     }
 }
 
-// TODO: FuncExpr might need changes to 
-// include the type TermType, it might not
 class FuncExpr extends TermExpr {
     readonly terms: TermExpr[];
     constructor(symbolName: string, tyDomain: TypeExpr, terms: TermExpr[]) {
         let collectType = new FuncType(terms.map(x => x.ty), tyDomain);
-        switch (terms.length) {
-            case 0: {
-                super(symbolName, collectType);
-                break;
-            }
-            case 1: {
-                super(symbolName, collectType)
-                break;
-            }
-            default: {
-                super(symbolName, collectType);
-                break;
-            }
-        }
+        super(symbolName, collectType);
         this.terms = terms;
     }
     toZ3Declaration(fd: number) {
