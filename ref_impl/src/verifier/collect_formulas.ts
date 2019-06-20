@@ -3,9 +3,9 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty, MIRCallNamespaceFunction } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType } from "../verifier/type_expr";
+import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType, RecordPropertyType } from "../verifier/type_expr";
 import { VarExpr, FuncExpr, TermExpr, ConstExpr } from "../verifier/term_expr";
 import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "../verifier/formula_expr";
 
@@ -28,7 +28,8 @@ let BString = new VarExpr("BString", new UninterpretedType("BType"));
 let BAny = new VarExpr("BAny", new UninterpretedType("BType"));
 let BSome = new VarExpr("BSome", new UninterpretedType("BType"));
 let BNone = new VarExpr("BNone", new UninterpretedType("BType"));
-let BTuple = new VarExpr("BTuple", new UninterpretedType("BType"));
+// let BTuple = new VarExpr("BTuple", new UninterpretedType("BType"));
+// let BRecord = new VarExpr("BRecord", new UninterpretedType("BRecord"));
 
 function debugging(x: any, flag: boolean) {
     if (flag) {
@@ -235,7 +236,7 @@ function conditionalAssignment(name: VarExpr, src: VarExpr, op: MIROp): FormulaE
         }
         else {
             return new EqualityTerm(name, BoxTermExpr(UnboxTermExpr(src)));
-        }  
+        }
     }
     else {
         throw new Error("Not an assignment operation");
@@ -432,14 +433,10 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 }).join(", ") + "]");
 
             let regVar = argumentToTermExpr(opConstructorTuple.trgt, section);
-            formula = new EqualityTerm(
-                new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
-                BTuple);
 
-            formula = new AndExpr(formula,
-                new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]),
-                    new ConstExpr(opConstructorTuple.args.length.toString(), new IntType())
-                ));
+            formula = new EqualityTerm(new FuncExpr("TupleLength", new IntType(), [regVar]),
+                new ConstExpr(opConstructorTuple.args.length.toString(), new IntType())
+            );
 
             opConstructorTuple.args.map((arg, index) => {
                 let argExpr = argumentToTermExpr(arg, section);
@@ -457,7 +454,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let regName = section + "_" + opConstructorRecord.trgt.nameID;
             stringVariableToStringType.set(regName,
                 "{" + opConstructorRecord.args.map(arg => {
-                    stringVariableToStringType.set(arg[0], "NSCore::String");
+                    // stringVariableToStringType.set(arg[0], "NSCore::String");
                     if (arg[1] instanceof MIRRegisterArgument) {
                         return arg[0] + ":" + stringVariableToStringType.get(section + "_" + arg[1].nameID);
                     }
@@ -467,22 +464,16 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 }).join(", ") + "}");
 
             let regVar = argumentToTermExpr(opConstructorRecord.trgt, section);
-            formula = new EqualityTerm(
-                new FuncExpr("HasType", new UninterpretedType("BType"), [regVar]),
-                BTuple);
 
-            formula = new AndExpr(formula,
-                new EqualityTerm(new FuncExpr("RecordLength", new IntType(), [regVar]),
-                    new ConstExpr(opConstructorRecord.args.length.toString(), new IntType())
-                ));
-
-
+            formula = new EqualityTerm(new FuncExpr("RecordLength", new IntType(), [regVar]),
+                new ConstExpr(opConstructorRecord.args.length.toString(), new IntType())
+            );
 
             opConstructorRecord.args.map((arg) => {
                 let argExpr = argumentToTermExpr(arg[1], section);
                 formula = new AndExpr(formula,
                     new EqualityTerm(
-                        new FuncExpr("RecordElement", argExpr.ty, [regVar, new ConstExpr(arg[0], new StringType())]),
+                        new FuncExpr("RecordElement", argExpr.ty, [regVar, new VarExpr(arg[0], new RecordPropertyType())]),
                         BoxTermExpr(UnboxTermExpr(argExpr))))
             });
 
@@ -495,7 +486,9 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             return formula;
         }
         case MIROpTag.CallNamespaceFunction: {
-            debugging("CallNamespaceFunction Not implemented yet", DEBUGGING);
+            debugging("CallNamespaceFunction is being implemented", DEBUGGING);
+            let opCallNamespaceFunction = op as MIRCallNamespaceFunction;
+            console.log(opCallNamespaceFunction);
             return formula;
         }
         case MIROpTag.CallStaticFunction: {
@@ -536,7 +529,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             let srcTypeString: string = "";
             for (let argString of srcTypeAll) {
-                stringVariableToStringType.set(opMIRAccessFromProperty.property, "NSCore::String");
+                // stringVariableToStringType.set(argString.substr(0, argString.indexOf(":")), "NSCore::String");
                 if (argString.startsWith(opMIRAccessFromProperty.property)) {
                     srcTypeString = argString;
                     break;
@@ -551,7 +544,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
                 BoxTermExpr(UnboxTermExpr(
                     new FuncExpr("RecordElement", resolveType(srcTypeString),
                         [argumentToTermExpr(opMIRAccessFromProperty.arg, section),
-                        new ConstExpr(opMIRAccessFromProperty.property, new StringType())]
+                        new VarExpr(opMIRAccessFromProperty.property, new RecordPropertyType())]
                     ))));
 
             return formula;

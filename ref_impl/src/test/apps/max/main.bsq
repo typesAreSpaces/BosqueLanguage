@@ -62,7 +62,8 @@ function max3(x: [Int, Int]): Int
 function max4(x: {f: Int, g: Int}): Int
 {
     var aa = @[1, 2];
-    var y = @{h = 1, i = 2};    
+    var y = @{h = 1, i = 2};
+    var yH = y.h;    
             
     if(x.f >= x.g){
         return x.f;
@@ -75,8 +76,12 @@ function max4(x: {f: Int, g: Int}): Int
 entrypoint function main(): Int {
     var x = 10;
     var y = 20;
+    
+    var zTuple = @[x, y];
+    var maxTuple = max3(zTuple);
+
     var zRecord = @{f = x, g = y};
-    return max4(zRecord);
-    //var zTuple = @[x, y];
-    //return max3(zTuple);
+    var maxRecord = max4(zRecord);
+    
+    return maxTuple;
 }

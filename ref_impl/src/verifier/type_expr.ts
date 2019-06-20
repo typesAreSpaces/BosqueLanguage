@@ -259,7 +259,7 @@ class RecordType extends TypeExpr {
     isUninterpreted = false;
     isConstructor = true;
     readonly elements: [string, TypeExpr][];
-    constructor(elements: [string,TypeExpr][]) {
+    constructor(elements: [string, TypeExpr][]) {
         super()
         this.elements = elements;
     }
@@ -274,14 +274,29 @@ class RecordType extends TypeExpr {
     }
 }
 
+class RecordPropertyType extends TypeExpr {
+    isPrimitiveType = true;
+    isUninterpreted = false;
+    isConstructor = false;
+    getType() {
+        return "RecordProperty"
+    }
+    getBosqueType() {
+        return "RecordProperty";
+    }
+    getAbstractType() {
+        return "RecordProperty";
+    }
+}
+
 // LambdaType type representation has "->"
 class LambdaType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
     isConstructor = true;
     readonly args: [string, TypeExpr][];
-    readonly result : TypeExpr;
-    constructor(args: [string, TypeExpr][], result : TypeExpr) {
+    readonly result: TypeExpr;
+    constructor(args: [string, TypeExpr][], result: TypeExpr) {
         super()
         this.args = args;
         this.result = result;
@@ -297,4 +312,4 @@ class LambdaType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType, TupleType, RecordType, LambdaType };
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TermType, TupleType, RecordType, LambdaType, RecordPropertyType };

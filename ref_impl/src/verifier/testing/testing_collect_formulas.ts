@@ -12,10 +12,10 @@ import { MIRBody } from "../../compiler/mir_ops";
 import { collectFormulas, stringVariableToStringType } from "../collect_formulas";
 import { FormulaExpr } from "../formula_expr";
 
-function getControlFlow(app: string, section: string, fd: number): void {
+function getControlFlow(directory: string, fileName: string, section: string): void {
 
+    let fd = FS.openSync(fileName.replace("bsq", "z3"), 'w');
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../../"));
-
     let files: { relativePath: string, contents: string }[] = [];
     try {
         const coredir = Path.join(bosque_dir, "src/core/core.bsq");
@@ -24,9 +24,9 @@ function getControlFlow(app: string, section: string, fd: number): void {
         const collectionsdir = Path.join(bosque_dir, "src/core/collections.bsq");
         const collectionsdata = FS.readFileSync(collectionsdir).toString();
 
-        const appdir = app;
+        const appdir = directory + fileName;
         const appdata = FS.readFileSync(appdir).toString();
-
+        
         files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];
     }
     catch (ex) {
@@ -79,15 +79,12 @@ function getControlFlow(app: string, section: string, fd: number): void {
 
 ////
 //Entrypoint
-
 setImmediate(() => {
     // Mac Machine
     // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps";
-
-    let bosqueFile = "/max/main.bsq";
-    let section = "NSMain::main";
-    let fd = FS.openSync(bosqueFile.split('/').join('_').replace("bsq", "z3"), 'w');
-    getControlFlow(dirMachine + bosqueFile, section, fd);
+    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
+    let bosqueFile = "main.bsq";
+    let section = "NSMain::max4";
+    getControlFlow(dirMachine, bosqueFile, section);
 });

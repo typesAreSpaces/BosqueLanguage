@@ -33,8 +33,9 @@ abstract class FormulaExpr {
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-sort Term)\n");
         // TODO: Add more BTypes if needed -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone BTuple BRecord)))\n\n");
+        FS.writeSync(fd, "(declare-datatypes () ((BType BInt BBool BString BAny BSome BNone BTuple BRecord)))\n");
         FS.writeSync(fd, "(declare-sort None)\n"); // To BoxNone/UnboxNone
+        FS.writeSync(fd, "(declare-sort RecordProperty)\n\n");
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(declare-fun HasType (Term) BType)\n");
         FS.writeSync(fd, "(declare-fun BoxInt (Int) Term)\n");
@@ -45,7 +46,7 @@ abstract class FormulaExpr {
         FS.writeSync(fd, "(declare-fun UnboxString (Term) String)\n");
         FS.writeSync(fd, "(declare-fun TupleElement (Term Int) Term)\n");
         FS.writeSync(fd, "(declare-fun TupleLength (Term) Int)\n");
-        FS.writeSync(fd, "(declare-fun RecordElement (Term String) Term)\n");
+        FS.writeSync(fd, "(declare-fun RecordElement (Term RecordProperty) Term)\n");
         FS.writeSync(fd, "(declare-fun RecordLength (Term) Int)\n");
         FS.writeSync(fd, "(declare-fun BoxNone (None) Term)\n");
         FS.writeSync(fd, "(declare-fun UnboxNone (Term) None)\n\n");
