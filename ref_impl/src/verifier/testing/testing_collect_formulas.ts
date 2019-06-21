@@ -4,87 +4,27 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import * as Path from "path";
-import chalk from "chalk";
-import { MIREmitter } from "../../compiler/mir_emitter";
-import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "../../compiler/mir_assembly";
-import { MIRBody } from "../../compiler/mir_ops";
-import { collectFormulas, stringVariableToStringType } from "../collect_formulas";
-import { FormulaExpr } from "../formula_expr";
+import { bosqueToIRBody } from "../util"
+import { collectFormula } from "../collect_formula";
+import { FormulaExpr } from "../formula_expr"
 
-function getControlFlow(directory: string, fileName: string, section: string): void {
-
-    let fd = FS.openSync(fileName.replace("bsq", "z3"), 'w');
-    let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../../"));
-    let files: { relativePath: string, contents: string }[] = [];
-    try {
-        const coredir = Path.join(bosque_dir, "src/core/core.bsq");
-        const coredata = FS.readFileSync(coredir).toString();
-
-        const collectionsdir = Path.join(bosque_dir, "src/core/collections.bsq");
-        const collectionsdata = FS.readFileSync(collectionsdir).toString();
-
-        const appdir = directory + fileName;
-        const appdata = FS.readFileSync(appdir).toString();
-        
-        files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];
-    }
-    catch (ex) {
-        process.stdout.write(chalk.red(`Read failed with exception -- ${ex}\n`));
-        FS.closeSync(fd);
-        process.exit(1);
-    }
-
-    const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), files);
-
-    if (errors.length !== 0) {
-        for (let i = 0; i < errors.length; ++i) {
-            process.stdout.write(chalk.red(`Parse error -- ${errors[i]}\n`));
-        }
-        FS.closeSync(fd);
-        process.exit(1);
-    }
-
-    try {
-        const sectionName = section.split(":").join("_");
-        const invokeDecl = ((masm as MIRAssembly).functionDecls.get(section) as MIRFunctionDecl).invoke;
-        const ibody = (invokeDecl.body as MIRBody).body;
-        // If this is a FunctionDecl then the array of parameters,
-        // if it is not empty, will add more elements to the
-        // variable stringVariableToStringType
-        invokeDecl.params.map(x => stringVariableToStringType.set(sectionName + "_" + x.name, x.type.trkey));
-        if (typeof(ibody) === "string") {
-            FS.closeSync(fd);
-            process.exit(0);
-        }
-        else {
-            // --------------------------------------------------
-            // Here we generate the file.z3, essentially
-            let formula = collectFormulas(ibody, sectionName);
-            FormulaExpr.initialDeclarationZ3(fd);
-            formula.toZ3(fd);
-            FormulaExpr.checkSatZ3(fd);
-            // FormulaExpr.getModelZ3(fd);
-            // --------------------------------------------------
-            FS.closeSync(fd);
-            process.exit(0);
-        }
-    }
-    catch (ex) {
-        process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
-        FS.closeSync(fd);
-        process.exit(1);
-    }
-}
-
-////
-//Entrypoint
 setImmediate(() => {
     // Mac Machine
-    // let dirMachine = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
+    // let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps"
     // Windows Machine
-    let dirMachine = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
-    let bosqueFile = "main.bsq";
-    let section = "NSMain::max4";
-    getControlFlow(dirMachine, bosqueFile, section);
+    let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
+    
+    let fileName = "main.bsq";
+    let section = "NSMain::main";
+    
+    let fd = FS.openSync("_" + (section.split(":").join("") + "_" + fileName).replace("bsq", "z3"), 'w');
+    
+    let [ir_body, sectionName] = bosqueToIRBody({directory: directory, fileName: fileName, section: section});
+    let formula = collectFormula(ir_body, {directory: directory, fileName: fileName, section: sectionName});
+
+    FormulaExpr.initialDeclarationZ3(fd);
+    formula.toZ3(fd);
+    FormulaExpr.checkSatZ3(fd);
+    
+    FS.closeSync(fd);
 });

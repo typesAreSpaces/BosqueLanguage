@@ -5,7 +5,7 @@
 
 import { TypeExpr, BoolType, FuncType, UninterpretedType, UnionType } from "./type_expr";
 import { TermExpr, VarExpr } from "./term_expr";
-import { stringVariableToStringType, resolveType } from "./collect_formulas"
+import { stringVariableToStringType, resolveType } from "./collect_formula"
 import * as FS from "fs";
 
 // REMARK: Names cannot include `,'

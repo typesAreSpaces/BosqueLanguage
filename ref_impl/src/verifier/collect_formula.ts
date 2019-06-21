@@ -3,11 +3,12 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
+import { bosqueToIRBody, InfoLocation } from "./util"
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty, MIRCallNamespaceFunction } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
-import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType, RecordPropertyType } from "../verifier/type_expr";
-import { VarExpr, FuncExpr, TermExpr, ConstExpr } from "../verifier/term_expr";
-import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "../verifier/formula_expr";
+import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType, RecordPropertyType } from "./type_expr";
+import { VarExpr, FuncExpr, TermExpr, ConstExpr } from "./term_expr";
+import { PredicateExpr, FormulaExpr, AndExpr, ImplExpr, NegExpr, makeConjunction, makeDisjuction, EqualityTerm } from "./formula_expr";
 
 let DEBUGGING = true;
 
@@ -375,7 +376,8 @@ function BoxFormulaExpr(x: FormulaExpr): TermExpr {
     return new FuncExpr("BoxBool", new TermType(), [x]);
 }
 
-function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr {
+function opToFormula(op: MIROp, info: InfoLocation, nameBlock: string): FormulaExpr {
+    let section = info.section
     let formula = new PredicateExpr("true", []) as FormulaExpr;
     switch (op.tag) {
         case MIROpTag.LoadConst:
@@ -454,7 +456,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             let regName = section + "_" + opConstructorRecord.trgt.nameID;
             stringVariableToStringType.set(regName,
                 "{" + opConstructorRecord.args.map(arg => {
-                    // stringVariableToStringType.set(arg[0], "NSCore::String");
                     if (arg[1] instanceof MIRRegisterArgument) {
                         return arg[0] + ":" + stringVariableToStringType.get(section + "_" + arg[1].nameID);
                     }
@@ -485,10 +486,15 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
             console.log(opConstructorLambda);
             return formula;
         }
-        case MIROpTag.CallNamespaceFunction: {
+        case MIROpTag.CallNamespaceFunction: { // ------------------------------------------------------------------------------------------------------------
             debugging("CallNamespaceFunction is being implemented", DEBUGGING);
             let opCallNamespaceFunction = op as MIRCallNamespaceFunction;
             console.log(opCallNamespaceFunction);
+
+            let [ir_body, sectionName] = bosqueToIRBody({directory: info.directory, fileName: info.fileName, section: opCallNamespaceFunction.fkey});
+            console.log(ir_body);
+            sectionName;
+
             return formula;
         }
         case MIROpTag.CallStaticFunction: {
@@ -529,7 +535,6 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 
             let srcTypeString: string = "";
             for (let argString of srcTypeAll) {
-                // stringVariableToStringType.set(argString.substr(0, argString.indexOf(":")), "NSCore::String");
                 if (argString.startsWith(opMIRAccessFromProperty.property)) {
                     srcTypeString = argString;
                     break;
@@ -831,7 +836,7 @@ function opToFormula(op: MIROp, section: string, nameBlock: string): FormulaExpr
 // params is a sorted array of MIRFunctionParameter
 // i.e. the first element corresponds to the first argument, ... and so on.
 // We resolve nameing by prefixing the section variable to every name encountered
-function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): FormulaExpr {
+function collectFormula(ibody: Map<string, MIRBasicBlock>, info: InfoLocation): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
@@ -846,7 +851,7 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>
         mapFormulas.set(block.label,
-            makeConjunction(block.ops.map(op => opToFormula(op, section, block.label)))));
+            makeConjunction(block.ops.map(op => opToFormula(op, info, block.label)))));
 
     function traverse(block: MIRBasicBlock): FormulaExpr {
         let currentFlow = flow.get(block.label) as FlowLink;
@@ -861,7 +866,7 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
             }
             case 2: {
                 let jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
-                let regName = section + "_" + jumpCondOp.arg.nameID;
+                let regName = info.section + "_" + jumpCondOp.arg.nameID;
                 let condition = new EqualityTerm(new PredicateExpr(regName, []), BoxTrue);
                 let branchTrue = new ImplExpr(condition, traverse(ibody.get(jumpCondOp.trueblock) as MIRBasicBlock));
                 let branchFalse = new ImplExpr(new NegExpr(condition), traverse(ibody.get(jumpCondOp.falseblock) as MIRBasicBlock));
@@ -876,4 +881,4 @@ function collectFormulas(ibody: Map<string, MIRBasicBlock>, section: string): Fo
     return traverse(ibody.get("entry") as MIRBasicBlock);
 }
 
-export { collectFormulas, stringVariableToStringType, resolveType, UnboxTermExpr, BoxTermExpr, UnboxFormulaExpr, BoxFormulaExpr }
+export { collectFormula, stringVariableToStringType, resolveType, UnboxTermExpr, BoxTermExpr, UnboxFormulaExpr, BoxFormulaExpr }
