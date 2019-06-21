@@ -232,7 +232,6 @@ class TermType extends TypeExpr {
     }
 }
 
-// LambdaType type representation has "[", "]"
 class TupleType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
@@ -253,7 +252,6 @@ class TupleType extends TypeExpr {
     }
 }
 
-// LambdaType type representation has "{", "}"
 class RecordType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;
@@ -289,7 +287,6 @@ class RecordPropertyType extends TypeExpr {
     }
 }
 
-// LambdaType type representation has "->"
 class LambdaType extends TypeExpr {
     isPrimitiveType = false;
     isUninterpreted = false;

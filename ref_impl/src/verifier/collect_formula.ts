@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { bosqueToIRBody, InfoLocation } from "./util"
+import { bosqueToIRBody, InfoFunctionCall } from "./util"
 import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty, MIRCallNamespaceFunction } from "../compiler/mir_ops";
 import { topologicalOrder, computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { TypeExpr, IntType, BoolType, StringType, NoneType, UninterpretedType, FuncType, UnionType, AnyType, SomeType, TermType, TupleType, RecordType, LambdaType, RecordPropertyType } from "./type_expr";
@@ -376,7 +376,7 @@ function BoxFormulaExpr(x: FormulaExpr): TermExpr {
     return new FuncExpr("BoxBool", new TermType(), [x]);
 }
 
-function opToFormula(op: MIROp, info: InfoLocation, nameBlock: string): FormulaExpr {
+function opToFormula(op: MIROp, info: InfoFunctionCall, nameBlock: string): FormulaExpr {
     let section = info.section
     let formula = new PredicateExpr("true", []) as FormulaExpr;
     switch (op.tag) {
@@ -492,8 +492,9 @@ function opToFormula(op: MIROp, info: InfoLocation, nameBlock: string): FormulaE
             console.log(opCallNamespaceFunction);
 
             let [ir_body, sectionName] = bosqueToIRBody({directory: info.directory, fileName: info.fileName, section: opCallNamespaceFunction.fkey});
-            console.log(ir_body);
-            sectionName;
+            // Not sure about this
+            let formula = collectFormula(ir_body, {directory: info.directory, fileName: info.fileName, section: sectionName});
+            
 
             return formula;
         }
@@ -836,7 +837,7 @@ function opToFormula(op: MIROp, info: InfoLocation, nameBlock: string): FormulaE
 // params is a sorted array of MIRFunctionParameter
 // i.e. the first element corresponds to the first argument, ... and so on.
 // We resolve nameing by prefixing the section variable to every name encountered
-function collectFormula(ibody: Map<string, MIRBasicBlock>, info: InfoLocation): FormulaExpr {
+function collectFormula(ibody: Map<string, MIRBasicBlock>, info: InfoFunctionCall): FormulaExpr {
     const blocks = topologicalOrder(ibody);
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();

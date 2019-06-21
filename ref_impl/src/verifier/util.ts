@@ -11,13 +11,13 @@ import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "./../compiler/mir_a
 import { MIRBody, MIRBasicBlock } from "./../compiler/mir_ops";
 import { stringVariableToStringType } from "./collect_formula";
 
-interface InfoLocation {
+interface InfoFunctionCall {
     directory: string;
     fileName: string;
     section: string;
 }
 
-function bosqueToIRBody( info: InfoLocation): [Map<string, MIRBasicBlock>, string] {
+function bosqueToIRBody( info: InfoFunctionCall): [Map<string, MIRBasicBlock>, string] {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../"));
     let files: { relativePath: string, contents: string }[] = [];
@@ -71,4 +71,4 @@ function bosqueToIRBody( info: InfoLocation): [Map<string, MIRBasicBlock>, strin
     }
 }
 
-export { bosqueToIRBody, InfoLocation };
+export { bosqueToIRBody, InfoFunctionCall };
