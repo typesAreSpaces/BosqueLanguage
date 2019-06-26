@@ -1,0 +1,26 @@
+//-------------------------------------------------------------------------------------------------------
+// Copyright (C) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+//-------------------------------------------------------------------------------------------------------
+
+//
+//This is a bosque test/benchmark for a simple identity function.
+//Expected output is: 1
+//
+
+namespace NSMain;
+
+function identity(x: Int): Int
+{
+    return x;
+}
+
+entrypoint function main() : Int {
+    
+    var x = identity(1);
+    var y = x;
+    var! y2 = y + 1;
+    y2 = x * y;
+    
+    return x;
+}

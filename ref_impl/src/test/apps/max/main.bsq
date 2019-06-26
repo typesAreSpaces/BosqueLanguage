@@ -10,6 +10,17 @@
 
 namespace NSMain;
 
+function max0(x: Int, y: Int): Int
+    ensures _return_ == x || _return_ == y;
+{
+    if(x >= y){
+            return x;
+        }
+        else{
+            return y;
+        }
+}
+
 function max(x: Int?, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
@@ -76,6 +87,8 @@ function max4(x: {f: Int, g: Int}): Int
 entrypoint function main(): Int {
     var x = 10;
     var y = 20;
+
+    var z = max0(x, y);
     
     var zTuple = @[x, y];
     var maxTuple = max3(zTuple);
