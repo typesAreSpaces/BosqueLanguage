@@ -2,47 +2,41 @@ module UnionType
 
 open FStar.All
 
-val the_idea : x:int{x >= 0} -> x:int{x >= 1}
-let the_idea n = if (n = 0) then 1 else n
-(* Seems to work *)
+type utib (t:eqtype) = x:t{t == int \/ t == bool}
 
+val test : utib bool -> int
+let test n = match n with
+| true -> 1
+| false -> 2
+| _ -> n + 1
 
-// Goal: create a type A such that :
-// 1) ... -1, 0, 1, ... : A
-// 2) false, true : A
-// Kind of like a union type, I'm aware this is
-// not the standard definition
+type utib2 'a = x:'a{x:int \/ x:bool}
 
-(* type intbool = #a:Type -> x:a{x:int \/ x:bool} *)
+val test2 : utib2 bool -> Tot int
+let test2 n = match n with 
+| true -> 1
+| false -> 2
+| _ -> n + 1
 
-(* val test : intbool -> intbool *)
-(* let test n = if (n = true) then 1 else if (n = false) then 2 else n *)
+type none = | None : none
+type noneableAux 'a 'b = x:'b{x:none \/ x:'a}
+type noneable 'a = noneableAux 'a none
 
+val test3 : noneable int -> Tot int
+let test3 = fun n -> match n with
+  | None -> 0
+  | _ -> n
 
-type list 'a = 
-| Nil  : list 'a
-| Cons : hd:'a -> tl:list 'a -> list 'a
+val maxNone : noneable int -> int -> Tot int
+let maxNone x y = match x with
+| None -> y
+| _ -> if (x > y) then x else y
+  
+val simple : int -> int
+let simple n = n
 
-type listInt = 
-| NilInt  : listInt
-| ConsInt : hdInt:int -> tlInt:listInt -> listInt
+let x = simple 10
 
-type whate = 
-| A : whate
+type list 'a = | Nil : list 'a | Const : hd : 'a -> tl : list 'a -> list 'a
 
-type none = 
-| None : none
-
-type either 'a 'b =
-| Either : left : 'a -> right : 'b -> either 'a 'b
-
-val projectLeft : either 'a 'b -> 'a
-let projectLeft n = match n with 
-| Either x y -> x
-
-val projectRight : either 'a 'b -> 'b
-let projectRight n = match n with 
-| Either x y -> y
-
-let whatever : either int bool = Either 12 true
-let hmmm = projectLeft whatever
+type none = | None : none
