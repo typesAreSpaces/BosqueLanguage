@@ -6,8 +6,8 @@
 import * as FS from "fs";
 import { bosqueToIRBody } from "../util"
 import { MIRBasicBlock } from "../../compiler/mir_ops";
-import { collectFormula } from "../collect_formula";
-import { FormulaExpr } from "../formula_expr"
+// import { collectFormula } from "../collect_formula";
+// import { FormulaExpr } from "../formula_expr"
 
 setImmediate(() => {
     // Mac Machine
@@ -16,7 +16,7 @@ setImmediate(() => {
     let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
     
     let fileName = "main.bsq";
-    let section = "NSMain::max0";
+    let section = "NSMain::max5";
     
     let fd = FS.openSync("_" + (section.split(":").join("") + "_" + fileName).replace("bsq", "z3"), 'w');
     
@@ -25,11 +25,11 @@ setImmediate(() => {
     console.log(sectionName);
     console.log(ir_body);
     (ir_body.get("entry") as MIRBasicBlock).ops.map(x => console.log(x));
-
-    let formula = collectFormula(ir_body, {directory: directory, fileName: fileName, section: sectionName});
-    FormulaExpr.initialDeclarationZ3(fd);
-    formula.toZ3(fd);
-    FormulaExpr.checkSatZ3(fd);
+    console.log(fd);
+    // let formula = collectFormula(ir_body, {directory: directory, fileName: fileName, section: sectionName});
+    // FormulaExpr.initialDeclarationZ3(fd);
+    // formula.toZ3(fd);
+    // FormulaExpr.checkSatZ3(fd);
     
-    FS.closeSync(fd);
+    // FS.closeSync(fd);
 });
