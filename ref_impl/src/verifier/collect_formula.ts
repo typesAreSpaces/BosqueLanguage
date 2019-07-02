@@ -842,12 +842,12 @@ function collectFormula(ibody: Map<string, MIRBasicBlock>, info: InfoFunctionCal
     const flow = computeBlockLinks(ibody);
     let mapFormulas: Map<string, FormulaExpr> = new Map<string, FormulaExpr>();
 
-    console.log("Blocks:-----------------------------------------------------------------------");
-    console.log(blocks);
-    console.log("More detailed Blocks:---------------------------------------------------------");
-    blocks.map(x => console.log(x));
-    console.log("More detailed++ Blocks:-------------------------------------------------------");
-    blocks.map(x => console.log(x.jsonify()));
+    // console.log("Blocks:-----------------------------------------------------------------------");
+    // console.log(blocks);
+    // console.log("More detailed Blocks:---------------------------------------------------------");
+    // blocks.map(x => console.log(x));
+    // console.log("More detailed++ Blocks:-------------------------------------------------------");
+    // blocks.map(x => console.log(x.jsonify()));
 
     blocks.map(block => mapBlockCondition.set(block.label, new Set()));
     blocks.map(block =>
