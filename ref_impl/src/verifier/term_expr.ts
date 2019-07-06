@@ -3,26 +3,22 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import * as FS from "fs";
-import { TypeExpr, FuncType, UninterpretedType } from "./type_expr";
-import { PredicateExpr } from "./formula_expr"
+// import * as FS from "fs";
+import { TypeExpr } from "./type_expr";
 
 abstract class TermExpr {
     readonly symbolName: string;
-    ty: TypeExpr;
-    // TODO: Add more reserved words from Z3
+    readonly ty: TypeExpr;
+    // TODO: Add more reserved words from FStar
+    static readonly opToFStarO : Map<string, string> = new Map<string, string> ([["&&", "op_AmpAmp"], ["||", "op_BarBar"], ["not", "op_Negation"], 
+        ["*", "op_Multiply"], ["-", "op_Substraction"], ["+", "op_Addition"], ["-", "op_Minus"], ["%", "op_Modulus"], ["/", "op_Division"],
+        ["<=", "op_LessThanOrEqual"], [">", "op_GreaterThan"], [">=", "op_GreaterThanOrEqual"], ["<", "op_LessThan"] , ["==", "op_Equality"], ["!=", "op_disEquality"]
+        ]);
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
-        ["+", "-", "*", "/", "%",
-            "HasType", "BInt", "BBool", "BString", "BAny", "BSome", "BNone", "BTuple", "BRecord",
-            "BoxInt", "UnboxInt",
-            "BoxBool", "UnboxBool",
-            "BoxString", "UnboxString",
-            "BoxAny", "UnboxAny",
-            "BoxSome", "UnboxSome",
-            "BoxNone", "UnboxNone",
-            "TupleElement", "TupleLength",
-            "RecordElement", "RecordLength",
-            "none"].map(x => [x, true])
+        ["op_AmpAmp", "op_BarBar", "op_Negation", 
+        "op_Multiply", "op_Substraction", "op_Addition", "op_Minus", "op_Modulus", "op_Division", 
+        "op_LessThanOrEqual", "op_GreaterThan", "op_GreaterThanOrEqual", "op_LessThan", "op_Equality", "op_disEquality"
+        ].map(x => [x, true]) 
     );
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;
@@ -31,67 +27,56 @@ abstract class TermExpr {
             TermExpr.symbolTable.set(this.symbolName, false);
         }
     }
-    toZ3DeclarationSort(fd: number): void {
-        let thisTypeTemp = this.ty.getType();
-        if (this.ty.isUninterpreted && !UninterpretedType.symbolTable.get(thisTypeTemp)) {
-            FS.writeSync(fd, "(declare-sort " + (this.ty as UninterpretedType).symbolName + ")\n");
-            UninterpretedType.symbolTable.set(thisTypeTemp, true);
-        }
-    }
-    abstract toZ3Declaration(fd: number): void;
-    abstract sexpr(): string;
+    abstract toFStarDeclaration(fd: number): void;
+    abstract toML(): string;
 }
 
-class VarExpr extends TermExpr {
+class VarTerm extends TermExpr {
     constructor(symbolName: string, ty: TypeExpr) {
         super(symbolName, ty);
     }
-    toZ3Declaration(fd: number) {
-        this.toZ3DeclarationSort(fd);
-        // This also checks predicate symbols because a variable can have boolean type
-        if (!VarExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
-            let declarationName = this.symbolName;
-            FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
-            VarExpr.symbolTable.set(this.symbolName, true);
+    toFStarDeclaration(fd: number) {
+        if (!VarTerm.symbolTable.get(this.symbolName)) {
+            // let declarationName = this.symbolName;
+            // FS.writeSync(fd, "(declare-fun " + declarationName + " () " + this.ty.getAbstractType() + ")\n");
+            VarTerm.symbolTable.set(this.symbolName, true);
         }
     }
-    sexpr() {
+    toML() {
         return this.symbolName;
     }
 }
 
-class ConstExpr extends TermExpr {
+class ConstTerm extends TermExpr {
     constructor(symbolName: string, ty: TypeExpr) {
         super(symbolName, ty);
     }
-    toZ3Declaration(fd: number) {
-        this.toZ3DeclarationSort(fd);
+    toFStarDeclaration(fd: number) {
     }
-    sexpr() {
+    toML() {
         return this.symbolName;
     }
 }
 
-class FuncExpr extends TermExpr {
+class FuncTerm extends TermExpr {
     readonly terms: TermExpr[];
-    constructor(symbolName: string, tyDomain: TypeExpr, terms: TermExpr[]) {
-        super(symbolName, new FuncType(terms.map(x => x.ty), tyDomain));
+    constructor(symbolName: string, terms: TermExpr[], ty: TypeExpr) {
+        super(symbolName, ty);
         this.terms = terms;
     }
-    toZ3Declaration(fd: number) {
-        this.toZ3DeclarationSort(fd);
-        for (let item of this.terms) {
-            item.toZ3Declaration(fd);
-        }
-        // This also checks predicate symbols because a function can return a boolean type
-        if (!FuncExpr.symbolTable.get(this.symbolName) && !PredicateExpr.symbolTable.get(this.symbolName)) {
-            FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getAbstractType() + ")\n");
-            FuncExpr.symbolTable.set(this.symbolName, true);
+    toFStarDeclaration(fd: number) {
+        // this.toZ3DeclarationSort(fd);]
+        // for (let item of this.terms) {
+        //     item.toZ3Declaration(fd);
+        // }
+        if (!FuncTerm.symbolTable.get(this.symbolName)) {
+            // FS.writeSync(fd, "(declare-fun " + this.symbolName + " " + this.ty.getAbstractType() + ")\n");
+            FuncTerm.symbolTable.set(this.symbolName, true);
         }
     }
-    sexpr() {
-        return "(" + this.symbolName + this.terms.reduce((a, b) => a + " " + b.sexpr(), "") + ")";
+    toML() {
+        return "(" + this.symbolName + " " + this.terms.map(x => x.toML()).join(" ") + ")";
     }
 }
 
-export { TermExpr, VarExpr, ConstExpr, FuncExpr };
+export { TermExpr, VarTerm, ConstTerm, FuncTerm };

@@ -41,7 +41,7 @@ abstract class MIRRegisterArgument extends MIRArgument {
 class MIRTempRegister extends MIRRegisterArgument {
     readonly regID: number;
     constructor(regID: number, forcename?: string) {
-        super(forcename || `@tmp_${regID}`);
+        super(forcename || `__tmp_${regID}`);
         this.regID = regID;
     }
 }

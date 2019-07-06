@@ -14,11 +14,12 @@ function max0(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if(x >= y){
-        return x;
+        var x2 = x;
     }
     else{
-        return y;
+        var y2 = y;
     }
+    return x;
 }
 
 function max(x: Int?, y: Int): Int

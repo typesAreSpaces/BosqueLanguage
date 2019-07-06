@@ -9,7 +9,6 @@ import chalk from "chalk";
 import { MIREmitter } from "./../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "./../compiler/mir_assembly";
 import { MIRBody, MIRBasicBlock } from "./../compiler/mir_ops";
-import { stringVariableToStringType } from "./collect_formula";
 
 interface InfoFunctionCall {
     directory: string;
@@ -48,15 +47,15 @@ function bosqueToIRBody( info: InfoFunctionCall): [Map<string, MIRBasicBlock>, s
     }
 
     try {
-        const sectionName = "@" + info.section.split(":").join("_");
+        const sectionName = "__" + info.section.split(":").join("_");
         const invokeDecl = ((masm as MIRAssembly).functionDecls.get(info.section) as MIRFunctionDecl).invoke;
         const ir_body = (invokeDecl.body as MIRBody).body; 
 
-        invokeDecl.params.map(arg => stringVariableToStringType.set(sectionName + "_" + arg.name, arg.type.trkey));
+        // invokeDecl.params.map(arg => stringVariableToStringType.set(sectionName + "_" + arg.name, arg.type.trkey));
         // TODO: Make declaration about the function itself
         // Hint: Check invokeDecl properties
-        console.log(invokeDecl);
-        console.log();
+        // console.log(invokeDecl);
+        // console.log();
         
         if (typeof (ir_body) === "string") {
             throw new Error("The program has string type\n");
