@@ -44,3 +44,7 @@ let test4 x = match x with
 | Intt n -> n
 | Booll _ -> 0
 
+type intersectionTypeIntBool 'a = x:'a{x:int /\ x:bool}
+
+val test5 : intersectionTypeIntBool bool -> Tot int
+let test5 x = if (x = true) then 1 else if (x = false) then 2 else x+1

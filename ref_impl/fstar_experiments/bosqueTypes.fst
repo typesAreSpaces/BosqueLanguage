@@ -31,5 +31,4 @@ val f : triple -> Tot int
 let f = fun x -> x.fst + x.third
 
 type ttriple = int * int
-val g : ttriple -> ttriple
-
+val g : ttriple -> ttriple 
