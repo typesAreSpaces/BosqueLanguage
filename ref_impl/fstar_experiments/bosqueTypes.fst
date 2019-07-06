@@ -1,5 +1,6 @@
 module BosqueTypes
 
+
 // ---------------------
 // Bosque Concepts------
 type bosque__Any       = 
@@ -31,3 +32,4 @@ let f = fun x -> x.fst + x.third
 
 type ttriple = int * int
 val g : ttriple -> ttriple
+
