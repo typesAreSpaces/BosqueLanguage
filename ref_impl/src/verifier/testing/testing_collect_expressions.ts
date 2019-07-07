@@ -20,8 +20,10 @@ setImmediate(() => {
     let fd = FS.openSync("_" + (section.split(":").join("") + "_" + fileName).replace("bsq", "fst"), 'w');
     fd;
 
-    let [ir_body, sectionName] = bosqueToIRBody({directory: directory, fileName: fileName, section: section});
-    let fstarProgram = collectExpr(ir_body, {directory: directory, fileName: fileName, section: sectionName});
+    // let [ir_body, sectionName] = bosqueToIRBody({directory: directory, fileName: fileName, section: section});
+    let ir_body = bosqueToIRBody({directory: directory, fileName: fileName, section: section});
+    // let fstarProgram = collectExpr(ir_body, {directory: directory, fileName: fileName, section: sectionName});
+    let fstarProgram = collectExpr(ir_body);
     console.log(fstarProgram.toML());
     // FormulaExpr.initialDeclarationZ3(fd);
     // formula.toZ3(fd);
