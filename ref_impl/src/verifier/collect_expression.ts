@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp } from "../compiler/mir_ops";
 // import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty, MIRCallNamespaceFunction } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
@@ -23,7 +23,7 @@ function debugging(message: string, flag: boolean): void {
     }
 }
 
-function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
+function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
     switch (op.tag) {
         case MIROpTag.LoadConst:
         case MIROpTag.LoadConstTypedString:
@@ -317,15 +317,15 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
             // The predicate returned is of type Bool
             // because the operations to arrive at this
             // point are <, <=, >, >= only
-            // let opBinCmp = op as MIRBinCmp;
+            let opBinCmp = op as MIRBinCmp;
+            let regName = sanitizeName(opBinCmp.trgt.nameID);
+            
 
-            // let regName = section + "_" + opBinCmp.trgt.nameID;
-            // stringVariableToStringType.set(regName, "NSCore::Bool");
-
-            // let lhsName = section + "_" + opBinCmp.lhs.nameID;
-            // let rhsName = section + "_" + opBinCmp.rhs.nameID;
-            // let originalTypeLHS = stringVariableToStringType.get(lhsName) as string;
-            // let originalTypeRHS = stringVariableToStringType.get(rhsName) as string;
+            let lhsName = sanitizeName(opBinCmp.lhs.nameID);
+            let rhsName = sanitizeName(opBinCmp.rhs.nameID);
+            // Continue working here!
+            if()
+            
 
             // stringVariableToStringType.set(lhsName, "NSCore::Int");
             // stringVariableToStringType.set(rhsName, "NSCore::Int");
@@ -366,8 +366,7 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
             // stringVariableToStringType.set(lhsName, originalTypeLHS);
             // stringVariableToStringType.set(rhsName, originalTypeRHS);
             // return new AndExpr(opFormulaInt, opFormulaString);
-            let temporal = [new VarTerm("_MIRBinCmp", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            return [new VarTerm(regName, boolType), new FuncTerm("<=", )];
         }
         case MIROpTag.MIRRegAssign: {
             debugging("MIRRegAssign Not implemented yet", DEBUGGING);
@@ -430,8 +429,7 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
             //         (mapBlockCondition.get(opJump.trgtblock) as Set<FormulaExpr>).add(formula_);
             //     }
             // }
-            let temporal = [new VarTerm("_MIRJump", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            return [new VarTerm("_MIRJump", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
         }
         case MIROpTag.MIRJumpCond: {
             // let opJumpCond = op as MIRJumpCond;
@@ -440,8 +438,7 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
             // let condition = new EqualityTerm(new PredicateExpr(regName, []), BoxTrue);
             // (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(condition);
             // (mapBlockCondition.get(opJumpCond.falseblock) as Set<FormulaExpr>).add(new NegExpr(condition));
-            let temporal = [new VarTerm("_MIRJumpCond", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            return [new VarTerm("_MIRJumpCond", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
         }
         case MIROpTag.MIRJumpNone: {
             debugging("MIRJumpNone Not implemented yet", DEBUGGING);
@@ -465,7 +462,12 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
         }
         case MIROpTag.MIRPhi: {
             let opPhi = op as MIRPhi;
+            console.log(comingFrom);
             console.log(opPhi);
+            console.log(opPhi.src.get(comingFrom));
+            let regName = sanitizeName(opPhi.trgt.nameID);
+            let srcName = sanitizeName((opPhi.src.get(comingFrom) as MIRRegisterArgument).nameID);
+
             // let targetName = section + "_" + opPhi.trgt.nameID;
 
             // let typePhi = new UnionType(new Set<TypeExpr>());
@@ -500,9 +502,8 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
             //     }
             // });
 
-            // stringVariableToStringType.set(targetName, Array.from(typePhiString).join(" | "));
-            let temporal = [new VarTerm("_MIRPhi", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            // FIX: Use the proper types
+            return [new VarTerm(regName, intType), new VarTerm(srcName, intType)] as [VarTerm, TermExpr];
         }
         case MIROpTag.MIRIsTypeOfNone: {
             // let opIsTypeOfNone = op as MIRIsTypeOfNone;
@@ -535,13 +536,13 @@ function opToAssignment(op: MIROp): [VarTerm, TermExpr] {
     }
 }
 
-function opsToExpr(ops: MIROp[], program: ExprExpr): ExprExpr {
+function opsToExpr(ops: MIROp[], comingFrom : string, program: ExprExpr): ExprExpr {
     if (ops.length == 0) {
         return program;
     }
     else {
-        let [lval, rval] = opToAssignment(ops[0]);
-        return opsToExpr(ops.slice(1), new AssignmentExpr(lval, rval, program));
+        let [lval, rval] = opToAssignment(ops[0], comingFrom);
+        return opsToExpr(ops.slice(1), comingFrom, new AssignmentExpr(lval, rval, program));
     }
 }
 
@@ -564,7 +565,7 @@ function collectExpr(mapBlocks: Map<string, MIRBasicBlock>): ExprExpr {
     // because opsToExpr requires it
     mapBlocks.forEach(x => x.ops.reverse());
 
-    function traverse(block: MIRBasicBlock): ExprExpr {
+    function traverse(block: MIRBasicBlock, comingFrom : string): ExprExpr {
         let currentFlow = flow.get(block.label) as FlowLink;
 
         let currentBlockFormula = mapBlocks.get(block.label) as MIRBasicBlock;
@@ -577,21 +578,21 @@ function collectExpr(mapBlocks: Map<string, MIRBasicBlock>): ExprExpr {
 
                 let regName = sanitizeName(lastOp.name.nameID);
                 // FIX: Use the correct type!
-                return opsToExpr(currentBlockFormula.ops,
+                return opsToExpr(currentBlockFormula.ops, comingFrom,
                     new ReturnExpr(new VarTerm(regName, intType)));
             }
             case 1: {
                 let successorLabel = currentFlow.succs.values().next().value;
-                return opsToExpr(currentBlockFormula.ops.slice(1),
-                    traverse(mapBlocks.get(successorLabel) as MIRBasicBlock));
+                return opsToExpr(currentBlockFormula.ops.slice(1), comingFrom,
+                    traverse(mapBlocks.get(successorLabel) as MIRBasicBlock, block.label));
             }
             case 2: {
                 let jumpCondOp = block.ops[0] as MIRJumpCond;
                 let regName = sanitizeName(jumpCondOp.arg.nameID);
                 let condition = new FuncTerm("op_Equality",
                     [new VarTerm(regName, boolType), new ConstTerm("true", boolType)], boolType);
-                let branchTrue = traverse(mapBlocks.get(jumpCondOp.trueblock) as MIRBasicBlock);
-                let branchFalse = traverse(mapBlocks.get(jumpCondOp.falseblock) as MIRBasicBlock);
+                let branchTrue = traverse(mapBlocks.get(jumpCondOp.trueblock) as MIRBasicBlock, block.label);
+                let branchFalse = traverse(mapBlocks.get(jumpCondOp.falseblock) as MIRBasicBlock, block.label);
                 return new ConditionalExpr(condition, branchTrue, branchFalse);
             }
             default: {
@@ -599,7 +600,7 @@ function collectExpr(mapBlocks: Map<string, MIRBasicBlock>): ExprExpr {
             }
         }
     }
-    return traverse(mapBlocks.get("entry") as MIRBasicBlock);
+    return traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry");
 }
 
 export { collectExpr }
