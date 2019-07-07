@@ -44,3 +44,11 @@ let test4 x = match x with
 | Intt n -> n
 | Booll _ -> 0
 
+let ahh __NSMain__max0____tmp_0 __NSMain__max0___return_ = if (op_Equality __NSMain__max0____tmp_0 true) then let temporal = 0 in let temporal = 0 in let temporal = 0 in let temporal = 0 in __NSMain__max0___return_ else let temporal
+ = 0 in let temporal = 0 in let temporal = 0 in let temporal = 0 in __NSMain__max0___return_
+ 
+let x_1 = 1
+
+let _ = assert (has_type x_1 int)
+
+let sdsdf = if (has_type x_1 int) then 1 else 0
