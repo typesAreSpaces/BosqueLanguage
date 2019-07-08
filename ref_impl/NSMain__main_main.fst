@@ -1,4 +1,4 @@
-module _nSMain__main_main.fst
+module NSMain__main_main.fst
 
 let nSMain__max0 x y = let __tmp_0 = (op_GreaterThanOrEqual x y) in if (op_Equality __tmp_0 true) then let _ir_ret__1 = x in let _ir_ret__2 = _ir_ret__1 in let _return_ = _ir_ret__2 in _return_ else let _ir_ret_ = y in let _ir_ret__2 = _ir_ret_ in let _return_ = _ir_ret__2 in _return_
 

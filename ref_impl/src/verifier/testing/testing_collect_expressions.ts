@@ -16,7 +16,8 @@ setImmediate(() => {
     let fileName = "main.bsq";
     let mapDeclarations = bosqueToInvokeDecl({ directory: directory, fileName: fileName });
     let fkey = "NSMain::main";
-    let fstarFileName = "_" + (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
+    let fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
+    fstarFileName = fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1);
     
     let fd = FS.openSync(fstarFileName, 'w');
     FS.writeSync(fd, `module ${fstarFileName}\n\n`);
