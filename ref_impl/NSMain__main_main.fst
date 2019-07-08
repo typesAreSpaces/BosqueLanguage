@@ -14,14 +14,11 @@ let nSMain__max0 x y =
                         _return_
 
 let nSMain__main  = 
-    let _MIRVarLifetimeStart = 0 in 
-        let x = 10 in 
-            let _MIRVarLifetimeStart = 0 in 
-                let y = 20 in 
-                    let __tmp_2 = (nSMain__max0 x y) in 
-                        let _MIRVarLifetimeStart = 0 in 
-                            let z = __tmp_2 in 
-                                let _ir_ret_ = z in 
-                                    let _return_ = _ir_ret_ in 
-                                        _return_
+    let x = 10 in 
+        let y = 20 in 
+            let __tmp_2 = (nSMain__max0 x y) in 
+                let z = __tmp_2 in 
+                    let _ir_ret_ = z in 
+                        let _return_ = _ir_ret_ in 
+                            _return_
 

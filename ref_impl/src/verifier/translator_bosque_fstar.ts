@@ -14,6 +14,7 @@ import { MIRFunctionDecl } from "../compiler/mir_assembly";
 class TranslatorBosqueFStar {
     static readonly intType = new IntType();
     static readonly boolType = new BoolType();
+    static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
 
     readonly stack_programs = [] as [string, string[], ExprExpr][];
@@ -54,48 +55,39 @@ class TranslatorBosqueFStar {
             case MIROpTag.AccessConstField:
             case MIROpTag.LoadFieldDefaultValue: {
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.AccessCapturedVariable: {
                 TranslatorBosqueFStar.debugging("AcessCapturedVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_AccessCapturedVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_AccessCapturedVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.AccessArgVariable: {
                 TranslatorBosqueFStar.debugging("AccessArgVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_AccessArgVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_AccessArgVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.AccessLocalVariable: {
                 TranslatorBosqueFStar.debugging("AcessLocalVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_AcessLocalVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_AcessLocalVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorPrimary: {
                 TranslatorBosqueFStar.debugging("ConstructorPrimary Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_ConstructorPrimary", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorPrimary", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorPrimaryCollectionEmpty: {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_ConstructorPrimaryCollectionEmpty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorPrimaryCollectionEmpty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorPrimaryCollectionSingletons: {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionSingletons Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_ConstructorPrimaryCollectionSingletons", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorPrimaryCollectionSingletons", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorPrimaryCollectionCopies: {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionCopies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_ConstructorPrimaryCollectionCopies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorPrimaryCollectionCopies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorPrimaryCollectionMixed: {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionMixed Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_ConstructorPrimaryCollectionMixed", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorPrimaryCollectionMixed", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorTuple: {
                 // let opConstructorTuple = op as MIRConstructorTuple;
@@ -124,8 +116,7 @@ class TranslatorBosqueFStar {
                 //             new FuncExpr("TupleElement", argExpr.ty, [regVar, new ConstExpr(index.toString(), new TranslatorBosqueFStar.intType())]),
                 //             BoxTermExpr(UnboxTermExpr(argExpr))))
                 // });
-                let temporal = [new VarTerm("_ConstructorTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorRecord: {
                 // let opConstructorRecord = op as MIRConstructorRecord;
@@ -154,15 +145,13 @@ class TranslatorBosqueFStar {
                 //             new FuncExpr("RecordElement", argExpr.ty, [regVar, new VarExpr(arg[0], new RecordPropertyType())]),
                 //             BoxTermExpr(UnboxTermExpr(argExpr))))
                 // });
-                let temporal = [new VarTerm("_ConstructorRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorLambda: {
                 // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 // let opConstructorLambda = op as MIRConstructorLambda;
                 // console.log(opConstructorLambda);
-                let temporal = [new VarTerm("_ConstructorLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_ConstructorLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.CallNamespaceFunction: {
                 let opCallNamespaceFunction = op as MIRCallNamespaceFunction;
@@ -178,8 +167,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.CallStaticFunction: {
                 TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRAccessFromIndex: {
                 // let opMIRAccessFromIndex = op as MIRAccessFromIndex;
@@ -198,13 +186,11 @@ class TranslatorBosqueFStar {
                 //             [argumentToTermExpr(opMIRAccessFromIndex.arg, section),
                 //             new ConstExpr(opMIRAccessFromIndex.idx.toString(), new TranslatorBosqueFStar.intType())]
                 //         ))));
-                let temporal = [new VarTerm("_MIRAccessFromIndex", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRAccessFromIndex", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromIndecies: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRAccessFromProperty: {
                 // let opMIRAccessFromProperty = op as MIRAccessFromProperty;
@@ -232,83 +218,67 @@ class TranslatorBosqueFStar {
                 //             [argumentToTermExpr(opMIRAccessFromProperty.arg, section),
                 //             new VarExpr(opMIRAccessFromProperty.property, new RecordPropertyType())]
                 //         ))));
-                let temporal = [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromProperties: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRAccessFromField: {
                 TranslatorBosqueFStar.debugging("MIRAccessFromField Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRAccessFromField", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRAccessFromField", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromFields: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromFields Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromTypeTuple: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeTuple Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromTypeTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromTypeTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromTypeRecord: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeRecord Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromTypeRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromTypeRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromTypeConcept: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeConcept Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRModifyWithIndecies: {
                 TranslatorBosqueFStar.debugging("MIRModifyWithIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRModifyWithIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRModifyWithIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRModifyWithProperties: {
                 TranslatorBosqueFStar.debugging("MIRModifyWithProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRModifyWithProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRModifyWithProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRModifyWithFields: {
                 TranslatorBosqueFStar.debugging("MIRModifyWithFields Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRModifyWithFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRModifyWithFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRStructuredExtendTuple: {
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendedTuple Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRStructuredExtendTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRStructuredExtendTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRStructuredExtendRecord: {
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendRecord Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRStructuredExtendRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRStructuredExtendRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRStructuredExtendObject: {
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendObject Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRStructuredExtendObject", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRStructuredExtendObject", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRInvokeKnownTarget: {
                 TranslatorBosqueFStar.debugging("MIRInvokeKnownTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRInvokeVirtualTarget: {
                 TranslatorBosqueFStar.debugging("MIRInvokeVirtualTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRCallLambda: {
                 TranslatorBosqueFStar.debugging("MIRCallLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRCallLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRCallLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRPrefixOp: {
                 let opPrefixOp = op as MIRPrefixOp;
@@ -330,8 +300,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRBinEq: {
                 TranslatorBosqueFStar.debugging("MIRBinEq Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRBinEq", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRBinEq", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRBinCmp: {
                 // The predicate returned is of type Bool
@@ -347,13 +316,11 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRRegAssign: {
                 TranslatorBosqueFStar.debugging("MIRRegAssign Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRRegAssign", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRRegAssign", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRTruthyConvert: {
                 TranslatorBosqueFStar.debugging("MIRTruthyConvert Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRTruthyConvert", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRTruthyConvert", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRVarStore: {
                 let opVarStore = op as MIRVarStore;
@@ -365,44 +332,27 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRAbort: {
                 TranslatorBosqueFStar.debugging("MIRAbort Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRAbort", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRAbort", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRDebug: {
                 TranslatorBosqueFStar.debugging("MIRDDebug Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRDebug", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRDebug", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRJump: {
-                // This return value here won't be used because collecExpr doesnt include it!
-                // by slicing the array of ops from 1
-                return [new VarTerm("_MIRJump", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
+                return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRJumpCond: {
-                // This return value here won't be used because collecExpr doesnt include it!
-                // by slicing the array of ops from 1
-                return [new VarTerm("_MIRJumpCond", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
+                return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRJumpNone: {
-                // TODO: Needs testing
-                // This return value here won't be used because collecExpr doesnt include it!
-                // by slicing the array of ops from 1
-                return [new VarTerm("_MIRJumpNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
+                return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRVarLifetimeStart: {
-                // let opVarLifetimeStart = op as MIRVarLifetimeStart;
-                // // We don't check if opVarLifetimeStart
-                // // is an instance of MIRRegisterArgument
-                // // because we know it is always a variable
-                // let sectionName = section + "_" + opVarLifetimeStart.name;
-                // stringVariableToStringType.set(sectionName, opVarLifetimeStart.rtype);
-                let temporal = [new VarTerm("_MIRVarLifetimeStart", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRVarLifetimeEnd: {
                 TranslatorBosqueFStar.debugging("MIRVarLifetimeEnd Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRVarLifetimeEnd", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRVarLifetimeEnd", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRPhi: {
                 let opPhi = op as MIRPhi;
@@ -417,32 +367,33 @@ class TranslatorBosqueFStar {
                 // return new EqualityTerm(new VarExpr(regName, new TranslatorBosqueFStar.boolType()),
                 //     BoxFormulaExpr(new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"),
                 //         [argumentToTermExpr(opIsTypeOfNone.arg, section)]), BNone)));
-                let temporal = [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRIsTypeOfSome: {
                 TranslatorBosqueFStar.debugging("MIRIsTypeOfSome Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 // let opIsTypeOfSome = op as MIRIsTypeOfSome;
                 // console.log(opIsTypeOfSome);
-                let temporal = [new VarTerm("_MIRIsTypeOfSome", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRIsTypeOfSome", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRIsTypeOf: {
                 TranslatorBosqueFStar.debugging("MIRIsTypeOf Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             default:
                 TranslatorBosqueFStar.debugging("This might be a problem", TranslatorBosqueFStar.DEBUGGING);
-                let temporal = [new VarTerm("_default_problem", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)] as [VarTerm, TermExpr];
-                return temporal;
+                return [new VarTerm("_default_problem", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
         }
     }
 
     opsToExpr(ops: MIROp[], comingFrom: string, program: ExprExpr): ExprExpr {
         return ops.reduce((partialProgram, currentOp) => {
             let [lval, rval] = this.opToAssignment(currentOp, comingFrom);
-            return new AssignmentExpr(lval, rval, partialProgram);
+            if(lval.symbolName == "_skip"){
+                return partialProgram;
+            }
+            else{
+                return new AssignmentExpr(lval, rval, partialProgram);
+            }
         }, program);
     }
 
