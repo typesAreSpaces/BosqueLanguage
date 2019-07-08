@@ -3,14 +3,13 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp } from "../compiler/mir_ops";
 // import { MIRBasicBlock, MIROpTag, MIRBinCmp, MIRArgument, MIROp, MIRRegisterArgument, MIRVarLifetimeStart, MIRVarStore, MIRReturnAssign, MIRJumpCond, MIRBinOp, MIRPhi, MIRJump, MIRIsTypeOfSome, MIRIsTypeOfNone, MIRConstructorTuple, MIRConstructorLambda, MIRConstructorRecord, MIRAccessFromIndex, MIRAccessFromProperty, MIRCallNamespaceFunction } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
-
 
 let intType = new IntType();
 let boolType = new BoolType();
@@ -302,26 +301,22 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
             return temporal;
         }
         case MIROpTag.MIRPrefixOp: {
-            debugging("MIRPrefixOp Not implemented yet", DEBUGGING);
-            let temporal = [new VarTerm("_MIRPrefixOp", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            let opPrefixOp = op as MIRPrefixOp;
+            console.log(opPrefixOp);
+            // FIX: Use the proper types
+            return [argumentToExpr(opPrefixOp.trgt), 
+                new FuncTerm(TermExpr.unaryOpToFStar.get(opPrefixOp.op) as string, 
+                [argumentToExpr(opPrefixOp.arg)], 
+                intType)]; // This type
         }
         case MIROpTag.MIRBinOp: {
-            // let opBinOp = op as MIRBinOp;
-            // let regName = section + "_" + opBinOp.trgt.nameID;
-            // // We follow the semantics given by
-            // // the interpreter. Hence, the result of a 
-            // // binary operation should be an Integer
-            // stringVariableToStringType.set(regName, "NSCore::Int");
-            // let rhsOfAssignmentTerm = new FuncExpr(opBinOp.op, new IntType(), [
-            //     UnboxTermExpr(argumentToTermExpr(opBinOp.lhs, section)),
-            //     UnboxTermExpr(argumentToTermExpr(opBinOp.rhs, section))
-            // ]);
-            // return new EqualityTerm(
-            //     new VarExpr(regName, new IntType()),
-            //     BoxTermExpr(rhsOfAssignmentTerm));
-            let temporal = [new VarTerm("_MIRBinOp", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            let opBinOp = op as MIRBinOp;
+            let lhs = argumentToExpr(opBinOp.lhs);
+            let rhs = argumentToExpr(opBinOp.rhs);
+            return [argumentToExpr(opBinOp.trgt), 
+                new FuncTerm(TermExpr.binOpToFStar.get(opBinOp.op) as string, 
+                [lhs, rhs], 
+                intType)];
         }
         case MIROpTag.MIRBinEq: {
             debugging("MIRBinEq Not implemented yet", DEBUGGING);
@@ -333,55 +328,12 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
             // because the operations to arrive at this
             // point are <, <=, >, >= only
             let opBinCmp = op as MIRBinCmp;
-            let regName = sanitizeName(opBinCmp.trgt.nameID);
-
-            // let lhsName = sanitizeName(opBinCmp.lhs.nameID);
-            // let rhsName = sanitizeName(opBinCmp.rhs.nameID);
             let lhs = argumentToExpr(opBinCmp.lhs);
             let rhs = argumentToExpr(opBinCmp.rhs);
-            
-
-            // stringVariableToStringType.set(lhsName, "NSCore::Int");
-            // stringVariableToStringType.set(rhsName, "NSCore::Int");
-            // let opFormulaInt = new ImplExpr(
-            //     new AndExpr(
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.lhs, section)]), BInt),
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.rhs, section)]), BInt)),
-            //     new AndExpr(
-            //         new EqualityTerm(
-            //             new VarExpr(regName, new BoolType()),
-            //             BoxFormulaExpr(new PredicateExpr(opBinCmp.op, [
-            //                 UnboxTermExpr(argumentToTermExpr(opBinCmp.lhs, section)),
-            //                 UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section))
-            //             ]))
-            //         ),
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BBool)
-            //     )
-            // );
-
-            // stringVariableToStringType.set(lhsName, "NSCore::String");
-            // stringVariableToStringType.set(rhsName, "NSCore::String");
-            // let opFormulaString = new ImplExpr(
-            //     new AndExpr(
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.lhs, section)]), BString),
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.rhs, section)]), BString)),
-            //     new AndExpr(
-            //         new EqualityTerm(
-            //             new VarExpr(regName, new BoolType()),
-            //             BoxFormulaExpr(new PredicateExpr(opBinCmp.op + "_string", [
-            //                 UnboxTermExpr(argumentToTermExpr(opBinCmp.lhs, section)),
-            //                 UnboxTermExpr(argumentToTermExpr(opBinCmp.rhs, section))
-            //             ]))
-            //         ),
-            //         new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"), [argumentToTermExpr(opBinCmp.trgt, section)]), BBool)
-            //     )
-            // );
-
-            // stringVariableToStringType.set(lhsName, originalTypeLHS);
-            // stringVariableToStringType.set(rhsName, originalTypeRHS);
-            // return new AndExpr(opFormulaInt, opFormulaString);
-            return [new VarTerm(regName, boolType), 
-                new FuncTerm((TermExpr.opToFStar.get(opBinCmp.op) as string), [lhs, rhs], boolType)];
+            // TODO: Is still necessary check if the type is either
+            // an int or a string?
+            return [argumentToExpr(opBinCmp.trgt), 
+                new FuncTerm((TermExpr.binOpToFStar.get(opBinCmp.op) as string), [lhs, rhs], boolType)];
         }
         case MIROpTag.MIRRegAssign: {
             debugging("MIRRegAssign Not implemented yet", DEBUGGING);
@@ -395,13 +347,11 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
         }
         case MIROpTag.MIRVarStore: {
             let opVarStore = op as MIRVarStore;
-            let regName = sanitizeName(opVarStore.name.nameID);
-            return [new VarTerm(regName, intType), argumentToExpr(opVarStore.src)];
+            return [argumentToExpr(opVarStore.name), argumentToExpr(opVarStore.src)];
         }
         case MIROpTag.MIRReturnAssign: {
             let opReturnAssign = op as MIRReturnAssign;
-            let regName = sanitizeName(opReturnAssign.name.nameID);
-            return [new VarTerm(regName, intType), argumentToExpr(opReturnAssign.src)];    
+            return [argumentToExpr(opReturnAssign.name), argumentToExpr(opReturnAssign.src)];    
         }
         case MIROpTag.MIRAbort: {
             debugging("MIRAbort Not implemented yet", DEBUGGING);
@@ -413,36 +363,21 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
             let temporal = [new VarTerm("_MIRDebug", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
             return temporal;
         }
-        case MIROpTag.MIRJump: {
-            // let opJump = op as MIRJump;
-            // formula = UnboxFormulaExpr(new PredicateExpr("MIRJumpFormula", []));
-            // let conditions = mapBlockCondition.get(nameBlock) as Set<FormulaExpr>;
-            // if (conditions.size > 0) {
-            //     for (let formula_ of conditions) {
-            //         (mapBlockCondition.get(opJump.trgtblock) as Set<FormulaExpr>).add(formula_);
-            //     }
-            // }
-            
+        case MIROpTag.MIRJump: {            
             // This return value here won't be used because collecExpr doesnt include it!
             // by slicing the array of ops from 1
             return [new VarTerm("_MIRJump", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
         }
-        case MIROpTag.MIRJumpCond: {
-            // let opJumpCond = op as MIRJumpCond;
-            // formula = UnboxFormulaExpr(new PredicateExpr("MIRJumpCondFormula", []));
-            // let regName = section + "_" + opJumpCond.arg.nameID;
-            // let condition = new EqualityTerm(new PredicateExpr(regName, []), BoxTrue);
-            // (mapBlockCondition.get(opJumpCond.trueblock) as Set<FormulaExpr>).add(condition);
-            // (mapBlockCondition.get(opJumpCond.falseblock) as Set<FormulaExpr>).add(new NegExpr(condition));
-            
+        case MIROpTag.MIRJumpCond: {            
             // This return value here won't be used because collecExpr doesnt include it!
             // by slicing the array of ops from 1
             return [new VarTerm("_MIRJumpCond", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
         }
         case MIROpTag.MIRJumpNone: {
-            debugging("MIRJumpNone Not implemented yet", DEBUGGING);
-            let temporal = [new VarTerm("_MIRJumpNone", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
-            return temporal;
+            // TODO: Needs testing
+            // This return value here won't be used because collecExpr doesnt include it!
+            // by slicing the array of ops from 1
+            return [new VarTerm("_MIRJumpNone", intType), new ConstTerm("0", intType)] as [VarTerm, TermExpr];
         }
         case MIROpTag.MIRVarLifetimeStart: {
             // let opVarLifetimeStart = op as MIRVarLifetimeStart;
@@ -461,45 +396,7 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
         }
         case MIROpTag.MIRPhi: {
             let opPhi = op as MIRPhi;
-            let regName = sanitizeName(opPhi.trgt.nameID);
-            let srcName = sanitizeName((opPhi.src.get(comingFrom) as MIRRegisterArgument).nameID);
-
-            // let targetName = section + "_" + opPhi.trgt.nameID;
-
-            // let typePhi = new UnionType(new Set<TypeExpr>());
-            // let typePhiString: Set<string> = new Set<string>();
-            // let changeFormula = false;
-            // opPhi.src.forEach((value, key) => {
-
-            //     let valueExpr = argumentToTermExpr(value, section);
-            //     stringVariableToStringType.set(targetName, stringVariableToStringType.get(valueExpr.symbolName) as string);
-            //     typePhi.elements.add(valueExpr.ty);
-            //     typePhiString.add(stringVariableToStringType.get(valueExpr.symbolName) as string);
-
-            //     let consequence = new EqualityTerm(argumentToTermExpr(opPhi.trgt, section), valueExpr);
-
-            //     let setOfConditions = mapBlockCondition.get(key) as Set<FormulaExpr>;
-            //     if (!changeFormula) {
-            //         changeFormula = true;
-            //         if (setOfConditions.size === 0) {
-            //             formula = consequence;
-            //         }
-            //         else {
-            //             formula = new ImplExpr(makeDisjuction(setOfConditions), consequence);
-            //         }
-            //     }
-            //     else {
-            //         if (setOfConditions.size === 0) {
-            //             formula = new AndExpr(formula, consequence);
-            //         }
-            //         else {
-            //             formula = new AndExpr(formula, new ImplExpr(makeDisjuction(setOfConditions), consequence));
-            //         }
-            //     }
-            // });
-
-            // FIX: Use the proper types
-            return [new VarTerm(regName, intType), new VarTerm(srcName, intType)] as [VarTerm, TermExpr];
+            return [argumentToExpr(opPhi.trgt), argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument)];
         }
         case MIROpTag.MIRIsTypeOfNone: {
             // let opIsTypeOfNone = op as MIRIsTypeOfNone;
@@ -549,13 +446,13 @@ function opsToExpr(ops: MIROp[], comingFrom : string, program: ExprExpr): ExprEx
 function collectExpr(mapBlocks: Map<string, MIRBasicBlock>): ExprExpr {
     const flow = computeBlockLinks(mapBlocks);
 
-    // console.log("Blocks:-----------------------------------------------------------------------");
-    // console.log(mapBlocks);
-    // console.log("More detailed Blocks:---------------------------------------------------------");
-    // mapBlocks.forEach(x => console.log(x));
-    // console.log("More detailed++ Blocks:-------------------------------------------------------");
-    // mapBlocks.forEach(x => console.log(x.jsonify()));
-    // console.log();
+    console.log("Blocks:-----------------------------------------------------------------------");
+    console.log(mapBlocks);
+    console.log("More detailed Blocks:---------------------------------------------------------");
+    mapBlocks.forEach(x => console.log(x));
+    console.log("More detailed++ Blocks:-------------------------------------------------------");
+    mapBlocks.forEach(x => console.log(x.jsonify()));
+    console.log();
 
     // We need to reverse the currentBlockFormula.ops
     // because opsToExpr requires it

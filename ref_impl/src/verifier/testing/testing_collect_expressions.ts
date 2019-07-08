@@ -10,9 +10,9 @@ import { collectExpr } from "../collect_expression";
 
 setImmediate(() => {
     // Mac Machine
-    let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
+    // let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
     // Windows Machine
-    // let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
+    let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
     
     let fileName = "main.bsq";
     let section = "NSMain::max0";

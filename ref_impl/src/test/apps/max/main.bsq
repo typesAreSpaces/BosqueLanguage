@@ -14,10 +14,10 @@ function max0(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if(x >= y){
-        return x;
+        return x - y;
     }
     else{
-        return y;
+        return y - x;
     }
 }
 
