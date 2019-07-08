@@ -14,10 +14,10 @@ function max0(x: Int, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if(x >= y){
-        return x - y;
+        return x;
     }
     else{
-        return y - x;
+        return y;
     }
 }
 
@@ -112,13 +112,13 @@ entrypoint function main(): Int {
 
     var z = max0(x, y);
     
-    var zTuple = @[x, y];
-    var maxTuple = max3(zTuple);
+    // var zTuple = @[x, y];
+    // var maxTuple = max3(zTuple);
 
-    var zRecord = @{f = x, g = y};
-    var maxRecord = max4(zRecord);
+    // var zRecord = @{f = x, g = y};
+    // var maxRecord = max4(zRecord);
 
-    var another_z = max5(x, y);
+    // var another_z = max5(x, y);
     
-    return asdf(23);
+    return z;
 }

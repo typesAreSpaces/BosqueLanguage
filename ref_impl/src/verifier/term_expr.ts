@@ -10,16 +10,19 @@ abstract class TermExpr {
     readonly symbolName: string;
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from FStar
-    static readonly binOpToFStar: Map<string, string> = new Map<string, string>([["&&", "op_AmpAmp"], ["||", "op_BarBar"],
-    ["*", "op_Multiply"], ["-", "op_Subtraction"], ["+", "op_Addition"], ["%", "op_Modulus"], ["/", "op_Division"],
-    ["<=", "op_LessThanOrEqual"], [">", "op_GreaterThan"], [">=", "op_GreaterThanOrEqual"], ["<", "op_LessThan"], ["==", "op_Equality"], ["!=", "op_disEquality"]
+    static readonly binOpToFStar: Map<string, string> = new Map<string, string>([
+        ["&&", "op_AmpAmp"], ["||", "op_BarBar"],
+        ["*", "op_Multiply"], ["-", "op_Subtraction"], ["+", "op_Addition"], ["%", "op_Modulus"], ["/", "op_Division"],
+        ["<=", "op_LessThanOrEqual"], [">", "op_GreaterThan"], [">=", "op_GreaterThanOrEqual"], ["<", "op_LessThan"],
+        ["==", "op_Equality"], ["!=", "op_disEquality"]
     ]);
-    static readonly unaryOpToFStar: Map<string, string> = new Map<string, string>(
-        [["!", "op_Negation"], ["-", "op_Minus"]
-        ]);
+    static readonly unaryOpToFStar: Map<string, string> = new Map<string, string>([
+        ["!", "op_Negation"],
+        ["-", "op_Minus"]
+    ]);
     static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>(
         ["op_AmpAmp", "op_BarBar", "op_Negation",
-            "op_Multiply", "op_Substraction", "op_Addition", "op_Minus", "op_Modulus", "op_Division",
+            "op_Multiply", "op_Subtraction", "op_Addition", "op_Minus", "op_Modulus", "op_Division",
             "op_LessThanOrEqual", "op_GreaterThan", "op_GreaterThanOrEqual", "op_LessThan", "op_Equality", "op_disEquality"
         ].map(x => [x, true])
     );

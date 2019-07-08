@@ -4,24 +4,29 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { bosqueToIRBody } from "../util"
-// import { MIRBasicBlock } from "../../compiler/mir_ops";
-import { collectExpr } from "../collect_expression";
+import { sanitizeName, bosqueToInvokeDecl } from "../util"
+import { TranslatorBosqueFStar } from "../translator_bosque_fstar";
+import { ExprExpr } from "../expression_expr";
 
 setImmediate(() => {
     // Mac Machine
     // let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
     // Windows Machine
     let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
-    
     let fileName = "main.bsq";
-    let section = "NSMain::max0";
+    let mapDeclarations = bosqueToInvokeDecl({ directory: directory, fileName: fileName });
+    let fkey = "NSMain::main";
+    let fstarFileName = "_" + (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
     
-    let fd = FS.openSync("_" + (section.split(":").join("") + "_" + fileName).replace("bsq", "fst"), 'w');
+    let fd = FS.openSync(fstarFileName, 'w');
+    FS.writeSync(fd, `module ${fstarFileName}\n\n`);
 
-    let ir_body = bosqueToIRBody({directory: directory, fileName: fileName, section: section});
-    let fstarProgram = collectExpr(ir_body);
-    console.log(fstarProgram.toML());
-    
+    let translation = new TranslatorBosqueFStar(mapDeclarations);
+    let fstarStackProgram = translation.collectExpr(fkey);
+    fstarStackProgram.reverse();
+    while (fstarStackProgram.length > 0) {
+        let [funName, args, program] = (fstarStackProgram.pop() as [string, string[], ExprExpr]);
+        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = ${program.toML()}\n\n`);
+    }
     FS.closeSync(fd);
 });

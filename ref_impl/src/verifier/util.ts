@@ -8,15 +8,13 @@ import * as Path from "path";
 import chalk from "chalk";
 import { MIREmitter } from "./../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly, MIRFunctionDecl } from "./../compiler/mir_assembly";
-import { MIRBody, MIRBasicBlock } from "./../compiler/mir_ops";
 
-interface InfoFunctionCall {
+interface PathFile {
     directory: string;
     fileName: string;
-    section: string;
 }
 
-function bosqueToIRBody(info: InfoFunctionCall): Map<string, MIRBasicBlock> {
+function bosqueToInvokeDecl(info: PathFile): Map<string, MIRFunctionDecl> {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../"));
     let files: { relativePath: string, contents: string }[] = [];
@@ -47,19 +45,7 @@ function bosqueToIRBody(info: InfoFunctionCall): Map<string, MIRBasicBlock> {
     }
 
     try {
-        const invokeDecl = ((masm as MIRAssembly).functionDecls.get(info.section) as MIRFunctionDecl).invoke;
-        const ir_body = (invokeDecl.body as MIRBody).body;
-
-        // TODO: Make declaration about the function itself
-        // Hint: Check invokeDecl properties
-        console.log(invokeDecl);
-
-        if (typeof (ir_body) === "string") {
-            throw new Error("The program has string type\n");
-        }
-        else {
-            return ir_body;
-        }
+        return (masm as MIRAssembly).functionDecls;
     }
     catch (ex) {
         process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
@@ -68,9 +54,13 @@ function bosqueToIRBody(info: InfoFunctionCall): Map<string, MIRBasicBlock> {
 } 
 
 function sanitizeName(name : string) : string {
-    // TODO: Add more `replace' operations if the IR syntax
-    // conflicts with FStar
-    return name.replace("#", "_").replace("$", "_").replace(":", "_");
+    // TODO: Add more `replace operations' if the IR syntax (names)
+    // conflicts with FStar syntax
+    let result = name
+    .replace(new RegExp("#", 'g'), "_")
+    .replace(new RegExp("\\$", 'g'), "_")
+    .replace(new RegExp(":", 'g'), "_")
+    return result.charAt(0).toLowerCase() + result.slice(1);
 }
 
-export { bosqueToIRBody, InfoFunctionCall, sanitizeName };
+export { bosqueToInvokeDecl, PathFile, sanitizeName };
