@@ -20,14 +20,14 @@ setImmediate(() => {
     fstarFileName = fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1);
     
     let fd = FS.openSync(fstarFileName, 'w');
-    FS.writeSync(fd, `module ${fstarFileName}\n\n`);
+    FS.writeSync(fd, `module ${fstarFileName.slice(0, -4)}\n\n`);
 
     let translation = new TranslatorBosqueFStar(mapDeclarations);
     let fstarStackProgram = translation.collectExpr(fkey);
     fstarStackProgram.reverse();
     while (fstarStackProgram.length > 0) {
         let [funName, args, program] = (fstarStackProgram.pop() as [string, string[], ExprExpr]);
-        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = ${program.toML()}\n\n`);
+        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = ${program.toML(0)}\n\n`);
     }
     FS.closeSync(fd);
 });

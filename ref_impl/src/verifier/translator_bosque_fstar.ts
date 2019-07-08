@@ -15,7 +15,7 @@ class TranslatorBosqueFStar {
     static readonly intType = new IntType();
     static readonly boolType = new BoolType();
     static readonly DEBUGGING = false;
-    
+
     readonly stack_programs = [] as [string, string[], ExprExpr][];
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
 
@@ -34,13 +34,15 @@ class TranslatorBosqueFStar {
         if (arg instanceof MIRRegisterArgument) {
             // FIX: Use the right type!
             // return new VarExpr(arg, resolveType(stringVariableToStringType.get(argName) as string));
-            return new VarTerm(sanitizeName(arg.nameID), TranslatorBosqueFStar.intType);
+            return new VarTerm(sanitizeName(arg.nameID),
+                TranslatorBosqueFStar.intType); // This one
         }
         // This branch handles constants
         else {
             // FIX: Use the right type!
             // return new ConstExpr(arg.stringify(), resolveType(stringConstantToStringType(arg.nameID)));
-            return new ConstTerm(arg.stringify(), TranslatorBosqueFStar.intType);
+            return new ConstTerm(arg.stringify(),
+                TranslatorBosqueFStar.intType); // This one
         }
     }
 
@@ -169,9 +171,9 @@ class TranslatorBosqueFStar {
                 // the stack_expressions stack
                 this.collectExpr(currentFunctionKey);
                 // FIX: Use the proper type
-                return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt), 
-                    new FuncTerm(sanitizeName(currentFunctionKey), 
-                    opCallNamespaceFunction.args.map(TranslatorBosqueFStar.argumentToExpr), 
+                return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt),
+                new FuncTerm(sanitizeName(currentFunctionKey),
+                    opCallNamespaceFunction.args.map(TranslatorBosqueFStar.argumentToExpr),
                     TranslatorBosqueFStar.intType)]; // This one
             }
             case MIROpTag.CallStaticFunction: {
@@ -315,7 +317,7 @@ class TranslatorBosqueFStar {
                 return [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.trgt),
                 new FuncTerm(TermExpr.unaryOpToFStar.get(opPrefixOp.op) as string,
                     [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.arg)],
-                    TranslatorBosqueFStar.intType)]; // This type
+                    TranslatorBosqueFStar.intType)]; // This one
             }
             case MIROpTag.MIRBinOp: {
                 let opBinOp = op as MIRBinOp;
@@ -448,7 +450,7 @@ class TranslatorBosqueFStar {
     // i.e. the first element corresponds to the first argument, ... and so on.
     // We resolve nameing by prefixing the section variable to every name encountered
     // function collectExpr(mapBlocks: Map<string, MIRBasicBlock>, info: InfoFunctionCall): ExprExpr {
-    collectExpr(fkey : string): [string, string[], ExprExpr][] {
+    collectExpr(fkey: string): [string, string[], ExprExpr][] {
         let declarations = (this.mapDeclarations.get(fkey) as MIRFunctionDecl).invoke;
         let mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
@@ -462,7 +464,7 @@ class TranslatorBosqueFStar {
             // mapBlocks.forEach(x => console.log(x));
             // console.log("More detailed++ Blocks:-------------------------------------------------------");
             // mapBlocks.forEach(x => console.log(x.jsonify()));
-            
+
             // We need to reverse the currentBlockFormula.ops
             // because opsToExpr requires it
             mapBlocks.forEach(x => x.ops.reverse());
@@ -481,7 +483,8 @@ class TranslatorBosqueFStar {
                         let regName = sanitizeName(lastOp.name.nameID);
                         // FIX: Use the correct type!
                         return this.opsToExpr(currentBlockFormula.ops, comingFrom,
-                            new ReturnExpr(new VarTerm(regName, TranslatorBosqueFStar.intType)));
+                            new ReturnExpr(new VarTerm(regName,
+                                TranslatorBosqueFStar.intType))); // This one
                     }
                     case 1: {
                         let successorLabel = currentFlow.succs.values().next().value;
@@ -503,8 +506,8 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-            this.stack_programs.push([fkey, 
-                declarations.params.map(x => x.name), 
+            this.stack_programs.push([fkey,
+                declarations.params.map(x => x.name),
                 traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry")]);
             return this.stack_programs;
         }

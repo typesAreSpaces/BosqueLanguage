@@ -1,13 +1,12 @@
-import { VarTerm, TermExpr } from "./term_expr";
-
 //-------------------------------------------------------------------------------------------------------
 // Copyright (C) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
+import { VarTerm, TermExpr } from "./term_expr";
+
 abstract class ExprExpr {
-    abstract toFStarDeclaration(fd: number): void;
-    abstract toML(): string;
+    abstract toML(indentatioLevel : number): string;
 }
 
 class ReturnExpr extends ExprExpr {
@@ -16,11 +15,8 @@ class ReturnExpr extends ExprExpr {
         super();
         this.returnExpr = returnExpr;
     }
-    toFStarDeclaration(fd : number){
-
-    }
-    toML(){
-        return this.returnExpr.toML();
+    toML(indentatioLevel : number){
+        return "\t".repeat(indentatioLevel) + this.returnExpr.toML();
     }
 }
 
@@ -34,11 +30,9 @@ class AssignmentExpr extends ExprExpr {
         this.rhs = rhs;
         this.continuation = continuation;
     }
-    toFStarDeclaration(fd: number){
-        
-    }
-    toML(){
-        return "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in " + this.continuation.toML();
+    toML(indentatioLevel : number){
+        return "\t".repeat(indentatioLevel) + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n" 
+        + this.continuation.toML(indentatioLevel + 1);
     }
 }
 
@@ -52,11 +46,11 @@ class ConditionalExpr extends ExprExpr {
         this.ifBranch = ifBranch;
         this.elseBranch = elseBranch;
     }
-    toFStarDeclaration(fd: number){
-        
-    }
-    toML(){
-        return "if " + this.condition.toML() + " then " + this.ifBranch.toML() + " else " + this.elseBranch.toML();
+    toML(indentatioLevel : number){
+        return "\t".repeat(indentatioLevel) + "if " + this.condition.toML() + " then \n" 
+        + this.ifBranch.toML(indentatioLevel + 1) + "\n" 
+        + "\t".repeat(indentatioLevel) + "else \n" 
+        + this.elseBranch.toML(indentatioLevel + 1);
     }
 }
 

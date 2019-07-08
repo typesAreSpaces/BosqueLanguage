@@ -11,7 +11,7 @@
 // however, it needs additional formalization
 // to deal with some rules and inference
 // (Current approach to accomplish the latter: take 
-// the grouded ast and build a `table' using
+// the grouded ast and build a `table` using
 
 abstract class TypeExpr {
     abstract getType(): string;
@@ -53,7 +53,7 @@ class SomeType extends TypeExpr {
     }
 }
 
-// REMARK: symbolNames cannot include `,'
+// REMARK: symbolNames cannot include `,`
 // or any other symbol that FStar cannot
 // parse as a valid char for a symbolNamed expression
 class UninterpretedType extends TypeExpr {
