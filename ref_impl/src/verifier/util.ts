@@ -47,15 +47,12 @@ function bosqueToIRBody(info: InfoFunctionCall): Map<string, MIRBasicBlock> {
     }
 
     try {
-        // const sectionName = "__" + info.section.split(":").join("_");
         const invokeDecl = ((masm as MIRAssembly).functionDecls.get(info.section) as MIRFunctionDecl).invoke;
         const ir_body = (invokeDecl.body as MIRBody).body;
 
-        // invokeDecl.params.map(arg => stringVariableToStringType.set(sectionName + "_" + arg.name, arg.type.trkey));
         // TODO: Make declaration about the function itself
         // Hint: Check invokeDecl properties
-        // console.log(invokeDecl);
-        // console.log();
+        console.log(invokeDecl);
 
         if (typeof (ir_body) === "string") {
             throw new Error("The program has string type\n");
@@ -71,7 +68,9 @@ function bosqueToIRBody(info: InfoFunctionCall): Map<string, MIRBasicBlock> {
 } 
 
 function sanitizeName(name : string) : string {
-    return name.replace("#", "_").replace("$", "_");
+    // TODO: Add more `replace' operations if the IR syntax
+    // conflicts with FStar
+    return name.replace("#", "_").replace("$", "_").replace(":", "_");
 }
 
 export { bosqueToIRBody, InfoFunctionCall, sanitizeName };

@@ -46,9 +46,16 @@ let test4 x = match x with
 
 let ahh __NSMain__max0____tmp_0 __NSMain__max0___return_ = if (op_Equality __NSMain__max0____tmp_0 true) then let temporal = 0 in let temporal = 0 in let temporal = 0 in let temporal = 0 in __NSMain__max0___return_ else let temporal
  = 0 in let temporal = 0 in let temporal = 0 in let temporal = 0 in __NSMain__max0___return_
- 
+
+let max2 x y = let __tmp_0 = (op_GreaterThanOrEqual x y) in if (op_Equality __tmp_0 true) then let _ir_ret__1 = x in let _ir_ret__2 = _ir_ret__1 in let _return_ = _ir_ret__2 in _return_ else let _ir_ret_ = y in let _ir_ret__2 = _ir_ret_ in let _return_ = _ir_ret__2 in _return_
+
 let x_1 = 1
+
 
 let _ = assert (has_type x_1 int)
 
+
+
 let sdsdf = if (has_type x_1 int) then 1 else 0
+
+
