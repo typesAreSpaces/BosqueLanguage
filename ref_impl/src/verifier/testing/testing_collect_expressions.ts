@@ -27,7 +27,7 @@ setImmediate(() => {
     fstarStackProgram.reverse();
     while (fstarStackProgram.length > 0) {
         let [funName, args, program] = (fstarStackProgram.pop() as [string, string[], ExprExpr]);
-        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = ${program.toML(0)}\n\n`);
+        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = \n${program.toML(1)}\n\n`);
     }
     FS.closeSync(fd);
 });
