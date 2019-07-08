@@ -430,13 +430,10 @@ function opToAssignment(op: MIROp, comingFrom : string): [VarTerm, TermExpr] {
 }
 
 function opsToExpr(ops: MIROp[], comingFrom : string, program: ExprExpr): ExprExpr {
-    if (ops.length == 0) {
-        return program;
-    }
-    else {
-        let [lval, rval] = opToAssignment(ops[0], comingFrom);
-        return opsToExpr(ops.slice(1), comingFrom, new AssignmentExpr(lval, rval, program));
-    }
+    return ops.reduce((partialProgram, currentOp) => {
+        let [lval, rval] = opToAssignment(currentOp, comingFrom);
+        return new AssignmentExpr(lval, rval, partialProgram);
+    }, program);  
 }
 
 // params is a sorted array of MIRFunctionParameter
