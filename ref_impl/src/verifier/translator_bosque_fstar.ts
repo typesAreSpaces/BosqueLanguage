@@ -6,10 +6,29 @@
 import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRFunctionDecl } from "../compiler/mir_assembly";
+
+class FStarDeclaration {
+    readonly fkey: string;
+    readonly args: string[];
+    readonly program: ExprExpr;
+    readonly type: FuncType;
+    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
+        this.fkey = fkey;
+        this.args = args;
+        this.program = program;
+        this.type = type;
+    }
+    printVal(): string {
+        return `val ${sanitizeName(this.fkey)} : ${this.type.getType()}\n`;
+    }
+    printLet(): string {
+        return `let ${sanitizeName(this.fkey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`;
+    }
+}
 
 class TranslatorBosqueFStar {
     static readonly intType = new IntType();
@@ -17,7 +36,7 @@ class TranslatorBosqueFStar {
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
 
-    readonly stack_programs = [] as [string, string[], ExprExpr][];
+    readonly stack_declarations = [] as FStarDeclaration[];
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
 
     constructor(mapDeclarations: Map<string, MIRFunctionDecl>) {
@@ -27,6 +46,21 @@ class TranslatorBosqueFStar {
     static debugging(message: string, flag: boolean): void {
         if (flag) {
             console.log(message);
+        }
+    }
+
+    // TODO: Add more types as needed
+    static stringToType(s: string): TypeExpr {
+        switch (s) {
+            case "NSCore::Int": {
+                return this.intType;
+            }
+            case "NSCore::Bool": {
+                return this.boolType;
+            }
+            default: {
+                throw new Error("Not a valid type");
+            }
         }
     }
 
@@ -351,8 +385,7 @@ class TranslatorBosqueFStar {
                 return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRVarLifetimeEnd: {
-                TranslatorBosqueFStar.debugging("MIRVarLifetimeEnd Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRVarLifetimeEnd", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
             case MIROpTag.MIRPhi: {
                 let opPhi = op as MIRPhi;
@@ -388,20 +421,16 @@ class TranslatorBosqueFStar {
     opsToExpr(ops: MIROp[], comingFrom: string, program: ExprExpr): ExprExpr {
         return ops.reduce((partialProgram, currentOp) => {
             let [lval, rval] = this.opToAssignment(currentOp, comingFrom);
-            if(lval.symbolName == "_skip"){
+            if (lval.symbolName == "_skip") {
                 return partialProgram;
             }
-            else{
+            else {
                 return new AssignmentExpr(lval, rval, partialProgram);
             }
         }, program);
     }
 
-    // params is a sorted array of MIRFunctionParameter
-    // i.e. the first element corresponds to the first argument, ... and so on.
-    // We resolve nameing by prefixing the section variable to every name encountered
-    // function collectExpr(mapBlocks: Map<string, MIRBasicBlock>, info: InfoFunctionCall): ExprExpr {
-    collectExpr(fkey: string): [string, string[], ExprExpr][] {
+    collectExpr(fkey: string): FStarDeclaration[] {
         let declarations = (this.mapDeclarations.get(fkey) as MIRFunctionDecl).invoke;
         let mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
@@ -416,7 +445,7 @@ class TranslatorBosqueFStar {
             // console.log("More detailed++ Blocks:-------------------------------------------------------");
             // mapBlocks.forEach(x => console.log(x.jsonify()));
 
-            // We need to reverse the currentBlockFormula.ops
+            // We need to reverse currentBlockFormula.ops
             // because opsToExpr requires it
             mapBlocks.forEach(x => x.ops.reverse());
 
@@ -457,12 +486,18 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-            this.stack_programs.push([fkey,
-                declarations.params.map(x => x.name),
-                traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry")]);
-            return this.stack_programs;
+            // FIX: Use the proper type
+            let programType = new FuncType(declarations.params.map(x => TranslatorBosqueFStar.stringToType(x.type.trkey)),
+                TranslatorBosqueFStar.intType); // This one
+            this.stack_declarations.push(
+                new FStarDeclaration(fkey,
+                    declarations.params.map(x => x.name),
+                    traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
+                    programType)
+            );
+            return this.stack_declarations;
         }
     }
 }
 
-export { TranslatorBosqueFStar }
+export { FStarDeclaration, TranslatorBosqueFStar }

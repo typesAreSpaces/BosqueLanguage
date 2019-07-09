@@ -1,5 +1,6 @@
 module NSMain__main_main
 
+val nSMain__max0 : int -> int -> Tot int
 let nSMain__max0 x y = 
     let __tmp_0 = (op_GreaterThanOrEqual x y) in 
         if (op_Equality __tmp_0 true) then 
@@ -13,6 +14,7 @@ let nSMain__max0 x y =
                     let _return_ = _ir_ret__2 in 
                         _return_
 
+val nSMain__main : int
 let nSMain__main  = 
     let x = 10 in 
         let y = 20 in 

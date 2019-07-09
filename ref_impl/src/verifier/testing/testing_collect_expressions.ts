@@ -5,8 +5,7 @@
 
 import * as FS from "fs";
 import { sanitizeName, bosqueToInvokeDecl } from "../util"
-import { TranslatorBosqueFStar } from "../translator_bosque_fstar";
-import { ExprExpr } from "../expression_expr";
+import { TranslatorBosqueFStar, FStarDeclaration } from "../translator_bosque_fstar";
 
 setImmediate(() => {
     // Mac Machine
@@ -26,8 +25,9 @@ setImmediate(() => {
     let fstarStackProgram = translation.collectExpr(fkey);
     fstarStackProgram.reverse();
     while (fstarStackProgram.length > 0) {
-        let [funName, args, program] = (fstarStackProgram.pop() as [string, string[], ExprExpr]);
-        FS.writeSync(fd, `let ${sanitizeName(funName)} ${args.join(" ")} = \n${program.toML(1)}\n\n`);
+        let currentDeclaration = fstarStackProgram.pop() as FStarDeclaration;
+        FS.writeSync(fd, currentDeclaration.printVal());
+        FS.writeSync(fd, currentDeclaration.printLet());
     }
     FS.closeSync(fd);
 });

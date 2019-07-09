@@ -13,19 +13,21 @@
 // (Current approach to accomplish the latter: take 
 // the grouded ast and build a `table` using
 
-abstract class TypeExpr {
+// TODO: Update getType appropriately
+
+abstract class TypeExpr {   
     abstract getType(): string;
 }
 
 class IntType extends TypeExpr {
     getType() {
-        return "Int";
+        return "int";
     }
 }
 
 class BoolType extends TypeExpr {
     getType() {
-        return "Bool";
+        return "bool";
     }
 }
 
@@ -81,7 +83,13 @@ class FuncType extends TypeExpr {
         this.image = image;
     }
     getType() {
-        return "(" + this.domain.map(x => x.getType()).join(" ") + ") -> " + this.image.getType();
+        if(this.domain.length == 0){
+            return this.image.getType();
+        }
+        else{
+            return this.domain.map(x => x.getType()).join(" -> ") + " -> Tot " + this.image.getType();
+        }
+        
     }
 }
 
