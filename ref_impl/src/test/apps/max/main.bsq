@@ -10,14 +10,19 @@
 
 namespace NSMain;
 
-function max0(x: Bool, y: Bool): Bool
+function max0(x: Int, y: Int): Int
+    ensures _return_ == x || _return_ == y;
 {
-    if(x){
-        return y;
-    }
-    else{
+    if(x >= y){
         return x;
     }
+    else{
+        return y;
+    }
+}
+
+function identity(x : String): String {
+    return x;
 }
 
 function max(x: Int?, y: Int): Int
@@ -105,11 +110,11 @@ function asdf(x : Int) : Int {
     return x;
 }
  
-entrypoint function main(): Bool {
+entrypoint function main(): Int {
     var x = 10;
     var y = 20;
 
-    var z = max0(true, false);
+    var z = max0(x, y);
     
     // var zTuple = @[x, y];
     // var maxTuple = max3(zTuple);

@@ -11,21 +11,21 @@ setImmediate(() => {
     // Mac Machine
     // let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
     // Windows Machine
-    let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
-    let fileName = "main.bsq";
-    let mapDeclarations = bosqueToInvokeDecl({ directory: directory, fileName: fileName });
-    let fkey = "NSMain::main";
+    const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
+    const fileName = "main.bsq";
+    const mapDeclarations = bosqueToInvokeDecl({ directory: directory, fileName: fileName });
+    const fkey = "NSMain::main";
     let fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
     fstarFileName = fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1);
     
-    let fd = FS.openSync(fstarFileName, 'w');
+    const fd = FS.openSync(fstarFileName, 'w');
     FS.writeSync(fd, `module ${fstarFileName.slice(0, -4)}\n\n`);
 
-    let translation = new TranslatorBosqueFStar(mapDeclarations);
-    let fstarStackProgram = translation.collectExpr(fkey);
+    const translation = new TranslatorBosqueFStar(mapDeclarations);
+    const fstarStackProgram = translation.collectExpr(fkey);
     fstarStackProgram.reverse();
     while (fstarStackProgram.length > 0) {
-        let currentDeclaration = fstarStackProgram.pop() as FStarDeclaration;
+        const currentDeclaration = fstarStackProgram.pop() as FStarDeclaration;
         FS.writeSync(fd, currentDeclaration.printVal());
         FS.writeSync(fd, currentDeclaration.printLet());
     }

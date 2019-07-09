@@ -15,7 +15,7 @@
 
 // TODO: Update getType appropriately
 
-abstract class TypeExpr {   
+abstract class TypeExpr {
     abstract getType(): string;
 }
 
@@ -33,7 +33,7 @@ class BoolType extends TypeExpr {
 
 class StringType extends TypeExpr {
     getType() {
-        return "String";
+        return "string";
     }
 }
 
@@ -60,13 +60,9 @@ class SomeType extends TypeExpr {
 // parse as a valid char for a symbolNamed expression
 class UninterpretedType extends TypeExpr {
     readonly symbolName: string;
-    static readonly symbolTable: Map<string, boolean> = new Map<string, boolean>();
     constructor(symbolName: string) {
         super();
         this.symbolName = symbolName;
-        if (!UninterpretedType.symbolTable.has(this.symbolName)) {
-            UninterpretedType.symbolTable.set(this.symbolName, false);
-        }
     }
     getType() {
         return this.symbolName;
@@ -82,12 +78,8 @@ class FuncType extends TypeExpr {
         this.image = image;
     }
     getType() {
-        if(this.domain.length == 0){
-            return this.image.getType();
-        }
-        else{
-            return this.domain.map(x => x.getType()).join(" -> ") + " -> Tot " + this.image.getType();
-        }
+        return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getType()).join(" -> ") + " -> Tot ")
+            + this.image.getType();
     }
 }
 
