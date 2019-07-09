@@ -24,3 +24,4 @@ let nSMain__main  =
                         let _return_ = _ir_ret_ in 
                             _return_
 
+let _ = assert (forall x y. nSMain__max0 x y >= x && nSMain__max0 x y >= y && (nSMain__max0 x y = x || nSMain__max0 x y = y))

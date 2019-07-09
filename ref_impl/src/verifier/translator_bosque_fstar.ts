@@ -486,9 +486,8 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-            // FIX: Use the proper type
             let programType = new FuncType(declarations.params.map(x => TranslatorBosqueFStar.stringToType(x.type.trkey)),
-                TranslatorBosqueFStar.intType); // This one
+                TranslatorBosqueFStar.stringToType(declarations.resultType.trkey));
             this.stack_declarations.push(
                 new FStarDeclaration(fkey,
                     declarations.params.map(x => x.name),
