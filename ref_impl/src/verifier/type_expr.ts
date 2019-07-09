@@ -73,7 +73,6 @@ class UninterpretedType extends TypeExpr {
     }
 }
 
-
 class FuncType extends TypeExpr {
     readonly domain: TypeExpr[];
     readonly image: TypeExpr;
@@ -89,7 +88,6 @@ class FuncType extends TypeExpr {
         else{
             return this.domain.map(x => x.getType()).join(" -> ") + " -> Tot " + this.image.getType();
         }
-        
     }
 }
 
@@ -108,7 +106,6 @@ class UnionType extends TypeExpr {
         }
     }
 }
-
 
 class TupleType extends TypeExpr {
     readonly elements: TypeExpr[];
