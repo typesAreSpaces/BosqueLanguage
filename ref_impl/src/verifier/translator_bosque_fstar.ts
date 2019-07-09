@@ -193,11 +193,10 @@ class TranslatorBosqueFStar {
                 // The following line will keep pushing to 
                 // the stack_expressions stack
                 this.collectExpr(currentFunctionKey);
-                // FIX: Use the proper type
                 return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt),
                 new FuncTerm(sanitizeName(currentFunctionKey),
                     opCallNamespaceFunction.args.map(TranslatorBosqueFStar.argumentToExpr),
-                    TranslatorBosqueFStar.intType)]; // This one
+                    TranslatorBosqueFStar.stringToType((this.mapDeclarations.get(currentFunctionKey) as MIRFunctionDecl).invoke.resultType.trkey))];
             }
             case MIROpTag.CallStaticFunction: {
                 TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);

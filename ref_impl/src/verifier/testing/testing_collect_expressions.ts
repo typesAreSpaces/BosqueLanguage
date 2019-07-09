@@ -9,9 +9,9 @@ import { TranslatorBosqueFStar, FStarDeclaration } from "../translator_bosque_fs
 
 setImmediate(() => {
     // Mac Machine
-    let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
+    // let directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
     // Windows Machine
-    // let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
+    let directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
     let fileName = "main.bsq";
     let mapDeclarations = bosqueToInvokeDecl({ directory: directory, fileName: fileName });
     let fkey = "NSMain::main";
