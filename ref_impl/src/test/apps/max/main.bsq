@@ -114,7 +114,7 @@ entrypoint function main(): Int {
     var x = 10;
     var y = 20;
 
-    var z = max0(x, y);
+    var z = max0(max0(x, y), y);
     
     // var zTuple = @[x, y];
     // var maxTuple = max3(zTuple);
