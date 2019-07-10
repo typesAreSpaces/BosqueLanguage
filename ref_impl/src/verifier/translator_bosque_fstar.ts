@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody, MIRConstructorTuple } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr } from "./type_expr";
@@ -138,34 +138,13 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionMixed Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionMixed", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorTuple: {
-                // let opConstructorTuple = op as MIRConstructorTuple;
-
-                // let regName = section + "_" + opConstructorTuple.trgt.nameID;
-                // stringVariableToStringType.set(regName,
-                //     "[" + opConstructorTuple.args.map(arg => {
-                //         if (arg instanceof MIRRegisterArgument) {
-                //             return stringVariableToStringType.get(section + "_" + arg.nameID);
-                //         }
-                //         else {
-                //             return stringConstantToStringType(arg.nameID);
-                //         }
-                //     }).join(", ") + "]");
-
-                // let regVar = argumentToTermExpr(opConstructorTuple.trgt, section);
-
-                // formula = new EqualityTerm(new FuncExpr("TupleLength", new TranslatorBosqueFStar.intType(), [regVar]),
-                //     new ConstExpr(opConstructorTuple.args.length.toString(), new TranslatorBosqueFStar.intType())
-                // );
-
-                // opConstructorTuple.args.map((arg, index) => {
-                //     let argExpr = argumentToTermExpr(arg, section);
-                //     formula = new AndExpr(formula,
-                //         new EqualityTerm(
-                //             new FuncExpr("TupleElement", argExpr.ty, [regVar, new ConstExpr(index.toString(), new TranslatorBosqueFStar.intType())]),
-                //             BoxTermExpr(UnboxTermExpr(argExpr))))
-                // });
-                return [new VarTerm("_ConstructorTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+            case MIROpTag.ConstructorTuple: {   // CONTINUE---------------------------------------------------------------------------------------
+                let opConstructorTuple = op as MIRConstructorTuple;
+                // FIX: Use the proper type
+                return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
+                new FuncTerm(sanitizeName(opConstructorTuple.tag),
+                    opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x)),
+                    TranslatorBosqueFStar.intType)]; // This one
             }
             case MIROpTag.ConstructorRecord: {
                 // let opConstructorRecord = op as MIRConstructorRecord;
@@ -217,7 +196,7 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRAccessFromIndex: {
+            case MIROpTag.MIRAccessFromIndex: { // CONTINUE---------------------------------------------------------------------------------------
                 // let opMIRAccessFromIndex = op as MIRAccessFromIndex;
 
                 // let regName = section + "_" + opMIRAccessFromIndex.trgt.nameID;
@@ -516,12 +495,12 @@ class TranslatorBosqueFStar {
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringToType(x.type.trkey)),
                 returnType);
-            if(!this.isFkeyOnStack.has(fkey)){
+            if (!this.isFkeyOnStack.has(fkey)) {
                 this.stack_declarations.push(
-                new FStarDeclaration(fkey,
-                    declarations.params.map(x => x.name),
-                    traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
-                    programType));
+                    new FStarDeclaration(fkey,
+                        declarations.params.map(x => x.name),
+                        traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
+                        programType));
                 this.isFkeyOnStack.add(fkey);
             }
             return this.stack_declarations;

@@ -21,7 +21,9 @@ let nSMain__main  =
             let __tmp_3 = (nSMain__max0 x y) in 
                 let __tmp_2 = (nSMain__max0 __tmp_3 y) in 
                     let z = __tmp_2 in 
-                        let _ir_ret_ = z in 
-                            let _return_ = _ir_ret_ in 
-                                _return_
+                        let __tmp_7 = (constructorTuple x y) in 
+                            let zTuple = __tmp_7 in 
+                                let _ir_ret_ = z in 
+                                    let _return_ = _ir_ret_ in 
+                                        _return_
 
