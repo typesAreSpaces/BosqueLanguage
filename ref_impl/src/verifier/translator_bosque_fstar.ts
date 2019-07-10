@@ -39,15 +39,15 @@ class TranslatorBosqueFStar {
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
     readonly fileName: string;
     readonly fd: number;
-    readonly mapIsFkeyReversed: Map<string, boolean>;
-    readonly mapIsFkeyOnStack: Map<string, boolean>;
+    readonly isFkeyReversed: Map<string, boolean>;
+    readonly isFkeyOnStack: Set<string>;
 
     constructor(mapDeclarations: Map<string, MIRFunctionDecl>, fileName: string) {
         this.mapDeclarations = mapDeclarations;
         this.fileName = fileName;
         this.fd = FS.openSync(fileName, 'w');
-        this.mapIsFkeyReversed = new Map<string, boolean>();
-        this.mapIsFkeyOnStack = new Map<string, boolean>();
+        this.isFkeyReversed = new Map<string, boolean>();
+        this.isFkeyOnStack = new Set<string>();
     }
 
     printPrelude(): void {
@@ -447,11 +447,8 @@ class TranslatorBosqueFStar {
     collectExpr(fkey: string): FStarDeclaration[] {
         const declarations = (this.mapDeclarations.get(fkey) as MIRFunctionDecl).invoke;
         let mapBlocks = (declarations.body as MIRBody).body;
-        if (this.mapIsFkeyReversed.get(fkey) == undefined) {
-            this.mapIsFkeyReversed.set(fkey, false);
-        }
-        if (this.mapIsFkeyOnStack.get(fkey) == undefined) {
-            this.mapIsFkeyOnStack.set(fkey, false);
+        if (this.isFkeyReversed.get(fkey) == undefined) {
+            this.isFkeyReversed.set(fkey, false);
         }
         if (typeof (mapBlocks) === "string") {
             throw new Error(`The program with fkey ${fkey} is a string\n`);
@@ -461,8 +458,8 @@ class TranslatorBosqueFStar {
             // If currentBlockFormula.ops is reversed (according to mapIsFkeyReversed)
             // we need to reversed it back because computeBlockLinks
             // need it to be in the original order
-            if (this.mapIsFkeyReversed.get(fkey)) {
-                this.mapIsFkeyReversed.set(fkey, false);
+            if (this.isFkeyReversed.get(fkey)) {
+                this.isFkeyReversed.set(fkey, false);
                 mapBlocks.forEach(x => x.ops.reverse());
             }
             const flow = computeBlockLinks(mapBlocks);
@@ -476,8 +473,8 @@ class TranslatorBosqueFStar {
 
             // We need to reverse (according to mapIsFkeyReversed) 
             // currentBlockFormula.ops because opsToExpr requires it
-            if (!this.mapIsFkeyReversed.get(fkey)) {
-                this.mapIsFkeyReversed.set(fkey, true);
+            if (!this.isFkeyReversed.get(fkey)) {
+                this.isFkeyReversed.set(fkey, true);
                 mapBlocks.forEach(x => x.ops.reverse());
             }
             const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
@@ -516,19 +513,17 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringToType(x.type.trkey)),
                 returnType);
-            if (!this.mapIsFkeyReversed.get(fkey)) {
-                this.mapIsFkeyReversed.set(fkey, true);
-
-            }
-            this.stack_declarations.push(
+            if(!this.isFkeyOnStack.has(fkey)){
+                this.stack_declarations.push(
                 new FStarDeclaration(fkey,
                     declarations.params.map(x => x.name),
                     traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
                     programType));
+                this.isFkeyOnStack.add(fkey);
+            }
             return this.stack_declarations;
         }
     }
