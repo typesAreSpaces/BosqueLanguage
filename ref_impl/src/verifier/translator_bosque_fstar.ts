@@ -40,13 +40,11 @@ class TranslatorBosqueFStar {
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
     readonly fileName: string;
     readonly stack_declarations = [] as FStarDeclaration[];
-    readonly isFkeyReversed: Map<string, boolean>;
     readonly isFkeyDeclared: Set<string>;
 
     constructor(mapDeclarations: Map<string, MIRFunctionDecl>, fileName: string) {
         this.mapDeclarations = mapDeclarations;
         this.fileName = fileName;
-        this.isFkeyReversed = new Map<string, boolean>();
         this.isFkeyDeclared = new Set<string>();
     }
 
@@ -66,7 +64,6 @@ class TranslatorBosqueFStar {
 
     // TODO: Add more types as needed
     static stringTypeToType(s: string): TypeExpr {
-        console.log(s);
         switch (s) {
             case "NSCore::Int": {
                 return TranslatorBosqueFStar.intType;
@@ -94,8 +91,10 @@ class TranslatorBosqueFStar {
 
     static argumentToExpr(arg: MIRArgument): TermExpr {
         // This branch handles variables
-
         if (arg instanceof MIRRegisterArgument) {
+            if(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) == undefined){
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(arg.nameID), "NSCore::Int");
+            }
             return new VarTerm(sanitizeName(arg.nameID),
                 TranslatorBosqueFStar.stringTypeToType(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string));
         }
@@ -158,7 +157,8 @@ class TranslatorBosqueFStar {
             case MIROpTag.ConstructorTuple: {
                 let opConstructorTuple = op as MIRConstructorTuple;
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x)),
@@ -218,7 +218,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRAccessFromIndex: {
                 let opMIRAccessFromIndex = op as MIRAccessFromIndex;
-                console.log(opMIRAccessFromIndex);
+                // console.log(opMIRAccessFromIndex);
                 // FIX: Use the proper type
                 let somethingAboutLength = "2";
                 // FIX: Use the right type
@@ -369,10 +369,14 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRVarStore: {
                 const opVarStore = op as MIRVarStore;
+                // FIX: Use the right type
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opVarStore.name.nameID), "NSCore::Int");
                 return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name), TranslatorBosqueFStar.argumentToExpr(opVarStore.src)];
             }
             case MIROpTag.MIRReturnAssign: {
                 const opReturnAssign = op as MIRReturnAssign;
+                // FIX: Use the right type
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opReturnAssign.name.nameID), "NSCore::Int");
                 return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name), TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src)];
             }
             case MIROpTag.MIRAbort: {
@@ -433,35 +437,37 @@ class TranslatorBosqueFStar {
     }
 
     opsToExpr(ops: MIROp[], comingFrom: string, program: ExprExpr): ExprExpr {
-        return ops.reduce((partialProgram, currentOp) => {
-            const [lval, rval] = this.opToAssignment(currentOp, comingFrom);
-            if (lval.symbolName == "_skip") {
-                return partialProgram;
+        // return ops.reduce((partialProgram, currentOp) => {
+        //     const [lval, rval] = this.opToAssignment(currentOp, comingFrom);
+        //     if (lval.symbolName == "_skip") {
+        //         return partialProgram;
+        //     }
+        //     else {
+        //         return new AssignmentExpr(lval, rval, partialProgram);
+        //     }
+        // }, program);
+        if(ops.length == 0){
+            return program;
+        }
+        else{
+            const [lval, rval] = this.opToAssignment(ops[0], comingFrom);
+            if(lval.symbolName == "_skip"){
+                return this.opsToExpr(ops.slice(1), comingFrom, program);
+            }   
+            else{
+                return new AssignmentExpr(lval, rval, this.opsToExpr(ops.slice(1), comingFrom, program));
             }
-            else {
-                return new AssignmentExpr(lval, rval, partialProgram);
-            }
-        }, program);
+        } 
     }
 
     collectExpr(fkey: string): FStarDeclaration[] {
         const declarations = (this.mapDeclarations.get(fkey) as MIRFunctionDecl).invoke;
         let mapBlocks = (declarations.body as MIRBody).body;
-        if (this.isFkeyReversed.get(fkey) == undefined) {
-            this.isFkeyReversed.set(fkey, false);
-        }
         if (typeof (mapBlocks) === "string") {
             throw new Error(`The program with fkey ${fkey} is a string\n`);
         }
         else {
             const returnType = TranslatorBosqueFStar.stringTypeToType(declarations.resultType.trkey);
-            // If currentBlockFormula.ops is reversed (according to mapIsFkeyReversed)
-            // we need to reversed it back because computeBlockLinks
-            // need it to be in the original order
-            if (this.isFkeyReversed.get(fkey)) {
-                this.isFkeyReversed.set(fkey, false);
-                mapBlocks.forEach(x => x.ops.reverse());
-            }
             const flow = computeBlockLinks(mapBlocks);
 
             // console.log("Blocks:-----------------------------------------------------------------------");
@@ -471,41 +477,34 @@ class TranslatorBosqueFStar {
             // console.log("More detailed++ Blocks:-------------------------------------------------------");
             // mapBlocks.forEach(x => console.log(x.jsonify()));
 
-            // We need to reverse (according to mapIsFkeyReversed) 
-            // currentBlockFormula.ops because opsToExpr requires it
-            if (!this.isFkeyReversed.get(fkey)) {
-                this.isFkeyReversed.set(fkey, true);
-                mapBlocks.forEach(x => x.ops.reverse());
-            }
             const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
                 mapBlocks = mapBlocks as Map<string, MIRBasicBlock>;
                 const currentFlow = flow.get(block.label) as FlowLink;
-                const currentBlockFormula = mapBlocks.get(block.label) as MIRBasicBlock;
-                console.assert(currentBlockFormula.ops.length > 0);
+                console.assert(block.ops.length > 0);
 
                 switch (currentFlow.succs.size) {
                     case 0: {
-                        const lastOp = currentBlockFormula.ops[0] as MIRVarStore;
+                        const lastOp = block.ops[block.ops.length - 1] as MIRVarStore;
                         console.assert(lastOp != undefined);
 
                         const regName = sanitizeName(lastOp.name.nameID);
-                        return this.opsToExpr(currentBlockFormula.ops, comingFrom,
+                        return this.opsToExpr(block.ops, comingFrom,
                             new ReturnExpr(new VarTerm(regName,
                                 returnType)));
                     }
                     case 1: {
                         const successorLabel = currentFlow.succs.values().next().value;
-                        return this.opsToExpr(currentBlockFormula.ops.slice(1), comingFrom,
+                        return this.opsToExpr(block.ops.slice(1), comingFrom,
                             traverse(mapBlocks.get(successorLabel) as MIRBasicBlock, block.label));
                     }
                     case 2: {
-                        const jumpCondOp = block.ops[0] as MIRJumpCond;
+                        const jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
                         const regName = sanitizeName(jumpCondOp.arg.nameID);
                         const condition = new FuncTerm("op_Equality",
                             [new VarTerm(regName, TranslatorBosqueFStar.boolType), new ConstTerm("true", TranslatorBosqueFStar.boolType)], TranslatorBosqueFStar.boolType);
                         const branchTrue = traverse(mapBlocks.get(jumpCondOp.trueblock) as MIRBasicBlock, block.label);
                         const branchFalse = traverse(mapBlocks.get(jumpCondOp.falseblock) as MIRBasicBlock, block.label);
-                        return this.opsToExpr(currentBlockFormula.ops.slice(1), comingFrom,
+                        return this.opsToExpr(block.ops.slice(0, -1), comingFrom,
                             new ConditionalExpr(condition, branchTrue, branchFalse));
                     }
                     default: {
@@ -518,7 +517,7 @@ class TranslatorBosqueFStar {
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type.trkey)),
                 returnType);
             // FIX: Needs to be mangled
-            // TranslatorBosqueFStar.typesSeen.set("_return_", programType.image.getFStarType());
+            TranslatorBosqueFStar.typesSeen.set("_return_", programType.image.getBosqueType());
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.stack_declarations.push(
                     new FStarDeclaration(fkey,

@@ -161,7 +161,10 @@ class RecordType extends TypeExpr {
         this.elements = elements;
     }
     getFStarType() {
-        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getType()).join(" ") + ")";
+        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getFStarType()).join(" ") + ")";
+    }
+    getBosqueType(){
+        return "";
     }
     fstarDeclaration(fd: number): void {
     }
@@ -186,6 +189,9 @@ class PolymorphicTupleType extends TypeExpr {
         }
         return "(" + this.symbolName + " "
             + type + ")";
+    }
+    getBosqueType(){
+        return "";
     }
     static fstarDeclaration(fd: number, length: number): void {
         let symbolName = "tuple__" + length;
@@ -222,6 +228,9 @@ class PolymorphicRecordType extends TypeExpr {
         return "";
         // return "(" + this.symbolName + " " + this.elements.map(x => x[1].getType()).join(" ") + ")";
     }
+    getBosqueType(){
+        return "";
+    }
     fstarDeclaration(fd: number): void {
     }
 }
@@ -232,6 +241,9 @@ class ConstructorType extends TypeExpr {
     }
     // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
     getFStarType() {
+        return "";
+    }
+    getBosqueType(){
         return "";
     }
     fstarDeclaration(fd: number): void {
@@ -249,7 +261,10 @@ class LambdaType extends TypeExpr {
     }
     // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
     getFStarType() {
-        return "(" + this.args.map(x => x[0] + ":" + x[1].getType()).join(", ") + ")" + " -> " + this.result.getType();
+        return "(" + this.args.map(x => x[0] + ":" + x[1].getFStarType()).join(", ") + ")" + " -> " + this.result.getFStarType();
+    }
+    getBosqueType(){
+        return "";
     }
     fstarDeclaration(): string {
         return "";
