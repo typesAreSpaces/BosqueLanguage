@@ -152,11 +152,12 @@ class TranslatorBosqueFStar {
             case MIROpTag.ConstructorTuple: {   // CONTINUE---------------------------------------------------------------------------------------
                 let opConstructorTuple = op as MIRConstructorTuple;
                 console.log(opConstructorTuple);
+                TupleType;
                 // FIX: Use the proper type
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
                 new FuncTerm(sanitizeName(opConstructorTuple.tag),
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x)),
-                    new TupleType())]; // This one
+                    TranslatorBosqueFStar.intType)]; // This one
             }
             case MIROpTag.ConstructorRecord: {
                 // let opConstructorRecord = op as MIRConstructorRecord;
@@ -504,6 +505,7 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
+            console.log(declarations.params);
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringToType(x.type.trkey)),
                 returnType);

@@ -10,11 +10,10 @@
 
 namespace NSMain;
 
-function max0(x: Int, y: Int): Int
-    ensures _return_ == x || _return_ == y;
+function max0(x: [Int, Int], y: Int): Int
 {
-    if(x >= y){
-        return x;
+    if(x[0] >= y){
+        return x[0];
     }
     else{
         return y;
@@ -108,10 +107,10 @@ function max5(x : Int, y : Int) : Int
 // }
 
 entrypoint function main(): Int {
-    var x = 10;
+    var x = @[10, 10];
     var y = 20;
 
-    var z = max0(max0(x, y), y);
+    var z = max0(x, y);
     
     var zTuple = @[x, y];
     // var zBaz = Baz@identity(1); 

@@ -102,26 +102,21 @@ class UnionType extends TypeExpr {
 }
 
 class TupleType extends TypeExpr {
-    static readonly declaredTuples: Map<string, boolean>;
+    static readonly declaredTuples: Map<number, boolean>;
     readonly symbolName: string;
     readonly elements: TypeExpr[];
     constructor(elements: TypeExpr[]) {
         super();
         this.symbolName = "tuple__" + elements.length;
         this.elements = elements;
-        if(TupleType.declaredTuples.get(this.symbolName) == undefined){
-            TupleType.declaredTuples.set(this.symbolName, false);
+        if (TupleType.declaredTuples.get(this.elements.length) == undefined) {
+            TupleType.declaredTuples.set(this.elements.length, false);
         }
     }
     getType() {
         return "(" + this.symbolName + " " + this.elements.map(x => x.getType()).join(" ") + ")";
     }
     fstarDeclaration(fd: number): void {
-        if(TupleType.declaredTuples.get(this.symbolName) == false){
-            FS.writeSync(fd, "type " + this.symbolName + " " + something + " =\n");
-            FS.writeSync(fd, "| Mk" + this.symbolName + ": " + somethingelse + " " + this.symbolName + somethigelsex2 + "\n");
-            TupleType.declaredTuples.set(this.symbolName, true);
-        }
     }
 }
 
@@ -137,7 +132,59 @@ class RecordType extends TypeExpr {
         return "(" + this.symbolName + " " + this.elements.map(x => x[1].getType()).join(" ") + ")";
     }
     fstarDeclaration(fd: number): void {
-        FS.writeSync(fd, "");
+    }
+}
+
+class PolymorphicTupleType extends TypeExpr {
+    static readonly declaredTuples: Map<number, boolean>;
+    readonly symbolName: string;
+    readonly length : number;
+    constructor(length : number) {
+        super();
+        this.symbolName = "tuple__" + length;
+        this.length = length;
+        if (TupleType.declaredTuples.get(length) == undefined) {
+            TupleType.declaredTuples.set(length, false);
+        }
+    }
+    getType() {
+        // FIX: It should be polymorphic
+        return this.symbolName + " " + this.elements.map(x => x.getType()).join(" ") + ")";
+    }
+    fstarDeclaration(fd: number): void {
+        if (TupleType.declaredTuples.get(this.length) == false) {
+            FS.writeSync(fd, "type " + this.symbolName);
+            for(let index = 1; index <= this.length; ++index){
+                FS.writeSync(fd, " (t_" + index + 1 + " : Type)");
+            }
+            FS.writeSync(fd, + " =\n");
+            FS.writeSync(fd, "| Mk" + this.symbolName + ":")
+            for(let index = 1; index <= this.length; ++index){
+                FS.writeSync(fd, " _" + index + ":t_" + index);
+            }
+            FS.writeSync(fd, + " " + this.symbolName );
+            for(let index = 1; index <= this.length; ++index){
+                FS.writeSync(fd, " t_" + index + 1);
+            }
+            FS.writeSync(fd, " \n");
+            TupleType.declaredTuples.set(this.length, true);
+        }
+    }
+}
+
+class PolymorphicRecordType extends TypeExpr {
+    readonly symbolName: string;
+    readonly elements: [string, TypeExpr][];
+    constructor(elements: [string, TypeExpr][]) {
+        super()
+        this.symbolName = "record__" + elements.length;
+        this.elements = elements;
+    }
+    getType() {
+        // FIX: It should be polymorphic
+        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getType()).join(" ") + ")";
+    }
+    fstarDeclaration(fd: number): void {
     }
 }
 
@@ -171,4 +218,4 @@ class LambdaType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, ConstructorType, LambdaType };
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, PolymorphicTupleType, PolymorphicRecordType, ConstructorType, LambdaType };
