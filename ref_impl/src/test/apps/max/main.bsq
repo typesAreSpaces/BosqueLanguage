@@ -12,6 +12,11 @@ namespace NSMain;
 
 function max0(x: [Int, Int], y: Int): Int
 {
+    var z = @[1, 2, 3];
+    var z_1 = z[0];
+    var z2 = @[1, 2, 3];
+    var z2_1 = z2[1];
+
     if(x[0] >= y){
         return x[0];
     }
@@ -108,6 +113,7 @@ function max5(x : Int, y : Int) : Int
 
 entrypoint function main(): Int {
     var x = @[10, 10];
+    var x2 = @[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
     var y = 20;
 
     var z = max0(x, y);
