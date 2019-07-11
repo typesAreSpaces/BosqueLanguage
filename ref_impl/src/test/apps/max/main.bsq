@@ -100,16 +100,13 @@ function max5(x : Int, y : Int) : Int
     return internal_result;
 }
 
-function asdf(x : Int) : Int {
-    if(x > 0){
-        var y = x;
-    }
-    else{
-        var y2 = x + 1;
-    }
-    return x;
-}
- 
+// entity Baz {
+//     field x : Int;
+//     factory identity(x: Int): {f : Int} {
+//         return @{f = x};
+//     }
+// }
+
 entrypoint function main(): Int {
     var x = 10;
     var y = 20;
@@ -117,6 +114,7 @@ entrypoint function main(): Int {
     var z = max0(max0(x, y), y);
     
     var zTuple = @[x, y];
+    // var zBaz = Baz@identity(1); 
     // var maxTuple = max3(zTuple);
 
     // var zRecord = @{f = x, g = y};
