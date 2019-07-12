@@ -92,9 +92,6 @@ class TranslatorBosqueFStar {
     static argumentToExpr(arg: MIRArgument): TermExpr {
         // This branch handles variables
         if (arg instanceof MIRRegisterArgument) {
-            if(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) == undefined){
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(arg.nameID), "NSCore::Int");
-            }
             return new VarTerm(sanitizeName(arg.nameID),
                 TranslatorBosqueFStar.stringTypeToType(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string));
         }
@@ -157,6 +154,8 @@ class TranslatorBosqueFStar {
             case MIROpTag.ConstructorTuple: {
                 let opConstructorTuple = op as MIRConstructorTuple;
                 // FIX: Use the right type
+                // CONTINUE:
+                console.log(opConstructorTuple);
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID),
                     "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
@@ -206,7 +205,8 @@ class TranslatorBosqueFStar {
                 // the stack_expressions stack
                 this.collectExpr(currentFunctionKey);
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt),
                 new FuncTerm(sanitizeName(currentFunctionKey),
                     opCallNamespaceFunction.args.map(TranslatorBosqueFStar.argumentToExpr),
@@ -222,7 +222,8 @@ class TranslatorBosqueFStar {
                 // FIX: Use the proper type
                 let somethingAboutLength = "2";
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.trgt),
                 new FuncTerm("Mktuple__" + somethingAboutLength + "?._" + (opMIRAccessFromIndex.idx + 1),
                     [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.arg)],
@@ -323,7 +324,8 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRPrefixOp: {
                 const opPrefixOp = op as MIRPrefixOp;
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPrefixOp.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPrefixOp.trgt.nameID),
+                    "NSCore::Int"); // This one
                 // FIX: Use the proper types
                 return [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.trgt),
                 new FuncTerm(TermExpr.unaryOpToFStar.get(opPrefixOp.op) as string,
@@ -335,7 +337,8 @@ class TranslatorBosqueFStar {
                 const lhs = TranslatorBosqueFStar.argumentToExpr(opBinOp.lhs);
                 const rhs = TranslatorBosqueFStar.argumentToExpr(opBinOp.rhs);
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinOp.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinOp.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opBinOp.trgt),
                 new FuncTerm(TermExpr.binOpToFStar.get(opBinOp.op) as string,
                     [lhs, rhs],
@@ -355,7 +358,8 @@ class TranslatorBosqueFStar {
                 // TODO: Is still necessary check if the type is either
                 // an int or a string?
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinCmp.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinCmp.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opBinCmp.trgt),
                 new FuncTerm((TermExpr.binOpToFStar.get(opBinCmp.op) as string), [lhs, rhs], TranslatorBosqueFStar.boolType)];
             }
@@ -370,13 +374,15 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRVarStore: {
                 const opVarStore = op as MIRVarStore;
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opVarStore.name.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opVarStore.name.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name), TranslatorBosqueFStar.argumentToExpr(opVarStore.src)];
             }
             case MIROpTag.MIRReturnAssign: {
                 const opReturnAssign = op as MIRReturnAssign;
                 // FIX: Use the right type
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opReturnAssign.name.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opReturnAssign.name.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name), TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src)];
             }
             case MIROpTag.MIRAbort: {
@@ -406,7 +412,8 @@ class TranslatorBosqueFStar {
                 const opPhi = op as MIRPhi;
                 // FIX: Use the right type 
                 // ?? I'm not so sure about this one
-                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID), "NSCore::Int");
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID),
+                    "NSCore::Int"); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument)];
             }
             case MIROpTag.MIRIsTypeOfNone: {
@@ -436,33 +443,24 @@ class TranslatorBosqueFStar {
         }
     }
 
-    opsToExpr(ops: MIROp[], comingFrom: string, program: ExprExpr): ExprExpr {
-        // return ops.reduce((partialProgram, currentOp) => {
-        //     const [lval, rval] = this.opToAssignment(currentOp, comingFrom);
-        //     if (lval.symbolName == "_skip") {
-        //         return partialProgram;
-        //     }
-        //     else {
-        //         return new AssignmentExpr(lval, rval, partialProgram);
-        //     }
-        // }, program);
-        if(ops.length == 0){
-            return program;
+    opsToExpr(ops: MIROp[], comingFrom: string, program: () => ExprExpr): ExprExpr {
+        if (ops.length == 0) {
+            return program();
         }
-        else{
+        else {
             const [lval, rval] = this.opToAssignment(ops[0], comingFrom);
-            if(lval.symbolName == "_skip"){
+            if (lval.symbolName == "_skip") {
                 return this.opsToExpr(ops.slice(1), comingFrom, program);
-            }   
-            else{
+            }
+            else {
                 return new AssignmentExpr(lval, rval, this.opsToExpr(ops.slice(1), comingFrom, program));
             }
-        } 
+        }
     }
 
     collectExpr(fkey: string): FStarDeclaration[] {
         const declarations = (this.mapDeclarations.get(fkey) as MIRFunctionDecl).invoke;
-        let mapBlocks = (declarations.body as MIRBody).body;
+        const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
             throw new Error(`The program with fkey ${fkey} is a string\n`);
         }
@@ -478,7 +476,6 @@ class TranslatorBosqueFStar {
             // mapBlocks.forEach(x => console.log(x.jsonify()));
 
             const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
-                mapBlocks = mapBlocks as Map<string, MIRBasicBlock>;
                 const currentFlow = flow.get(block.label) as FlowLink;
                 console.assert(block.ops.length > 0);
 
@@ -486,16 +483,14 @@ class TranslatorBosqueFStar {
                     case 0: {
                         const lastOp = block.ops[block.ops.length - 1] as MIRVarStore;
                         console.assert(lastOp != undefined);
-
                         const regName = sanitizeName(lastOp.name.nameID);
-                        return this.opsToExpr(block.ops, comingFrom,
-                            new ReturnExpr(new VarTerm(regName,
-                                returnType)));
+                        const continuation = () => new ReturnExpr(new VarTerm(regName, returnType));
+                        return this.opsToExpr(block.ops, comingFrom, continuation);
                     }
                     case 1: {
                         const successorLabel = currentFlow.succs.values().next().value;
-                        return this.opsToExpr(block.ops.slice(1), comingFrom,
-                            traverse(mapBlocks.get(successorLabel) as MIRBasicBlock, block.label));
+                        const continuation = () => traverse((mapBlocks as Map<string, MIRBasicBlock>).get(successorLabel) as MIRBasicBlock, block.label);
+                        return this.opsToExpr(block.ops.slice(0, -1), comingFrom, continuation);
                     }
                     case 2: {
                         const jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
@@ -504,8 +499,8 @@ class TranslatorBosqueFStar {
                             [new VarTerm(regName, TranslatorBosqueFStar.boolType), new ConstTerm("true", TranslatorBosqueFStar.boolType)], TranslatorBosqueFStar.boolType);
                         const branchTrue = traverse(mapBlocks.get(jumpCondOp.trueblock) as MIRBasicBlock, block.label);
                         const branchFalse = traverse(mapBlocks.get(jumpCondOp.falseblock) as MIRBasicBlock, block.label);
-                        return this.opsToExpr(block.ops.slice(0, -1), comingFrom,
-                            new ConditionalExpr(condition, branchTrue, branchFalse));
+                        const continuation = () => new ConditionalExpr(condition, branchTrue, branchFalse);
+                        return this.opsToExpr(block.ops.slice(0, -1), comingFrom, continuation);
                     }
                     default: {
                         throw new Error("Wrong Control-Flow graph. The out-degree of any node cannot be more than 2.");
