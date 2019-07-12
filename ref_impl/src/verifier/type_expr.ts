@@ -21,8 +21,11 @@ abstract class TypeExpr {
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
     static print(fd : number) : void {
-        TupleType.declaredTuples.forEach((_, index) => {
+        TupleType.isDeclared.forEach((_, index) => {
             TupleType.fstarDeclaration(fd, index);
+        });
+        RecordType.isDeclared.forEach((_, index) => {
+            RecordType.fstarDeclaration(fd, index);
         });
     }
 }
@@ -56,7 +59,7 @@ class StringType extends TypeExpr {
 
 class NoneType extends TypeExpr {
     getFStarType() {
-        return "None";
+        return "";
     }
     getBosqueType(){
         return "None";
@@ -65,7 +68,7 @@ class NoneType extends TypeExpr {
 
 class AnyType extends TypeExpr {
     getFStarType() {
-        return "Any";
+        return "";
     }
     getBosqueType(){
         return "Any";
@@ -74,7 +77,7 @@ class AnyType extends TypeExpr {
 
 class SomeType extends TypeExpr {
     getFStarType() {
-        return "Some";
+        return "";
     }
     getBosqueType(){
         return "Some";
@@ -122,30 +125,31 @@ class UnionType extends TypeExpr {
         this.elements = elements;
     }
     getFStarType() {
+        return "";
+    }
+    getBosqueType(){
         if (this.elements.size === 0) {
             return "Empty";
         }
         else {
-            return Array.from(this.elements).map(x => x.getFStarType()).join(" | ");
+            return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");
         }
-    }
-    getBosqueType(){
-        return "";
     }
 }
 
 class TupleType extends TypeExpr {
-    static readonly declaredTuples: Map<number, boolean> = new Map<number, boolean>();
+    static readonly isDeclared: Map<number, boolean> = new Map<number, boolean>();
+    readonly length: number;
     readonly symbolName: string;
     readonly elements: TypeExpr[];
-    readonly length: number;
+
     constructor(elements : TypeExpr[]) {
         super();
-        this.symbolName = "tuple__" + elements.length;
-        this.elements = elements;
         this.length = elements.length;
-        if (TupleType.declaredTuples.get(this.length) == undefined) {
-            TupleType.declaredTuples.set(this.length, false);
+        this.symbolName = "tuple__" + this.length;
+        this.elements = elements;
+        if (TupleType.isDeclared.get(this.length) == undefined) {
+            TupleType.isDeclared.set(this.length, false);
         }
     }
     getFStarType() {
@@ -155,8 +159,8 @@ class TupleType extends TypeExpr {
         return "";
     }
     static fstarDeclaration(fd: number, length: number): void {
-        let symbolName = "tuple__" + length;
-        if (TupleType.declaredTuples.get(length) == false) {
+        const symbolName = "tuple__" + length;
+        if (TupleType.isDeclared.get(length) == false) {
             FS.writeSync(fd, "type " + symbolName);
             for (let index = 1; index <= length; ++index) {
                 FS.writeSync(fd, " (t_" + index + " : Type)");
@@ -171,18 +175,25 @@ class TupleType extends TypeExpr {
                 FS.writeSync(fd, " t_" + index);
             }
             FS.writeSync(fd, " \n\n");
-            TupleType.declaredTuples.set(length, true);
+            TupleType.isDeclared.set(length, true);
         }
     }
 }
 
 class RecordType extends TypeExpr {
+    static readonly isDeclared: Map<string, boolean> = new Map<string, boolean>();
+    readonly signature: string;
     readonly symbolName: string;
     readonly elements: [string, TypeExpr][];
+    
     constructor(elements: [string, TypeExpr][]) {
         super()
-        this.symbolName = "record__" + elements.length;
+        this.signature = elements.map(x => x[0]).join("_");
+        this.symbolName = "record__" + this.signature;
         this.elements = elements;
+        if (RecordType.isDeclared.get(this.signature) == undefined) {
+            RecordType.isDeclared.set(this.signature, false);
+        }
     }
     getFStarType() {
         return "(" + this.symbolName + " " + this.elements.map(x => x[1].getFStarType()).join(" ") + ")";
@@ -190,27 +201,27 @@ class RecordType extends TypeExpr {
     getBosqueType(){
         return "";
     }
-    fstarDeclaration(fd: number): void {
-    }
-}
-
-class PolymorphicRecordType extends TypeExpr {
-    readonly symbolName: string;
-    readonly keys: string[];
-    constructor(keys: string[]) {
-        super()
-        this.symbolName = "record__" + keys.length;
-        this.keys = keys;
-    }
-    getFStarType() {
-        // FIX: It should be polymorphic
-        return "";
-        // return "(" + this.symbolName + " " + this.elements.map(x => x[1].getType()).join(" ") + ")";
-    }
-    getBosqueType(){
-        return "";
-    }
-    fstarDeclaration(fd: number): void {
+    static fstarDeclaration(fd: number, signature: string): void {
+        const symbolName = "record__" + signature;
+        const keys = signature.split("_");
+        const length = keys.length;
+        if (RecordType.isDeclared.get(signature) == false) {
+            FS.writeSync(fd, "type " + symbolName);
+            for (let index = 1; index <= length; ++index) {
+                FS.writeSync(fd, " (t_" + index + " : Type)");
+            }
+            FS.writeSync(fd, " =\n");
+            FS.writeSync(fd, "| Mk" + symbolName + ":")
+            for (let index = 1; index <= length; ++index) {
+                FS.writeSync(fd, " " + keys[index-1] + ":t_" + index + " ->");
+            }
+            FS.writeSync(fd, " " + symbolName);
+            for (let index = 1; index <= length; ++index) {
+                FS.writeSync(fd, " t_" + index);
+            }
+            FS.writeSync(fd, " \n\n");
+            TupleType.isDeclared.set(length, true);
+        }
     }
 }
 
@@ -238,9 +249,11 @@ class LambdaType extends TypeExpr {
         this.args = args;
         this.result = result;
     }
-    // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
+    
     getFStarType() {
-        return "(" + this.args.map(x => x[0] + ":" + x[1].getFStarType()).join(", ") + ")" + " -> " + this.result.getFStarType();
+        return "";
+        // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
+        // return "(" + this.args.map(x => x[0] + ":" + x[1].getFStarType()).join(", ") + ")" + " -> " + this.result.getFStarType();
     }
     getBosqueType(){
         return "";
@@ -250,4 +263,4 @@ class LambdaType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, PolymorphicRecordType, ConstructorType, LambdaType };
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, ConstructorType, LambdaType };

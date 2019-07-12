@@ -4,10 +4,10 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody, MIRConstructorTuple, MIRAccessFromIndex } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType, RecordType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRFunctionDecl } from "../compiler/mir_assembly";
@@ -198,33 +198,14 @@ class TranslatorBosqueFStar {
                     new TupleType(types))];
             }
             case MIROpTag.ConstructorRecord: {
-                // let opConstructorRecord = op as MIRConstructorRecord;
-
-                // let regName = section + "_" + opConstructorRecord.trgt.nameID;
-                // stringVariableToStringType.set(regName,
-                //     "{" + opConstructorRecord.args.map(arg => {
-                //         if (arg[1] instanceof MIRRegisterArgument) {
-                //             return arg[0] + ":" + stringVariableToStringType.get(section + "_" + arg[1].nameID);
-                //         }
-                //         else {
-                //             return arg[0] + ":" + stringConstantToStringType(arg[1].nameID);
-                //         }
-                //     }).join(", ") + "}");
-
-                // let regVar = argumentToTermExpr(opConstructorRecord.trgt, section);
-
-                // formula = new EqualityTerm(new FuncExpr("RecordLength", new TranslatorBosqueFStar.intType(), [regVar]),
-                //     new ConstExpr(opConstructorRecord.args.length.toString(), new TranslatorBosqueFStar.intType())
-                // );
-
-                // opConstructorRecord.args.map((arg) => {
-                //     let argExpr = argumentToTermExpr(arg[1], section);
-                //     formula = new AndExpr(formula,
-                //         new EqualityTerm(
-                //             new FuncExpr("RecordElement", argExpr.ty, [regVar, new VarExpr(arg[0], new RecordPropertyType())]),
-                //             BoxTermExpr(UnboxTermExpr(argExpr))))
-                // });
-                return [new VarTerm("_ConstructorRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                const opConstructorRecord = op as MIRConstructorRecord;
+                const elements = opConstructorRecord.args.map(x => [x[0], TranslatorBosqueFStar.typeArgumentToType(x[1], fkey)]) as [string, TypeExpr][];
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorRecord.trgt.nameID + fkey),
+                    new RecordType(elements));
+                return [TranslatorBosqueFStar.argumentToExpr(opConstructorRecord.trgt, fkey),
+                new FuncTerm("Mkrecord__" + opConstructorRecord.args.map(x => x[0]).join("_"),
+                    opConstructorRecord.args.map(x => TranslatorBosqueFStar.argumentToExpr(x[1], fkey)),
+                    new RecordType(elements))];
             }
             case MIROpTag.ConstructorLambda: {
                 // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -270,31 +251,21 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRAccessFromProperty: {
-                // let opMIRAccessFromProperty = op as MIRAccessFromProperty;
-
-                // let regName = section + "_" + opMIRAccessFromProperty.trgt.nameID;
-                // let srcName = section + "_" + opMIRAccessFromProperty.arg.nameID;
-                // let tupleTyString = stringVariableToStringType.get(srcName) as string;
-                // let srcTypeAll = tupleTyString.substr(1, tupleTyString.length - 2).split(", ");
-
-                // let srcTypeString: string = "";
-                // for (let argString of srcTypeAll) {
-                //     if (argString.startsWith(opMIRAccessFromProperty.property)) {
-                //         srcTypeString = argString;
-                //         break;
-                //     }
-                // }
-                // srcTypeString = srcTypeString.slice(srcTypeString.indexOf(":") + 1);
-
-                // stringVariableToStringType.set(regName, srcTypeString);
-                // let regVar = argumentToTermExpr(opMIRAccessFromProperty.trgt, section);
-                // formula = new EqualityTerm(
-                //     regVar,
-                //     BoxTermExpr(UnboxTermExpr(
-                //         new FuncExpr("RecordElement", resolveType(srcTypeString),
-                //             [argumentToTermExpr(opMIRAccessFromProperty.arg, section),
-                //             new VarExpr(opMIRAccessFromProperty.property, new RecordPropertyType())]
-                //         ))));
+                const opMIRAccessFromProperty = op as MIRAccessFromProperty;
+                console.log(opMIRAccessFromProperty);
+                const typeOfTuple = TranslatorBosqueFStar.typesSeen.get(sanitizeName(opMIRAccessFromProperty.arg.nameID + fkey)) as TypeExpr;
+                if (typeOfTuple instanceof RecordType) {
+                    const keyTypes = new Map(typeOfTuple.elements);
+                    TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromProperty.trgt.nameID + fkey),
+                        (keyTypes.get(opMIRAccessFromProperty.property) as TypeExpr));
+                    return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromProperty.trgt, fkey),
+                    new FuncTerm("Mkrecord__" + typeOfTuple.signature + "?." + opMIRAccessFromProperty.property,
+                        [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromProperty.arg, fkey)],
+                        (keyTypes.get(opMIRAccessFromProperty.property) as TypeExpr))];
+                }
+                else {
+                    throw new Error(`Type ${typeOfTuple} is not a RecordType`);
+                } 
                 return [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRProjectFromProperties: {

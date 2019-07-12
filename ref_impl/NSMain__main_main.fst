@@ -9,6 +9,9 @@ type tuple__16 (t_1 : Type) (t_2 : Type) (t_3 : Type) (t_4 : Type) (t_5 : Type) 
 type tuple__3 (t_1 : Type) (t_2 : Type) (t_3 : Type) =
 | Mktuple__3: _1:t_1 -> _2:t_2 -> _3:t_3 -> tuple__3 t_1 t_2 t_3 
 
+type record__f_g (t_1 : Type) (t_2 : Type) =
+| Mkrecord__f_g: f:t_1 -> g:t_2 -> record__f_g t_1 t_2 
+
 val nSMain__max0 : (tuple__2 int int) -> int -> Tot int
 let nSMain__max0 x y = 
     let __tmp_0 = (Mktuple__3 1 2 3) in 
@@ -40,12 +43,16 @@ let nSMain__main  =
             let __tmp_16 = (Mktuple__2 1 1) in 
                 let __tmp_3 = (Mktuple__16 1 1 1 1 1 1 1 1 1 1 1 1 __tmp_16 "hello" false true) in 
                     let x2 = __tmp_3 in 
-                        let y = 20 in 
-                            let __tmp_23 = (nSMain__max0 x y) in 
-                                let z = __tmp_23 in 
-                                    let __tmp_26 = (Mktuple__2 x y) in 
-                                        let zTuple = __tmp_26 in 
-                                            let _ir_ret_ = z in 
-                                                let _return_ = _ir_ret_ in 
-                                                    _return_
+                        let __tmp_22 = (Mkrecord__f_g 1 2) in 
+                            let x3 = __tmp_22 in 
+                                let __tmp_27 = (Mkrecord__f_g?.f x3) in 
+                                    let x4 = __tmp_27 in 
+                                        let y = 20 in 
+                                            let __tmp_29 = (nSMain__max0 x y) in 
+                                                let z = __tmp_29 in 
+                                                    let __tmp_32 = (Mktuple__2 x y) in 
+                                                        let zTuple = __tmp_32 in 
+                                                            let _ir_ret_ = z in 
+                                                                let _return_ = _ir_ret_ in 
+                                                                    _return_
 
