@@ -152,24 +152,6 @@ class TupleType extends TypeExpr {
     }
 }
 
-class RecordType extends TypeExpr {
-    readonly symbolName: string;
-    readonly elements: [string, TypeExpr][];
-    constructor(elements: [string, TypeExpr][]) {
-        super()
-        this.symbolName = "record__" + elements.length;
-        this.elements = elements;
-    }
-    getFStarType() {
-        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getFStarType()).join(" ") + ")";
-    }
-    getBosqueType(){
-        return "";
-    }
-    fstarDeclaration(fd: number): void {
-    }
-}
-
 class PolymorphicTupleType extends TypeExpr {
     static readonly declaredTuples: Map<number, boolean> = new Map<number, boolean>();
     readonly symbolName: string;
@@ -212,6 +194,24 @@ class PolymorphicTupleType extends TypeExpr {
             FS.writeSync(fd, " \n\n");
             PolymorphicTupleType.declaredTuples.set(length, true);
         }
+    }
+}
+
+class RecordType extends TypeExpr {
+    readonly symbolName: string;
+    readonly elements: [string, TypeExpr][];
+    constructor(elements: [string, TypeExpr][]) {
+        super()
+        this.symbolName = "record__" + elements.length;
+        this.elements = elements;
+    }
+    getFStarType() {
+        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getFStarType()).join(" ") + ")";
+    }
+    getBosqueType(){
+        return "";
+    }
+    fstarDeclaration(fd: number): void {
     }
 }
 

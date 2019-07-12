@@ -13,11 +13,11 @@ val nSMain__max0 : (tuple__2 int int) -> int -> Tot int
 let nSMain__max0 x y = 
     let __tmp_0 = (Mktuple__3 1 2 3) in 
         let z = __tmp_0 in 
-            let __tmp_6 = (Mktuple__2?._1 z) in 
+            let __tmp_6 = (Mktuple__3?._1 z) in 
                 let z_1 = __tmp_6 in 
                     let __tmp_7 = (Mktuple__3 1 2 3) in 
                         let z2 = __tmp_7 in 
-                            let __tmp_13 = (Mktuple__2?._2 z2) in 
+                            let __tmp_13 = (Mktuple__3?._2 z2) in 
                                 let z2_1 = __tmp_13 in 
                                     let __tmp_17 = (Mktuple__2?._1 x) in 
                                         let __tmp_14 = (op_GreaterThanOrEqual __tmp_17 y) in 
