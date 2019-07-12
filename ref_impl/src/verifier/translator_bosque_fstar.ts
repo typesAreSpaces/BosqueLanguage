@@ -7,10 +7,12 @@ import * as FS from "fs";
 import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody, MIRConstructorTuple, MIRAccessFromIndex } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, PolymorphicTupleType, StringType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRFunctionDecl } from "../compiler/mir_assembly";
+
+type StringTypeMangleNameWithFkey = string;
 
 class FStarDeclaration {
     readonly fkey: string;
@@ -36,7 +38,7 @@ class TranslatorBosqueFStar {
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
     // typesSeen : String[MangledNamewithFkey] -> TypeExpr
-    static readonly typesSeen = new Map<string, TypeExpr>();
+    static readonly typesSeen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
     readonly fileName: string;
@@ -82,9 +84,7 @@ class TranslatorBosqueFStar {
                         .map(TranslatorBosqueFStar.stringTypeToType));
                 }
                 else {
-                    console.log(s);
-                    console.log(TranslatorBosqueFStar.typesSeen);
-                    throw new Error("Not a valid type, yet");
+                    throw new Error(`${s} is not a valid constant value type, yet`);
                 }
             }
         }
@@ -109,7 +109,7 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                throw new Error("Not implemented yet");
+                throw new Error(`The case ${stringConst} is not implemented yet`);
             }
         }
     }
@@ -191,11 +191,11 @@ class TranslatorBosqueFStar {
                 const opConstructorTuple = op as MIRConstructorTuple;
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
-                    new PolymorphicTupleType(types));
+                    new TupleType(types));
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt, fkey),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
-                    new PolymorphicTupleType(types))];
+                    new TupleType(types))];
             }
             case MIROpTag.ConstructorRecord: {
                 // let opConstructorRecord = op as MIRConstructorRecord;
@@ -262,17 +262,7 @@ class TranslatorBosqueFStar {
                         typeOfTuple.elements[opMIRAccessFromIndex.idx])];
                 }
                 else {
-                    if (typeOfTuple instanceof PolymorphicTupleType) {
-                        TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
-                            typeOfTuple.elements[opMIRAccessFromIndex.idx]); // This one
-                        return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.trgt, fkey),
-                        new FuncTerm("Mktuple__" + typeOfTuple.length + "?._" + (opMIRAccessFromIndex.idx + 1),
-                            [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.arg, fkey)],
-                            typeOfTuple.elements[opMIRAccessFromIndex.idx])]; // This one        
-                    }
-                    else {
-                        throw new Error(`Type ${typeOfTuple} is TupleType | PolymorphicTupleType`);
-                    }
+                    throw new Error(`Type ${typeOfTuple} is not a TupleType`);
                 }
             }
             case MIROpTag.MIRProjectFromIndecies: {

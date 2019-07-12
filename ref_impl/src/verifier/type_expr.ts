@@ -21,8 +21,8 @@ abstract class TypeExpr {
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
     static print(fd : number) : void {
-        PolymorphicTupleType.declaredTuples.forEach((_, index) => {
-            PolymorphicTupleType.fstarDeclaration(fd, index);
+        TupleType.declaredTuples.forEach((_, index) => {
+            TupleType.fstarDeclaration(fd, index);
         });
     }
 }
@@ -135,24 +135,6 @@ class UnionType extends TypeExpr {
 }
 
 class TupleType extends TypeExpr {
-    readonly symbolName: string;
-    readonly elements: TypeExpr[];
-    constructor(elements: TypeExpr[]) {
-        super();
-        this.symbolName = "tuple__" + elements.length;
-        this.elements = elements;
-    }
-    getFStarType() {
-        return "(" + this.symbolName + " " + this.elements.map(x => x.getFStarType()).join(" ") + ")";
-    }
-    getBosqueType(){
-        return "";
-    }
-    fstarDeclaration(fd: number): void {
-    }
-}
-
-class PolymorphicTupleType extends TypeExpr {
     static readonly declaredTuples: Map<number, boolean> = new Map<number, boolean>();
     readonly symbolName: string;
     readonly elements: TypeExpr[];
@@ -162,25 +144,19 @@ class PolymorphicTupleType extends TypeExpr {
         this.symbolName = "tuple__" + elements.length;
         this.elements = elements;
         this.length = elements.length;
-        if (PolymorphicTupleType.declaredTuples.get(this.length) == undefined) {
-            PolymorphicTupleType.declaredTuples.set(this.length, false);
+        if (TupleType.declaredTuples.get(this.length) == undefined) {
+            TupleType.declaredTuples.set(this.length, false);
         }
     }
     getFStarType() {
         return "(" + this.symbolName + " " + this.elements.map(x => x.getFStarType()).join(" ") + ")";
-        // let type = "";
-        // for (let index = 1; index <= this.length; ++index) {
-        //     type = type + " (t_" + index + 1 + " : Type)";
-        // }
-        // return "(" + this.symbolName + " "
-        //     + type + ")";
     }
     getBosqueType(){
         return "";
     }
     static fstarDeclaration(fd: number, length: number): void {
         let symbolName = "tuple__" + length;
-        if (PolymorphicTupleType.declaredTuples.get(length) == false) {
+        if (TupleType.declaredTuples.get(length) == false) {
             FS.writeSync(fd, "type " + symbolName);
             for (let index = 1; index <= length; ++index) {
                 FS.writeSync(fd, " (t_" + index + " : Type)");
@@ -195,7 +171,7 @@ class PolymorphicTupleType extends TypeExpr {
                 FS.writeSync(fd, " t_" + index);
             }
             FS.writeSync(fd, " \n\n");
-            PolymorphicTupleType.declaredTuples.set(length, true);
+            TupleType.declaredTuples.set(length, true);
         }
     }
 }
@@ -274,4 +250,4 @@ class LambdaType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, PolymorphicTupleType, PolymorphicRecordType, ConstructorType, LambdaType };
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, PolymorphicRecordType, ConstructorType, LambdaType };
