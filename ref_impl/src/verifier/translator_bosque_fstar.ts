@@ -150,40 +150,40 @@ class TranslatorBosqueFStar {
             case MIROpTag.LoadConstTypedString:
             case MIROpTag.AccessNamespaceConstant:
             case MIROpTag.AccessConstField:
-            case MIROpTag.LoadFieldDefaultValue: {
+            case MIROpTag.LoadFieldDefaultValue: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.AccessCapturedVariable: {
+            case MIROpTag.AccessCapturedVariable: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("AcessCapturedVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_AccessCapturedVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.AccessArgVariable: {
+            case MIROpTag.AccessArgVariable: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("AccessArgVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_AccessArgVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.AccessLocalVariable: {
+            case MIROpTag.AccessLocalVariable: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("AcessLocalVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_AcessLocalVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorPrimary: {
-                // let opConstructorPrimary = op as MIRConstructorPrimary;
+            case MIROpTag.ConstructorPrimary: { // IMPLEMENT:
+                // const opConstructorPrimary = op as MIRConstructorPrimary;
                 TranslatorBosqueFStar.debugging("ConstructorPrimary Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimary", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorPrimaryCollectionEmpty: {
+            case MIROpTag.ConstructorPrimaryCollectionEmpty: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionEmpty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorPrimaryCollectionSingletons: {
+            case MIROpTag.ConstructorPrimaryCollectionSingletons: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionSingletons Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionSingletons", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorPrimaryCollectionCopies: {
+            case MIROpTag.ConstructorPrimaryCollectionCopies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionCopies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionCopies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.ConstructorPrimaryCollectionMixed: {
+            case MIROpTag.ConstructorPrimaryCollectionMixed: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionMixed Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionMixed", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -197,7 +197,7 @@ class TranslatorBosqueFStar {
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
                     new TupleType(types))];
             }
-            case MIROpTag.ConstructorRecord: {
+            case MIROpTag.ConstructorRecord: { 
                 const opConstructorRecord = op as MIRConstructorRecord;
                 const elements = opConstructorRecord.args.map(x => [x[0], TranslatorBosqueFStar.typeArgumentToType(x[1], fkey)]) as [string, TypeExpr][];
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorRecord.trgt.nameID + fkey),
@@ -207,9 +207,9 @@ class TranslatorBosqueFStar {
                     opConstructorRecord.args.map(x => TranslatorBosqueFStar.argumentToExpr(x[1], fkey)),
                     new RecordType(elements))];
             }
-            case MIROpTag.ConstructorLambda: {
+            case MIROpTag.ConstructorLambda: { // IMPLEMENT:
                 // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                // let opConstructorLambda = op as MIRConstructorLambda;
+                // const opConstructorLambda = op as MIRConstructorLambda;
                 // console.log(opConstructorLambda);
                 return [new VarTerm("_ConstructorLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -227,7 +227,7 @@ class TranslatorBosqueFStar {
                     opCallNamespaceFunction.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
                     resultType)];
             }
-            case MIROpTag.CallStaticFunction: {
+            case MIROpTag.CallStaticFunction: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -246,7 +246,7 @@ class TranslatorBosqueFStar {
                     throw new Error(`Type ${typeOfTuple} is not a TupleType`);
                 }
             }
-            case MIROpTag.MIRProjectFromIndecies: {
+            case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -266,63 +266,63 @@ class TranslatorBosqueFStar {
                     throw new Error(`Type ${typeOfTuple} is not a RecordType`);
                 }
             }
-            case MIROpTag.MIRProjectFromProperties: {
+            case MIROpTag.MIRProjectFromProperties: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRAccessFromField: {
+            case MIROpTag.MIRAccessFromField: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRAccessFromField Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRAccessFromField", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRProjectFromFields: {
+            case MIROpTag.MIRProjectFromFields: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromFields Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRProjectFromTypeTuple: {
+            case MIROpTag.MIRProjectFromTypeTuple: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeTuple Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromTypeTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRProjectFromTypeRecord: {
+            case MIROpTag.MIRProjectFromTypeRecord: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeRecord Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromTypeRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRProjectFromTypeConcept: {
+            case MIROpTag.MIRProjectFromTypeConcept: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeConcept Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRModifyWithIndecies: {
+            case MIROpTag.MIRModifyWithIndecies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRModifyWithIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRModifyWithIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRModifyWithProperties: {
+            case MIROpTag.MIRModifyWithProperties: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRModifyWithProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRModifyWithProperties", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRModifyWithFields: {
+            case MIROpTag.MIRModifyWithFields: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRModifyWithFields Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRModifyWithFields", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRStructuredExtendTuple: {
+            case MIROpTag.MIRStructuredExtendTuple: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendedTuple Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRStructuredExtendTuple", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRStructuredExtendRecord: {
+            case MIROpTag.MIRStructuredExtendRecord: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendRecord Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRStructuredExtendRecord", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRStructuredExtendObject: {
+            case MIROpTag.MIRStructuredExtendObject: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRStructuredExtendObject Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRStructuredExtendObject", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRInvokeKnownTarget: {
+            case MIROpTag.MIRInvokeKnownTarget: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRInvokeKnownTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRInvokeVirtualTarget: {
+            case MIROpTag.MIRInvokeVirtualTarget: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRInvokeVirtualTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRCallLambda: {
+            case MIROpTag.MIRCallLambda: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRCallLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRCallLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -346,11 +346,11 @@ class TranslatorBosqueFStar {
                     [lhs, rhs],
                     TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRBinEq: {
+            case MIROpTag.MIRBinEq: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRBinEq Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRBinEq", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRBinCmp: {
+            case MIROpTag.MIRBinCmp: { 
                 // The predicate returned is of type Bool
                 // because the operations to arrive at this
                 // point are <, <=, >, >= only
@@ -364,11 +364,11 @@ class TranslatorBosqueFStar {
                 return [TranslatorBosqueFStar.argumentToExpr(opBinCmp.trgt, fkey),
                 new FuncTerm((TermExpr.binOpToFStar.get(opBinCmp.op) as string), [lhs, rhs], TranslatorBosqueFStar.boolType)];
             }
-            case MIROpTag.MIRRegAssign: {
+            case MIROpTag.MIRRegAssign: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRRegAssign Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRRegAssign", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRTruthyConvert: {
+            case MIROpTag.MIRTruthyConvert: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRTruthyConvert Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRTruthyConvert", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -384,11 +384,11 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.typeArgumentToType(opReturnAssign.src, fkey));
                 return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name, fkey), TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src, fkey)];
             }
-            case MIROpTag.MIRAbort: {
+            case MIROpTag.MIRAbort: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRAbort Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRAbort", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRDebug: {
+            case MIROpTag.MIRDebug: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRDDebug Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRDebug", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -415,10 +415,10 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.intType); // I mean, this one
                 return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
             }
-            case MIROpTag.MIRIsTypeOfNone: {
-                // let opIsTypeOfNone = op as MIRIsTypeOfNone;
+            case MIROpTag.MIRIsTypeOfNone: { // IMPLEMENT:
+                // const opIsTypeOfNone = op as MIRIsTypeOfNone;
 
-                // let regName = section + "_" + opIsTypeOfNone.trgt.nameID;
+                // const regName = section + "_" + opIsTypeOfNone.trgt.nameID;
                 // stringVariableToStringType.set(regName, "NSCore::Bool");
 
                 // return new EqualityTerm(new VarExpr(regName, new TranslatorBosqueFStar.boolType()),
@@ -426,13 +426,13 @@ class TranslatorBosqueFStar {
                 //         [argumentToTermExpr(opIsTypeOfNone.arg, section)]), BNone)));
                 return [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRIsTypeOfSome: {
+            case MIROpTag.MIRIsTypeOfSome: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRIsTypeOfSome Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                // let opIsTypeOfSome = op as MIRIsTypeOfSome;
+                // const opIsTypeOfSome = op as MIRIsTypeOfSome;
                 // console.log(opIsTypeOfSome);
                 return [new VarTerm("_MIRIsTypeOfSome", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRIsTypeOf: {
+            case MIROpTag.MIRIsTypeOf: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRIsTypeOf Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -502,7 +502,7 @@ class TranslatorBosqueFStar {
                         return this.opsToExpr(block.ops.slice(0, -1), comingFrom, fkey, continuation);
                     }
                     default: {
-                        throw new Error("Wrong Control-Flow graph. The out-degree of any node cannot be more than 2.");
+                        throw new Error(`Wrong Control-Flow graph. The out-degree of any node cannot be more than 2 in block: ${block}`);
                     }
                 }
             }
