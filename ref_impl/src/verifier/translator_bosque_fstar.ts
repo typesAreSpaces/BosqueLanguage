@@ -7,7 +7,7 @@ import * as FS from "fs";
 import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRCallNamespaceFunction, MIRBody, MIRConstructorTuple, MIRAccessFromIndex } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, PolymorphicTupleType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr, TupleType, PolymorphicTupleType, StringType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRFunctionDecl } from "../compiler/mir_assembly";
@@ -32,6 +32,7 @@ class FStarDeclaration {
 class TranslatorBosqueFStar {
     static readonly intType = new IntType();
     static readonly boolType = new BoolType();
+    static readonly stringType = new StringType();
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
     // typesSeen : String[MangledNamewithFkey] -> String[Type]
@@ -63,6 +64,7 @@ class TranslatorBosqueFStar {
     }
 
     // TODO: Add more types as needed
+    // stringTypeToType : String[Type] -> TypeExpr
     static stringTypeToType(s: string): TypeExpr {
         switch (s) {
             case "NSCore::Int": {
@@ -73,20 +75,51 @@ class TranslatorBosqueFStar {
             }
             default: {
                 if (s.charAt(0) == '[') {
+
+                    console.log("hmmmmmmm")
+                    console.log(s
+                        .slice(1)
+                        .slice(0, -1)
+                        .split(", ")
+                        .map(TranslatorBosqueFStar.stringTypeToType));
+                    console.log("hmmmmmmm")
                     return new TupleType(s
                         .slice(1)
                         .slice(0, -1)
                         .split(", ")
                         .map(TranslatorBosqueFStar.stringTypeToType));
                 }
-                throw new Error("Not a valid type, yet");
+                else{
+                    console.log(s);
+                    console.log(TranslatorBosqueFStar.typesSeen);
+                    throw new Error("Not a valid type, yet");
+                }
             }
         }
     }
 
     // TODO: Add more types as needed
+    // stringConstToType : String[ValueType] -> TypeExpr
     static stringConstToType(s: string): TypeExpr {
-        throw new Error("Not implemented yet");
+        let stringConst = s.slice(1);
+        stringConst = stringConst.substr(0, stringConst.indexOf("="));
+        switch (stringConst) {
+            case "int": {
+                return TranslatorBosqueFStar.intType;
+            }
+            case "true": {
+                return TranslatorBosqueFStar.boolType;
+            }
+            case "false": {
+                return TranslatorBosqueFStar.boolType;
+            }
+            case "string": {
+                return TranslatorBosqueFStar.stringType;
+            }
+            default: {
+                throw new Error("Not implemented yet");
+            }
+        }
     }
 
     static argumentToExpr(arg: MIRArgument): TermExpr {
@@ -97,14 +130,38 @@ class TranslatorBosqueFStar {
         }
         // This branch handles constants
         else {
-            // FIX: Use the proper type
             return new ConstTerm(arg.stringify(),
-                TranslatorBosqueFStar.intType); // This one
-            // The following implementation goes in the right
-            // direction, but it should use information from
-            // the MIRConstantArgument
-            // return new ConstTerm(arg.stringify(),
-            //     TranslatorBosqueFStar.stringConstToType(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string));
+                TranslatorBosqueFStar.stringConstToType(arg.nameID));
+        }
+    }
+
+    // argumentToType : MIRArgument -> String[Type]
+    static argumentToType(arg: MIRArgument): string {
+        // This branch handles variables
+        if (arg instanceof MIRRegisterArgument) {
+            return (TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string);
+        }
+        // This branch handles constants
+        else {
+            let stringConst = arg.nameID.slice(1);
+            stringConst = stringConst.substr(0, stringConst.indexOf("="));
+            switch (stringConst) {
+                case "int": {
+                    return "NSCore::Int";
+                }
+                case "true": {
+                    return "NSCore::Bool";
+                }
+                case "false": {
+                    return "NSCore::Bool";
+                }
+                case "string": {
+                    return "NSCore::String";
+                }
+                default: {
+                    throw new Error("Not implemented yet");
+                }
+            }
         }
     }
 
@@ -153,11 +210,9 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.ConstructorTuple: {
                 let opConstructorTuple = op as MIRConstructorTuple;
-                // FIX: Use the right type
-                // CONTINUE:
                 console.log(opConstructorTuple);
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    "[" + opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToType(x)).join(", ") + "]");
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x)),

@@ -113,7 +113,7 @@ function max5(x : Int, y : Int) : Int
 
 entrypoint function main(): Int {
     var x = @[10, 10];
-    var x2 = @[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+    var x2 = @[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, @[1, 1], "hello", false, true];
     var y = 20;
 
     var z = max0(x, y);
