@@ -35,8 +35,8 @@ class TranslatorBosqueFStar {
     static readonly stringType = new StringType();
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
-    // typesSeen : String[MangledNamewithFkey] -> String[Type]
-    static readonly typesSeen = new Map<string, string>();
+    // typesSeen : String[MangledNamewithFkey] -> TypeExpr
+    static readonly typesSeen = new Map<string, TypeExpr>();
 
     readonly mapDeclarations: Map<string, MIRFunctionDecl>;
     readonly fileName: string;
@@ -89,7 +89,7 @@ class TranslatorBosqueFStar {
                         .split(", ")
                         .map(TranslatorBosqueFStar.stringTypeToType));
                 }
-                else{
+                else {
                     console.log(s);
                     console.log(TranslatorBosqueFStar.typesSeen);
                     throw new Error("Not a valid type, yet");
@@ -126,7 +126,7 @@ class TranslatorBosqueFStar {
         // This branch handles variables
         if (arg instanceof MIRRegisterArgument) {
             return new VarTerm(sanitizeName(arg.nameID),
-                TranslatorBosqueFStar.stringTypeToType(TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string));
+                (TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as TypeExpr));
         }
         // This branch handles constants
         else {
@@ -135,33 +135,15 @@ class TranslatorBosqueFStar {
         }
     }
 
-    // argumentToType : MIRArgument -> String[Type]
-    static argumentToType(arg: MIRArgument): string {
+    // argumentToType : MIRArgument -> TypeExpr
+    static argumentToType(arg: MIRArgument): TypeExpr {
         // This branch handles variables
         if (arg instanceof MIRRegisterArgument) {
-            return (TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as string);
+            return (TranslatorBosqueFStar.typesSeen.get(sanitizeName(arg.nameID)) as TypeExpr);
         }
         // This branch handles constants
         else {
-            let stringConst = arg.nameID.slice(1);
-            stringConst = stringConst.substr(0, stringConst.indexOf("="));
-            switch (stringConst) {
-                case "int": {
-                    return "NSCore::Int";
-                }
-                case "true": {
-                    return "NSCore::Bool";
-                }
-                case "false": {
-                    return "NSCore::Bool";
-                }
-                case "string": {
-                    return "NSCore::String";
-                }
-                default: {
-                    throw new Error("Not implemented yet");
-                }
-            }
+            return TranslatorBosqueFStar.stringConstToType(arg.nameID);
         }
     }
 
@@ -211,8 +193,11 @@ class TranslatorBosqueFStar {
             case MIROpTag.ConstructorTuple: {
                 let opConstructorTuple = op as MIRConstructorTuple;
                 console.log(opConstructorTuple);
+                // TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID),
+                //     "[" + opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToType(x))    .join(", ") + "]");
+                // FIX: Use proper type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID),
-                    "[" + opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToType(x)).join(", ") + "]");
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x)),
@@ -261,7 +246,7 @@ class TranslatorBosqueFStar {
                 this.collectExpr(currentFunctionKey);
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt),
                 new FuncTerm(sanitizeName(currentFunctionKey),
                     opCallNamespaceFunction.args.map(TranslatorBosqueFStar.argumentToExpr),
@@ -278,7 +263,7 @@ class TranslatorBosqueFStar {
                 let somethingAboutLength = "2";
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.trgt),
                 new FuncTerm("Mktuple__" + somethingAboutLength + "?._" + (opMIRAccessFromIndex.idx + 1),
                     [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.arg)],
@@ -380,7 +365,7 @@ class TranslatorBosqueFStar {
                 const opPrefixOp = op as MIRPrefixOp;
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPrefixOp.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 // FIX: Use the proper types
                 return [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.trgt),
                 new FuncTerm(TermExpr.unaryOpToFStar.get(opPrefixOp.op) as string,
@@ -393,7 +378,7 @@ class TranslatorBosqueFStar {
                 const rhs = TranslatorBosqueFStar.argumentToExpr(opBinOp.rhs);
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinOp.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opBinOp.trgt),
                 new FuncTerm(TermExpr.binOpToFStar.get(opBinOp.op) as string,
                     [lhs, rhs],
@@ -414,7 +399,7 @@ class TranslatorBosqueFStar {
                 // an int or a string?
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opBinCmp.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opBinCmp.trgt),
                 new FuncTerm((TermExpr.binOpToFStar.get(opBinCmp.op) as string), [lhs, rhs], TranslatorBosqueFStar.boolType)];
             }
@@ -430,14 +415,14 @@ class TranslatorBosqueFStar {
                 const opVarStore = op as MIRVarStore;
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opVarStore.name.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name), TranslatorBosqueFStar.argumentToExpr(opVarStore.src)];
             }
             case MIROpTag.MIRReturnAssign: {
                 const opReturnAssign = op as MIRReturnAssign;
                 // FIX: Use the right type
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opReturnAssign.name.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name), TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src)];
             }
             case MIROpTag.MIRAbort: {
@@ -468,7 +453,7 @@ class TranslatorBosqueFStar {
                 // FIX: Use the right type 
                 // ?? I'm not so sure about this one
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID),
-                    "NSCore::Int"); // This one
+                    TranslatorBosqueFStar.intType); // This one
                 return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument)];
             }
             case MIROpTag.MIRIsTypeOfNone: {
@@ -562,12 +547,12 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-            declarations.params.map(x => TranslatorBosqueFStar.typesSeen.set(x.name, x.type.trkey));
+            declarations.params.map(x => TranslatorBosqueFStar.typesSeen.set(x.name, TranslatorBosqueFStar.stringTypeToType(x.type.trkey)));
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type.trkey)),
                 returnType);
             // FIX: Needs to be mangled
-            TranslatorBosqueFStar.typesSeen.set("_return_", programType.image.getBosqueType());
+            TranslatorBosqueFStar.typesSeen.set("_return_", TranslatorBosqueFStar.stringTypeToType(programType.image.getBosqueType()));
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.stack_declarations.push(
                     new FStarDeclaration(fkey,
