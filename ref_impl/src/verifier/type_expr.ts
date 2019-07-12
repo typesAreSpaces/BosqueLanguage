@@ -155,22 +155,25 @@ class TupleType extends TypeExpr {
 class PolymorphicTupleType extends TypeExpr {
     static readonly declaredTuples: Map<number, boolean> = new Map<number, boolean>();
     readonly symbolName: string;
+    readonly elements: TypeExpr[];
     readonly length: number;
-    constructor(length: number) {
+    constructor(elements : TypeExpr[]) {
         super();
-        this.symbolName = "tuple__" + length;
-        this.length = length;
-        if (PolymorphicTupleType.declaredTuples.get(length) == undefined) {
-            PolymorphicTupleType.declaredTuples.set(length, false);
+        this.symbolName = "tuple__" + elements.length;
+        this.elements = elements;
+        this.length = elements.length;
+        if (PolymorphicTupleType.declaredTuples.get(this.length) == undefined) {
+            PolymorphicTupleType.declaredTuples.set(this.length, false);
         }
     }
     getFStarType() {
-        let type = "";
-        for (let index = 1; index <= this.length; ++index) {
-            type = type + " (t_" + index + 1 + " : Type)";
-        }
-        return "(" + this.symbolName + " "
-            + type + ")";
+        return "(" + this.symbolName + " " + this.elements.map(x => x.getFStarType()).join(" ") + ")";
+        // let type = "";
+        // for (let index = 1; index <= this.length; ++index) {
+        //     type = type + " (t_" + index + 1 + " : Type)";
+        // }
+        // return "(" + this.symbolName + " "
+        //     + type + ")";
     }
     getBosqueType(){
         return "";

@@ -188,14 +188,14 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_ConstructorPrimaryCollectionMixed", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.ConstructorTuple: {
-                let opConstructorTuple = op as MIRConstructorTuple;
-                console.log(opConstructorTuple);
+                const opConstructorTuple = op as MIRConstructorTuple;
+                const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
-                    new PolymorphicTupleType(opConstructorTuple.args.length));
+                    new PolymorphicTupleType(types));
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt, fkey),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
-                    new PolymorphicTupleType(opConstructorTuple.args.length))];
+                    new PolymorphicTupleType(types))];
             }
             case MIROpTag.ConstructorRecord: {
                 // let opConstructorRecord = op as MIRConstructorRecord;
@@ -263,14 +263,12 @@ class TranslatorBosqueFStar {
                 }
                 else {
                     if (typeOfTuple instanceof PolymorphicTupleType) {
-                        // CONTINUE:
-                        // FIX: Use the right type
                         TranslatorBosqueFStar.typesSeen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
-                            TranslatorBosqueFStar.intType); // This one
+                            typeOfTuple.elements[opMIRAccessFromIndex.idx]); // This one
                         return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.trgt, fkey),
                         new FuncTerm("Mktuple__" + typeOfTuple.length + "?._" + (opMIRAccessFromIndex.idx + 1),
                             [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.arg, fkey)],
-                            TranslatorBosqueFStar.intType)]; // This one        
+                            typeOfTuple.elements[opMIRAccessFromIndex.idx])]; // This one        
                     }
                     else {
                         throw new Error(`Type ${typeOfTuple} is TupleType | PolymorphicTupleType`);
@@ -561,7 +559,7 @@ class TranslatorBosqueFStar {
                         programType));
                 this.isFkeyDeclared.add(fkey);
             }
-            console.log(TranslatorBosqueFStar.typesSeen);
+            // console.log(TranslatorBosqueFStar.typesSeen);
             return this.stack_declarations;
         }
     }
