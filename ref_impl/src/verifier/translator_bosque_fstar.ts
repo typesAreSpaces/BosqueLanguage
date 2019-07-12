@@ -252,7 +252,6 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRAccessFromProperty: {
                 const opMIRAccessFromProperty = op as MIRAccessFromProperty;
-                console.log(opMIRAccessFromProperty);
                 const typeOfTuple = TranslatorBosqueFStar.typesSeen.get(sanitizeName(opMIRAccessFromProperty.arg.nameID + fkey)) as TypeExpr;
                 if (typeOfTuple instanceof RecordType) {
                     const keyTypes = new Map(typeOfTuple.elements);
@@ -265,8 +264,7 @@ class TranslatorBosqueFStar {
                 }
                 else {
                     throw new Error(`Type ${typeOfTuple} is not a RecordType`);
-                } 
-                return [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                }
             }
             case MIROpTag.MIRProjectFromProperties: {
                 TranslatorBosqueFStar.debugging("MIRProjectFromProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -520,7 +518,7 @@ class TranslatorBosqueFStar {
                         programType));
                 this.isFkeyDeclared.add(fkey);
             }
-            // console.log(TranslatorBosqueFStar.typesSeen);
+            console.log(TranslatorBosqueFStar.typesSeen);
             return this.stack_declarations;
         }
     }

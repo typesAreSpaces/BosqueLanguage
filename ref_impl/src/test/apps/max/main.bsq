@@ -116,6 +116,8 @@ entrypoint function main(): Int {
     var x2 = @[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, @[1, 1], "hello", false, true];
     var x3 = @{f = 1, g = 2};
     var x4 = x3.f;
+    var x5 = @{g = 10, f = 20};
+    var x6 = x5.f;
     var y = 20;
 
     var z = max0(x, y);

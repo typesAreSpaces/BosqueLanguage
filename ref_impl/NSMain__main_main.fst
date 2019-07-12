@@ -47,12 +47,16 @@ let nSMain__main  =
                             let x3 = __tmp_22 in 
                                 let __tmp_27 = (Mkrecord__f_g?.f x3) in 
                                     let x4 = __tmp_27 in 
-                                        let y = 20 in 
-                                            let __tmp_29 = (nSMain__max0 x y) in 
-                                                let z = __tmp_29 in 
-                                                    let __tmp_32 = (Mktuple__2 x y) in 
-                                                        let zTuple = __tmp_32 in 
-                                                            let _ir_ret_ = z in 
-                                                                let _return_ = _ir_ret_ in 
-                                                                    _return_
+                                        let __tmp_28 = (Mkrecord__f_g 20 10) in 
+                                            let x5 = __tmp_28 in 
+                                                let __tmp_33 = (Mkrecord__f_g?.f x5) in 
+                                                    let x6 = __tmp_33 in 
+                                                        let y = 20 in 
+                                                            let __tmp_35 = (nSMain__max0 x y) in 
+                                                                let z = __tmp_35 in 
+                                                                    let __tmp_38 = (Mktuple__2 x y) in 
+                                                                        let zTuple = __tmp_38 in 
+                                                                            let _ir_ret_ = z in 
+                                                                                let _return_ = _ir_ret_ in 
+                                                                                    _return_
 
