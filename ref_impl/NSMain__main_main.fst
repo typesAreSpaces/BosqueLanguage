@@ -60,3 +60,9 @@ let nSMain__main  =
                                                                                 let _return_ = _ir_ret_ in 
                                                                                     _return_
 
+
+let _ = assert (forall x y. nSMain__max0 (Mktuple__2 x y) y >= x && nSMain__max0 (Mktuple__2 x y) y >= y && (nSMain__max0 (Mktuple__2 x y) x = x || nSMain__max0 (Mktuple__2 x y) y = y))
+
+let pair = Mktuple__2 19 23
+
+let x = (Mktuple__2?._1 pair)
