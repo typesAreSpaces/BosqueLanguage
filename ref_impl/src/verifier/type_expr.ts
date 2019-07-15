@@ -21,6 +21,8 @@ abstract class TypeExpr {
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
     static print(fd : number) : void {
+        // TODO: Include more classese that need
+        // to be declared in the FStar prelude file
         TupleType.isDeclared.forEach((_, index) => {
             TupleType.fstarDeclaration(fd, index);
         });
@@ -57,6 +59,7 @@ class StringType extends TypeExpr {
     }
 }
 
+// TODO: Implement getFStarType
 class NoneType extends TypeExpr {
     getFStarType() {
         return "";
@@ -66,6 +69,7 @@ class NoneType extends TypeExpr {
     }
 }
 
+// TODO: Implement getFStarType
 class AnyType extends TypeExpr {
     getFStarType() {
         return "";
@@ -75,6 +79,7 @@ class AnyType extends TypeExpr {
     }
 }
 
+// TODO: Implement getFStarType
 class SomeType extends TypeExpr {
     getFStarType() {
         return "";
@@ -101,6 +106,7 @@ class UninterpretedType extends TypeExpr {
     }
 }
 
+// TODO: Implement getBosqueType 
 class FuncType extends TypeExpr {
     readonly domain: TypeExpr[];
     readonly image: TypeExpr;
@@ -118,6 +124,7 @@ class FuncType extends TypeExpr {
     }
 }
 
+// TODO: Implement getFStarType
 class UnionType extends TypeExpr {
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
     constructor(elements: Set<TypeExpr>) {
@@ -137,6 +144,7 @@ class UnionType extends TypeExpr {
     }
 }
 
+// TODO: Implement getBosqueType
 class TupleType extends TypeExpr {
     static readonly isDeclared: Map<number, boolean> = new Map<number, boolean>();
     readonly length: number;
@@ -180,6 +188,7 @@ class TupleType extends TypeExpr {
     }
 }
 
+// TODO: Implement getBosqueType
 class RecordType extends TypeExpr {
     static readonly isDeclared: Map<string, boolean> = new Map<string, boolean>();
     readonly signature: string;
@@ -225,6 +234,9 @@ class RecordType extends TypeExpr {
     }
 }
 
+// TODO: Implement getFStarType
+// TODO: Implement getBosqueType
+// TODO: Implement fstarDeclaration
 class ConstructorType extends TypeExpr {
     constructor() {
         super();
@@ -236,11 +248,14 @@ class ConstructorType extends TypeExpr {
     getBosqueType(){
         return "";
     }
-    fstarDeclaration(fd: number): void {
+    static fstarDeclaration(fd: number): void {
         FS.writeSync(fd, "");
     }
 }
 
+// TODO: Implement getFStarType
+// TODO: Implement getBosqueType
+// TODO: Implement fstarDeclaration
 class LambdaType extends TypeExpr {
     readonly args: [string, TypeExpr][];
     readonly result: TypeExpr;
@@ -258,7 +273,7 @@ class LambdaType extends TypeExpr {
     getBosqueType(){
         return "";
     }
-    fstarDeclaration(): string {
+    static fstarDeclaration(): string {
         return "";
     }
 }
