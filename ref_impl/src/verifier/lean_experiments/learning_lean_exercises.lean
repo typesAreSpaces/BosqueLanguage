@@ -23,8 +23,21 @@ let part2 :=
     fun hp : ¬p, 
     show false, from 
     absurd hp (swap_neg p (iff.elim_right h1) hp) in
-show false, 
-from absurd part1 part2
+show false, from 
+absurd part1 part2
+
+theorem neg_neg_excludded_middle : Π p : Prop, ((p ∨ (p → false)) → false) → false :=
+assume p : Prop,
+assume hyp1, 
+let subproof1 := assume hyp : p, hyp1 (or.intro_left (p → false) hyp) in
+let subproof2 := or.intro_right p subproof1 in
+hyp1 subproof2
+
+theorem neg_neg_excludded_middle_2 : Π p : Prop, ((p ∨ (p → false)) → false) → false :=
+assume p : Prop,
+assume hyp1, 
+hyp1 (or.intro_right p (assume hyp : p, hyp1 (or.intro_left (p → false) hyp)))
+
 
 end final_exercise
 
