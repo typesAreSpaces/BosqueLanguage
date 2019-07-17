@@ -25,3 +25,15 @@ tail_aux v rfl
 
 end vector
 
+namespace ahh
+  constants m n : nat
+  constant b : bool
+
+  #print "Reducing Pairs"
+  #reduce (m, n ).1
+
+  #reduce b && ff
+
+
+
+end ahh

@@ -139,10 +139,11 @@ class TranslatorBosqueFStar {
         }
     }
 
-
-    // Common pattern: 
-    //     TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID + fkey),
-    //         TranslatorBosqueFStar.intType); // I mean, this one
+    // -- Common pattern: 
+    // typesSeen -> set -> (sanitize -> trgt.name + fkey, a Type)
+    // return [argumentToExpr (trgt, fkey), argumentToExpr (src, fkey)]
+    // -- Example:
+    // TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID + fkey), TranslatorBosqueFStar.intType);        
     // return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
     opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] {
         switch (op.tag) {
