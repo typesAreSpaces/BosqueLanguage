@@ -15,8 +15,6 @@ import * as FS from "fs";
 // (Current approach to accomplish the latter: take 
 // the grouded ast and build a `table` using
 
-// TODO: Update getType appropriately
-
 abstract class TypeExpr {
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
