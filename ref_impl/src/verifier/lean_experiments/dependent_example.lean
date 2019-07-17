@@ -24,4 +24,3 @@ tail_aux v rfl
 #check tail 
 
 end vector
-
