@@ -6,7 +6,6 @@ let rec length l = match l with
   | _ :: tl -> 1 + length tl
 
 // Exercise 4a\
-
 val append_with_property : l1 : list 'a -> l2 : list 'a -> l : list 'a {length l == length l1 + length l2}
 let rec append_with_property l1 l2 = match l1 with 
 | [] -> l2
