@@ -92,6 +92,7 @@ class SomeType extends TypeExpr {
 // parse as a valid char for a symbolNamed expression
 class UninterpretedType extends TypeExpr {
     readonly symbolName: string;
+    
     constructor(symbolName: string) {
         super();
         this.symbolName = symbolName;
@@ -108,6 +109,7 @@ class UninterpretedType extends TypeExpr {
 class FuncType extends TypeExpr {
     readonly domain: TypeExpr[];
     readonly image: TypeExpr;
+
     constructor(domain: TypeExpr[], image: TypeExpr) {
         super();
         this.domain = domain;
@@ -125,6 +127,7 @@ class FuncType extends TypeExpr {
 // TODO: Implement getFStarType
 class UnionType extends TypeExpr {
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
+
     constructor(elements: Set<TypeExpr>) {
         super();
         this.elements = elements;
@@ -239,7 +242,6 @@ class ConstructorType extends TypeExpr {
     constructor() {
         super();
     }
-    // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
     getFStarType() {
         return "";
     }
@@ -257,15 +259,14 @@ class ConstructorType extends TypeExpr {
 class LambdaType extends TypeExpr {
     readonly args: [string, TypeExpr][];
     readonly result: TypeExpr;
+
     constructor(args: [string, TypeExpr][], result: TypeExpr) {
         super()
         this.args = args;
         this.result = result;
     }
-    
     getFStarType() {
         return "";
-        // FIX: THIS IS WRONG. Keep in mind this goes into FStar signatures
         // return "(" + this.args.map(x => x[0] + ":" + x[1].getFStarType()).join(", ") + ")" + " -> " + this.result.getFStarType();
     }
     getBosqueType(){
