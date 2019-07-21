@@ -75,4 +75,4 @@ let test1 = VCons 3 (VCons 45 VNil)
 let test2 = VCons 98 (VCons 83 VNil)
 let test3 = VCons 98 (VCons 83 (VCons 34 VNil))
 let add_test = add_vector test1 test2
-// let add_test_2 = add_vector test1 test3
+let add_test_2 = add_vector test1 test3
