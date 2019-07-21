@@ -11,6 +11,9 @@ For a look at how the language works and flows _in the large_ please see the cod
 
 **Note:** This repository and code represent a project in an early state. This was done to enable academic collaboration and community participation. However, this means that the language is subject to revision, there are bugs and missing functionality, and the performance is limited. Thus, we **do not** recommend the use of the Bosque language for _any_ production work and instead encourage experimentation only with small/experimental side projects at this point in time.
 
+## News
+**July 2019** Big changes have arrived! Based on the great feedback from the community and some experience using the language we have  updated to version 0.1.0. This change includes a range of syntax cleanup and adjustment, the addition of numerous language features, and simplifications to parts of the semantics to improve our ability to do formal analysis of Bosque programs.
+
 ## Documentation
 
 * [Language Docs](docs/language/overview.md)
@@ -34,21 +37,21 @@ add2(2, 3) //5
 All odd check using rest parameters and lambda:
 
 ```none
-function allOdd(...args: List[Int]): Bool {
+function allOdd(...args: List<Int>): Bool {
     return args->all(fn(x) => x % 2 == 1);
 }
 
-allOdd(1, 3, 4) //false
+allOdd(1, 3, 4)) //false
 ```
 
 Bulk update properties on Record
 
 ```none
-function update(point: {x: Int, y: Int, z: Int}, value: Int): {x: Int, y: Int, z: Int} {
-    return point<~(y=value, x=-point.x);
+function updatePoint(point: {x: Int, y: Int, z: Int}, value: Int): {x: Int, y: Int, z: Int} {
+    return point->updatePoint(y=value, x=-point.x);
 }
 
-update(@{x=1, y=2, z=3}, 5) //@{x=-1, y=5, z=3}
+updatePoint({x=1, y=2, z=3}, 5) //{x=-1, y=5, z=3}
 ```
 
 Noneable access on optional argument:
@@ -57,6 +60,9 @@ Noneable access on optional argument:
 function tryGetProperty(r?: {f: Int, k: Int}): Int? {
     return r?.f;
 }
+
+tryGetProperty({f=2, k=1}) //2
+tryGetProperty()           //none
 ```
 
 Sign (with optional argument):
@@ -74,6 +80,10 @@ function sign(x?: Int): Int {
 
     return y;
 }
+
+sign(5)    //1
+sign(-5)   //-1
+sign()     //0
 ```
 
 ## Using the Bosque Language
@@ -103,6 +113,8 @@ The `ref_impl` directory contains a simple command line runner for standalone Bo
 ```none
 node bin/test/app_runner.js FILE.bsq
 ```
+
+We also provide a compiler (to bytecode only right now) in the directory `compiler\bcgen.js` and a way to execute the code in the resulting bytecode assemblies with the executor in `interpreter\exec.js`. 
 
 ### Visual Studio Code Integration
 

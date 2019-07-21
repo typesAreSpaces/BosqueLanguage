@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "target": "es6",
+        "sourceMap": true,
+        "outDir": "bin"
+    },
+    "include": [
+        "./src/verifier/*.ts",
+        "./src/verifier/testing/*.ts"
+    ]
+}
