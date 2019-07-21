@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty, MIRInvokeFixedFunction } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType, RecordType } from "./type_expr";
@@ -213,20 +213,21 @@ class TranslatorBosqueFStar {
             //     // console.log(opConstructorLambda);
             //     return [new VarTerm("_ConstructorLambda", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
-            // case MIROpTag.CallNamespaceFunction: {
-            //     const opCallNamespaceFunction = op as MIRCallNamespaceFunction;
-            //     const currentFunctionKey = opCallNamespaceFunction.fkey;
-            //     // The following line will keep pushing to 
-            //     // the stack_expressions stack
-            //     this.collectExpr(currentFunctionKey);
-            //     const resultType = TranslatorBosqueFStar.stringTypeToType((this.mapDeclarations.get(currentFunctionKey) as MIRInvokeBodyDecl).invoke.resultType.trkey);
-            //     TranslatorBosqueFStar.typesSeen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID + fkey),
-            //         resultType);
-            //     return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt, fkey),
-            //     new FuncTerm(sanitizeName(currentFunctionKey),
-            //         opCallNamespaceFunction.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
-            //         resultType)];
-            // }
+
+            case MIROpTag.MIRInvokeFixedFunction: {
+                const opCallNamespaceFunction = op as MIRInvokeFixedFunction;
+                const currentFunctionKey = opCallNamespaceFunction.mkey;
+                // The following line will keep pushing to 
+                // the stack_expressions stack
+                this.collectExpr(currentFunctionKey);
+                const resultType = TranslatorBosqueFStar.stringTypeToType((this.mapDeclarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID + fkey),
+                    resultType);
+                return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt, fkey),
+                new FuncTerm(sanitizeName(currentFunctionKey),
+                    opCallNamespaceFunction.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
+                    resultType)];
+            }
             // case MIROpTag.CallStaticFunction: { // IMPLEMENT:
             //     TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
             //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
@@ -437,8 +438,7 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             default:
-                TranslatorBosqueFStar.debugging("This might be a problem", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_default_problem", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                throw new Error(`Operation ${op} not defined`);
         }
     }
 

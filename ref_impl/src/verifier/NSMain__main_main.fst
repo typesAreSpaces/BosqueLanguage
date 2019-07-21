@@ -26,14 +26,14 @@ let nSMain__max0 x y =
                                         let __tmp_14 = (op_GreaterThanOrEqual __tmp_17 y) in 
                                             if (op_Equality __tmp_14 true) then 
                                                 let __tmp_21 = (Mktuple__2?._1 x) in 
-                                                    let _ir_ret__1 = __tmp_21 in 
-                                                        let _ir_ret__2 = _ir_ret__1 in 
-                                                            let _return_ = _ir_ret__2 in 
+                                                    let __ir_ret___1 = __tmp_21 in 
+                                                        let __ir_ret___2 = __ir_ret___1 in 
+                                                            let _return_ = __ir_ret___2 in 
                                                                 _return_
                                             else 
-                                                let _ir_ret_ = y in 
-                                                    let _ir_ret__2 = _ir_ret_ in 
-                                                        let _return_ = _ir_ret__2 in 
+                                                let __ir_ret__ = y in 
+                                                    let __ir_ret___2 = __ir_ret__ in 
+                                                        let _return_ = __ir_ret___2 in 
                                                             _return_
 
 val nSMain__main : int
@@ -56,7 +56,7 @@ let nSMain__main  =
                                                                 let z = __tmp_35 in 
                                                                     let __tmp_38 = (Mktuple__2 x y) in 
                                                                         let zTuple = __tmp_38 in 
-                                                                            let _ir_ret_ = z in 
-                                                                                let _return_ = _ir_ret_ in 
+                                                                            let __ir_ret__ = z in 
+                                                                                let _return_ = __ir_ret__ in 
                                                                                     _return_
 
