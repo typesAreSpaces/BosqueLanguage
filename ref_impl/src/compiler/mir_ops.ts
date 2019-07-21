@@ -194,12 +194,10 @@ class MIRConstantString extends MIRConstantArgument {
 enum MIROpTag {
     MIRLoadConst = "MIRLoadConst",
     MIRLoadConstTypedString = "MIRLoadConstTypedString",
-
     MIRAccessConstantValue = "MIRAccessConstantValue",
     MIRLoadFieldDefaultValue = "MIRLoadFieldDefaultValue",
     MIRAccessArgVariable = "MIRAccessArgVariable",
     MIRAccessLocalVariable = "MIRAccessLocalVariable",
-
     MIRConstructorPrimary = "MIRConstructorPrimary",
     MIRConstructorPrimaryCollectionEmpty = "MIRConstructorPrimaryCollectionEmpty",
     MIRConstructorPrimaryCollectionSingletons = "MIRConstructorPrimaryCollectionSingletons",
@@ -207,7 +205,6 @@ enum MIROpTag {
     MIRConstructorPrimaryCollectionMixed = "MIRConstructorPrimaryCollectionMixed",
     MIRConstructorTuple = "MIRConstructorTuple",
     MIRConstructorRecord = "MIRConstructorRecord",
-
     MIRAccessFromIndex = "MIRAccessFromIndex",
     MIRProjectFromIndecies = "MIRProjectFromIndecies",
     MIRAccessFromProperty = "MIRAccessFromProperty",
@@ -223,37 +220,28 @@ enum MIROpTag {
     MIRStructuredExtendTuple = "MIRStructuredExtendTuple",
     MIRStructuredExtendRecord = "MIRStructuredExtendRecord",
     MIRStructuredExtendObject = "MIRStructuredExtendObject",
-
     MIRInvokeFixedFunction = "MIRInvokeFixedFunction",
     MIRInvokeVirtualTarget = "MIRInvokeVirtualTarget",
-
     MIRPrefixOp = "MIRPrefixOp",
-
     MIRBinOp = "MIRBinOp",
     MIRBinEq = "MIRBinEq",
     MIRBinCmp = "MIRBinCmp",
-
     MIRIsTypeOfNone = "MIRIsTypeOfNone",
     MIRIsTypeOfSome = "MIRIsTypeOfSome",
     MIRIsTypeOf = "MIRIsTypeOf",
-
     MIRRegAssign = "MIRRegAssign",
     MIRTruthyConvert = "MIRTruthyConvert",
     MIRLogicStore = "MIRLogicStore",
     MIRVarStore = "MIRVarStore",
     MIRReturnAssign = "MIRReturnAssign",
-
     MIRAbort = "MIRAbort",
     MIRDebug = "MIRDebug",
-
     MIRJump = "MIRJump",
     MIRJumpCond = "MIRJumpCond",
     MIRJumpNone = "MIRJumpNone",
-
     MIRPhi = "MIRPhi",
-
     MIRVarLifetimeStart = "MIRVarLifetimeStart",
-    MIRVarLifetimeEnd = "MIRVarLifetimeEnd"
+    MIRVarLifetimeEnd = "MIRVarLifetimeEnd",
 }
 
 function varsOnlyHelper(args: MIRArgument[]): MIRRegisterArgument[] {
