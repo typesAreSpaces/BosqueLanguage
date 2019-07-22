@@ -1,20 +1,64 @@
 module Max_example
 
-val max : int -> int -> Tot int
-let max x y = if (x >= y) then x else y
+open FStar.Exn
 
+val max_obvious : int -> int -> int
+let max_obvious x y = if (x > y) then x else y
 
-val max_tuple : int * int -> Tot int
-let max_tuple (y, z) = max y z
+let _ = assert (forall x y . max_obvious x y >= x && max_obvious x y >= y && (max_obvious x y = x || max_obvious x y = y))
 
-type record_int = {x : int; y : int}
+val max_control_flow : int -> int -> int
+let max_control_flow x y = let tmp_0 = x > y in 
+  if (tmp_0) then 
+    let return_ = x in 
+      return_ 
+  else 
+    let return_ = y in 
+    return_
 
-val max_record : record_int -> Tot int
-let max_record ({x  = _x; y = _y}) = max _x _y
+let _ = assert (forall x y . max_control_flow x y >= x && max_control_flow x y >= y && (max_control_flow x y = x || max_control_flow x y = y))
+(* let _ = assert (forall x y . max_control_flow x y = (x + y)) ;; So if something is false, FStar wont be able to prove it! *)
 
-let _ = assert (forall x y . max x y >= x && max x y >= y && (max x y = x || max x y = y))
+val max_control_flow_2 : int -> int -> int
+let max_control_flow_2 x y = let tmp_0 = x > y in 
+  if (tmp_0) then 
+    let return_1 = x in 
+    let return_2 = y in (* This branch is not supposed to know about this variable! *)
+      if (tmp_0) then 
+        let return_ = return_1 in 
+          return_ 
+      else 
+        let return_ = return_2 in 
+          return_ 
+  else 
+    let return_1 = x in (* This branch is not supposed to know about this variable! *)
+    let return_2 = y in 
+      if (tmp_0) then 
+        let return_ = return_1 in 
+          return_ 
+      else 
+        let return_ = return_2 in 
+          return_ 
 
-let _ = assert (forall x y . max_tuple (x, y) >= x && max_tuple (x, y) >= y && (max_tuple (x, y) = x || max_tuple (x, y) = y))
+let _ = assert (forall x y . max_control_flow_2 x y >= x && max_control_flow_2 x y >= y && (max_control_flow_2 x y = x || max_control_flow_2 x y = y))
 
-let _ = assert (forall x y . max_record ({x = x; y = y}) >= x && max_record ({x = x; y = y}) >= y && (max_record ({x = x; y = y}) = x || max_record ({x = x; y = y}) = y))
+// val max_control_flow_3 : int -> int -> int
+// let max_control_flow_3 x y = let tmp_0 = x > y in 
+//   if (tmp_0) then 
+//     let return_1 = x in 
+//       if (tmp_0) then 
+//         let return_ = return_1 in 
+//           return_ 
+//       else 
+//         let return_ = 0 in (* Or any other default value (?) *)
+//           return_ 
+//   else 
+//     let return_2 = y in 
+//       if (tmp_0) then 
+//         let return_ = 0 in (* Or any other default value (?) *)
+//           return_ 
+//       else 
+//         let return_ = return_2 in 
+//           return_ 
 
+// let _ = assert (forall x y . max_control_flow_3 x y >= x && max_control_flow_3 x y >= y && (max_control_flow_3 x y = x || max_control_flow_3 x y = y))

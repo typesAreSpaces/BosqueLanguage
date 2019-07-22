@@ -17,6 +17,27 @@ let rec nth n #m (VCons x #m' xs) =
   then x
   else nth (n-1) #m' xs
 
+type bosque_option (a : Type) = 
+| Bosque_None : bosque_option a
+| Bosque_Error : bosque_option a
+| Bosque_Some : v:a -> bosque_option a
+
+val nthNoCondition : n:nat -> #m:nat -> vector 'a m -> Tot (bosque_option 'a)
+let rec nthNoCondition n #m y = match y with
+| VNil -> 
+       if (n < 0) then Bosque_Error
+       else Bosque_None
+| (VCons x #m' xs) -> 
+         if (n < 0) then Bosque_Error else
+         if (n >= m) then Bosque_None else
+         if n = 0 then Bosque_Some x 
+         else nthNoCondition (n-1) #m' xs
+
+let test1 = VCons 1 (VCons 2 VNil)
+let ok_test = nthNoCondition 1 test1
+let none_test = nthNoCondition 18 test1
+// let error_test = nthNoCondition (-1) test1
+
 val append: #a:Type -> #n1:nat -> #n2:nat -> l:vector a n1 -> vector a n2 ->  Tot (vector a (n1 + n2)) //implicit n1 decreases
 let rec append #a #n1 #n2 v1 v2 =
   match v1 with
