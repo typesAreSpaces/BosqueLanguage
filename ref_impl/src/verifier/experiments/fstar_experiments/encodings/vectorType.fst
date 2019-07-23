@@ -1,4 +1,5 @@
-module Vector_example
+module VectorType
+open BosqueOption
 
 type vector 'a : nat -> Type =
   | VNil : vector 'a 0
@@ -11,33 +12,53 @@ val head: #a:Type -> #n:pos -> vector a n -> Tot a
 let head #a #n v = match v with
   | VCons x xs -> x
 
+// So l = m - 1
 val nth : n:nat -> #m:nat{m > n} -> vector 'a m -> Tot 'a
-let rec nth n #m (VCons x #m' xs) =
+let rec nth n #m (VCons x #l xs) =
   if n = 0
   then x
-  else nth (n-1) #m' xs
+  else nth (n-1) #l xs
 
-type bosque_option (a : Type) = 
-| Bosque_None : bosque_option a
-| Bosque_Error : bosque_option a
-| Bosque_Some : v:a -> bosque_option a
+let test__1 = VCons 1 (VCons 2 VNil)
+let mmm = nth 0 test__1
 
-val nthNoCondition : n:nat -> #m:nat -> vector 'a m -> Tot (bosque_option 'a)
+val nthNoCondition : n:nat -> #m:nat -> vector 'a m -> Tot (bosqueOption 'a)
 let rec nthNoCondition n #m y = match y with
 | VNil -> 
-       if (n < 0) then Bosque_Error
-       else Bosque_None
+       if (n < 0) then BosqueError
+       else BosqueNone
 | (VCons x #m' xs) -> 
-         if (n < 0) then Bosque_Error else
-         if (n >= m) then Bosque_None else
-         if n = 0 then Bosque_Some x 
+         if (n < 0) then BosqueError else
+         if (n >= m) then BosqueNone else
+         if n = 0 then BosqueSome x 
          else nthNoCondition (n-1) #m' xs
 
-let test1 = VCons 1 (VCons 2 VNil)
-let ok_test = nthNoCondition 1 test1
-let none_test = nthNoCondition 18 test1
-// let error_test = nthNoCondition (-1) test1
+let test_1 = VCons 1 (VCons 2 VNil)
+let ok_test = nthNoCondition 1 test_1
+let none_test = nthNoCondition 18 test_1
+// let error_test = nthNoCondition (-1) test_1
 
+(* Add Vector function *)
+val add_vector : #n:nat -> vector int n -> vector int n -> Tot (vector int n)
+let rec add_vector #n x y = match x with 
+| VNil -> VNil
+| VCons hd1 tl1 -> 
+  let VCons hd2 tl2 = y in
+  VCons (hd1 + hd2) (add_vector tl1 tl2)
+
+// val add_vector : n:nat -> vector int n -> vector int n -> Tot (vector int n)
+// let rec add_vector #n x y = match x, y with 
+// | 0, VNil, VNil -> VNil
+// | n, (VCons hd1 tl1), (VCons hd2 tl2) -> VCons (hd1 + hd2) (add_vector tl1 tl2)
+
+(* Add vector examples *)
+let test1 = VCons 3 (VCons 45 VNil)
+let test2 = VCons 98 (VCons 83 VNil)
+let test3 = VCons 98 (VCons 83 (VCons 34 VNil))
+let add_test = add_vector test1 test2
+let add_test_2 = add_vector test1 test3
+
+(* Other functions *)
 val append: #a:Type -> #n1:nat -> #n2:nat -> l:vector a n1 -> vector a n2 ->  Tot (vector a (n1 + n2)) //implicit n1 decreases
 let rec append #a #n1 #n2 v1 v2 =
   match v1 with
@@ -78,22 +99,3 @@ let rec zip' #a #b #n v1 v2 = match v1 with
   | VCons a tl1 ->
     let VCons b tl2 = v2 in
     VCons (a, b) (zip' tl1 tl2)
-
-
-val add_vector : #n:nat -> vector int n -> vector int n -> Tot (vector int n)
-let rec add_vector #n x y = match x with 
-| VNil -> VNil
-| VCons hd1 tl1 -> 
-  let VCons hd2 tl2 = y in
-  VCons (hd1 + hd2) (add_vector tl1 tl2)
-
-// val add_vector : n:nat -> vector int n -> vector int n -> Tot (vector int n)
-// let rec add_vector #n x y = match x, y with 
-// | 0, VNil, VNil -> VNil
-// | n, (VCons hd1 tl1), (VCons hd2 tl2) -> VCons (hd1 + hd2) (add_vector tl1 tl2)
-
-let test1 = VCons 3 (VCons 45 VNil)
-let test2 = VCons 98 (VCons 83 VNil)
-let test3 = VCons 98 (VCons 83 (VCons 34 VNil))
-let add_test = add_vector test1 test2
-let add_test_2 = add_vector test1 test3
