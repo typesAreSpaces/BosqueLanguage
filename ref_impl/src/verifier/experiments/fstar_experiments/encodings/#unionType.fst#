@@ -30,5 +30,5 @@ let test2 = projectBoolfromUnionIntBool var1
 
 
 type union_IntBoolbosqueOption : Type -> Type -> Type -> Type = 
-| InjectIntfromUnionInt0Bool0bosqueOption : x : int -> union_IntBoolbosqueOption int bool (bosqueOption int)
-| InjectBoolfromUnionIntBoolbosqueOption : x : bool -> union_IntBoolbosqueOption int bool (bosqueOption int)
+| InjectIntfromUnionInt0Bool0bosqueOption : x : int -> union_IntBoolbosqueOption int bool (bosqueOption)
+| InjectBoolfromUnionIntBoolbosqueOption : x : bool -> union_IntBoolbosqueOption int bool (bosqueOption)
