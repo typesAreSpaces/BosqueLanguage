@@ -2,24 +2,27 @@ module NSMain__main_main
 open BosqueOption
 
 type union__bool0int0bosqueOption: Type -> Type -> Type ->Type =
-| Injectboolfrombool0int0bosqueOption: x : bool -> union__bool0int0bosqueOption bool int bosqueOption
-| Injectintfrombool0int0bosqueOption: x : int -> union__bool0int0bosqueOption bool int bosqueOption
-| InjectbosqueOptionfrombool0int0bosqueOption: x : bosqueOption -> union__bool0int0bosqueOption bool int bosqueOption
+| Injectboolfrombool0int0bosqueOption: x : bool -> union__bool0int0bosqueOption bool int (bosqueOption bool)
+| Injectintfrombool0int0bosqueOption: x : int -> union__bool0int0bosqueOption bool int (bosqueOption int) 
+| InjectbosqueOptionfrombool0int0bosqueOption: singletonBosqueNone -> union__bool0int0bosqueOption bool int singletonBosqueNone
 
-val projectboolfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int bosqueOption) -> bosqueOption bool
+val projectboolfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int singletonBosqueNone) -> bosqueOption bool
 let projectboolfrombool0int0bosqueOption x = match x with
 | Injectboolfrombool0int0bosqueOption x -> BosqueSome x
 | _ -> BosqueNone
 
-val projectintfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int bosqueOption) -> bosqueOption int
+val projectintfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int singletonBosqueNone) -> bosqueOption int
 let projectintfrombool0int0bosqueOption x = match x with
 | Injectintfrombool0int0bosqueOption x -> BosqueSome x
 | _ -> BosqueNone
 
-val projectbosqueOptionfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int bosqueOption) -> bosqueOption bosqueOption
+val projectbosqueOptionfrombool0int0bosqueOption : (union__bool0int0bosqueOption bool int singletonBosqueNone) -> bosqueOption singletonBosqueNone
 let projectbosqueOptionfrombool0int0bosqueOption x = match x with
 | InjectbosqueOptionfrombool0int0bosqueOption x -> BosqueSome x
 | _ -> BosqueNone
+
+let test1 = InjectbosqueOptionfrombool0int0bosqueOption BosqueNone
+let ok1 = projectbosqueOptionfrombool0int0bosqueOption test1
 
 type union__int0bosqueOption: Type -> Type ->Type =
 | Injectintfromint0bosqueOption: x : int -> union__int0bosqueOption int bosqueOption

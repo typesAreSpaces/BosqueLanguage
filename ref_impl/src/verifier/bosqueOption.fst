@@ -9,3 +9,5 @@ let lift_bosqueOption (f : ('a -> 'b)) : (bosqueOption 'a -> bosqueOption 'b) = 
 | BosqueError -> BosqueError
 | BosqueNone -> BosqueNone 
 | BosqueSome v -> BosqueSome (f v)
+
+type singletonBosqueNone = x : (bosqueOption bool){x = BosqueNone}
