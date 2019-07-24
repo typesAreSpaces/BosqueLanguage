@@ -62,7 +62,7 @@ class StringType extends TypeExpr {
 
 class NoneType extends TypeExpr {
     getFStarType() {
-        return "bosqueOption";
+        return "singletonBosqueNone";
     }
     getBosqueType() {
         return "None";
