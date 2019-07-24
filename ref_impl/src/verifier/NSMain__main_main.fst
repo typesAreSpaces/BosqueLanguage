@@ -1,5 +1,4 @@
 module NSMain__main_main
-open BosqueOption
 
 type union__bool0int0bosqueOption: Type -> Type -> Type ->Type =
 | Injectboolfrombool0int0bosqueOption: x : bool -> union__bool0int0bosqueOption bool int bosqueOption

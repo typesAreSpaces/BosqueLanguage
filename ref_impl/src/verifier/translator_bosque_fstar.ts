@@ -43,7 +43,7 @@ class TranslatorBosqueFStar {
 
     readonly mapDeclarations: Map<string, MIRInvokeBodyDecl>;
     readonly fileName: string;
-    readonly stack_declarations = [] as FStarDeclaration[];
+    readonly function_declarations = [] as FStarDeclaration[];
     readonly isFkeyDeclared: Set<string>;
 
     constructor(mapDeclarations: Map<string, MIRInvokeBodyDecl>, fileName: string) {
@@ -476,7 +476,7 @@ class TranslatorBosqueFStar {
         }
     }
 
-    collectExpr(fkey: string): FStarDeclaration[] {
+    collectExpr(fkey: string){
         const declarations = (this.mapDeclarations.get(fkey) as MIRInvokeBodyDecl);
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
@@ -531,7 +531,7 @@ class TranslatorBosqueFStar {
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
                 returnType);
             if (!this.isFkeyDeclared.has(fkey)) {
-                this.stack_declarations.push(
+                this.function_declarations.push(
                     new FStarDeclaration(fkey,
                         declarations.params.map(x => x.name),
                         traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
@@ -539,20 +539,15 @@ class TranslatorBosqueFStar {
                 this.isFkeyDeclared.add(fkey);
             }
             console.log(TranslatorBosqueFStar.typesSeen);
-            return this.stack_declarations;
         }
     }
 
-    // This method destroys this.stack_declarations
     generateFStarCode(fkey: string) {
         const fd = FS.openSync(this.fileName, 'w');
         this.collectExpr(fkey);
-        this.stack_declarations.reverse();
         this.printPrelude(fd);
         TypeExpr.print(fd);
-        while (this.stack_declarations.length > 0) {
-            (this.stack_declarations.pop() as FStarDeclaration).print(fd);
-        }
+        this.function_declarations.map(x => x.print(fd));
         TranslatorBosqueFStar.closeFS(fd);
     }
 }
