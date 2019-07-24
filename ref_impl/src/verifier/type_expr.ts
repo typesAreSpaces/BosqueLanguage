@@ -18,9 +18,12 @@ import * as FS from "fs";
 abstract class TypeExpr {
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
-    static print(fd : number) : void {
+    static print(fd: number): void {
         // TODO: Include more classese that need
         // to be declared in the FStar prelude file
+        UnionType.isDeclared.forEach((_, index) => {
+            UnionType.fstarDeclaration(fd, index);
+        })
         TupleType.isDeclared.forEach((_, index) => {
             TupleType.fstarDeclaration(fd, index);
         });
@@ -34,7 +37,7 @@ class IntType extends TypeExpr {
     getFStarType() {
         return "int";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "NSCore::Int";
     }
 }
@@ -43,7 +46,7 @@ class BoolType extends TypeExpr {
     getFStarType() {
         return "bool";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "NSCore::Bool";
     }
 }
@@ -52,17 +55,16 @@ class StringType extends TypeExpr {
     getFStarType() {
         return "string";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "NSCore::String";
     }
 }
 
-// TODO: Implement getFStarType
 class NoneType extends TypeExpr {
     getFStarType() {
-        return "";
+        return "bosqueOption";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "None";
     }
 }
@@ -72,7 +74,7 @@ class AnyType extends TypeExpr {
     getFStarType() {
         return "";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "Any";
     }
 }
@@ -82,7 +84,7 @@ class SomeType extends TypeExpr {
     getFStarType() {
         return "";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "Some";
     }
 }
@@ -92,7 +94,7 @@ class SomeType extends TypeExpr {
 // parse as a valid char for a symbolNamed expression
 class UninterpretedType extends TypeExpr {
     readonly symbolName: string;
-    
+
     constructor(symbolName: string) {
         super();
         this.symbolName = symbolName;
@@ -100,7 +102,7 @@ class UninterpretedType extends TypeExpr {
     getFStarType() {
         return this.symbolName;
     }
-    getBosqueType(){
+    getBosqueType() {
         return this.symbolName;
     }
 }
@@ -119,28 +121,71 @@ class FuncType extends TypeExpr {
         return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getFStarType()).join(" -> ") + " -> Tot ")
             + this.image.getFStarType();
     }
-    getBosqueType(){
+    getBosqueType() {
         return "";
     }
 }
 
-// TODO: Implement getFStarType
 class UnionType extends TypeExpr {
+    static readonly isDeclared: Map<string, boolean> = new Map<string, boolean>();
+    readonly signature: string;
+    readonly symbolName: string;
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
 
     constructor(elements: Set<TypeExpr>) {
         super();
+        this.signature = Array.from(elements).map(x => x.getFStarType()).join("0");
+        this.symbolName = "union__" + this.signature;
         this.elements = elements;
+        if (UnionType.isDeclared.get(this.signature) == undefined) {
+            UnionType.isDeclared.set(this.signature, false);
+        }
     }
     getFStarType() {
-        return "";
+        return "(" + this.symbolName
+            + " " + Array.from(this.elements).map(x => x.getFStarType()).join(" ")
+            + ")";
     }
-    getBosqueType(){
+    getBosqueType() {
         if (this.elements.size === 0) {
             return "Empty";
         }
         else {
             return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");
+        }
+    }
+    static fstarDeclaration(fd: number, signature: string): void {
+        const symbolName = "union__" + signature;
+        const stringTypes = signature.split("0");
+        const length = stringTypes.length;
+        const actualStringType = symbolName + " " + stringTypes.join(" ");
+        if (UnionType.isDeclared.get(signature) == false) {
+            // * Type Definition
+            // ** Type name ---------------------------------
+            FS.writeSync(fd, "type " + symbolName + ":");
+            for (let index = 0; index < length; ++index) {
+                FS.writeSync(fd, " Type ->");
+            }
+            FS.writeSync(fd, "Type =\n");
+            // ----------------------------------------------
+            // ** Injections --------------------------------
+            const injectionDeclaration = (stringType : string) => {
+                return "| Inject" + stringType + "from" + signature + ": x : " + stringType + " -> " + actualStringType + "\n";
+            }
+            stringTypes.map(x => FS.writeSync(fd, injectionDeclaration(x)));
+            FS.writeSync(fd, "\n");
+            // ----------------------------------------------
+            // ** Projections
+            const projectionDeclaration = (stringType: string) => {
+                const projectionName = "project" + stringType + "from" + signature;
+                const injectionName = "Inject" + stringType + "from" + signature;
+                const valPart = "val " + projectionName + " : (" + actualStringType + ") -> bosqueOption " + stringType;
+                const letPart = "let " + projectionName + " x = match x with\n| " + injectionName + " x -> BosqueSome x\n| _ -> BosqueNone";
+                return valPart + "\n" + letPart + "\n\n";
+            };
+            stringTypes.map(x => FS.writeSync(fd, projectionDeclaration(x)));
+            // ----------------------------------------------
+            UnionType.isDeclared.set(signature, true); 
         }
     }
 }
@@ -152,7 +197,7 @@ class TupleType extends TypeExpr {
     readonly symbolName: string;
     readonly elements: TypeExpr[];
 
-    constructor(elements : TypeExpr[]) {
+    constructor(elements: TypeExpr[]) {
         super();
         this.length = elements.length;
         this.symbolName = "tuple__" + this.length;
@@ -162,9 +207,11 @@ class TupleType extends TypeExpr {
         }
     }
     getFStarType() {
-        return "(" + this.symbolName + " " + this.elements.map(x => x.getFStarType()).join(" ") + ")";
+        return "(" + this.symbolName
+            + " " + this.elements.map(x => x.getFStarType()).join(" ")
+            + ")";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "";
     }
     static fstarDeclaration(fd: number, length: number): void {
@@ -195,7 +242,7 @@ class RecordType extends TypeExpr {
     readonly signature: string;
     readonly symbolName: string;
     readonly elements: [string, TypeExpr][];
-    
+
     constructor(elements: [string, TypeExpr][]) {
         super()
         this.signature = elements.map(x => x[0]).join("_");
@@ -206,9 +253,11 @@ class RecordType extends TypeExpr {
         }
     }
     getFStarType() {
-        return "(" + this.symbolName + " " + this.elements.map(x => x[1].getFStarType()).join(" ") + ")";
+        return "(" + this.symbolName
+            + " " + this.elements.map(x => x[1].getFStarType()).join(" ")
+            + ")";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "";
     }
     static fstarDeclaration(fd: number, signature: string): void {
@@ -223,7 +272,7 @@ class RecordType extends TypeExpr {
             FS.writeSync(fd, " =\n");
             FS.writeSync(fd, "| Mk" + symbolName + ":")
             for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " " + keys[index-1] + ":t_" + index + " ->");
+                FS.writeSync(fd, " " + keys[index - 1] + ":t_" + index + " ->");
             }
             FS.writeSync(fd, " " + symbolName);
             for (let index = 1; index <= length; ++index) {
@@ -245,7 +294,7 @@ class ConstructorType extends TypeExpr {
     getFStarType() {
         return "";
     }
-    getBosqueType(){
+    getBosqueType() {
         return "";
     }
     static fstarDeclaration(fd: number): void {
@@ -269,7 +318,7 @@ class LambdaType extends TypeExpr {
         return "";
         // return "(" + this.args.map(x => x[0] + ":" + x[1].getFStarType()).join(", ") + ")" + " -> " + this.result.getFStarType();
     }
-    getBosqueType(){
+    getBosqueType() {
         return "";
     }
     static fstarDeclaration(): string {

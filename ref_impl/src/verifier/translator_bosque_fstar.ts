@@ -4,10 +4,10 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty, MIRInvokeFixedFunction } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty, MIRInvokeFixedFunction, MIRIsTypeOfNone } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType, RecordType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr, TupleType, StringType, RecordType, UnionType, NoneType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRInvokeBodyDecl } from "../compiler/mir_assembly";
@@ -35,6 +35,7 @@ class TranslatorBosqueFStar {
     static readonly intType = new IntType();
     static readonly boolType = new BoolType();
     static readonly stringType = new StringType();
+    static readonly noneType = new NoneType();
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
     static readonly DEBUGGING = false;
     // typesSeen : String[MangledNamewithFkey] -> TypeExpr
@@ -75,6 +76,9 @@ class TranslatorBosqueFStar {
             case "NSCore::Bool": {
                 return TranslatorBosqueFStar.boolType;
             }
+            case "NSCore::None": {
+                return TranslatorBosqueFStar.noneType;
+            }
             default: {
                 if (s.charAt(0) == '[') {
                     return new TupleType(s
@@ -83,7 +87,16 @@ class TranslatorBosqueFStar {
                         .split(", ")
                         .map(TranslatorBosqueFStar.stringTypeToType));
                 }
+                if(s.includes("|")){
+                    console.log(s);
+                    console.log(s.split(" | "));
+                    return new UnionType(new Set(s
+                        .split(" | ")
+                        .map(TranslatorBosqueFStar.stringTypeToType)
+                    ));
+                }
                 else {
+                    console.log(s);
                     throw new Error(`${s} is not a valid constant value type, yet`);
                 }
             }
@@ -140,7 +153,7 @@ class TranslatorBosqueFStar {
     }
 
     // -- Common pattern: 
-    // typesSeen -> set -> (sanitize -> trgt.name + fkey, a Type)
+    // typesSeen -> set -> (sanitize -> trgt.name + fkey, [a Type])
     // return [argumentToExpr (trgt, fkey), argumentToExpr (src, fkey)]
     // -- Example:
     // TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID + fkey), TranslatorBosqueFStar.intType);        
@@ -189,6 +202,8 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRConstructorTuple: {
                 const opConstructorTuple = op as MIRConstructorTuple;
+                console.log("eahnhhhh");
+                console.log(opConstructorTuple);
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
                     new TupleType(types));
@@ -417,15 +432,19 @@ class TranslatorBosqueFStar {
                 return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
             }
             case MIROpTag.MIRIsTypeOfNone: { // IMPLEMENT:
-                // const opIsTypeOfNone = op as MIRIsTypeOfNone;
-
+                const opIsTypeOfNone = op as MIRIsTypeOfNone;
+                console.log(opIsTypeOfNone);
+                // FIX:
+                TranslatorBosqueFStar.typesSeen.set(sanitizeName(opIsTypeOfNone.trgt.nameID + fkey), TranslatorBosqueFStar.boolType);
+                return [TranslatorBosqueFStar.argumentToExpr(opIsTypeOfNone.trgt, fkey), 
+                    new ConstTerm("true", TranslatorBosqueFStar.boolType)];
                 // const regName = section + "_" + opIsTypeOfNone.trgt.nameID;
                 // stringVariableToStringType.set(regName, "NSCore::Bool");
 
                 // return new EqualityTerm(new VarExpr(regName, new TranslatorBosqueFStar.boolType()),
                 //     BoxFormulaExpr(new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"),
                 //         [argumentToTermExpr(opIsTypeOfNone.arg, section)]), BNone)));
-                return [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                // return [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRIsTypeOfSome: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRIsTypeOfSome Not implemented yet", TranslatorBosqueFStar.DEBUGGING);

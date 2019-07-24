@@ -25,11 +25,15 @@ function max0(x: [Int, Int], y: Int): Int
     }
 }
 
+function identityUnion(x : Int | None | Bool) : Int | None | Bool {
+    return x;
+}
+
 function identity(x : String): String {
     return x;
 }
 
-function max(x: Int?, y: Int): Int
+function max(x: Int | None, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
     if (x == none) {
@@ -82,7 +86,7 @@ function max4(x: {f: Int, g: Int}): Int
 {
     var aa = [1, 2];
     var y = {h = 1, i = 2};
-    var yH = y.h;    
+    var yH = y.h;
             
     if(x.f >= x.g){
         return x.f;
@@ -119,9 +123,13 @@ entrypoint function main(): Int {
     var x5 = {g = 10, f = 20};
     var x6 = x5.f;
     var y = 20;
-
-    var z = max0(x, y);
+    var y2 = identityUnion(y);
     
+    // var z = max0(x, y);
+    var z = max(x.0, y);
+    
+    
+
     var zTuple = [x, y];
     // var zBaz = Baz@identity(1); 
     // var maxTuple = max3(zTuple);
