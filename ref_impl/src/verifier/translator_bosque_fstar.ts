@@ -53,7 +53,10 @@ class TranslatorBosqueFStar {
     }
 
     printPrelude(fd: number): void {
-        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n\n`);
+        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
+        FS.writeSync(fd, `open BosqueOption\n`);
+        
+        FS.writeSync(fd, `\n`);
     }
 
     static closeFS(fd: number): void {
