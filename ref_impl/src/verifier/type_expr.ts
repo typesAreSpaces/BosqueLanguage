@@ -127,7 +127,7 @@ class FuncType extends TypeExpr {
 }
 
 class UnionType extends TypeExpr {
-    static readonly isDeclared: Map<string, boolean> = new Map<string, boolean>();
+    static readonly isDeclared: Set<string> = new Set<string>();
     readonly signature: string;
     readonly symbolName: string;
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
@@ -137,9 +137,7 @@ class UnionType extends TypeExpr {
         this.signature = Array.from(elements).map(x => x.getFStarType()).join("0");
         this.symbolName = "union__" + this.signature;
         this.elements = elements;
-        if (UnionType.isDeclared.get(this.signature) == undefined) {
-            UnionType.isDeclared.set(this.signature, false);
-        }
+        UnionType.isDeclared.add(this.signature);
     }
     getFStarType() {
         return "(" + this.symbolName
@@ -159,40 +157,37 @@ class UnionType extends TypeExpr {
         const stringTypes = signature.split("0");
         const length = stringTypes.length;
         const actualStringType = symbolName + " " + stringTypes.join(" ");
-        if (UnionType.isDeclared.get(signature) == false) {
-            // * Type Definition
-            // ** Type name ---------------------------------
-            FS.writeSync(fd, "type " + symbolName + ":");
-            for (let index = 0; index < length; ++index) {
-                FS.writeSync(fd, " Type ->");
-            }
-            FS.writeSync(fd, "Type =\n");
-            // ----------------------------------------------
-            // ** Injections --------------------------------
-            const injectionDeclaration = (stringType : string) => {
-                return "| Inject" + stringType + "from" + signature + ": x : " + stringType + " -> " + actualStringType + "\n";
-            }
-            stringTypes.map(x => FS.writeSync(fd, injectionDeclaration(x)));
-            FS.writeSync(fd, "\n");
-            // ----------------------------------------------
-            // ** Projections
-            const projectionDeclaration = (stringType: string) => {
-                const projectionName = "project" + stringType + "from" + signature;
-                const injectionName = "Inject" + stringType + "from" + signature;
-                const valPart = "val " + projectionName + " : (" + actualStringType + ") -> bosqueOption " + stringType;
-                const letPart = "let " + projectionName + " x = match x with\n| " + injectionName + " x -> BosqueSome x\n| _ -> BosqueNone";
-                return valPart + "\n" + letPart + "\n\n";
-            };
-            stringTypes.map(x => FS.writeSync(fd, projectionDeclaration(x)));
-            // ----------------------------------------------
-            UnionType.isDeclared.set(signature, true); 
+        // * Type Definition
+        // ** Type name ---------------------------------
+        FS.writeSync(fd, "type " + symbolName + ":");
+        for (let index = 0; index < length; ++index) {
+            FS.writeSync(fd, " Type ->");
         }
+        FS.writeSync(fd, "Type =\n");
+        // ----------------------------------------------
+        // ** Injections --------------------------------
+        const injectionDeclaration = (stringType: string) => {
+            return "| Inject" + stringType + "from" + signature + ": x : " + stringType + " -> " + actualStringType + "\n";
+        }
+        stringTypes.map(x => FS.writeSync(fd, injectionDeclaration(x)));
+        FS.writeSync(fd, "\n");
+        // ----------------------------------------------
+        // ** Projections
+        const projectionDeclaration = (stringType: string) => {
+            const projectionName = "project" + stringType + "from" + signature;
+            const injectionName = "Inject" + stringType + "from" + signature;
+            const valPart = "val " + projectionName + " : (" + actualStringType + ") -> bosqueOption " + stringType;
+            const letPart = "let " + projectionName + " x = match x with\n| " + injectionName + " x -> BosqueSome x\n| _ -> BosqueNone";
+            return valPart + "\n" + letPart + "\n\n";
+        };
+        stringTypes.map(x => FS.writeSync(fd, projectionDeclaration(x)));
+        // ----------------------------------------------
     }
 }
 
 // TODO: Implement getBosqueType
 class TupleType extends TypeExpr {
-    static readonly isDeclared: Map<number, boolean> = new Map<number, boolean>();
+    static readonly isDeclared: Set<number> = new Set<number>();
     readonly length: number;
     readonly symbolName: string;
     readonly elements: TypeExpr[];
@@ -202,9 +197,7 @@ class TupleType extends TypeExpr {
         this.length = elements.length;
         this.symbolName = "tuple__" + this.length;
         this.elements = elements;
-        if (TupleType.isDeclared.get(this.length) == undefined) {
-            TupleType.isDeclared.set(this.length, false);
-        }
+        TupleType.isDeclared.add(this.length);
     }
     getFStarType() {
         return "(" + this.symbolName
@@ -216,29 +209,26 @@ class TupleType extends TypeExpr {
     }
     static fstarDeclaration(fd: number, length: number): void {
         const symbolName = "tuple__" + length;
-        if (TupleType.isDeclared.get(length) == false) {
-            FS.writeSync(fd, "type " + symbolName);
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " (t_" + index + " : Type)");
-            }
-            FS.writeSync(fd, " =\n");
-            FS.writeSync(fd, "| Mk" + symbolName + ":")
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " _" + index + ":t_" + index + " ->");
-            }
-            FS.writeSync(fd, " " + symbolName);
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " t_" + index);
-            }
-            FS.writeSync(fd, " \n\n");
-            TupleType.isDeclared.set(length, true);
+        FS.writeSync(fd, "type " + symbolName);
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " (t_" + index + " : Type)");
         }
+        FS.writeSync(fd, " =\n");
+        FS.writeSync(fd, "| Mk" + symbolName + ":")
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " _" + index + ":t_" + index + " ->");
+        }
+        FS.writeSync(fd, " " + symbolName);
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " t_" + index);
+        }
+        FS.writeSync(fd, " \n\n");
     }
 }
 
 // TODO: Implement getBosqueType
 class RecordType extends TypeExpr {
-    static readonly isDeclared: Map<string, boolean> = new Map<string, boolean>();
+    static readonly isDeclared: Set<string> = new Set<string>();
     readonly signature: string;
     readonly symbolName: string;
     readonly elements: [string, TypeExpr][];
@@ -248,9 +238,7 @@ class RecordType extends TypeExpr {
         this.signature = elements.map(x => x[0]).join("_");
         this.symbolName = "record__" + this.signature;
         this.elements = elements;
-        if (RecordType.isDeclared.get(this.signature) == undefined) {
-            RecordType.isDeclared.set(this.signature, false);
-        }
+        RecordType.isDeclared.add(this.signature);
     }
     getFStarType() {
         return "(" + this.symbolName
@@ -264,23 +252,20 @@ class RecordType extends TypeExpr {
         const symbolName = "record__" + signature;
         const keys = signature.split("_");
         const length = keys.length;
-        if (RecordType.isDeclared.get(signature) == false) {
-            FS.writeSync(fd, "type " + symbolName);
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " (t_" + index + " : Type)");
-            }
-            FS.writeSync(fd, " =\n");
-            FS.writeSync(fd, "| Mk" + symbolName + ":")
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " " + keys[index - 1] + ":t_" + index + " ->");
-            }
-            FS.writeSync(fd, " " + symbolName);
-            for (let index = 1; index <= length; ++index) {
-                FS.writeSync(fd, " t_" + index);
-            }
-            FS.writeSync(fd, " \n\n");
-            TupleType.isDeclared.set(length, true);
+        FS.writeSync(fd, "type " + symbolName);
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " (t_" + index + " : Type)");
         }
+        FS.writeSync(fd, " =\n");
+        FS.writeSync(fd, "| Mk" + symbolName + ":")
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " " + keys[index - 1] + ":t_" + index + " ->");
+        }
+        FS.writeSync(fd, " " + symbolName);
+        for (let index = 1; index <= length; ++index) {
+            FS.writeSync(fd, " t_" + index);
+        }
+        FS.writeSync(fd, " \n\n");
     }
 }
 
