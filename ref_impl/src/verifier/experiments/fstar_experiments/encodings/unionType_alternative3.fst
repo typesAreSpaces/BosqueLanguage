@@ -144,7 +144,7 @@ let maxWithUnion2 x y = match x with
   | BInt x2 -> BInt x2
   | _ -> BError
 ) 
-| BInt x1 -> if (extractBool (greaterOrEq x y)) then BInt x1 else y
+| BInt x1 -> if (extractBool (greaterOrEq x y)) then x else y
 | _ -> BError
 
 let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) 
