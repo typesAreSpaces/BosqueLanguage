@@ -55,7 +55,7 @@ class TranslatorBosqueFStar {
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         FS.writeSync(fd, `open BosqueOption\n`);
-        
+
         FS.writeSync(fd, `\n`);
     }
 
@@ -91,8 +91,6 @@ class TranslatorBosqueFStar {
                         .map(TranslatorBosqueFStar.stringTypeToType));
                 }
                 if(s.includes("|")){
-                    console.log(s);
-                    console.log(s.split(" | "));
                     return new UnionType(new Set(s
                         .split(" | ")
                         .map(TranslatorBosqueFStar.stringTypeToType)
@@ -205,8 +203,6 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRConstructorTuple: {
                 const opConstructorTuple = op as MIRConstructorTuple;
-                console.log("eahnhhhh");
-                console.log(opConstructorTuple);
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
                     new TupleType(types));
@@ -428,7 +424,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRPhi: {
                 const opPhi = op as MIRPhi;
-                // FIX: Use the right type 
+                // Use the right type 
                 // ?? I'm not so sure about this one
                 TranslatorBosqueFStar.typesSeen.set(sanitizeName(opPhi.trgt.nameID + fkey),
                     TranslatorBosqueFStar.intType); // I mean, this one
@@ -541,7 +537,7 @@ class TranslatorBosqueFStar {
                         programType));
                 this.isFkeyDeclared.add(fkey);
             }
-            console.log(TranslatorBosqueFStar.typesSeen);
+            // console.log(TranslatorBosqueFStar.typesSeen);
         }
     }
 
