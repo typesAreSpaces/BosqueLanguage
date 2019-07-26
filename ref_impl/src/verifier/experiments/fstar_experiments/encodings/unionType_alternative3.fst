@@ -6,7 +6,7 @@ module UnionType_alternative3
 type sequence 'a : int -> Type = 
 | CNil : sequence 'a 0
 (* For necessity, we require the dimension to be explicit *)
-| CCons : hd:'a -> n:nat -> tl : sequence 'a n -> sequence 'a (n + 1)
+| CCons : hd:'a -> #n:nat -> tl : sequence 'a n -> sequence 'a (n + 1)
 
 (* Dynamic: depends on the 
    entities created by user *) 
@@ -30,12 +30,23 @@ type bosqueType =
 val nthTuple : index:int -> dimension:int -> bosqueTerm -> Tot bosqueTerm
 let rec nthTuple index dimension y = match y with
 | BTuple 0 CNil -> if (index < 0) then BError else BNone
-| BTuple dimension'' (CCons x dimension' xs) -> 
-  if (index < 0) then BError else
+| BTuple dimension'' (CCons x #dimension' xs) -> 
+  if (index < 0 || dimension <> dimension'') then BError else
   if (index >= dimension) then BNone else
   if index = 0 then x
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError
+
+(* Testing: BTuple *)
+let test0a = BTuple 2 (CCons (BInt 342) (CCons (BBool true) (CNil)))
+// let test0b = isTuple 2 test0a
+// let test0c = isTuple 2 (BInt 234)
+let test0d0 = nthTuple 0 2 test0a
+let test0d00 = nthTuple 0 3 test0a
+let test0d1 = nthTuple 1 2 test0a
+let test0d2 = nthTuple 2 2 test0a
+let test0d20 = nthTuple 2 10000 test0a
+let test0d3 = nthTuple (-1) 2 test0a
 
 val getType : bosqueTerm -> bosqueType
 let getType x = match x with
@@ -83,15 +94,10 @@ let isTuple n x = match x with
 | _ -> false
 (* ---------------------------------------------------------------- *)
 
-(* Testing: BTuple *)
-let test0a = BTuple 2 (CCons (BInt 342) 1 (CCons (BBool true) 0 (CNil)))
-let test0b = isTuple 2 test0a
-let test0c = isTuple 2 (BInt 234)
-let test0d0 = nthTuple 0 2 test0a
-let test0d1 = nthTuple 1 2 test0a
-let test0d2 = nthTuple 2 2 test0a
-let test0d20 = nthTuple 2 10000 test0a
-let test0d3 = nthTuple (-1) 2 test0a
+
+
+
+
 
 (* ---------------------------------------------------------------- *)
 (* Function to extract boolean, mainly used inside conditionals and assertions *)
