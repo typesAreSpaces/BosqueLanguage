@@ -1,16 +1,21 @@
 module UnionType_alternative3
 
-type tuple__2 (t_1 : Type) (t_2 : Type) =
-| Mktuple__2: _1:t_1 -> _2:t_2 -> tuple__2 t_1 t_2 
+// TODO: Implement tuples as recursive structures
+// Same for records
 
-(* Dynamic: depends on the tuples, records, 
-   and entities created by user *)
+type sequence 'a : int -> Type = 
+| CNil : sequence 'a 0
+(* For necessity, we require the dimension to be explicit *)
+| CCons : hd:'a -> n:nat -> tl : sequence 'a n -> sequence 'a (n + 1)
+
+(* Dynamic: depends on the 
+   entities created by user *) 
 noeq type bosqueTerm = 
 | BError : bosqueTerm
 | BNone : bosqueTerm
 | BInt : int -> bosqueTerm
 | BBool : bool -> bosqueTerm
-| BTuple__2 : tuple__2 bosqueTerm bosqueTerm -> bosqueTerm
+| BTuple : n:int -> sequence bosqueTerm n -> bosqueTerm
 
 // Convention with UnionTerm: 
 // its elements should be unique
@@ -20,9 +25,17 @@ type bosqueType =
 | BTypeInt
 | BTypeBool
 | BTypeUnion : bosqueType -> bosqueType -> bosqueType
-| BTypeTuple__2
+| BTypeTuple
 
-// let test0a = Mktuple__2 (BInt 2) (BInt 4)
+val nthTuple : index:int -> dimension:int -> bosqueTerm -> Tot bosqueTerm
+let rec nthTuple index dimension y = match y with
+| BTuple 0 CNil -> if (index < 0) then BError else BNone
+| BTuple dimension'' (CCons x dimension' xs) -> 
+  if (index < 0) then BError else
+  if (index >= dimension) then BNone else
+  if index = 0 then x
+  else nthTuple (index-1) dimension' (BTuple dimension' xs)
+| _ -> BError
 
 val getType : bosqueTerm -> bosqueType
 let getType x = match x with
@@ -30,7 +43,7 @@ let getType x = match x with
 | BNone -> BTypeNone
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
-| BTuple__2 _ -> BTypeTuple__2
+| BTuple _ _ -> BTypeTuple
 
 // forall x y . bosqueSubtypeOf x y <===> x :> y
 val bosqueSubtypeOf : bosqueType -> bosqueType -> (Tot bool)
@@ -39,12 +52,13 @@ let rec bosqueSubtypeOf x y = match x, y with
 | BTypeNone, BTypeNone -> true
 | BTypeInt, BTypeInt -> true
 | BTypeBool, BTypeBool -> true
-| BTypeTuple__2, BTypeTuple__2 -> true // FIX: This is wrong, but I just want to see how it behaves
-| BTypeUnion x1 y1, BTypeUnion x2 y2 -> (bosqueSubtypeOf x1 x2 || bosqueSubtypeOf y1 x2) && (bosqueSubtypeOf x1 y2 || bosqueSubtypeOf y1 y2)
+| BTypeUnion x1 y1, BTypeUnion x2 y2 -> (bosqueSubtypeOf x1 x2 || bosqueSubtypeOf y1 x2) 
+  && (bosqueSubtypeOf x1 y2 || bosqueSubtypeOf y1 y2)
 | BTypeUnion x1 y1, z -> bosqueSubtypeOf x1 z || bosqueSubtypeOf y1 z 
+// Missing: BTuple ? ?, x
 | _, _ -> false
 
-(* Testing *)
+(* Testing: bosqueSubtypeOf *)
 let test1a = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
 let test1b = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeNone)
 let test1c = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeNone BTypeBool)
@@ -62,7 +76,22 @@ val isInt : bosqueTerm -> bool
 let isInt x = match x with 
 | BInt _ -> true
 | _ -> false 
+
+val isTuple : n:int -> x:bosqueTerm -> bool
+let isTuple n x = match x with
+| BTuple m _ -> n = m
+| _ -> false
 (* ---------------------------------------------------------------- *)
+
+(* Testing: BTuple *)
+let test0a = BTuple 2 (CCons (BInt 342) 1 (CCons (BBool true) 0 (CNil)))
+let test0b = isTuple 2 test0a
+let test0c = isTuple 2 (BInt 234)
+let test0d0 = nthTuple 0 2 test0a
+let test0d1 = nthTuple 1 2 test0a
+let test0d2 = nthTuple 2 2 test0a
+let test0d20 = nthTuple 2 10000 test0a
+let test0d3 = nthTuple (-1) 2 test0a
 
 (* ---------------------------------------------------------------- *)
 (* Function to extract boolean, mainly used inside conditionals and assertions *)
@@ -74,16 +103,16 @@ let extractBool x = match x with
 (* ---------------------------------------------------------------- *)
 (* Definition of UnionType *)
 type typeUnionIntBool = x:bosqueType{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) x}
-type termUnionIntBool = x:bosqueTerm{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)}
-
-type termInt = x:bosqueTerm{isInt x}
+type termUnionIntBool = x:bosqueTerm{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)} 
+(* Definition of IntType *)
+type termInt = x:bosqueTerm{isInt x} 
 (* ---------------------------------------------------------------- *)
 
 (* Function with union as argument *)
 val f : x : typeUnionIntBool -> bosqueType
 let f x = x
 
-(* Testing *)
+(* Testing: BTypeUnion *)
 let test2a = f BTypeInt
 let test2b = f BTypeBool
 let test2c = f (BTypeUnion BTypeInt BTypeBool)
@@ -94,11 +123,10 @@ let test2d = f (BTypeUnion BTypeBool BTypeInt)
 (* Definition of equality relation on terms *)
 val eqTerm : bosqueTerm -> bosqueTerm -> bosqueTerm
 let eqTerm x y = match x, y with
-| BError, BError -> BBool true
+// | BError, BError -> BBool true
 | BNone, BNone -> BBool true
 | BInt x1, BInt y1 -> BBool (x1 = y1)
 | BBool x1, BBool y1 -> BBool (x1 = y1)
-| BTuple__2 _, BTuple__2 _ -> BBool true // FIX: This is wrong, but I just want to see how it behaves
 | _, _ -> BError 
 
 (* Definition of greater than or equal relation on terms *)
@@ -107,10 +135,7 @@ let greaterOrEq x y = match x, y with
 | BInt x1, BInt y1 -> BBool (x1 >= y1)
 | _, _ -> BError
 
-
-
-
-
+(* -------------------------------------------------------------------------------------------------------------- *)
 
 (* Examples *)
 
@@ -126,7 +151,7 @@ let maxWithUnion x y = match x with
 )
 | _ -> BError
 
-(* Testing *)
+(* Testing: maxWithUnion *)
 let test3a = maxWithUnion (BInt 12) (BInt 10)
 let test3b = maxWithUnion (BInt 10) (BInt 12)
 let test3c = maxWithUnion (BBool false) (BInt 12)
@@ -161,9 +186,23 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 && (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
 )
 
-let _ = assert (forall x y z. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt x) )
-&& extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
-&& (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
-)
+// The following fails, as expected
+// let _ = assert (forall x y z. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt x) )
+// && extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt y))
+// && (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
+// && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
+// )
+
+// val maxWithTuple : x:bosqueTerm{isTuple 2 x} -> y:bosqueTerm{isInt y} -> z:bosqueTerm{isInt z}
+// let maxWithTuple x y = if (extractBool (greaterOrEq (nthTuple 0 2 x) y)) then (nthTuple 0 2 x) else y
+
+val maxWithTuple : x:bosqueTerm{isTuple 2 x} -> y:bosqueTerm{isInt y} -> bosqueTerm
+let maxWithTuple x y = let projec = nthTuple 0 2 x in match projec with 
+| BInt x1 -> if (extractBool (greaterOrEq projec y)) then projec else y
+| _ -> BError
+
+(* Testing: maxWithTuple *)
+let test4a = maxWithTuple (test0a) (BInt 1203)
+let test4b = maxWithTuple (test0a) (BInt (-12))
+
 (* ---------------------------------------------------------------- *)
