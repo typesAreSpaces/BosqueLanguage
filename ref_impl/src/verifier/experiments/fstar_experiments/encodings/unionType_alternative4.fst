@@ -1,4 +1,4 @@
-module UnionType_alternative3
+module UnionType_alternative4
 
 // TODO: Implement tuples as recursive structures
 // Same for records
@@ -7,6 +7,11 @@ type sequence 'a : int -> Type =
 | CNil : sequence 'a 0
 | CCons : hd:'a -> #n:nat -> tl : sequence 'a n -> sequence 'a (n + 1) 
 
+val mapSequence : ('a -> Tot 'b) -> #n:nat -> (sequence 'a n) -> Tot (sequence 'b n)
+let rec mapSequence f #n seq = match seq with
+| CNil -> CNil
+| CCons hd tl -> CCons (f hd) (mapSequence f tl)
+
 (* Dynamic: depends on the 
    entities created by user *) 
 noeq type bosqueTerm = 
@@ -14,19 +19,19 @@ noeq type bosqueTerm =
 | BNone : bosqueTerm
 | BInt : int -> bosqueTerm
 | BBool : bool -> bosqueTerm
-| BTuple : n:int -> sequence bosqueTerm n -> bosqueTerm 
+| BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
 
 // Convention with UnionTerm: 
 // its elements should be unique
-type bosqueType = 
+type bosqueType =
 | BTypeError 
 | BTypeNone
 | BTypeInt
 | BTypeBool
 | BTypeUnion : bosqueType -> bosqueType -> bosqueType
-| BTypeTuple
-// bool indicates closeness 
-// | BTypeTuple : bool -> n:int -> sequence bosqueType n -> bosqueType
+// The bool indicates if the Tuple is open or not
+| BTypeEmptyTuple
+| BTypeTuple : bool -> n:nat -> sequence bosqueType n -> bosqueType
 
 val nthTuple : index:int -> dimension:int -> bosqueTerm -> Tot bosqueTerm
 let rec nthTuple index dimension y = match y with
@@ -38,13 +43,37 @@ let rec nthTuple index dimension y = match y with
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError
 
-val getType : bosqueTerm -> bosqueType
-let getType x = match x with
+// val extractTupleAux : n:nat -> bosqueTerm -> option (sequence bosqueTerm n)
+// let extractTupleAux n x = match x with
+// | BTuple m x -> if (m = n) then (Some x) else None
+// | _ -> None
+
+val isTuple : n:nat -> x:bosqueTerm -> bool
+let isTuple n x = match x with
+| BTuple m _ -> n = m
+| _ -> false
+
+val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
+let extractTuple n x = match x with
+| BTuple _ seq -> seq
+
+let aaa = BTuple 2 (CCons (BInt 3) (CCons (BBool true) CNil))
+let bb = extractTuple 2 aaa
+
+val getType : bosqueTerm -> Tot bosqueType
+let rec getType x = match x with
 | BError -> BTypeError
 | BNone -> BTypeNone
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
-| BTuple _ _ -> BTypeTuple
+| BTuple 0 CNil -> BTypeEmptyTuple
+| BTuple n CNil -> BTypeError
+| BTuple 0 (CCons _ _) -> BTypeError
+| BTuple n (CCons hd #m tl) -> 
+  if (m + 1 <> n) then BTypeError 
+  else BTypeTuple false (m + 1) (mapSequence getType (CCons hd tl))
+// | BTuple n (CCons hd #m tl) -> if (m + 1 <> n) then BTypeError else BTypeTuple false (m+1) (mapSequence getType (CCons hd tl))
+// | BTuple n y -> BTypeTuple false n (mapSequence getType y)
 
 // forall x y . bosqueSubtypeOf x y <===> x :> y
 val bosqueSubtypeOf : bosqueType -> bosqueType -> (Tot bool)
@@ -78,8 +107,8 @@ let isInt x = match x with
 | BInt _ -> true
 | _ -> false 
 
-val isTuple : n:int -> x:bosqueTerm -> bool
-let isTuple n x = match x with
+val isTuple' : n:int -> x:bosqueTerm -> bool
+let isTuple' n x = match x with
 | BTuple m _ -> n = m
 | _ -> false
 (* ---------------------------------------------------------------- *)
