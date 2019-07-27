@@ -23,7 +23,7 @@ noeq type bosqueTerm =
 
 // Convention with UnionTerm: 
 // its elements should be unique
-type bosqueType =
+noeq type bosqueType =
 | BTypeError 
 | BTypeNone
 | BTypeInt
@@ -33,6 +33,43 @@ type bosqueType =
 | BTypeEmptyTuple
 | BTypeTuple : bool -> n:nat -> sequence bosqueType n -> bosqueType
 
+(* ------------------------------------------------------------------------------------------------ *)
+(* Operations on Bosque terms *)
+
+(* -------------------------------------- *)
+(* Type checkers *)
+val isBool : bosqueTerm -> bool
+let isBool x = match x with 
+| BBool _ -> true
+| _ -> false 
+
+val isInt : bosqueTerm -> bool
+let isInt x = match x with 
+| BInt _ -> true
+| _ -> false 
+
+val isTuple : n:nat -> x:bosqueTerm -> bool
+let isTuple n x = match x with
+| BTuple m _ -> n = m
+| _ -> false
+(* -------------------------------------- *)
+
+(* Definition of equality relation on Bosque terms *)
+val eqTerm : bosqueTerm -> bosqueTerm -> bosqueTerm
+let eqTerm x y = match x, y with
+// | BError, BError -> BBool true
+| BNone, BNone -> BBool true
+| BInt x1, BInt y1 -> BBool (x1 = y1)
+| BBool x1, BBool y1 -> BBool (x1 = y1)
+| _, _ -> BError 
+
+(* Definition of greater than or equal relation on terms *)
+val greaterOrEq : bosqueTerm -> bosqueTerm -> bosqueTerm
+let greaterOrEq x y = match x, y with
+| BInt x1, BInt y1 -> BBool (x1 >= y1)
+| _, _ -> BError
+
+(* Tuple projector *)
 val nthTuple : index:int -> dimension:int -> bosqueTerm -> Tot bosqueTerm
 let rec nthTuple index dimension y = match y with
 | BTuple 0 CNil -> if (index < 0 || dimension <> 0) then BError else BNone
@@ -43,17 +80,34 @@ let rec nthTuple index dimension y = match y with
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError 
 
-val isTuple : n:nat -> x:bosqueTerm -> bool
-let isTuple n x = match x with
-| BTuple m _ -> n = m
-| _ -> false
+(* ----------------------------------------------------------------------------------------- *)
+(* Extractors *)
+
+(* Function to extract boolean, mainly used inside conditionals (fstar programming language) 
+   and assertions (z3 smt solver) *)
+val extractBool : x:bosqueTerm{isBool x} -> bool
+let extractBool x = match x with
+| BBool y -> y
 
 val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
 let extractTuple n x = match x with
 | BTuple _ seq -> seq
+(* ----------------------------------------------------------------------------------------- *)
+(* ------------------------------------------------------------------------------------------------ *)
 
-let aaa = BTuple 2 (CCons (BInt 3) (CCons (BBool true) CNil))
-let bb = extractTuple 2 aaa
+(* --------------------------------------------------------------- *)
+(* Operations on Bosque Types *)
+
+(* Definition of equality relation on Bosque types *)
+val eqType : bosqueType -> bosqueType -> bool
+let eqType x y = match x, y with
+| BTypeError, BTypeError -> true 
+| BTypeNone, BTypeNone -> true
+| BTypeInt, BTypeInt -> true
+| BTypeBool, BTypeBool -> true
+| BTypeUnion _ _ , BTypeUnion _ _ -> true // FIX: This is incomplete
+| BTypeTuple, BTypeTuple -> true
+| _, _ -> false 
 
 val getType : bosqueTerm -> Tot bosqueType
 let rec getType x = match x with
@@ -83,30 +137,27 @@ let rec bosqueSubtypeOf x y = match x, y with
 // Missing: BTuple ? ?, x
 | _, _ -> false
 
+(* ---------------------------------------------------------------- *)
+(* Definition of UnionType *)
+type typeUnionIntBool = x:bosqueType{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) x}
+type termUnionIntBool = x:bosqueTerm{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)} 
+(* Definition of IntType *)
+type termInt = x:bosqueTerm{isInt x} 
+(* ---------------------------------------------------------------- *)
+
+(* --------------------------------------------------------------- *)
+
+
+
+let aaa = BTuple 2 (CCons (BInt 3) (CCons (BBool true) CNil))
+let bb = extractTuple 2 aaa
+
 (* Testing: bosqueSubtypeOf *)
 let test1a = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
 let test1b = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeNone)
 let test1c = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeNone BTypeBool)
 let test1d = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeInt (BTypeUnion BTypeNone BTypeBool))
 let test1e = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeBool BTypeInt)
-
-(* ---------------------------------------------------------------- *)
-(* Type checkers *)
-val isBool : bosqueTerm -> bool
-let isBool x = match x with 
-| BBool _ -> true
-| _ -> false 
-
-val isInt : bosqueTerm -> bool
-let isInt x = match x with 
-| BInt _ -> true
-| _ -> false 
-
-val isTuple' : n:int -> x:bosqueTerm -> bool
-let isTuple' n x = match x with
-| BTuple m _ -> n = m
-| _ -> false
-(* ---------------------------------------------------------------- *)
 
 (* Testing: BTuple *)
 let test0a = BTuple 2 (CCons (BInt 342) (CCons (BBool true) (CNil)))
@@ -124,26 +175,6 @@ let test0a_ = BTuple 0 CNil
 let test0b_ = isTuple 0 test0a_
 let test0c_ = isTuple 10 test0a_
 
-(* ---------------------------------------------------------------- *)
-(* Function to extract boolean, mainly used inside conditionals (fstar programming language) 
-   and assertions (z3 smt solver) *)
-val extractBool : x:bosqueTerm{isBool x} -> bool
-let extractBool x = match x with
-| BBool y -> y
-(* ---------------------------------------------------------------- *)
-
-(* ---------------------------------------------------------------- *)
-(* Definition of UnionType *)
-type typeUnionIntBool = x:bosqueType{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) x}
-type termUnionIntBool = x:bosqueTerm{bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)} 
-(* Definition of IntType *)
-type termInt = x:bosqueTerm{isInt x} 
-(* ---------------------------------------------------------------- *)
-
-(* Function with union as argument *)
-val f : x : typeUnionIntBool -> bosqueType
-let f x = x
-
 (* Testing: BTypeUnion *)
 let test2a = f BTypeInt
 let test2b = f BTypeBool
@@ -152,31 +183,16 @@ let test2d = f (BTypeUnion BTypeBool BTypeInt)
 // The following fails, as expected
 // let test2e = f (BTypeNone)
 
-(* Definition of equality relation on terms *)
-val eqType : bosqueType -> bosqueType -> bool
-let eqType x y = match x, y with
-| BTypeError, BTypeError -> true 
-| BTypeNone, BTypeNone -> true
-| BTypeInt, BTypeInt -> true
-| BTypeBool, BTypeBool -> true
-| BTypeUnion _ _ , BTypeUnion _ _ -> true // FIX: This is incomplete
-| BTypeTuple, BTypeTuple -> true
-| _, _ -> false 
 
 
-val eqTerm : bosqueTerm -> bosqueTerm -> bosqueTerm
-let eqTerm x y = match x, y with
-// | BError, BError -> BBool true
-| BNone, BNone -> BBool true
-| BInt x1, BInt y1 -> BBool (x1 = y1)
-| BBool x1, BBool y1 -> BBool (x1 = y1)
-| _, _ -> BError 
 
-(* Definition of greater than or equal relation on terms *)
-val greaterOrEq : bosqueTerm -> bosqueTerm -> bosqueTerm
-let greaterOrEq x y = match x, y with
-| BInt x1, BInt y1 -> BBool (x1 >= y1)
-| _, _ -> BError
+
+
+
+
+
+
+
 
 (* -------------------------------------------------------------------------------------------------------------- *)
 
