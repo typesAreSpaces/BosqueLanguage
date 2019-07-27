@@ -3,7 +3,7 @@ module UnionType_alternative4
 // TODO: Implement tuples as recursive structures
 // Same for records
  
-type sequence 'a : int -> Type = 
+type sequence 'a : nat -> Type = 
 | CNil : sequence 'a 0
 | CCons : hd:'a -> #n:nat -> tl : sequence 'a n -> sequence 'a (n + 1) 
 
@@ -41,12 +41,7 @@ let rec nthTuple index dimension y = match y with
   if (index >= dimension) then BNone else
   if index = 0 then x
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
-| _ -> BError
-
-// val extractTupleAux : n:nat -> bosqueTerm -> option (sequence bosqueTerm n)
-// let extractTupleAux n x = match x with
-// | BTuple m x -> if (m = n) then (Some x) else None
-// | _ -> None
+| _ -> BError 
 
 val isTuple : n:nat -> x:bosqueTerm -> bool
 let isTuple n x = match x with
