@@ -56,11 +56,11 @@ let example1 = A2 (CCons (A2 CNil)  (CCons (A2 CNil) CNil) )
 let example21 = A2 (CCons example1 CNil)
 let example31 = f2 example21
 
-val f0 : n:nat -> Tot nat
+val f0 : n:nat -> Tot nat (decreases (-n+1))
 let rec f0 n = if (n > 0) then 0 else f0 (n + 1)
 
-val f6 : nat -> Tot nat
-let rec f6 n = admit(); if (n > 6) then 0 else f6 (n + 1)
+val f6 : n:nat -> Tot nat (decreases (-n + 7))
+let rec f6 n = if (n > 6) then 0 else f6 (n + 1)
 
 val lemma_f6 : n:nat -> Lemma (f6 n == 0)
 let lemma_f6 n = ()
@@ -68,12 +68,16 @@ let lemma_f6 n = ()
 val max : m:nat -> n:nat -> nat
 let max m n = if (m > n) then m else n
 
-val f7 : n:nat -> Tot nat
-let rec f7 n = if (n > 7) then 0 else f7 (n + 1)
+val f7 : n:nat -> Tot nat (decreases (-n + 8))
+let rec f7 n = if (n > 7) then 0 else f7 (n + 1) 
 
 // The fuel wasn't enough
-val lemma_f7 : n:nat -> Lemma (f7 n == 0)
-let rec lemma_f7 n = if (n > 7) then () else lemma_f7 (n + 1)
+val lemma_f7 : n:nat -> Lemma (ensures f7 n == 0)
+let rec lemma_f7 n = admit(); if (n > 7) then () else lemma_f7 (n + 1)
+
+// So it needs a ranking-function to work!
+val lemma_f7_2 : n:nat -> Lemma (ensures f7 n == 0) (decreases (-n + 8))
+let rec lemma_f7_2 n = if (n > 7) then () else lemma_f7_2 (n + 1)
 
 val foo : l:list int -> Tot int (decreases %[l; 0])
 val bar : l:list int -> Tot int (decreases %[1; 1])
