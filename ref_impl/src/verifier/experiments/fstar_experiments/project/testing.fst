@@ -1,7 +1,10 @@
 module Testing
  
 open Sequence
-open BosquePrelude
+open BosqueTerms
+open BosqueTypes
+open Util
+
 
 (* --------------------------------------------------------------- *)
 
