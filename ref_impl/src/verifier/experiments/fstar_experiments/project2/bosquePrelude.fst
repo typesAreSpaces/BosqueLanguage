@@ -1,4 +1,4 @@
-module BosquePrelude 
+module BosquePrelude
 
 open Sequence
 
@@ -12,7 +12,9 @@ type bosqueTerm =
 | BError : bosqueTerm
 
 // Convention with UnionTerm: 
-// its elements should be unique
+// 1) its elements should be unique
+// 2) There is a unique way to represent any union (normal form)
+// the latter was needed for eqType
 type bosqueType =
 | BTypeNone
 | BTypeInt
@@ -32,24 +34,43 @@ let rec getType x = match x with
 | BNone -> BTypeNone
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
-| BTuple n CNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
-| BTuple n (CCons y ys) -> BTypeTuple false n (getType_aux #n (CCons y ys))
+| BTuple n SNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
+| BTuple n (SCons y ys) -> BTypeTuple false n (getType_aux #n (SCons y ys))
 and 
 getType_aux #n x = match x with
-| CNil -> CNil
-| CCons y ys -> CCons (getType y) (getType_aux ys)
+| SNil -> SNil
+| SCons y ys -> SCons (getType y) (getType_aux ys)
 
 (* Definition of equality relation on Bosque terms *)
-val eqTerm : bosqueTerm -> bosqueTerm -> bosqueTerm
-let eqTerm x y = match x, y with
+val eqTerm_aux : #n:nat -> (x:sequence bosqueTerm n) -> sequence bosqueTerm n -> Tot bosqueTerm (decreases x)
+val eqTerm : x:bosqueTerm -> bosqueTerm -> Tot bosqueTerm (decreases x)
+let rec eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
 | BInt x1, BInt y1 -> BBool (x1 = y1)
 | BBool x1, BBool y1 -> BBool (x1 = y1)
+| BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BError
+                                   else eqTerm_aux #n1 seq1 seq2
 // | BError, BError -> BBool true
-| _, _ -> BError 
+| _, _ -> BError
+and 
+eqTerm_aux #n x y = match x with
+| SNil -> (match y with
+         | SNil -> BBool true
+         | _ -> BError
+         )
+| SCons x1 xs1 -> (match y with
+                 | SNil -> BError
+                 | SCons y1 ys1 -> (match (eqTerm x1 y1) with
+                                  | BBool b1 -> (match (eqTerm_aux xs1 ys1) with
+                                               | BBool b2 -> BBool (b1 && b2)
+                                               | _ -> BError
+                                               )
+                                  | _ -> BError 
+                                  )
+                 )
 
 (* Definition of greater than or equal relation on Bosque terms *)
-val greaterOrEq : bosqueTerm -> bosqueTerm -> bosqueTerm
+val greaterOrEq : bosqueTerm -> bosqueTerm -> Tot bosqueTerm
 let greaterOrEq x y = match x, y with
 | BInt x1, BInt y1 -> BBool (x1 >= y1)
 | _, _ -> BError
@@ -57,8 +78,8 @@ let greaterOrEq x y = match x, y with
 (* Tuple projector *)
 val nthTuple : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm
 let rec nthTuple index dimension y = match y with
-| BTuple 0 CNil -> if (index < 0 || dimension <> 0) then BError else BNone
-| BTuple dimension'' (CCons x #dimension' xs) -> 
+| BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+| BTuple dimension'' (SCons x #dimension' xs) -> 
   if (index < 0 || dimension <> dimension'') then BError else
   if (index >= dimension) then BNone else
   if index = 0 then x
@@ -66,20 +87,31 @@ let rec nthTuple index dimension y = match y with
 | _ -> BError
 
 (* Definition of equality relation on Bosque types *)
-val eqType : bosqueType -> bosqueType -> bool
-let eqType x y = match x, y with
+val eqType_aux : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
+val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
+let rec eqType x y = match x, y with
 | BTypeNone, BTypeNone -> true
 | BTypeInt, BTypeInt -> true
 | BTypeBool, BTypeBool -> true
-| BTypeUnion _ _ , BTypeUnion _ _ -> true    // FIX: This is incomplete
-| BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2
-| BTypeTuple _ _ _, BTypeTuple _ _ _ -> true // FIX: This is incomplete
-| BTypeError, BTypeError -> true 
+// The following might be incomplete, but if Unions are normalized then it is complete
+| BTypeUnion x1 x2 , BTypeUnion y1 y2 -> eqType x1 y1 && eqType x2 y2
+| BTypeUnion _ _, _ -> false
+| BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2 
+| BTypeTuple b1 n1 seq1, BTypeTuple b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqType_aux seq1 seq2
+| BTypeError, BTypeError -> true
 | _, _ -> false
+and
+eqType_aux #n x y = match x with
+| SNil -> (match y with 
+  | SNil -> true
+  | _ -> false
+  )
+| SCons x1 xs1 -> let (SCons y1 ys1) = y in 
+  eqType x1 y1 && eqType_aux xs1 ys1
 
 (* Definition to encode the subtype relation on Bosque types *)
 // forall x y . bosqueSubtypeOf x y <===> x :> y
-val bosqueSubtypeOf : bosqueType -> bosqueType -> (Tot bool)
+val bosqueSubtypeOf : bosqueType -> bosqueType -> Tot bool
 let rec bosqueSubtypeOf x y = match x, y with
 | BTypeNone, BTypeNone -> true
 | BTypeInt, BTypeInt -> true
@@ -87,36 +119,38 @@ let rec bosqueSubtypeOf x y = match x, y with
 | BTypeUnion x1 y1, BTypeUnion x2 y2 -> (bosqueSubtypeOf x1 x2 || bosqueSubtypeOf y1 x2) 
   && (bosqueSubtypeOf x1 y2 || bosqueSubtypeOf y1 y2)
 | BTypeUnion x1 y1, z -> bosqueSubtypeOf x1 z || bosqueSubtypeOf y1 z 
-| BTypeEmptyTuple b1, BTypeEmptyTuple _ -> b1
-// Missing case: BTuple
+| BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2
+// FIX: The following doesnt' include the open/close semantics of Tuples
+| BTypeTuple _ _ _, BTypeTuple _ _ _ -> true
 | BTypeError, BTypeError -> true
 | _, _ -> false
 
 
-(* --------------------------------- *)
+(* ----------------------------------------------------------- *)
 (* Type checkers *)
-val isBool : bosqueTerm -> bool
+val isBool : bosqueTerm -> Tot bool
 let isBool x = match x with 
 | BBool _ -> true
 | _ -> false 
 
-val isInt : bosqueTerm -> bool
+val isInt : bosqueTerm -> Tot bool
 let isInt x = match x with 
 | BInt _ -> true
 | _ -> false 
 
-val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> bool
+val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple n seq x = match x with
-| BTuple m seq' -> n = m && (eqType (getType (BTuple m seq')) (BTypeTuple false m seq)) 
+| BTuple m seq' -> n = m 
+  && (eqType (getType (BTuple m seq')) (BTypeTuple false m seq))
 | _ -> false
-(* --------------------------------- *)
+(* ----------------------------------------------------------- *)
 
-  (* ------------------------------------------------------------------------ *)
+(* ------------------------------------------------------------------------ *)
 (* Extractors *)
 
 (* This is mainly used inside conditionals (in the fstar programming language) 
    and assertions (in the z3 smt solver) *)
-val extractBool : x:bosqueTerm{isBool x} -> bool
+val extractBool : x:bosqueTerm{isBool x} -> Tot bool
 let extractBool x = match x with
 | BBool y -> y
 

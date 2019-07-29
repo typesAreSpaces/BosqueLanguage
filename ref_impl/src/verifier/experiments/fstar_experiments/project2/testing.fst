@@ -1,13 +1,12 @@
 module Testing
  
 open Sequence
-open BosqueTerms
-open BosqueTypes
+open BosquePrelude
 
 (* --------------------------------------------------------------- *)
 
-let aaa = BTuple 2 (CCons (BInt 3) (CCons (BBool true) CNil))
-let bb = extractTuple 2 aaa
+let aaa = BTuple 2 (SCons (BInt 3) (SCons (BBool true) SNil))
+// let bb = extractTuple 2 aaa
 
 (* Testing: bosqueSubtypeOf *)
 let testa0 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
@@ -17,13 +16,13 @@ let testa3 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeIn
 let testa4 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeBool BTypeInt)
 
 (* Testing: BTuple *)
-let testb0 = BTuple 2 (CCons (BInt 342) (CCons (BBool true) (CNil)))
+let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 // The following fails, as expected
-// let test0a1 = BTuple 3 (CCons (BInt 342) (CCons (BBool true) (CNil)))
-let testb1 = BTuple 0 (CNil)
-let testb2 = isTuple 2 testb0
-let testb3 = isTuple 3 testb0
-let testb4 = isTuple 2 (BInt 234)
+// let test0a1 = BTuple 3 (SCons (BInt 342) (SCons (BBool true) (SNil)))
+let testb1 = BTuple 0 (SNil)
+// let testb2 = isTuple 2 testb0
+// let testb3 = isTuple 3 testb0
+// let testb4 = isTuple 2 (BInt 234)
 let testb5 = nthTuple 0 2 testb0
 let testb6 = nthTuple 0 3 testb0
 let testb7 = nthTuple 1 2 testb0
@@ -31,12 +30,12 @@ let testb8 = nthTuple 2 2 testb0
 let testb9 = nthTuple 2 10000 testb0
 let testb10 = nthTuple 10001 10000 testb0
 let testb11 = nthTuple (-1) 2 testb0
-let testb12 = BTuple 0 CNil
-let testb13 = isTuple 0 testb12
-let testb14 = isTuple 10 testb12
+let testb12 = BTuple 0 SNil
+// let testb13 = isTuple 0 testb12
+// let testb14 = isTuple 10 testb12
 
 (* Testing: getType *)
-let testc1 = BTuple 2 (CCons aaa ((CCons testb0) CNil))
+let testc1 = BTuple 2 (SCons aaa ((SCons testb0) SNil))
 let testc2 = getType testb0
 let testc3 = getType testb1
 let testc4 = getType testc1
