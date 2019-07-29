@@ -20,37 +20,13 @@ getType_aux #n x = match x with
 | SCons y ys -> SCons (getType y) (getType_aux ys)
 
 (* --------------------------------------------------------------- *)
-(* Type checkers *)
-val isBool : bosqueTerm -> Tot bool
-let isBool x = match x with 
-| BBool _ -> true
-| _ -> false 
-
-val isInt : bosqueTerm -> Tot bool
-let isInt x = match x with 
-| BInt _ -> true
-| _ -> false 
-
+(* Casting / Type checkers *)
 val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple n seq x = match x with
 | BTuple m seq' -> n = m 
   && (eqType (getType (BTuple m seq')) (BTypeTuple false m seq))
 | _ -> false
 (* --------------------------------------------------------------- *)
-
-(* ------------------------------------------------------------------------ *)
-(* Extractors *)
-
-(* This is mainly used inside conditionals (in the fstar programming language) 
-   and assertions (in the z3 smt solver) *)
-val extractBool : x:bosqueTerm{isBool x} -> Tot bool
-let extractBool x = match x with
-| BBool y -> y
-
-// val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
-// let extractTuple n x = match x with
-// | BTuple _ seq -> seq
-(* ------------------------------------------------------------------------ *)
 
 (* ------------------------------------------------------------------------------------------- *)
 (* Type instantiation *)

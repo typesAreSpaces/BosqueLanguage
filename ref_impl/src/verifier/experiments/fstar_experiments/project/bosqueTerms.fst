@@ -11,9 +11,51 @@ type bosqueTerm =
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
 | BError : bosqueTerm
 
+(* --------------------------------------------------------------- *)
+(* Casting / Type checkers *)
+val isNone : bosqueTerm -> Tot bool
+let isNone x = match x with 
+| BNone -> true
+| _ -> false 
+
+val isInt : bosqueTerm -> Tot bool
+let isInt x = match x with 
+| BInt _ -> true
+| _ -> false 
+
+val isBool : bosqueTerm -> Tot bool
+let isBool x = match x with 
+| BBool _ -> true
+| _ -> false 
+
+val isError : bosqueTerm -> Tot bool
+let isError x = match x with 
+| BError -> true
+| _ -> false 
+(* --------------------------------------------------------------- *)
+
+(* ------------------------------------------------------------------------ *)
+(* Extractors *)
+
+(* This is mainly used inside conditionals (in the fstar programming language) 
+   and assertions (in the z3 smt solver) *)
+val extractBool : x:bosqueTerm{isBool x} -> Tot bool
+let extractBool x = match x with
+| BBool y -> y
+
+// val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
+// let extractTuple n x = match x with
+// | BTuple _ seq -> seq
+(* ------------------------------------------------------------------------ *)
+
 (* Definition of equality relation on Bosque terms *)
-val eqTerm_aux : #n:nat -> (x:sequence bosqueTerm n) -> sequence bosqueTerm n -> Tot bosqueTerm (decreases x)
-val eqTerm : x:bosqueTerm -> bosqueTerm -> Tot bosqueTerm (decreases x)
+val eqTerm_aux : #n:nat 
+  -> (x:sequence bosqueTerm n) 
+  -> sequence bosqueTerm n 
+  -> Tot (z:bosqueTerm{isBool z \/ isError z}) (decreases x)
+val eqTerm : x:bosqueTerm 
+  -> bosqueTerm 
+  -> Tot (z:bosqueTerm{isBool z \/ isError z})  (decreases x)
 let rec eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
 | BInt x1, BInt y1 -> BBool (x1 = y1)
@@ -40,7 +82,7 @@ eqTerm_aux #n x y = match x with
                  )
 
 (* Definition of greater than or equal relation on Bosque terms *)
-val greaterOrEq : bosqueTerm -> bosqueTerm -> Tot bosqueTerm
+val greaterOrEq : bosqueTerm -> bosqueTerm -> Tot (x:bosqueTerm{isBool x \/ isError x})
 let greaterOrEq x y = match x, y with
 | BInt x1, BInt y1 -> BBool (x1 >= y1)
 | _, _ -> BError
@@ -55,5 +97,3 @@ let rec nthTuple index dimension y = match y with
   if index = 0 then x
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError
-
-
