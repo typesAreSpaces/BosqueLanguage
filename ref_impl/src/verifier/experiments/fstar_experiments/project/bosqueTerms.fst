@@ -5,11 +5,11 @@ open Sequence
 (* Dynamic: depends on the 
    entities created by user *) 
 noeq type bosqueTerm = 
-| BError : bosqueTerm
 | BNone : bosqueTerm
 | BInt : int -> bosqueTerm
 | BBool : bool -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
+| BError : bosqueTerm
 
 (* -------------------------------------- *)
 (* Type checkers *)
@@ -32,10 +32,10 @@ let isTuple n x = match x with
 (* Definition of equality relation on Bosque terms *)
 val eqTerm : bosqueTerm -> bosqueTerm -> bosqueTerm
 let eqTerm x y = match x, y with
-// | BError, BError -> BBool true
 | BNone, BNone -> BBool true
 | BInt x1, BInt y1 -> BBool (x1 = y1)
 | BBool x1, BBool y1 -> BBool (x1 = y1)
+// | BError, BError -> BBool true
 | _, _ -> BError 
 
 (* Definition of greater than or equal relation on Bosque terms *)
