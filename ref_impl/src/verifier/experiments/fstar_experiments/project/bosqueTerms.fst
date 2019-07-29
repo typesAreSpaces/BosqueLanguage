@@ -1,6 +1,7 @@
 module BosqueTerms
 
 open Sequence
+open BosqueTypes
 
 (* Dynamic: depends on the 
    entities created by user *) 
@@ -10,6 +11,23 @@ type bosqueTerm =
 | BBool : bool -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
 | BError : bosqueTerm
+
+(* Definition of getType *)
+val getType_aux : #n:nat 
+  -> (x: sequence bosqueTerm n) 
+  -> Tot (sequence bosqueType n) (decreases x)
+val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
+let rec getType x = match x with
+| BNone -> BTypeNone
+| BInt _ -> BTypeInt
+| BBool _ -> BTypeBool
+| BTuple n SNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
+| BTuple n (SCons y ys) -> BTypeTuple false n (getType_aux #n (SCons y ys))
+| BError -> BTypeError
+and 
+getType_aux #n x = match x with
+| SNil -> SNil
+| SCons y ys -> SCons (getType y) (getType_aux ys)
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
@@ -27,6 +45,12 @@ val isBool : bosqueTerm -> Tot bool
 let isBool x = match x with 
 | BBool _ -> true
 | _ -> false 
+
+val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isTuple n seq x = match x with
+| BTuple m seq' -> n = m 
+  && (eqType (getType (BTuple m seq')) (BTypeTuple false m seq))
+| _ -> false
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
@@ -97,3 +121,12 @@ let rec nthTuple index dimension y = match y with
   if index = 0 then x
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError
+
+(* ------------------------------------------------------------------------------------------- *)
+(* Type instantiation *)
+type typeUnionIntBool = x:bosqueType{subtypeOf (BTypeUnion BTypeInt BTypeBool) x}
+type termUnionIntBool = x:bosqueTerm{subtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)} 
+(* Definition of IntType *)
+type termInt = x:bosqueTerm{isInt x} 
+(* ------------------------------------------------------------------------------------------- *)
+

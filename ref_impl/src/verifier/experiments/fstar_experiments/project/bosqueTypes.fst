@@ -41,15 +41,15 @@ eqType_aux #n x y = match x with
   eqType x1 y1 && eqType_aux xs1 ys1
 
 (* Definition to encode the subtype relation on Bosque types 
-   i.e. forall x y . bosqueSubtypeOf x y <===> x :> y *)
-val bosqueSubtypeOf : bosqueType -> bosqueType -> Tot bool
-let rec bosqueSubtypeOf x y = match x, y with
+   i.e. forall x y . subtypeOf x y <===> x :> y *)
+val subtypeOf : bosqueType -> bosqueType -> Tot bool
+let rec subtypeOf x y = match x, y with
 | BTypeNone, BTypeNone -> true
 | BTypeInt, BTypeInt -> true
 | BTypeBool, BTypeBool -> true
-| BTypeUnion x1 y1, BTypeUnion x2 y2 -> (bosqueSubtypeOf x1 x2 || bosqueSubtypeOf y1 x2) 
-  && (bosqueSubtypeOf x1 y2 || bosqueSubtypeOf y1 y2)
-| BTypeUnion x1 y1, z -> bosqueSubtypeOf x1 z || bosqueSubtypeOf y1 z 
+| BTypeUnion x1 y1, BTypeUnion x2 y2 -> (subtypeOf x1 x2 || subtypeOf y1 x2) 
+  && (subtypeOf x1 y2 || subtypeOf y1 y2)
+| BTypeUnion x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z 
 | BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2
 // FIX: The following doesnt' include the open/close semantics of Tuples
 | BTypeTuple _ _ _, BTypeTuple _ _ _ -> true

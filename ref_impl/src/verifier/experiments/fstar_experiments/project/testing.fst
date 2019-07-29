@@ -3,7 +3,6 @@ module Testing
 open Sequence
 open BosqueTerms
 open BosqueTypes
-open Util
 
 
 (* --------------------------------------------------------------- *)
@@ -11,12 +10,12 @@ open Util
 let aaa = BTuple 2 (SCons (BInt 3) (SCons (BBool true) SNil))
 // let bb = extractTuple 2 aaa
 
-(* Testing: bosqueSubtypeOf *)
-let testa0 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
-let testa1 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeNone)
-let testa2 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeNone BTypeBool)
-let testa3 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeInt (BTypeUnion BTypeNone BTypeBool))
-let testa4 = bosqueSubtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeBool BTypeInt)
+(* Testing: subtypeOf *)
+let testa0 = subtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
+let testa1 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeNone)
+let testa2 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeNone BTypeBool)
+let testa3 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeInt (BTypeUnion BTypeNone BTypeBool))
+let testa4 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeBool BTypeInt)
 
 (* Testing: BTuple *)
 let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
@@ -116,7 +115,7 @@ let test4b = maxWithTuple (testb0) (BInt (-12))
 // The following fails, as expected
 // let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) (BTypeInt)) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (bosqueEqType (getType (nthTuple 0 2 x)) (BTypeInt)) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
 (* ---------------------------------------------------------------- *)
 
