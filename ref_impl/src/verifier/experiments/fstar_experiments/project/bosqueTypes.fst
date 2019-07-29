@@ -31,23 +31,17 @@ let eqType x y = match x, y with
 | BTypeTuple _ _ _, BTypeTuple _ _ _ -> true // FIX: This is incomplete
 | _, _ -> false 
 
-val mapTermToType : #n:nat -> sequence bosqueTerm n -> Tot (sequence bosqueType n) 
-val getType : bosqueTerm -> Tot bosqueType
+val mapTermToType : #n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
+val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
 let rec getType x = match x with
 | BError -> BTypeError
 | BNone -> BTypeNone
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
-| BTuple n y -> admit(); BTypeTuple false n (mapTermToType y)
-// | BTuple 0 CNil -> BTypeEmptyTuple
-// | BTuple n CNil -> BTypeError
-// | BTuple 0 (CCons _ _) -> BTypeError
-// | BTuple n (CCons hd #m tl) -> 
-//   if (m + 1 <> n) then BTypeError 
-//   else BTypeTuple false (m + 1) (CCons (getType hd) (mapTermToType #m tl))
+| BTuple n y -> BTypeTuple false n (mapTermToType y)
 and mapTermToType #n x1 = match x1 with
 | CNil -> CNil
-| CCons y1 #m ys1 -> admit(); CCons (getType y1) (mapTermToType #m ys1)
+| CCons y1 ys1 -> CCons (getType y1) (mapTermToType ys1)
 
 // forall x y . bosqueSubtypeOf x y <===> x :> y
 val bosqueSubtypeOf : bosqueType -> bosqueType -> (Tot bool)
