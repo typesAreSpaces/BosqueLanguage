@@ -33,7 +33,9 @@ val ackermann: m:nat -> n:nat -> Tot nat (decreases %[m; n])
 let rec ackermann m n =
   if m=0 then n + 1
     else if n = 0 then ackermann (m - 1) 1
-      else ackermann (m - 1) (ackermann m (n - 1))val max : nat -> nat -> nat
+      else ackermann (m - 1) (ackermann m (n - 1))
+
+val max : nat -> nat -> nat
 let max x y = if (x > y) then x else y
 
 type list' (a : Type) : Type =
@@ -64,51 +66,51 @@ type bb =
 | Nilb
 | B : (list' bb) -> bb
 
-val wo_aa_aux : list' aa -> nat
-val wo_aa : aa -> nat
-let rec wo_aa x = match x with
+val wfo_aa_aux : list' aa -> nat
+val wfo_aa : aa -> nat
+let rec wfo_aa x = match x with
 | Nila -> 0
 | A Nil' -> 1
-| A (Cons' y ys) -> 1 + max (wo_aa y) (wo_aa_aux ys)
-and wo_aa_aux x = match x with
+| A (Cons' y ys) -> 1 + max (wfo_aa y) (wfo_aa_aux ys)
+and wfo_aa_aux x = match x with
 | Nil' -> 0
-| Cons' y ys -> max (wo_aa y) (wo_aa_aux ys)
+| Cons' y ys -> max (wfo_aa y) (wfo_aa_aux ys)
 
 (* Testing *)
 let test0 = Nila
 let test1 = A (Cons' test0 Nil')
 let test2 = A (Cons' test1 (Cons' test0 Nil'))
 let test3 = A (Cons' test1 (Cons' test1 Nil'))
-let wo_0 = wo_aa test0
-let wo_1 = wo_aa test1
-let wo_2 = wo_aa test2
-let wo_3 = wo_aa test3
+let wo_0 = wfo_aa test0
+let wo_1 = wfo_aa test1
+let wo_2 = wfo_aa test2
+let wo_3 = wfo_aa test3
 
 // // Bizarre ... This is actually the identity function on aa
 // // This doesn't work
-// val bizarre_id : x:aa -> Tot aa (decreases (wo_aa x))
+// val bizarre_id : x:aa -> Tot aa (decreases (wfo_aa x))
 // let rec bizarre_id x = match x with
 // | Nila -> Nila
 // | A y -> A (map' bizarre_id y)
 
 // // Bizarre ... This is actually the identity function on aa
 // // This doesn't work either
-// val bizarre_id : x:aa -> Tot aa (decreases (wo_aa x))
+// val bizarre_id : x:aa -> Tot aa (decreases (wfo_aa x))
 // let rec bizarre_id x = match x with
 // | Nila -> Nila
 // | A Nil' -> A Nil'
 // | A (Cons' y ys) -> A (Cons' (bizarre_id y) (map' bizarre_id ys))
 
-let test_0 = bizarre test0
-let test_1 = bizarre test1
-let test_2 = bizarre test2
-let test_3 = bizarre test3
+// let test_0 = bizarre test0
+// let test_1 = bizarre test1
+// let test_2 = bizarre test2
+// let test_3 = bizarre test3
 
-// First approach, it didn't work
-val f : x:aa -> Tot bb (decreases (wo_aa x)) 
-let rec f x = match x with
-| Nila -> Nilb
-| A y -> B (map' f y)
+// // First approach, it didn't work
+// val f : x:aa -> Tot bb (decreases (wfo_aa x)) 
+// let rec f x = match x with
+// | Nila -> Nilb
+// | A y -> B (map' f y)
 
 val g : list' aa -> list' bb
 val f : aa -> Tot bb 
@@ -139,9 +141,6 @@ type bb2 =
 | Nilb2
 | B2 : #n:nat -> (sequence bb2 n) -> bb2
 
-val max : nat -> nat -> nat
-let max x y = if (x > y) then x else y
-
 // val maxaa2 : #n:nat -> sequence aa2 n -> aux:nat -> nat
 // val rankingFunctionaa2 : aa2 -> nat
 // let rec rankingFunctionaa2 x = match x with
@@ -151,14 +150,27 @@ let max x y = if (x > y) then x else y
 // | CNil -> aux
 // | CCons y ys -> maxaa2 ys (max aux (rankingFunctionaa2 y)) 
 
-val maxaa2 : #n:nat -> sequence aa2 n -> aux:nat -> nat
-val rfaa2 : aa2 -> nat
-let rfaa2 x = match x with
+val wfo_aa2_aux : #n:nat -> sequence aa2 n -> nat 
+val wfo_aa2 : aa2 -> nat
+let rec wfo_aa2 x = match x with
 | Nila2 -> 0
-| A2 y -> 1 
+| A2 CNil -> 0
+| A2 (CCons y #m ys) -> admit(); 1 + max (wfo_aa2 y) (wfo_aa2_aux #m ys)
+and wfo_aa2_aux #n x = match x with
+| CNil -> 0
+| CCons y #m ys -> max (wfo_aa2 y) (wfo_aa2_aux #m ys)
+
+let t0 = Nila2
+let t1 = A2 (CCons t0 CNil)
+let t2 = A2 (CCons t1 (CCons t0 CNil))
+let t3 = A2 (CCons t1 (CCons t1 CNil))
+let wt0 = wfo_aa2 t0
+let wt1 = wfo_aa2 t1
+let wt2 = wfo_aa2 t2
+let wt3 = wfo_aa2 t3
 
 val g2 : #n:nat -> sequence aa2 n -> sequence bb2 n
-val f2 : x:aa2 -> Tot bb2 (decreases (rfaa2 x))
+val f2 : x:aa2 -> Tot bb2 (decreases (wfo_aa2 x))
 let rec f2 x = match x with
 | Nila2 -> Nilb2
 | A2 y -> B2 (g2 y)
