@@ -20,7 +20,7 @@ let rec getType x = match x with
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
 | BTuple n SNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
-| BTuple n y -> BTypeTuple false n (mapSequence' (hide x) getType y)
+| BTuple n y -> BTypeTuple false n (mapSequence' (hide x) getType y) 
 | BError -> BTypeError
 
 val mapTermsToTypes : #n:nat 
@@ -47,10 +47,10 @@ let isBool x = match x with
 | BBool _ -> true
 | _ -> false 
 
-val isTuple : #n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isTuple #n seqTypes x = match x with
-| BTuple m seqTerms -> n = m 
-  && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
+val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isTuple n seqTypes x = match x with
+| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BTypeEmptyTuple false))
+  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 | _ -> false
 
 val isError : bosqueTerm -> Tot bool
