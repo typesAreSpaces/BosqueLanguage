@@ -15,7 +15,7 @@ type bosqueType =
 | BTypeEmptyTuple : bool -> bosqueType
 // The bool indicates if the Tuple is open or not
 | BTypeTuple : bool -> n:nat -> sequence bosqueType n -> bosqueType
-| BTypeError 
+| BTypeError
 
 (* Definition of equality relation on Bosque types *)
 val eqTypeSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)

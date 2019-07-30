@@ -2,6 +2,7 @@ module BosqueTerms
 
 open Sequence
 open BosqueTypes
+open FStar.Ghost
 
 (* Dynamic: depends on the 
    entities created by user *) 
@@ -12,30 +13,22 @@ type bosqueTerm =
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
 | BError : bosqueTerm
 
-// val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
-// let rec getType x = match x with
-// | BNone -> BTypeNone
-// | BInt _ -> BTypeInt
-// | BBool _ -> BTypeBool
-// | BTuple n y -> BTypeTuple false n (mapSequence getType y)
-// | BError -> BTypeError
-
 (* Definition of getType *)
-val mapBosqueTermType : #n:nat 
-  -> (x: sequence bosqueTerm n) 
-  -> Tot (sequence bosqueType n) (decreases x)
-val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
+val getType : x:bosqueTerm -> Tot bosqueType
 let rec getType x = match x with
 | BNone -> BTypeNone
 | BInt _ -> BTypeInt
 | BBool _ -> BTypeBool
 | BTuple n SNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
-| BTuple n (SCons y ys) -> BTypeTuple false n (mapBosqueTermType #n (SCons y ys))
+| BTuple n y -> BTypeTuple false n (mapSequence' (hide x) getType y)
 | BError -> BTypeError
-and 
-mapBosqueTermType #n x = match x with
+
+val mapTermsToTypes : #n:nat 
+  -> (x: sequence bosqueTerm n) 
+  -> Tot (sequence bosqueType n)
+let rec mapTermsToTypes #n x = match x with
 | SNil -> SNil
-| SCons y ys -> SCons (getType y) (mapBosqueTermType ys)
+| SCons y ys -> SCons (getType y) (mapTermsToTypes ys)
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
@@ -57,7 +50,7 @@ let isBool x = match x with
 val isTuple : #n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple #n seqTypes x = match x with
 | BTuple m seqTerms -> n = m 
-  && (eqTypeSeq (mapBosqueTermType seqTerms) seqTypes)
+  && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 | _ -> false
 
 val isError : bosqueTerm -> Tot bool
@@ -137,4 +130,3 @@ type termUnionIntBool = x:bosqueTerm{subtypeOf (BTypeUnion BTypeInt BTypeBool) (
 (* Definition of IntType *)
 type termInt = x:bosqueTerm{isInt x} 
 (* ------------------------------------------------------------------------------------------- *)
-
