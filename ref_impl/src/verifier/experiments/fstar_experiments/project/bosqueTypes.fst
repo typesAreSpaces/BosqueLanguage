@@ -18,7 +18,7 @@ type bosqueType =
 | BTypeError 
 
 (* Definition of equality relation on Bosque types *)
-val eqType_aux : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
+val eqTypeSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
 val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec eqType x y = match x, y with
 | BTypeNone, BTypeNone -> true
@@ -28,17 +28,17 @@ let rec eqType x y = match x, y with
 | BTypeUnion x1 x2 , BTypeUnion y1 y2 -> eqType x1 y1 && eqType x2 y2
 | BTypeUnion _ _, _ -> false
 | BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2 
-| BTypeTuple b1 n1 seq1, BTypeTuple b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqType_aux seq1 seq2
+| BTypeTuple b1 n1 seq1, BTypeTuple b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq seq1 seq2
 | BTypeError, BTypeError -> true
 | _, _ -> false
 and
-eqType_aux #n x y = match x with
+eqTypeSeq #n x y = match x with
 | SNil -> (match y with 
   | SNil -> true
   | _ -> false
   )
 | SCons x1 xs1 -> let (SCons y1 ys1) = y in 
-  eqType x1 y1 && eqType_aux xs1 ys1
+  eqType x1 y1 && eqTypeSeq xs1 ys1
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e. forall x y . subtypeOf x y <===> x :> y *)

@@ -4,7 +4,6 @@ open Sequence
 open BosqueTerms
 open BosqueTypes
 
-
 (* --------------------------------------------------------------- *)
 
 let aaa = BTuple 2 (SCons (BInt 3) (SCons (BBool true) SNil))
@@ -22,7 +21,7 @@ let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 // The following fails, as expected
 // let test0a1 = BTuple 3 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 let testb1 = BTuple 0 (SNil)
-// let testb2 = isTuple 2 testb0
+let testb2 = isTuple 2 (BTypeTuple false 0 (BTypeEmptyTuple)) testb0
 // let testb3 = isTuple 3 testb0
 // let testb4 = isTuple 2 (BInt 234)
 let testb5 = nthTuple 0 2 testb0
