@@ -12,6 +12,14 @@ type bosqueTerm =
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
 | BError : bosqueTerm
 
+// val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
+// let rec getType x = match x with
+// | BNone -> BTypeNone
+// | BInt _ -> BTypeInt
+// | BBool _ -> BTypeBool
+// | BTuple n y -> BTypeTuple false n (mapSequence getType y)
+// | BError -> BTypeError
+
 (* Definition of getType *)
 val mapBosqueTermType : #n:nat 
   -> (x: sequence bosqueTerm n) 
