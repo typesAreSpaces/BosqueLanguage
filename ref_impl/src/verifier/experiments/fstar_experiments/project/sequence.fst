@@ -27,16 +27,23 @@ let rec fold_leftSequence #a #b #n f l x = match l with
 
 val zipSequence : #a:Type -> #b:Type -> #n:nat -> sequence a n -> sequence b n -> Tot (sequence (a * b) n)
 let rec zipSequence #a #b #n v1 v2 = match v1 with
-  | SNil -> SNil
-  | SCons a tl1 ->
-    let SCons b tl2 = v2 in
-    SCons (a, b) (zipSequence tl1 tl2)
+| SNil -> SNil
+| SCons a tl1 ->
+  let SCons b tl2 = v2 in
+  SCons (a, b) (zipSequence tl1 tl2)
 
 val zipSequence': #a:Type -> #b:Type -> #n:nat 
   -> (x:erased a)
   -> (y:sequence a n{y << reveal x}) -> (z:sequence b n{z << reveal x}) -> Tot (sequence (a * b) n)
 let rec zipSequence' #a #b #n x v1 v2 = match v1 with
-  | SNil -> SNil
-  | SCons a tl1 ->
-    let SCons b tl2 = v2 in
-    SCons (a, b) (zipSequence' x tl1 tl2)
+| SNil -> SNil
+| SCons a tl1 ->
+  let SCons b tl2 = v2 in
+  SCons (a, b) (zipSequence' x tl1 tl2)
+
+val take : #a:Type -> #n:nat -> m:nat{m <= n} -> sequence a n -> sequence a m
+let rec take #a #n m x = match x with
+| SNil -> SNil
+| SCons hd tl -> 
+  if (m = 0) then SNil 
+  else SCons hd (take (m - 1) tl)

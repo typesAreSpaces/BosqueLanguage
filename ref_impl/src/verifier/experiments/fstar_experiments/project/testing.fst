@@ -117,4 +117,3 @@ let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTup
 let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BTypeInt) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
 (* ---------------------------------------------------------------- *)
-

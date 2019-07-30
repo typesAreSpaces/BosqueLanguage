@@ -1,6 +1,7 @@
 module BosqueTypes
 
 open Sequence
+open Util
 
 // Convention with UnionTerm: 
 // 1) its elements should be unique
@@ -51,7 +52,16 @@ let rec subtypeOf x y = match x, y with
   && (subtypeOf x1 y2 || subtypeOf y1 y2)
 | BTypeUnion x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z 
 | BTypeEmptyTuple b1, BTypeEmptyTuple b2 -> b1 = b2
-// FIX: The following doesnt' include the open/close semantics of Tuples
-| BTypeTuple _ _ _, BTypeTuple _ _ _ -> true
+| BTypeTuple b1 n1 seq1, BTypeTuple b2 n2 seq2 -> 
+  if b1 then 
+    if b2 then 
+      if (n1 > n2) then false
+      else eqTypeSeq seq1 (take n1 seq2)
+    else let p = Util.min n1 n2 in eqTypeSeq (take p seq1) (take p seq2)
+  else 
+    if b2 then false 
+    else 
+      if (n1 >= n2) then eqTypeSeq (take n2 seq1) seq2
+      else false 
 | BTypeError, BTypeError -> true
 | _, _ -> false
