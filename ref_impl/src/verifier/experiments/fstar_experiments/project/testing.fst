@@ -10,21 +10,21 @@ let aaa = BTuple 2 (SCons (BInt 3) (SCons (BBool true) SNil))
 // let bb = extractTuple 2 aaa
 
 (* Testing: subtypeOf *)
-let testa0 = subtypeOf (BTypeUnion BTypeInt BTypeBool) BTypeInt
-let testa1 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeNone)
-let testa2 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeNone BTypeBool)
-let testa3 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeInt (BTypeUnion BTypeNone BTypeBool))
-let testa4 = subtypeOf (BTypeUnion BTypeInt BTypeBool) (BTypeUnion BTypeBool BTypeInt)
-let testa5 = subtypeOf (BTypeTuple false 1 (SCons BTypeInt SNil)) (BTypeTuple false 1 (SCons BTypeInt SNil))
+let testa0 = subtypeOf (BUnionType BIntType BBoolType) BIntType
+let testa1 = subtypeOf (BUnionType BIntType BBoolType) (BNoneType)
+let testa2 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BNoneType BBoolType)
+let testa3 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BIntType (BUnionType BNoneType BBoolType))
+let testa4 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BBoolType BIntType)
+let testa5 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BIntType SNil))
 
-let testa6 = subtypeOf (BTypeTuple false 1 (SCons BTypeInt SNil)) (BTypeTuple false 1 (SCons BTypeBool SNil))
-let testa7 = subtypeOf (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil))) (BTypeTuple false 1 (SCons BTypeBool SNil))
-let testa8 = subtypeOf (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil))) (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil)))
-let testa9 = subtypeOf (BTypeTuple false 1 (SCons BTypeInt SNil)) (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil)))
-let testa10 = subtypeOf (BTypeTuple true 1 (SCons BTypeInt SNil)) (BTypeTuple false 1 (SCons BTypeInt SNil))
-let testa11 = subtypeOf (BTypeTuple true 1 (SCons BTypeInt SNil)) (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil)))
-let testa12 = subtypeOf (BTypeTuple false 1 (SCons BTypeInt SNil)) (BTypeTuple true 1 (SCons BTypeInt SNil))
-let testa13 = subtypeOf (BTypeEmptyTuple true) (BTypeTuple false 2 (SCons BTypeInt (SCons BTypeBool SNil)))
+let testa6 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BBoolType SNil))
+let testa7 = subtypeOf (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil))) (BTupleType false 1 (SCons BBoolType SNil))
+let testa8 = subtypeOf (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil))) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
+let testa9 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
+let testa10 = subtypeOf (BTupleType true 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BIntType SNil))
+let testa11 = subtypeOf (BTupleType true 1 (SCons BIntType SNil)) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
+let testa12 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType true 1 (SCons BIntType SNil))
+let testa13 = subtypeOf (BEmptyTupleType true) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
 
 (* Testing: BTuple *)
 let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
@@ -111,7 +111,7 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
-val maxWithTuple : x:bosqueTerm{isTuple 2 (SCons (BTypeInt) (SCons (BTypeBool) SNil)) x} 
+val maxWithTuple : x:bosqueTerm{isTuple 2 (SCons (BIntType) (SCons (BBoolType) SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
@@ -124,6 +124,6 @@ let test4b = maxWithTuple (testb0) (BInt (-12))
 
 let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BTypeInt) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
 (* ---------------------------------------------------------------- *)

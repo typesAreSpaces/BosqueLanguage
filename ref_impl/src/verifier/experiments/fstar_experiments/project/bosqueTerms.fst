@@ -16,12 +16,12 @@ type bosqueTerm =
 (* Definition of getType *)
 val getType : x:bosqueTerm -> Tot bosqueType
 let rec getType x = match x with
-| BNone -> BTypeNone
-| BInt _ -> BTypeInt
-| BBool _ -> BTypeBool
-| BTuple n SNil -> if (n <> 0) then BTypeError else BTypeEmptyTuple false 
-| BTuple n y -> BTypeTuple false n (mapSequence' (hide x) getType y) 
-| BError -> BTypeError
+| BNone -> BNoneType
+| BInt _ -> BIntType
+| BBool _ -> BBoolType
+| BTuple n SNil -> if (n <> 0) then BErrorType else BEmptyTupleType false 
+| BTuple n y -> BTupleType false n (mapSequence' (hide x) getType y) 
+| BError -> BErrorType
 
 val mapTermsToTypes : #n:nat 
   -> (x: sequence bosqueTerm n) 
@@ -49,7 +49,7 @@ let isBool x = match x with
 
 val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple n seqTypes x = match x with
-| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BTypeEmptyTuple false))
+| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false))
   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 | _ -> false
 
@@ -125,8 +125,8 @@ let rec nthTuple index dimension y = match y with
 
 (* ------------------------------------------------------------------------------------------- *)
 (* Type instantiation *)
-type typeUnionIntBool = x:bosqueType{subtypeOf (BTypeUnion BTypeInt BTypeBool) x}
-type termUnionIntBool = x:bosqueTerm{subtypeOf (BTypeUnion BTypeInt BTypeBool) (getType x)} 
+type typeUnionIntBool = x:bosqueType{subtypeOf (BUnionType BIntType BBoolType) x}
+type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)} 
 (* Definition of IntType *)
 type termInt = x:bosqueTerm{isInt x} 
 (* ------------------------------------------------------------------------------------------- *)
