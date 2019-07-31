@@ -1,7 +1,7 @@
 module BosqueTypes
 
 open Sequence
-open Util
+module Util=Util
 
 // Convention with UnionTerm: 
 // 1) its elements should be unique
