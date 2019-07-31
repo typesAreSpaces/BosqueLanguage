@@ -8,19 +8,28 @@ open FStar.Ghost
    entities created by user *) 
 type bosqueTerm = 
 | BNone : bosqueTerm
-| BInt : int -> bosqueTerm
 | BBool : bool -> bosqueTerm
-| BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm 
+| BInt : int -> bosqueTerm
+// No support for Float
+// No support for Regex
+| BString : string -> bosqueTerm
+| BGUID : string -> int -> bosqueTerm
+| BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
+| BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm
 | BError : bosqueTerm
 
 (* Definition of getType *)
 val getType : x:bosqueTerm -> Tot bosqueType
 let rec getType x = match x with
 | BNone -> BNoneType
-| BInt _ -> BIntType
 | BBool _ -> BBoolType
+| BInt _ -> BIntType
+| BString _ -> BStringType
+| BGUID _ _ -> BGUIDType
 | BTuple n SNil -> if (n <> 0) then BErrorType else BEmptyTupleType false 
 | BTuple n y -> BTupleType false n (mapSequence' (hide x) getType y) 
+// FIX: The following is incomplete
+| BRecord _ _ -> BRecordType false 0 (SNil)
 | BError -> BErrorType
 
 val mapTermsToTypes : #n:nat 
@@ -37,14 +46,24 @@ let isNone x = match x with
 | BNone -> true
 | _ -> false 
 
+val isBool : bosqueTerm -> Tot bool
+let isBool x = match x with 
+| BBool _ -> true
+| _ -> false 
+
 val isInt : bosqueTerm -> Tot bool
 let isInt x = match x with 
 | BInt _ -> true
 | _ -> false 
 
-val isBool : bosqueTerm -> Tot bool
-let isBool x = match x with 
-| BBool _ -> true
+val isString : bosqueTerm -> Tot bool
+let isString x = match x with 
+| BString _ -> true
+| _ -> false 
+
+val isGUID : bosqueTerm -> Tot bool
+let isGUID x = match x with 
+| BGUID _ _ -> true
 | _ -> false 
 
 val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
@@ -52,6 +71,13 @@ let isTuple n seqTypes x = match x with
 | BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false))
   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 | _ -> false
+
+// FIX: Implement the following function
+// val isRecord : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+// let isRecord n seqTypes x = match x with
+// | BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false))
+//   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
+// | _ -> false
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
@@ -83,10 +109,13 @@ val eqTerm : x:bosqueTerm
   -> Tot (z:bosqueTerm{isBool z \/ isError z})  (decreases x)
 let rec eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
-| BInt x1, BInt y1 -> BBool (x1 = y1)
 | BBool x1, BBool y1 -> BBool (x1 = y1)
+| BInt x1, BInt y1 -> BBool (x1 = y1)
+| BString s1, BString s2 -> BBool (s1 = s2)
+| BGUID s1 n1, BGUID s2 n2 -> BBool (s1 = s2 && n1 = n2)
 | BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BError
                                    else eqTerm_aux #n1 seq1 seq2
+// FIX: Include case for BRecord
 // | BError, BError -> BBool true
 | _, _ -> BError
 and 
@@ -110,6 +139,7 @@ eqTerm_aux #n x y = match x with
 val greaterOrEq : bosqueTerm -> bosqueTerm -> Tot (x:bosqueTerm{isBool x \/ isError x})
 let greaterOrEq x y = match x, y with
 | BInt x1, BInt y1 -> BBool (x1 >= y1)
+// FIX: Include case for Strings
 | _, _ -> BError
 
 (* Tuple projector *)
@@ -122,6 +152,18 @@ let rec nthTuple index dimension y = match y with
   if index = 0 then x
   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 | _ -> BError
+
+// FIX: Implement the following function
+// (* Record projector *)
+// val nthRecord : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm
+// let rec nthRecord index dimension y = match y with
+// | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+// | BTuple dimension'' (SCons x #dimension' xs) -> 
+//   if (index < 0 || dimension <> dimension'') then BError else
+//   if (index >= dimension) then BNone else
+//   if index = 0 then x
+//   else nthTuple (index-1) dimension' (BTuple dimension' xs)
+// | _ -> BError
 
 (* ------------------------------------------------------------------------------------------- *)
 (* Type instantiation *)

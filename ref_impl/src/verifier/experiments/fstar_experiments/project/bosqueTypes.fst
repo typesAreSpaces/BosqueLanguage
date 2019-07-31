@@ -9,14 +9,36 @@ module Util=Util
 // the latter was needed for eqType
 type bosqueType =
 | BAnyType
+| BSomeType
+| BTruthyType
 | BNoneType
-| BIntType
-| BBoolType
 | BUnionType : bosqueType -> bosqueType -> bosqueType
+| BParseableType
+| BBoolType
+| BIntType
+| BFloatType // Bad news, FStar doesn't provide support for this type
+| BRegexType // Bad news, FStar doesn't provide support for this type
+| BStringType
+| BGUIDType
 // The bool indicates if the Empty Tuple is open or not
 | BEmptyTupleType : bool -> bosqueType
 // The bool indicates if the Tuple is open or not
 | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType
+// FIX: The following two are wrong
+// The bool indicates if the Empty Tuple is open or not
+| BEmptyRecordType : bool -> bosqueType
+// The bool indicates if the Tuple is open or not
+| BRecordType : bool -> n:nat -> sequence bosqueType n -> bosqueType
+// FIX: The following is incomplete
+| BFunctionType
+// FIX: The following is incomplete
+| BObjectType
+// FIX: The following is incomplete
+| BEnumType 
+// FIX: The following is incomplete
+| BCustomKeyType
+// FIX: The following is incomplete
+| BKeyedType
 | BErrorType
 
 (* Definition of equality relation on Bosque types *)
@@ -24,14 +46,34 @@ val eqTypeSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> 
 val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec eqType x y = match x, y with
 | BAnyType, BAnyType -> true
+| BSomeType, BSomeType -> true
+| BTruthyType, BTruthyType -> true
 | BNoneType, BNoneType -> true
-| BIntType, BIntType -> true
-| BBoolType, BBoolType -> true
 // The following might be incomplete, but if Unions are normalized then it is complete
 | BUnionType x1 x2 , BUnionType y1 y2 -> eqType x1 y1 && eqType x2 y2
-| BUnionType _ _, _ -> false
+| BParseableType, BParseableType -> true 
+| BBoolType, BBoolType -> true
+| BIntType, BIntType -> true
+| BFloatType, BFloatType -> true
+| BRegexType, BRegexType -> true
+// FIX: The following is wrong
+| BStringType, BStringType -> true
+| BGUIDType, BGUIDType -> true
 | BEmptyTupleType b1, BEmptyTupleType b2 -> b1 = b2 
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq seq1 seq2
+| BEmptyRecordType b1,  BEmptyRecordType b2 -> b1 = b2
+// FIX: The following is wrong
+| BRecordType _ _ _, BRecordType _ _ _ -> true
+// FIX: The following is wrong
+| BFunctionType, BFunctionType -> true
+// FIX: The following is wrong
+| BObjectType, BObjectType -> true
+// FIX: The following is wrong
+| BEnumType, BEnumType -> true
+// FIX: The following is wrong
+| BCustomKeyType, BCustomKeyType -> true
+// FIX: The following is wrong
+| BKeyedType, BKeyedType -> true
 | BErrorType, BErrorType -> true
 | _, _ -> false
 and
