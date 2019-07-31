@@ -8,6 +8,7 @@ module Util=Util
 // 2) There is a unique way to represent any union (normal form)
 // the latter was needed for eqType
 type bosqueType =
+| BAnyType
 | BNoneType
 | BIntType
 | BBoolType
@@ -22,6 +23,7 @@ type bosqueType =
 val eqTypeSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
 val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec eqType x y = match x, y with
+| BAnyType, BAnyType -> true
 | BNoneType, BNoneType -> true
 | BIntType, BIntType -> true
 | BBoolType, BBoolType -> true
@@ -45,6 +47,7 @@ eqTypeSeq #n x y = match x with
    i.e. forall x y . subtypeOf x y <===> x :> y *)
 val subtypeOf : bosqueType -> bosqueType -> Tot bool
 let rec subtypeOf x y = match x, y with
+| BAnyType, _ -> true
 | BNoneType, BNoneType -> true
 | BIntType, BIntType -> true
 | BBoolType, BBoolType -> true
