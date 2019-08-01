@@ -12,7 +12,7 @@ type bosqueTerm =
 | BInt : int -> bosqueTerm
 // No support for Float
 // No support for Regex
-| BString : string -> bosqueTerm
+| BTypedString : value:string -> content_type:bosqueType -> bosqueTerm
 | BGUID : string -> int -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
 | BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm
@@ -24,7 +24,7 @@ let rec getType x = match x with
 | BNone -> BNoneType
 | BBool _ -> BBoolType
 | BInt _ -> BIntType
-| BString _ -> BStringType
+| BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
 | BTuple n SNil -> if (n <> 0) then BErrorType else BEmptyTupleType false 
 | BTuple n y -> BTupleType false n (mapSequence' (hide x) getType y) 
@@ -56,9 +56,9 @@ let isInt x = match x with
 | BInt _ -> true
 | _ -> false 
 
-val isString : bosqueTerm -> Tot bool
-let isString x = match x with 
-| BString _ -> true
+val isString : bosqueType -> bosqueTerm -> Tot bool
+let isString ty x = match x with 
+| BTypedString _ ty' -> eqType ty ty'
 | _ -> false 
 
 val isGUID : bosqueTerm -> Tot bool
@@ -111,7 +111,7 @@ let rec eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
 | BBool x1, BBool y1 -> BBool (x1 = y1)
 | BInt x1, BInt y1 -> BBool (x1 = y1)
-| BString s1, BString s2 -> BBool (s1 = s2)
+| BTypedString s1 ty1, BTypedString s2 ty2 -> BBool (s1 = s2 && eqType ty1 ty2)
 | BGUID s1 n1, BGUID s2 n2 -> BBool (s1 = s2 && n1 = n2)
 | BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BError
                                    else eqTerm_aux #n1 seq1 seq2

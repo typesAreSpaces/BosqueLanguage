@@ -18,7 +18,7 @@ type bosqueType =
 | BIntType
 | BFloatType // Bad news, FStar doesn't provide support for this type
 | BRegexType // Bad news, FStar doesn't provide support for this type
-| BStringType
+| BTypedStringType : bosqueType -> bosqueType
 | BGUIDType
 // The bool indicates if the Empty Tuple is open or not
 | BEmptyTupleType : bool -> bosqueType
@@ -57,7 +57,7 @@ let rec eqType x y = match x, y with
 | BFloatType, BFloatType -> true
 | BRegexType, BRegexType -> true
 // FIX: The following is wrong
-| BStringType, BStringType -> true
+| BTypedStringType t1, BTypedStringType t2 -> (eqType t1 t2)
 | BGUIDType, BGUIDType -> true
 | BEmptyTupleType b1, BEmptyTupleType b2 -> b1 = b2 
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq seq1 seq2
