@@ -98,7 +98,8 @@ class TranslatorBosqueFStar {
                 }
                 else {
                     console.log(s);
-                    throw new Error(`${s} is not a valid constant value type, yet`);
+                    return TranslatorBosqueFStar.boolType;
+                    // throw new Error(`${s} is not a valid constant value type, yet`);
                 }
             }
         }
@@ -110,6 +111,9 @@ class TranslatorBosqueFStar {
         let stringConst = s.slice(1);
         stringConst = stringConst.substr(0, stringConst.indexOf("="));
         switch (stringConst) {
+            case "none": {
+                return TranslatorBosqueFStar.noneType;
+            }
             case "int": {
                 return TranslatorBosqueFStar.intType;
             }
@@ -123,6 +127,7 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
+                console.log(stringConst);
                 throw new Error(`The case ${stringConst} is not implemented yet`);
             }
         }
@@ -529,6 +534,7 @@ class TranslatorBosqueFStar {
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
                 returnType);
+            console.log(returnType);
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.function_declarations.push(
                     new FStarDeclaration(fkey,

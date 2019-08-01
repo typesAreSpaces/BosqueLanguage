@@ -35,7 +35,7 @@ abstract class TypeExpr {
 
 class IntType extends TypeExpr {
     getFStarType() {
-        return "int";
+        return "x:bosqueTerm{isInt x}";
     }
     getBosqueType() {
         return "NSCore::Int";
@@ -44,7 +44,7 @@ class IntType extends TypeExpr {
 
 class BoolType extends TypeExpr {
     getFStarType() {
-        return "bool";
+        return "x:bosqueTerm{isBool x}";
     }
     getBosqueType() {
         return "NSCore::Bool";
@@ -53,7 +53,8 @@ class BoolType extends TypeExpr {
 
 class StringType extends TypeExpr {
     getFStarType() {
-        return "string";
+        // FIX: This is wrong
+        return "x:bosqueTerm{isString x}";
     }
     getBosqueType() {
         return "NSCore::String";
@@ -311,4 +312,18 @@ class LambdaType extends TypeExpr {
     }
 }
 
-export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, ConstructorType, LambdaType };
+class OptionalType extends TypeExpr {
+    readonly ty : TypeExpr;
+
+    constructor(ty : TypeExpr){
+        super();
+        this.ty = ty;
+    }
+    getFStarType(){
+        return "";
+    }
+    getBosqueType(){
+        return "";
+    }
+}
+export { TypeExpr, IntType, BoolType, StringType, NoneType, AnyType, SomeType, FuncType, UninterpretedType, UnionType, TupleType, RecordType, ConstructorType, LambdaType, OptionalType };

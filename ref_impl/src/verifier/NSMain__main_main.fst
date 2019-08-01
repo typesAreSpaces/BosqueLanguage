@@ -41,6 +41,9 @@ type tuple__2 (t_1 : Type) (t_2 : Type) =
 type tuple__16 (t_1 : Type) (t_2 : Type) (t_3 : Type) (t_4 : Type) (t_5 : Type) (t_6 : Type) (t_7 : Type) (t_8 : Type) (t_9 : Type) (t_10 : Type) (t_11 : Type) (t_12 : Type) (t_13 : Type) (t_14 : Type) (t_15 : Type) (t_16 : Type) =
 | Mktuple__16: _1:t_1 -> _2:t_2 -> _3:t_3 -> _4:t_4 -> _5:t_5 -> _6:t_6 -> _7:t_7 -> _8:t_8 -> _9:t_9 -> _10:t_10 -> _11:t_11 -> _12:t_12 -> _13:t_13 -> _14:t_14 -> _15:t_15 -> _16:t_16 -> tuple__16 t_1 t_2 t_3 t_4 t_5 t_6 t_7 t_8 t_9 t_10 t_11 t_12 t_13 t_14 t_15 t_16 
 
+type tuple__1 (t_1 : Type) =
+| Mktuple__1: _1:t_1 -> tuple__1 t_1 
+
 type record__f_g (t_1 : Type) (t_2 : Type) =
 | Mkrecord__f_g: f:t_1 -> g:t_2 -> record__f_g t_1 t_2 
 
@@ -71,6 +74,12 @@ let nSMain__max x y =
                             let _return_ = __ir_ret___3 in 
                                 _return_
 
+val nSMain__identityTupleOptional : (tuple__2 int bool) -> Tot (tuple__2 int bool)
+let nSMain__identityTupleOptional x = 
+    let __ir_ret__ = x in 
+        let _return_ = __ir_ret__ in 
+            _return_
+
 val nSMain__main : int
 let nSMain__main  = 
     let __tmp_0 = (Mktuple__2 10 10) in 
@@ -92,9 +101,15 @@ let nSMain__main  =
                                                                     let __tmp_40 = (Mktuple__2?._1 x) in 
                                                                         let __tmp_37 = (nSMain__max __tmp_40 y) in 
                                                                             let z = __tmp_37 in 
-                                                                                let __tmp_42 = (Mktuple__2 x y) in 
-                                                                                    let zTuple = __tmp_42 in 
-                                                                                        let __ir_ret__ = z in 
-                                                                                            let _return_ = __ir_ret__ in 
-                                                                                                _return_
+                                                                                let __tmp_43 = (Mktuple__2 1 true) in 
+                                                                                    let __tmp_42 = (nSMain__identityTupleOptional __tmp_43) in 
+                                                                                        let z2 = __tmp_42 in 
+                                                                                            let __tmp_47 = (Mktuple__1 1) in 
+                                                                                                let __tmp_46 = (nSMain__identityTupleOptional __tmp_47) in 
+                                                                                                    let z3 = __tmp_46 in 
+                                                                                                        let __tmp_49 = (Mktuple__2 x y) in 
+                                                                                                            let zTuple = __tmp_49 in 
+                                                                                                                let __ir_ret__ = z in 
+                                                                                                                    let _return_ = __ir_ret__ in 
+                                                                                                                        _return_
 

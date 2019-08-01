@@ -33,6 +33,14 @@ function identity(x : String): String {
     return x;
 }
 
+function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
+    return x;
+}
+
+function identityTupleOptional(x : [Int, ?:Bool]) : [Int, ?:Bool] {
+    return x;
+}
+
 function max(x: Int | None, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
@@ -127,7 +135,8 @@ entrypoint function main(): Int {
     
     // var z = max0(x, y);
     var z = max(x.0, y);
-    
+    var z2 = identityTupleOptional([1, true]);
+    var z3 = identityTupleOptional([1]);
     
 
     var zTuple = [x, y];
