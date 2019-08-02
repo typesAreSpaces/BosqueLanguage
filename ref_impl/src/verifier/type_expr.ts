@@ -42,10 +42,12 @@ class SomeType extends TypeExpr {
     }
 }
 
-// TODO: Implement getFStarTerm
+// getFStarTerm returns (bosqueTerm), but ideally
+// getFStarTerm should never be called on a TruthyType
+// because it is a concept, not an identity
 class TruthyType extends TypeExpr {
     getFStarTerm() {
-        return "";
+        return "(bosqueTerm)";
     }
     getFStarType() {
         return "BTruthyType";
@@ -67,7 +69,6 @@ class NoneType extends TypeExpr {
     }
 }
 
-// TODO: Needs testing
 class UnionType extends TypeExpr {
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
     readonly types: string;
@@ -93,7 +94,7 @@ class UnionType extends TypeExpr {
             return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");
         }
     }
-    static toFStarUnion(x : TypeExpr[]) : string {
+    static toFStarUnion(x: TypeExpr[]): string {
         if (x.length == 2) {
             return "(BUnionType "
                 + x[0].getFStarType()
@@ -166,8 +167,9 @@ class TupleType extends TypeExpr {
         this.types = TupleType.toFStarTuple(this.elements);
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{isTuple "
-            + this.elements.length
+        return "(x:bosqueTerm{is" + (this.isOpen ? "Open" : "Closed") + "Tuple "
+            + this.isOpen 
+            + " " + this.elements.length
             + " " + this.types
             + "})";
     }
@@ -181,11 +183,11 @@ class TupleType extends TypeExpr {
         return "[" + this.elements.map(x => x.getBosqueType()).join(" | ") + "]";
     }
 
-    static toFStarTuple(types: TypeExpr[]) : string {
-        if (types.length == 0){
+    static toFStarTuple(types: TypeExpr[]): string {
+        if (types.length == 0) {
             return "SNil";
         }
-        else{
+        else {
             const tail = types.slice(1);
             return "(SCons " + types[0].getFStarType() + " " + this.toFStarTuple(tail) + ")";
         }
@@ -289,7 +291,8 @@ class KeyedType {
 }
 
 
-export { TypeExpr,
+export {
+    TypeExpr,
     AnyType, SomeType, TruthyType,
     NoneType, UnionType, BoolType,
     IntType, TypedStringType, TupleType,

@@ -37,7 +37,7 @@ function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
-function identityTupleOptional(x : [Int, ?:Bool, Int, ?:None, ...]) : [Int, ?:Bool, Int, ?:None, ...] {
+function identityTupleOptional(x : [Int, ?:Bool, Int, ?:None, ?:Bool, ...]) : [Int, ?:Bool, Int, ?:None, ?:Bool, ...] {
     return x;
 }
 

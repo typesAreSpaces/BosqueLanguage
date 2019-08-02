@@ -28,13 +28,13 @@ let nSMain__identityUnion x =
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__identityTupleOptional : (x:bosqueTerm{isTuple 1 (SCons BBoolType SNil)}) -> Tot (x:bosqueTerm{isTuple 1 (SCons BBoolType SNil)})
+val nSMain__identityTupleOptional : (x:bosqueTerm{subtypeOf (BUnionType (BTupleType true 1 (SCons BIntType SNil)) (BUnionType (BTupleType true 3 (SCons BIntType (SCons BBoolType (SCons BIntType SNil)))) (BUnionType (BTupleType true 4 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BNoneType SNil))))) (BTupleType true 5 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BNoneType (SCons BBoolType SNil))))))))) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType (BTupleType true 1 (SCons BIntType SNil)) (BUnionType (BTupleType true 3 (SCons BIntType (SCons BBoolType (SCons BIntType SNil)))) (BUnionType (BTupleType true 4 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BNoneType SNil))))) (BTupleType true 5 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BNoneType (SCons BBoolType SNil))))))))) (getType x)})
 let nSMain__identityTupleOptional x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__identity : (x:bosqueTerm{isTuple 1 (SCons (BTypeStringType BAnyType) SNil)}) -> Tot (x:bosqueTerm{isTuple 1 (SCons (BTypeStringType BAnyType) SNil)})
+val nSMain__identity : (x:bosqueTerm{isOpenTuple true 1 (SCons (BTypeStringType BAnyType) SNil)}) -> Tot (x:bosqueTerm{isOpenTuple true 1 (SCons (BTypeStringType BAnyType) SNil)})
 let nSMain__identity x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 

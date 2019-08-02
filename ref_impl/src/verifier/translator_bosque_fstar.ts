@@ -57,6 +57,7 @@ class TranslatorBosqueFStar {
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         FS.writeSync(fd, `open BosqueOption\n`);
+        
         FS.writeSync(fd, `\n`);
     }
 
@@ -68,6 +69,17 @@ class TranslatorBosqueFStar {
         if (flag) {
             console.log(message);
         }
+    }
+
+    static optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
+        let setOfTypes = new Set<TypeExpr>();
+        setOfTypes.add(new TupleType(isOpen, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
+        let accum = nonOptionals;
+        for (let index = 0; index < optionals.length; ++index) {
+            accum += ", " + optionals[index];
+            setOfTypes.add(new TupleType(isOpen, accum.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
+        }
+        return new UnionType(setOfTypes);
     }
 
     // TODO: Add more types as needed
@@ -92,41 +104,37 @@ class TranslatorBosqueFStar {
             default: {
                 if (s.charAt(0) == '[') {
                     s = s.slice(1).slice(0, -1);
-                    if (s.includes("?:")) {
-                        // This is based on the assumption that 
-                        // concrete types cannot follow optional types
-                        // inside tuples
-                        const types = s.split("?:");
-                        const nonOptionals = types[0];
-                        // TODO: Add optionals
-                        // const optionals = types.slice(1);
-                        if (s.includes("...")) {
-
-                            console.log(s);
-                            return new TupleType(true,
-                                nonOptionals
-                                    .slice(0, -5)
-                                    .split(", ")
-                                    .map(TranslatorBosqueFStar.stringTypeToType));
+                    if (s.includes("...")) {
+                        s = s.slice(0, -5); // Getting rid of the ellipsis and comma
+                        if (s.includes("?:")) {
+                            // This is based on the assumption that 
+                            // concrete types cannot follow optional types
+                            // inside tuples
+                            const types = s.split("?:");
+                            const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
+                            const optionals = types.slice(1);
+                            return TranslatorBosqueFStar.optionalTupleSugaring(true, nonOptionals, 
+                                optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                         }
                         else {
-                            return new TupleType(false,
-                                nonOptionals
-                                    .split(", ")
-                                    .map(TranslatorBosqueFStar.stringTypeToType));
+                            return new TupleType(true,
+                                s.split(", ").map(TranslatorBosqueFStar.stringTypeToType));
                         }
                     }
                     else {
-                        if (s.includes("...")) {
-                            return new TupleType(true, s
-                                .slice(0, -5)
-                                .split(", ")
-                                .map(TranslatorBosqueFStar.stringTypeToType));
+                        if (s.includes("?:")) {
+                            // This is based on the assumption that 
+                            // concrete types cannot follow optional types
+                            // inside tuples
+                            const types = s.split("?:");
+                            const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
+                            const optionals = types.slice(1);
+                            return TranslatorBosqueFStar.optionalTupleSugaring(false, nonOptionals, 
+                                optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                         }
                         else {
-                            return new TupleType(false, s
-                                .split(", ")
-                                .map(TranslatorBosqueFStar.stringTypeToType));
+                            return new TupleType(false,
+                                s.split(", ").map(TranslatorBosqueFStar.stringTypeToType));
                         }
                     }
                 }
@@ -148,9 +156,7 @@ class TranslatorBosqueFStar {
                                 s = s.substr(index + 1, s.length - index - 2);
                                 return new TypedStringType(TranslatorBosqueFStar.stringTypeToType(s));
                             }
-                            // FIX:
-                            return TranslatorBosqueFStar.boolType;
-                            // throw new Error(`${s} is not a valid constant value type, yet`);
+                            throw new Error(s + " is not a valid constant value type, yet");
                         }
                     }
                 }
@@ -180,7 +186,7 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                throw new Error(`The case ${stringConst} is not implemented yet`);
+                throw new Error("The case " + stringConst + " is not implemented yet");
             }
         }
     }
@@ -333,7 +339,7 @@ class TranslatorBosqueFStar {
                 //         typeOfTuple.elements[opMIRAccessFromIndex.idx])];
                 // }
                 // else {
-                //     throw new Error(`Type ${typeOfTuple} is not a TupleType`);
+                //     throw new Error("Type " + typeOfTuple + " is not a TupleType");
                 // }
                 TranslatorBosqueFStar.debugging("MIRAccessFromIndex Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRAccessFromIndex", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
@@ -356,7 +362,7 @@ class TranslatorBosqueFStar {
                 //         (keyTypes.get(opMIRAccessFromProperty.property) as TypeExpr))];
                 // }
                 // else {
-                //     throw new Error(`Type ${typeOfTuple} is not a RecordType`);
+                //     throw new Error("Type " + typeOfTuple + " is not a RecordType");
                 // }
                 TranslatorBosqueFStar.debugging("MIRAccessFromProperty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
@@ -536,7 +542,7 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             default:
-                throw new Error(`Operation ${op} not defined`);
+                throw new Error("Operation " + op + " not defined");
         }
     }
 
@@ -559,7 +565,7 @@ class TranslatorBosqueFStar {
         const declarations = (this.mapDeclarations.get(fkey) as MIRInvokeBodyDecl);
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
-            throw new Error(`The program with fkey ${fkey} is a string\n`);
+            throw new Error("The program with fkey " + fkey + " is a string");
         }
         else {
             const returnType = TranslatorBosqueFStar.stringTypeToType(declarations.resultType);
@@ -600,7 +606,7 @@ class TranslatorBosqueFStar {
                         return this.opsToExpr(block.ops.slice(0, -1), comingFrom, fkey, continuation);
                     }
                     default: {
-                        throw new Error(`Wrong Control-Flow graph. The out-degree of any node cannot be more than 2 in block: ${block}`);
+                        throw new Error("Wrong Control-Flow graph. The out-degree of any node cannot be more than 2 in block: " + block);
                     }
                 }
             }
