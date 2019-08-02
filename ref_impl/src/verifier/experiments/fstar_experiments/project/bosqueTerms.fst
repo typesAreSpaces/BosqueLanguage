@@ -44,7 +44,10 @@ let rec mapTermsToTypes #n x = match x with
 val isNone : bosqueTerm -> Tot bool
 let isNone x = match x with 
 | BNone -> true
-| _ -> false 
+| _ -> false
+
+val isSome : bosqueTerm -> Tot bool
+let isSome x = not (isNone x)
 
 val isBool : bosqueTerm -> Tot bool
 let isBool x = match x with 
@@ -56,8 +59,8 @@ let isInt x = match x with
 | BInt _ -> true
 | _ -> false 
 
-val isString : bosqueType -> bosqueTerm -> Tot bool
-let isString ty x = match x with 
+val isTypedString : bosqueType -> bosqueTerm -> Tot bool
+let isTypedString ty x = match x with 
 | BTypedString _ ty' -> eqType ty ty'
 | _ -> false 
 
