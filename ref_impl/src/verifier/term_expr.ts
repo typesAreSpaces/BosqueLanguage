@@ -51,7 +51,9 @@ class FuncTerm extends TermExpr {
         this.terms = terms;
     }
     toML() {
-        return "(" + this.symbolName + " " + this.terms.map(x => x.toML()).join(" ") + ")";
+        return "(" + this.symbolName
+            + " " + this.terms.map(x => x.toML()).join(" ") 
+            + ")";
     }
 }
 
