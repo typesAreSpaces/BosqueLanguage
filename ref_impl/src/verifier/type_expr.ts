@@ -165,10 +165,7 @@ class TupleType extends TypeExpr {
         super();
         this.isOpen = isOpen;
         this.elements = elements;
-        this.elements.reverse();
-        this.types = this.elements.reduce((x, y) =>
-            "(SCons " + y.getFStarType() + " " + x + ")", "SNil");
-        this.elements.reverse();
+        this.types = TupleType.toFStarTuple(this.elements);
     }
     getFStarTerm() {
         return "(x:bosqueTerm{isTuple "
@@ -184,6 +181,16 @@ class TupleType extends TypeExpr {
     }
     getBosqueType() {
         return "[" + this.elements.map(x => x.getBosqueType()).join(" | ") + "]";
+    }
+
+    static toFStarTuple(types: TypeExpr[]) : string {
+        if (types.length == 0){
+            return "SNil";
+        }
+        else{
+            const tail = types.slice(1);
+            return "(SCons " + types[0].getFStarType() + " " + this.toFStarTuple(tail) + ")";
+        }
     }
 }
 

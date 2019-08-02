@@ -95,8 +95,8 @@ class TranslatorBosqueFStar {
                     if (s.includes("?:")) {
                         const types = s.split("?:");
                         const nonOptionals = types[0].split(", ");
-                        // TODO: Add the optionals
-                        const optionals = types.slice(1);
+                        // TODO: Add optionals
+                        // const optionals = types.slice(1);
                         if (s.includes("...")) {
                             return new TupleType(true,
                                 nonOptionals.map(TranslatorBosqueFStar.stringTypeToType));

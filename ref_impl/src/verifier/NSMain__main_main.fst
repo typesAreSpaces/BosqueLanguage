@@ -28,7 +28,7 @@ let nSMain__identityUnion x =
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__identityTupleOptional : (x:bosqueTerm{isNone x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__identityTupleOptional : (x:bosqueTerm{isTuple 2 (SCons BIntType (SCons BBoolType SNil))}) -> Tot (x:bosqueTerm{isTuple 2 (SCons BIntType (SCons BBoolType SNil))})
 let nSMain__identityTupleOptional x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
