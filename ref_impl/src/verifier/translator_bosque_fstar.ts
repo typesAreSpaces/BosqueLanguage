@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRAccessFromIndex, MIRConstructorRecord, MIRAccessFromProperty, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType } from "./type_expr";
@@ -26,7 +26,6 @@ class FStarDeclaration {
         this.type = type;
     }
     print(fd: number): void {
-        console.log(this.type);
         FS.writeSync(fd, `val ${sanitizeName(this.fkey)} : ${this.type.getFStarTerm()}\n`);
         FS.writeSync(fd, `let ${sanitizeName(this.fkey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
@@ -75,10 +74,10 @@ class TranslatorBosqueFStar {
     // stringTypeToType : String[Type] -> TypeExpr
     static stringTypeToType(s: string): TypeExpr {
         switch (s) {
-            case "NSCore::Any" : {
+            case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
             }
-            case "NSCore::Some" : {
+            case "NSCore::Some": {
                 return TranslatorBosqueFStar.someType;
             }
             case "NSCore::Int": {
@@ -92,23 +91,58 @@ class TranslatorBosqueFStar {
             }
             default: {
                 if (s.charAt(0) == '[') {
-                    // FIX: This not always should be a closed Tuple
-                    return new TupleType(false, s
-                        .slice(1)
-                        .slice(0, -1)
-                        .split(", ")
-                        .map(TranslatorBosqueFStar.stringTypeToType));
-                }
-                if (s.includes("|")) {
-                    return new UnionType(new Set(s
-                        .split(" | ")
-                        .map(TranslatorBosqueFStar.stringTypeToType)
-                    ));
+                    s = s.slice(1).slice(0, -1);
+                    if (s.includes("?:")) {
+                        const types = s.split("?:");
+                        const nonOptionals = types[0].split(", ");
+                        // TODO: Add the optionals
+                        const optionals = types.slice(1);
+                        if (s.includes("...")) {
+                            return new TupleType(true,
+                                nonOptionals.map(TranslatorBosqueFStar.stringTypeToType));
+                        }
+                        else {
+                            return new TupleType(false,
+                                nonOptionals.map(TranslatorBosqueFStar.stringTypeToType));
+                        }
+                    }
+                    else {
+                        if (s.includes("...")) {
+                            return new TupleType(true, s
+                                .split(", ")
+                                .map(TranslatorBosqueFStar.stringTypeToType));
+                        }
+                        else {
+                            // FIX: This not always should be a closed Tuple
+                            return new TupleType(false, s
+                                .split(", ")
+                                .map(TranslatorBosqueFStar.stringTypeToType));
+                        }
+                    }
                 }
                 else {
-                    console.log(s);
-                    return TranslatorBosqueFStar.boolType;
-                    // throw new Error(`${s} is not a valid constant value type, yet`);
+                    if (s.charAt(0) == '{') {
+                        // FIX: Implement actual record type
+                        return TranslatorBosqueFStar.noneType;
+                    }
+                    else {
+                        if (s.includes("|")) {
+                            return new UnionType(new Set(s
+                                .split(" | ")
+                                .map(TranslatorBosqueFStar.stringTypeToType)
+                            ));
+                        }
+                        else {
+                            if (s.includes("NSCore::String")) {
+                                const index = s.indexOf("=");
+                                s = s.substr(index + 1, s.length - index - 2);
+                                return new TypedStringType(TranslatorBosqueFStar.stringTypeToType(s));
+                            }
+                            // FIX:
+                            return TranslatorBosqueFStar.boolType;
+                            // throw new Error(`${s} is not a valid constant value type, yet`);
+                        }
+                    }
                 }
             }
         }
@@ -136,7 +170,6 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                console.log(stringConst);
                 throw new Error(`The case ${stringConst} is not implemented yet`);
             }
         }
@@ -183,7 +216,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRLoadConstTypedString: {
                 const opMIRLoadConstTypedString = op as MIRLoadConstTypedString;
-                
+
                 console.log("The following provides the _location_ of the entity used");
                 console.log(opMIRLoadConstTypedString.tkey);
                 console.log("The following provides the _type_ of the Typed String declared");
@@ -234,7 +267,6 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRConstructorTuple: {
                 const opConstructorTuple = op as MIRConstructorTuple;
-                console.log(opConstructorTuple);
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
                     new TupleType(false, types)); // FIX: This not always should be a close Tuple
@@ -279,8 +311,8 @@ class TranslatorBosqueFStar {
             //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
             case MIROpTag.MIRAccessFromIndex: {
-                const opMIRAccessFromIndex = op as MIRAccessFromIndex;
-                console.log(opMIRAccessFromIndex);
+                // const opMIRAccessFromIndex = op as MIRAccessFromIndex;
+                // console.log(opMIRAccessFromIndex);
                 // const typeOfTuple = TranslatorBosqueFStar.types_seen.get(sanitizeName(opMIRAccessFromIndex.arg.nameID + fkey)) as TypeExpr;
                 // if (typeOfTuple instanceof TupleType) {
                 //     TranslatorBosqueFStar.types_seen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
@@ -301,8 +333,8 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRAccessFromProperty: {
-                const opMIRAccessFromProperty = op as MIRAccessFromProperty;
-                console.log(opMIRAccessFromProperty);
+                // const opMIRAccessFromProperty = op as MIRAccessFromProperty;
+                // console.log(opMIRAccessFromProperty);
                 // const typeOfTuple = TranslatorBosqueFStar.types_seen.get(sanitizeName(opMIRAccessFromProperty.arg.nameID + fkey)) as TypeExpr;
                 // if (typeOfTuple instanceof RecordType) {
                 //     const keyTypes = new Map(typeOfTuple.elements);
@@ -521,7 +553,6 @@ class TranslatorBosqueFStar {
         }
         else {
             const returnType = TranslatorBosqueFStar.stringTypeToType(declarations.resultType);
-            MIRInvokeBodyDecl;
             const flow = computeBlockLinks(mapBlocks);
 
             // console.log("Blocks:-----------------------------------------------------------------------");
@@ -567,6 +598,7 @@ class TranslatorBosqueFStar {
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
                 returnType);
+            console.log(declarations.params);
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.function_declarations.push(
                     new FStarDeclaration(fkey,

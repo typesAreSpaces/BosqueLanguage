@@ -25,11 +25,11 @@ function max0(x: [Int, Int], y: Int): Int
     }
 }
 
-function identityUnion(x : Int | None | Any | Bool) : Int | None | Any | Bool {
+function identityUnion(x : Int | None | String | Bool) : Int | None | String | Bool {
     return x;
 }
 
-function identity(x : String): String {
+function identity(x : [String, ...]): [String, ...] {
     return x;
 }
 
@@ -37,7 +37,7 @@ function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
-function identityTupleOptional(x : [Int, ?:Bool]) : [Int, ?:Bool] {
+function identityTupleOptional(x : [Int, ?:Bool, ?:None]) : [Int, ?:Bool, ?:None] {
     return x;
 }
 
@@ -154,7 +154,7 @@ entrypoint function main(): Int {
     
     var z2 = identityTupleOptional([1, true]);
     var z3 = identityTupleOptional([1]);
-
+    var z4 = identity(["hello"]);
 
     
     

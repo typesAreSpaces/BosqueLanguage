@@ -77,9 +77,10 @@ class UnionType extends TypeExpr {
         this.elements = elements;
         const canonical_order = Array.from(elements).sort();
         this.types = UnionType.toFStarUnion(canonical_order);
-
     }
     getFStarTerm() {
+        console.log('whattt-------------------------------------------------------------');
+        console.log(this.types);
         return "(x:bosqueTerm{subtypeOf " + this.types + " (getType x)})";
     }
     getFStarType() {
@@ -94,10 +95,10 @@ class UnionType extends TypeExpr {
             return Array.from(this.elements).map(x => x.getBosqueType()).join(" | ");
         }
     }
-    static toFStarUnion = (x: TypeExpr[]) => {
+    static toFStarUnion(x : TypeExpr[]) : string {
         if (x.length == 2) {
-            return "(BUnionType"
-                + " " + x[0].getFStarType()
+            return "(BUnionType "
+                + x[0].getFStarType()
                 + " " + x[1].getFStarType() + ")"
         }
         else {
@@ -105,7 +106,8 @@ class UnionType extends TypeExpr {
                 throw new Error("UnionType expected two or more types");
             }
             else {
-                return "";
+                const tail = x.slice(1);
+                return "(BUnionType " + x[0].getFStarType() + " " + UnionType.toFStarUnion(tail) + ")";
             }
         }
     }

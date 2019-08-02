@@ -22,20 +22,14 @@ let nSMain__max x y =
                             let _return_ = __ir_ret___3 in 
                                 _return_
 
-val nSMain__identityUnion : (x:bosqueTerm{subtypeOf (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType (BTypeStringType BAnyType)))) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType (BTypeStringType BAnyType)))) (getType x)})
+val nSMain__identityUnion : (bosqueTerm) -> Tot (bosqueTerm)
 let nSMain__identityUnion x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__identityTupleOptional : (x:bosqueTerm{isNone x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__identityTupleOptional : (x:bosqueTerm{isTuple 2 (SCons BIntType (SCons BBoolType SNil))}) -> Tot (x:bosqueTerm{isTuple 2 (SCons BIntType (SCons BBoolType SNil))})
 let nSMain__identityTupleOptional x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__identity : (x:bosqueTerm{isTuple 2 (SCons (BTypeStringType BAnyType) (SCons BBoolType SNil))}) -> Tot (x:bosqueTerm{isTuple 2 (SCons (BTypeStringType BAnyType) (SCons BBoolType SNil))})
-let nSMain__identity x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
@@ -71,12 +65,9 @@ let nSMain__main  =
                                                                                                             let __tmp_50 = (Mktuple__1 1) in 
                                                                                                                 let __tmp_49 = (nSMain__identityTupleOptional __tmp_50) in 
                                                                                                                     let z3 = __tmp_49 in 
-                                                                                                                        let __tmp_53 = (Mktuple__1 "hello") in 
-                                                                                                                            let __tmp_52 = (nSMain__identity __tmp_53) in 
-                                                                                                                                let z4 = __tmp_52 in 
-                                                                                                                                    let __tmp_55 = (Mktuple__2 x y) in 
-                                                                                                                                        let zTuple = __tmp_55 in 
-                                                                                                                                            let __ir_ret__ = z in 
-                                                                                                                                                let _return_ = __ir_ret__ in 
-                                                                                                                                                    _return_
+                                                                                                                        let __tmp_52 = (Mktuple__2 x y) in 
+                                                                                                                            let zTuple = __tmp_52 in 
+                                                                                                                                let __ir_ret__ = z in 
+                                                                                                                                    let _return_ = __ir_ret__ in 
+                                                                                                                                        _return_
 
