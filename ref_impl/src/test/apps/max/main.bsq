@@ -37,7 +37,7 @@ function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
-function identityTupleOptional(x : [Int, ?:Bool, ?:None]) : [Int, ?:Bool, ?:None] {
+function identityTupleOptional(x : [Int, ?:Bool, Int, ?:None, ...]) : [Int, ?:Bool, Int, ?:None, ...] {
     return x;
 }
 
@@ -152,8 +152,8 @@ entrypoint function main(): Int {
     
     // var z = max0(x, y);
     
-    var z2 = identityTupleOptional([1, true]);
-    var z3 = identityTupleOptional([1]);
+    var z2 = identityTupleOptional([1, true, 2]);
+    // var z3 = identityTupleOptional([1]);
     var z4 = identity(["hello"]);
 
     

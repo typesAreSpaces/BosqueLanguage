@@ -93,27 +93,37 @@ class TranslatorBosqueFStar {
                 if (s.charAt(0) == '[') {
                     s = s.slice(1).slice(0, -1);
                     if (s.includes("?:")) {
+                        // This is based on the assumption that 
+                        // concrete types cannot follow optional types
+                        // inside tuples
                         const types = s.split("?:");
-                        const nonOptionals = types[0].split(", ");
+                        const nonOptionals = types[0];
                         // TODO: Add optionals
                         // const optionals = types.slice(1);
                         if (s.includes("...")) {
+
+                            console.log(s);
                             return new TupleType(true,
-                                nonOptionals.map(TranslatorBosqueFStar.stringTypeToType));
+                                nonOptionals
+                                    .slice(0, -5)
+                                    .split(", ")
+                                    .map(TranslatorBosqueFStar.stringTypeToType));
                         }
                         else {
                             return new TupleType(false,
-                                nonOptionals.map(TranslatorBosqueFStar.stringTypeToType));
+                                nonOptionals
+                                    .split(", ")
+                                    .map(TranslatorBosqueFStar.stringTypeToType));
                         }
                     }
                     else {
                         if (s.includes("...")) {
                             return new TupleType(true, s
+                                .slice(0, -5)
                                 .split(", ")
                                 .map(TranslatorBosqueFStar.stringTypeToType));
                         }
                         else {
-                            // FIX: This not always should be a closed Tuple
                             return new TupleType(false, s
                                 .split(", ")
                                 .map(TranslatorBosqueFStar.stringTypeToType));
