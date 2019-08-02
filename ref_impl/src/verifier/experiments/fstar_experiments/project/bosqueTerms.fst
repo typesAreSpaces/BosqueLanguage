@@ -69,10 +69,16 @@ let isGUID x = match x with
 | BGUID _ _ -> true
 | _ -> false 
 
-val isTuple : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isTuple n seqTypes x = match x with
-| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false))
-  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
+val isOpenTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isOpenTuple b n seqTypes x = match x with
+| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false)) && b
+  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes) && b
+| _ -> false
+
+val isClosedTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isClosedTuple b n seqTypes x = match x with
+| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false)) && not b
+  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes) && not b
 | _ -> false
 
 // FIX: Implement the following function

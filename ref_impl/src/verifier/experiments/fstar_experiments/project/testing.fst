@@ -31,7 +31,9 @@ let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 // The following fails, as expected
 // let test0a1 = BTuple 3 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 let testb1 = BTuple 0 SNil
-let testb2 = isTuple 0 SNil testb0
+let testb2 = isClosedTuple false 0 SNil testb0
+let testb2' = isClosedTuple false 2 (SCons BIntType (SCons BBoolType SNil)) testb0
+let testb2'' = isClosedTuple true 2 (SCons BIntType (SCons BBoolType SNil)) testb0
 // The following fails, as expected
 // let testb2_ = isTuple 1 SNil testb0
 // let testb3 = isTuple 3 testb0
@@ -111,7 +113,7 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
-val maxWithTuple : x:bosqueTerm{isTuple 2 (SCons (BIntType) (SCons (BBoolType) SNil)) x} 
+val maxWithTuple : x:bosqueTerm{isOpenTuple true 2 (SCons (BIntType) (SCons (BBoolType) SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
@@ -125,5 +127,20 @@ let test4b = maxWithTuple (testb0) (BInt (-12))
 let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
 let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+
+val maxWithTuple2 : x:bosqueTerm{isClosedTuple false 2 (SCons (BIntType) (SCons (BBoolType) SNil)) x} 
+  -> y:bosqueTerm{isInt y} 
+  -> z:bosqueTerm{isInt z}
+let maxWithTuple2 x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
+| BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+| _ -> BError
+
+(* Testing: maxWithTuple2 *)
+let test5a = maxWithTuple2 (testb0) (BInt 1203)
+let test5b = maxWithTuple2 (testb0) (BInt (-12))
+
+let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
+
+let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
 
 (* ---------------------------------------------------------------- *)
