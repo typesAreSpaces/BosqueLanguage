@@ -25,7 +25,7 @@ function max0(x: [Int, Int], y: Int): Int
     }
 }
 
-function identityUnion(x : Int | None | Bool) : Int | None | Bool {
+function identityUnion(x : Int | None | Any | Bool) : Int | None | Any | Bool {
     return x;
 }
 
@@ -123,20 +123,40 @@ function max5(x : Int, y : Int) : Int
 //     }
 // }
 
+
+entity PlayerMark provides Parsable {
+    field mark: String;
+
+    override static tryParse(str: String): PlayerMark | None {
+        return (str == "x" || str == "o") ? PlayerMark{ mark=str } : none;
+    }
+}
+
 entrypoint function main(): Int {
-    var x = [10, 10];
+    
+    var s = "hello1";
+    var s1 = PlayerMark'x';
+    var n = none;
+     
+    var x = [10, 30];
+    var y = 20;
+    var z = max(x.0, y);
+
     var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
     var x3 = {f = 1, g = 2};
     var x4 = x3.f;
     var x5 = {g = 10, f = 20};
     var x6 = x5.f;
-    var y = 20;
+    
     var y2 = identityUnion(y);
     
     // var z = max0(x, y);
-    var z = max(x.0, y);
+    
     var z2 = identityTupleOptional([1, true]);
     var z3 = identityTupleOptional([1]);
+
+
+    
     
 
     var zTuple = [x, y];
