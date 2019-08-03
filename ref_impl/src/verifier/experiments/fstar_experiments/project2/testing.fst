@@ -6,7 +6,7 @@ open BosqueTypes
 
 (* --------------------------------------------------------------- *)
 
-let aaa = BTuple 2 (SCons (BInt 3) (SCons (BBool true) SNil))
+let aaa = BTuple 2 (SCons (BInt 3) 1 (SCons (BBool true) 0 SNil))
 // let bb = extractTuple 2 aaa
 
 (* Testing: subtypeOf *)
@@ -17,25 +17,25 @@ let testa2 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BNoneType BBo
 let testa3 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BIntType (BUnionType BNoneType BBoolType))
 let testa4 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BBoolType BIntType)
 
-let testa5 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BIntType SNil))
+let testa5 = subtypeOf (BTupleType false 1 (SCons BIntType 0 SNil)) (BTupleType false 1 (SCons BIntType 0 SNil))
 
-let testa6 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BBoolType SNil))
-let testa7 = subtypeOf (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil))) (BTupleType false 1 (SCons BBoolType SNil))
-let testa8 = subtypeOf (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil))) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
-let testa9 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
-let testa10 = subtypeOf (BTupleType true 1 (SCons BIntType SNil)) (BTupleType false 1 (SCons BIntType SNil))
-let testa11 = subtypeOf (BTupleType true 1 (SCons BIntType SNil)) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
-let testa12 = subtypeOf (BTupleType false 1 (SCons BIntType SNil)) (BTupleType true 1 (SCons BIntType SNil))
-let testa13 = subtypeOf (BTupleType true 0 SNil) (BTupleType false 2 (SCons BIntType (SCons BBoolType SNil)))
+let testa6 = subtypeOf (BTupleType false 1 (SCons BIntType 0 SNil)) (BTupleType false 1 (SCons BBoolType 0 SNil))
+let testa7 = subtypeOf (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))) (BTupleType false 1 (SCons BBoolType 0 SNil))
+let testa8 = subtypeOf (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))) (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)))
+let testa9 = subtypeOf (BTupleType false 1 (SCons BIntType 0 SNil)) (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)))
+let testa10 = subtypeOf (BTupleType true 1 (SCons BIntType 0 SNil)) (BTupleType false 1 (SCons BIntType 0 SNil))
+let testa11 = subtypeOf (BTupleType true 1 (SCons BIntType 0 SNil)) (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)))
+let testa12 = subtypeOf (BTupleType false 1 (SCons BIntType 0 SNil)) (BTupleType true 1 (SCons BIntType 0 SNil))
+let testa13 = subtypeOf (BTupleType true 0 SNil) (BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)))
 
 (* Testing: BTuple *)
-let testb0 = BTuple 2 (SCons (BInt 342) (SCons (BBool true) (SNil)))
+let testb0 = BTuple 2 (SCons (BInt 342) 1 (SCons (BBool true) 0 SNil))
 // The following fails, as expected
 // let test0a1 = BTuple 3 (SCons (BInt 342) (SCons (BBool true) (SNil)))
 let testb1 = BTuple 0 SNil
 let testb2 = isTuple false 0 SNil testb0
-let testb2' = isTuple false 2 (SCons BIntType (SCons BBoolType SNil)) testb0
-let testb2'' = isTuple true 2 (SCons BIntType (SCons BBoolType SNil)) testb0
+let testb2' = isTuple false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)) testb0
+let testb2'' = isTuple true 2 (SCons BIntType 1 (SCons BBoolType 0 SNil)) testb0
 // The following fails, as expected
 // let testb2_ = isTuple 1 SNil testb0
 // let testb3 = isTuple 3 testb0
@@ -52,7 +52,7 @@ let testb12 = BTuple 0 SNil
 // let testb14 = isTuple 10 testb12
 
 (* Testing: getType *)
-let testc1 = BTuple 2 (SCons aaa ((SCons testb0) SNil))
+let testc1 = BTuple 2 (SCons aaa 1 ((SCons testb0) 0 SNil))
 let testc2 = getType testb0
 let testc3 = getType testb1
 let testc4 = getType testc1
@@ -115,7 +115,7 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
-val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) (SCons (BBoolType) SNil)) x} 
+val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
@@ -130,7 +130,7 @@ let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTup
 
 let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
-val maxWithTuple2 : x:bosqueTerm{subtypeOf (BTupleType false 2 (SCons (BIntType) (SCons (BBoolType) SNil))) (getType x)} 
+val maxWithTuple2 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple2 x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 

@@ -46,4 +46,4 @@ let rec take #a n m x = match x with
 | SNil -> SNil
 | SCons hd m' tl -> 
   if (m = 0) then SNil 
-  else SCons hd m' (take m' (m - 1) tl)
+  else SCons hd (m - 1) (take m' (m - 1) tl)

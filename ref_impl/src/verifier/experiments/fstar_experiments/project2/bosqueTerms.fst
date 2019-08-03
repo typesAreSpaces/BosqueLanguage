@@ -27,7 +27,7 @@ let rec getType x = match x with
 | BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
 | BTuple n SNil -> if (n <> 0) then BErrorType else BTupleType false 0 SNil
-| BTuple n y -> BTupleType false n (mapSequence' (hide x) getType y) 
+| BTuple n y -> BTupleType false n (mapSequence' n (hide x) getType y) 
 // FIX: The following is incomplete
 | BRecord _ _ -> BRecordType false 0 (SNil)
 | BError -> BErrorType
@@ -37,7 +37,7 @@ val mapTermsToTypes : #n:nat
   -> Tot (sequence bosqueType n)
 let rec mapTermsToTypes #n x = match x with
 | SNil -> SNil
-| SCons y ys -> SCons (getType y) (mapTermsToTypes ys)
+| SCons y m ys -> SCons (getType y) m (mapTermsToTypes ys)
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
@@ -76,9 +76,16 @@ val isTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot 
 //   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 // | _ -> false
 let isTuple b n seqTypes x = match x with
-| BTuple m seqTerms -> if (n = 0) then eqType (BTupleType b n seqTypes) (getType x)
-  else (n = m) && eqType (BTupleType b n seqTypes) (getType x)
+| BTuple m seqTerms -> (n = m) && eqType (BTupleType b n seqTypes) (getType x)
 | _ -> false
+
+val isTuple2 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isTuple2 b n seqTypes x = match x with
+| BTuple m seqTerms -> eqType (BTupleType b n seqTypes) (getType x)
+| _ -> false
+
+val isTuple3 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isTuple3 b n seqTypes x = eqType (BTupleType b n seqTypes) (getType x)
 
 val isRecord : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isRecord b n seqTypes x = eqType (getType x) (BRecordType b n seqTypes)
@@ -128,11 +135,11 @@ eqTerm_aux #n x y = match x with
          | SNil -> BBool true
          | _ -> BError
          )
-| SCons x1 xs1 -> (match y with
+| SCons x1 m xs1 -> (match y with
                  | SNil -> BError
-                 | SCons y1 ys1 -> (match (eqTerm x1 y1) with
+                 | SCons y1 m' ys1 -> (match (eqTerm x1 y1) with
                                   | BBool b1 -> (match (eqTerm_aux xs1 ys1) with
-                                               | BBool b2 -> BBool (b1 && b2)
+                                               | BBool b2 -> BBool ((m = m') && b1 && b2)
                                                | _ -> BError
                                                )
                                   | _ -> BError 

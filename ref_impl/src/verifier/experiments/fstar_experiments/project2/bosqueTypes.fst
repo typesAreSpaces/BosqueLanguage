@@ -38,7 +38,7 @@ type bosqueType =
 | BErrorType
 
 (* Definition of equality relation on Bosque types *)
-val eqTypeSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
+val eqTypeSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
 val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec eqType x y = match x, y with
 | BAnyType, BAnyType -> true
@@ -54,7 +54,7 @@ let rec eqType x y = match x, y with
 | BRegexType, BRegexType -> true
 | BTypedStringType t1, BTypedStringType t2 -> (eqType t1 t2)
 | BGUIDType, BGUIDType -> true 
-| BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq seq1 seq2
+| BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq n1 seq1 seq2
 // FIX: The following is wrong
 | BRecordType _ _ _, BRecordType _ _ _ -> true
 // FIX: The following is wrong
@@ -70,19 +70,19 @@ let rec eqType x y = match x, y with
 | BErrorType, BErrorType -> true
 | _, _ -> false
 and
-eqTypeSeq #n x y = match x with
+eqTypeSeq n x y = match x with
 | SNil -> (match y with 
   | SNil -> true
   | _ -> false
   )
-| SCons x1 xs1 -> (match y with 
+| SCons x1 m xs1 -> (match y with 
                  | SNil -> false
-                 | SCons y1 ys1 -> eqType x1 y1 && eqTypeSeq xs1 ys1  
+                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
                  )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e. forall x y . subtypeOf x y <===> x :> y *)
-val subtypeOfSeq : #n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
+val subtypeOfSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
 val subtypeOf : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec subtypeOf x y = match x, y with
 | BAnyType, _ -> true
@@ -97,21 +97,21 @@ let rec subtypeOf x y = match x, y with
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> 
   if b1 then 
     if (n1 > n2) then false
-    else subtypeOfSeq seq1 (take n1 seq2)
+    else subtypeOfSeq n1 seq1 (take n2 n1 seq2)
   else 
     if b2 then false 
     else 
-      if (n1 = n2) then subtypeOfSeq seq1 seq2
+      if (n1 = n2) then subtypeOfSeq n1 seq1 seq2
       else false 
 | BErrorType, BErrorType -> true
 | _, _ -> false
 and 
-subtypeOfSeq #n x y = match x with
+subtypeOfSeq n x y = match x with
 | SNil -> (match y with
   | SNil -> true
   | _ -> false
   )
-| SCons x1 xs1 -> (match y with 
+| SCons x1 m xs1 -> (match y with 
                  | SNil -> false
-                 | SCons y1 ys1 -> eqType x1 y1 && eqTypeSeq xs1 ys1  
+                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
                  )
