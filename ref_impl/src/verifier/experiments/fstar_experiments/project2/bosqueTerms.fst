@@ -19,7 +19,8 @@ type bosqueTerm =
 | BError : bosqueTerm
 
 (* Definition of getType *)
-val getType : x:bosqueTerm -> Tot bosqueType
+val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
+val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
 let rec getType x = match x with
 | BNone -> BNoneType
 | BBool _ -> BBoolType
@@ -27,17 +28,14 @@ let rec getType x = match x with
 | BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
 | BTuple n SNil -> if (n <> 0) then BErrorType else BTupleType false 0 SNil
-| BTuple n y -> BTupleType false n (mapSequence' n (hide x) getType y) 
+| BTuple n y -> BTupleType false n (getTypeSeq n y)
 // FIX: The following is incomplete
 | BRecord _ _ -> BRecordType false 0 (SNil)
 | BError -> BErrorType
-
-val mapTermsToTypes : #n:nat 
-  -> (x: sequence bosqueTerm n) 
-  -> Tot (sequence bosqueType n)
-let rec mapTermsToTypes #n x = match x with
+and
+getTypeSeq n x = match x with
 | SNil -> SNil
-| SCons y m ys -> SCons (getType y) m (mapTermsToTypes ys)
+| SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
