@@ -101,7 +101,12 @@ let isError x = match x with
    and assertions (in the z3 smt solver) *)
 val extractBool : x:bosqueTerm{isBool x} -> Tot bool
 let extractBool x = match x with
-| BBool y -> y
+| BBool y -> y 
+
+// Hmmm
+val extractBool2 : x:bosqueTerm{eqType BBoolType (getType x)} -> Tot bool
+let extractBool2 x = match x with
+| BBool y -> y 
 
 // val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
 // let extractTuple n x = match x with
