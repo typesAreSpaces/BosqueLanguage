@@ -26,7 +26,7 @@ let rec getType x = match x with
 | BInt _ -> BIntType
 | BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
-| BTuple n SNil -> if (n <> 0) then BErrorType else BEmptyTupleType false 
+| BTuple n SNil -> if (n <> 0) then BErrorType else BTupleType false 0 SNil
 | BTuple n y -> BTupleType false n (mapSequence' (hide x) getType y) 
 // FIX: The following is incomplete
 | BRecord _ _ -> BRecordType false 0 (SNil)
@@ -69,24 +69,19 @@ let isGUID x = match x with
 | BGUID _ _ -> true
 | _ -> false 
 
-val isOpenTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isOpenTuple b n seqTypes x = match x with
-| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false)) && b
-  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes) && b
-| _ -> false
-
-val isClosedTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isClosedTuple b n seqTypes x = match x with
-| BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false)) && not b
-  else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes) && not b
-| _ -> false
-
-// FIX: Implement the following function
-// val isRecord : n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-// let isRecord n seqTypes x = match x with
-// | BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BEmptyTupleType false))
+val isTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+// let isTuple b n seqTypes x = eqType (BTupleType b n seqTypes) (getType x)
+// let isTuple b n seqTypes x = match x with
+// | BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BTupleType false 0 SNil))
 //   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
 // | _ -> false
+let isTuple b n seqTypes x = match x with
+| BTuple m seqTerms -> if (n = 0) then eqType (BTupleType b n seqTypes) (getType x)
+  else (n = m) && eqType (BTupleType b n seqTypes) (getType x)
+| _ -> false
+
+val isRecord : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isRecord b n seqTypes x = eqType (getType x) (BRecordType b n seqTypes)
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
@@ -152,7 +147,7 @@ let greaterOrEq x y = match x, y with
 | _, _ -> BError
 
 (* Tuple projector *)
-val nthTuple : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm
+val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm)
 let rec nthTuple index dimension y = match y with
 | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
 | BTuple dimension'' (SCons x #dimension' xs) -> 
