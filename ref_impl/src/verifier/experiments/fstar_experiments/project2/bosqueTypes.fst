@@ -1,5 +1,7 @@
 module BosqueTypes
 
+#set-options "--z3rlimit 15"
+
 open Sequence
 module Util=Util
 
@@ -57,15 +59,15 @@ let rec eqType x y = match x, y with
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq n1 seq1 seq2
 // FIX: The following is wrong
 | BRecordType _ _ _, BRecordType _ _ _ -> true
-// FIX: The following is wrong
+// FIX: The following is incomplete
 | BFunctionType, BFunctionType -> true
-// FIX: The following is wrong
+// FIX: The following is incomplete
 | BObjectType, BObjectType -> true
-// FIX: The following is wrong
+// FIX: The following is incomplete
 | BEnumType, BEnumType -> true
-// FIX: The following is wrong
+// FIX: The following is incomplete
 | BCustomKeyType, BCustomKeyType -> true
-// FIX: The following is wrong
+// FIX: The following is incomplete
 | BKeyedType, BKeyedType -> true
 | BErrorType, BErrorType -> true
 | _, _ -> false
@@ -77,7 +79,7 @@ eqTypeSeq n x y = match x with
   )
 | SCons x1 m xs1 -> (match y with 
                  | SNil -> false
-                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
+                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1
                  )
 
 val lemma_eqType_refl : x:bosqueType -> Lemma (ensures eqType x x) (decreases x)
@@ -156,26 +158,45 @@ lemma_eqTypeSeq_sym n x y = match x with
 val lemma_eqTypeSeq_trans : n:nat -> (x:sequence bosqueType n)
   -> (y:sequence bosqueType n) 
   -> (z:sequence bosqueType n)
-  -> Lemma (requires (eqTypeSeq n x y) && (eqTypeSeq n y z)) (ensures (eqTypeSeq n x z)) (decreases x)
+  -> Lemma (requires (eqTypeSeq n x y) && (eqTypeSeq n y z)) (ensures (eqTypeSeq n x z)) (decreases %[x; y; z])
 val lemma_eqType_trans : x:bosqueType
   -> y:bosqueType 
   -> z:bosqueType 
-  -> Lemma (requires (eqType x y) && (eqType y z)) (ensures (eqType x z)) (decreases x)
+  -> Lemma (requires (eqType x y) && (eqType y z)) (ensures (eqType x z)) (decreases %[x; y; z])
 let rec lemma_eqType_trans x y z = match x with
 | BAnyType -> ()
 | BSomeType -> ()
 | BTruthyType -> ()
 | BNoneType -> ()
-| BUnionType t1 t2 -> admit()
+| BUnionType t1 t2 -> (match y with
+                     | BUnionType t1' t2' -> (match z with
+                                            | BUnionType t1'' t2'' -> lemma_eqType_trans t1 t1' t1''; 
+                                                                     lemma_eqType_trans t2 t2' t2'' 
+                                            | _ -> ()
+                                            )
+                     | _ -> ()
+                     )
 | BParseableType -> ()
 | BBoolType -> ()
 | BIntType -> ()
 | BFloatType -> ()
 | BRegexType -> ()
-| BTypedStringType t -> admit()
+| BTypedStringType t -> (match y with
+                       | BTypedStringType t' -> (match z with
+                                               | BTypedStringType t'' -> lemma_eqType_trans t t' t''
+                                               | _ -> ()
+                                               )
+                       | _ -> ()
+                       )
 | BGUIDType -> ()
-| BTupleType _ n seq -> admit()
-| BRecordType _ n seq -> admit()
+| BTupleType _ n seq -> (match y with
+                     | BTupleType _ n' seq' -> (match z with
+                                            | BTupleType _ n'' seq'' -> lemma_eqTypeSeq_trans n seq seq' seq''
+                                            | _ -> ()
+                                            )
+                     | _ -> ()
+                     )
+| BRecordType _ n seq -> ()
 | BFunctionType -> ()
 | BObjectType -> ()
 | BEnumType -> ()
@@ -185,10 +206,20 @@ let rec lemma_eqType_trans x y z = match x with
 and 
 lemma_eqTypeSeq_trans n x y z = match x with
 | SNil -> (match y with 
-         | SNil -> admit()
-         | SCons hd' m' tl' -> admit()
+         | SNil -> ()
+         | SCons hd' m' tl' -> (match z with 
+                              | SNil -> ()
+                              | SCons hd'' m'' tl'' -> ()
+                              )
          )
-| SCons hd m tl -> admit()
+| SCons hd m tl -> (match y with 
+                  | SNil -> ()
+                  | SCons hd' m' tl' -> (match z with 
+                                       | SNil -> ()
+                                       | SCons hd'' m'' tl'' -> lemma_eqType_trans hd hd' hd''; 
+                                                               lemma_eqTypeSeq_trans m tl tl' tl''
+                                       )
+                  )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e. forall x y . subtypeOf x y <===> x :> y *)

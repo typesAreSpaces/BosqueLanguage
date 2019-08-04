@@ -87,12 +87,8 @@ let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion (BInt x) (B
 
 val maxWithUnion2 : termUnionIntBool -> termInt -> termInt
 let maxWithUnion2 x y = match x with 
-| BBool z -> (match y with 
-  | BInt x2 -> BInt x2
-  | _ -> BError
-) 
-| BInt x1 -> if (extractBool (greaterOrEq x y)) then x else y
-| _ -> BError
+| BBool _ -> y 
+| BInt _ -> if (extractBool (greaterOrEq x y)) then x else y
 
 let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) 
 && extractBool (greaterOrEq (maxWithUnion2 (BInt x) (BInt y)) (BInt y))
@@ -115,12 +111,20 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
+// val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
+//   -> y:bosqueTerm{isInt y} 
+//   -> z:bosqueTerm{isInt z}
+// let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
+// | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+// | _ -> BError
+
 val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
-let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
-| BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
-| _ -> BError
+let maxWithTuple x y = 
+  let xAt0 = nthTuple 0 2 x in 
+    if (extractBool (greaterOrEq xAt0 y)) then xAt0 
+    else y
 
 (* Testing: maxWithTuple *)
 let test4a = maxWithTuple (testb0) (BInt 1203)

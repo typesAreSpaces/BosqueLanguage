@@ -4,7 +4,7 @@ open FStar.Ghost
 
 type sequence 'a : nat -> Type = 
 | SNil : sequence 'a 0
-| SCons : hd:'a -> n:nat -> tl : sequence 'a n -> sequence 'a (n + 1) 
+| SCons : hd:'a -> n:nat -> tl : sequence 'a n -> sequence 'a (n + 1)
 
 val mapSequence : (#a:Type) -> (#b:Type) -> (n:nat) 
   -> (a -> Tot b) -> (sequence a n) 

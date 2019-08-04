@@ -2,7 +2,6 @@ module BosqueTerms
 
 open Sequence
 open BosqueTypes
-open FStar.Ghost
 
 (* Dynamic: depends on the 
    entities created by user *) 
@@ -182,7 +181,7 @@ let rec nthTuple index dimension y = match y with
 (* ------------------------------------------------------------------------------------------- *)
 (* Type instantiation *)
 type typeUnionIntBool = x:bosqueType{subtypeOf (BUnionType BIntType BBoolType) x}
-type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)} 
+type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)}
 (* Definition of IntType *)
 type termInt = x:bosqueTerm{isInt x} 
 (* ------------------------------------------------------------------------------------------- *)
