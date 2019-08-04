@@ -85,7 +85,7 @@ let isRecord b n seqTypes x = eqType (getType x) (BRecordType b n seqTypes)
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
-| BError -> true
+| BError -> true 
 | _ -> false 
 (* --------------------------------------------------------------- *)
 
