@@ -73,12 +73,15 @@ class TranslatorBosqueFStar {
 
     static optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
         let setOfTypes = new Set<TypeExpr>();
-        setOfTypes.add(new TupleType(isOpen, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
+        setOfTypes.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
         let accum = nonOptionals;
-        for (let index = 0; index < optionals.length; ++index) {
+        const secondLastIndex = optionals.length - 2; 
+        for (let index = 0; index < secondLastIndex; ++index) {
             accum += ", " + optionals[index];
-            setOfTypes.add(new TupleType(isOpen, accum.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
+            setOfTypes.add(new TupleType(false, accum.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
         }
+        accum += ", " + optionals[secondLastIndex + 1];
+        setOfTypes.add(new TupleType(isOpen, accum.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
         return new UnionType(setOfTypes);
     }
 
