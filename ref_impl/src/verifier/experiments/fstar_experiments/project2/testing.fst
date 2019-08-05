@@ -9,6 +9,9 @@ open BosqueTypes
 let aaa = BTuple 2 (SCons (BInt 3) 1 (SCons (BBool true) 0 SNil))
 // let bb = extractTuple 2 aaa
 
+let oktest = BTuple 2 (SCons (BInt 3) 1 (SCons (BBool true) 0 SNil))
+let oktest2 = nthTupleType 10 2 oktest
+
 (* Testing: subtypeOf *)
 let testa0 = subtypeOf (BUnionType BIntType BBoolType) BIntType
 let testa0' = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BBoolType BIntType)
@@ -111,7 +114,7 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
-val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
+val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x}
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple x y = 
@@ -127,11 +130,22 @@ let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTup
 
 let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
-val maxWithTuple2 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
+val maxWithTuple2 : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
-let maxWithTuple2 x y = 
+let maxWithTuple2 x y = match x with 
+| BTuple 2 seq -> 
   let xAt0 = nthTuple 0 2 x in 
+    match xAt0 with 
+    | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    | _ -> BError
+
+val maxWithTuple3 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
+  -> y:bosqueTerm{isInt y} 
+  -> z:bosqueTerm{isInt z}
+let maxWithTuple3 x y = 
+  let xAt0 = nthTuple 0 2 x in 
+    assert (isInt xAt0);
     match xAt0 with 
     | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
     | _ -> BError
