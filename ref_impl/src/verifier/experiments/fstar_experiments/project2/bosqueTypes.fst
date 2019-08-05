@@ -238,11 +238,11 @@ let rec subtypeOf x y = match x, y with
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> 
   if b1 then 
     if (n1 > n2) then false
-    else subtypeOfSeq n1 seq1 (take n2 n1 seq2)
+    else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1 (take n2 n1 seq2)
   else 
     if b2 then false 
     else 
-      if (n1 = n2) then subtypeOfSeq n1 seq1 seq2
+      if (n1 = n2) then (not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2
       else false 
 | BErrorType, BErrorType -> true
 | _, _ -> false
