@@ -167,7 +167,7 @@ class TupleType extends TypeExpr {
         this.types = TupleType.toFStarTuple(this.elements);
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{is" + (this.isOpen ? "Open" : "Closed") + "Tuple "
+        return "(x:bosqueTerm{isTuple "
             + this.isOpen 
             + " " + this.elements.length
             + " " + this.types
