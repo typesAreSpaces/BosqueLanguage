@@ -42,7 +42,7 @@ class TranslatorBosqueFStar {
     static readonly DEBUGGING = false;
     // types_seen : String[MangledNamewithFkey] -> TypeExpr
     static readonly types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
-    
+
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
     readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
     readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
@@ -54,6 +54,28 @@ class TranslatorBosqueFStar {
         this.mapFuncDeclarations = masm.invokeDecls;
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
+
+        console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
+        console.log(this.mapEntityDeclarations.forEach((x, index) => {
+            console.log(`${index} provides:`);
+            x.provides.map(y => y.options.map(z => {
+                console.log(`Key: ${y.trkey}; Options ${z.jemit}`);
+            }));
+            console.log();
+        }));
+        console.log("END Entity Declarations --------------------------------------------------------------------------------");
+        
+        console.log("BEGIN Concept Declarations --------------------------------------------------------------------------------");
+        console.log(this.mapConceptDeclarations.forEach((x, index) => {
+            console.log(`${index} provides:`);
+            x.provides.map(y => y.options.map(z => {
+                console.log(`Key: ${y.trkey}; Options ${z.jemit}`);
+            }));
+            console.log();
+        }));
+        console.log("END Concept Declarations --------------------------------------------------------------------------------");
+        console.log();
+        
         this.fileName = fileName;
         this.isFkeyDeclared = new Set<string>();
     }
@@ -61,7 +83,7 @@ class TranslatorBosqueFStar {
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         FS.writeSync(fd, `open BosqueOption\n`);
-        
+
         FS.writeSync(fd, `\n`);
     }
 
@@ -79,7 +101,7 @@ class TranslatorBosqueFStar {
         let setOfTypes = new Set<TypeExpr>();
         setOfTypes.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
         let accum = nonOptionals;
-        const secondLastIndex = optionals.length - 2; 
+        const secondLastIndex = optionals.length - 2;
         for (let index = 0; index < secondLastIndex; ++index) {
             accum += ", " + optionals[index];
             setOfTypes.add(new TupleType(false, accum.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
@@ -120,7 +142,7 @@ class TranslatorBosqueFStar {
                             const types = s.split("?:");
                             const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
                             const optionals = types.slice(1);
-                            return TranslatorBosqueFStar.optionalTupleSugaring(true, nonOptionals, 
+                            return TranslatorBosqueFStar.optionalTupleSugaring(true, nonOptionals,
                                 optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                         }
                         else {
@@ -136,7 +158,7 @@ class TranslatorBosqueFStar {
                             const types = s.split("?:");
                             const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
                             const optionals = types.slice(1);
-                            return TranslatorBosqueFStar.optionalTupleSugaring(false, nonOptionals, 
+                            return TranslatorBosqueFStar.optionalTupleSugaring(false, nonOptionals,
                                 optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                         }
                         else {
@@ -239,7 +261,6 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRLoadConstTypedString: {
                 const opMIRLoadConstTypedString = op as MIRLoadConstTypedString;
-
                 console.log("The following provides the _location_ of the entity used");
                 console.log(opMIRLoadConstTypedString.tkey);
                 console.log("The following provides the _type_ of the Typed String declared");
@@ -292,7 +313,7 @@ class TranslatorBosqueFStar {
                 const opConstructorTuple = op as MIRConstructorTuple;
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
-                    new TupleType(false, types)); 
+                    new TupleType(false, types));
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt, fkey),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
