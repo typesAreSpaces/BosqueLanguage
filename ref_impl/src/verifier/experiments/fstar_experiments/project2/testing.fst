@@ -140,10 +140,44 @@ let maxWithTuple2 x y = match x with
     | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
     | _ -> BError
 
+val withOpenTuple : x:bosqueTerm{subtypeOf (BTupleType true 0 SNil) (getType x)} -> Tot bool
+let withOpenTuple x = match x with 
+| BTuple m seq -> false
+
+val maxWithTuple2' : x:bosqueTerm{subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType x)} 
+  -> y:bosqueTerm{isInt y} 
+  -> z:bosqueTerm
+let maxWithTuple2' x y = match x with 
+| BTuple 2 seq -> 
+  let xAt0 = nthTuple 0 2 x in 
+    (match xAt0 with 
+    | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    | _ -> BError
+    )
+| _ -> BError
+
+let tupleTypeExample = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil)))
+let testing = subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType tupleTypeExample)
+
+let hmm = maxWithTuple2' tupleTypeExample (BInt 33)
+let hmm2 = maxWithTuple2' (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) (BInt 33)
+
 val maxWithTuple3 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
-let maxWithTuple3 x y = 
+let maxWithTuple3 x y = match x with 
+| BTuple 2 seq ->
+  let xAt0 = nthTuple 0 2 x in 
+    assert (isInt xAt0);
+    match xAt0 with 
+    | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    | _ -> BError
+| _ -> BError
+
+val maxWithTuple4 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
+  -> y:bosqueTerm{isInt y} 
+  -> z:bosqueTerm{isInt z}
+let maxWithTuple4 x y = 
   let xAt0 = nthTuple 0 2 x in 
     assert (isInt xAt0);
     match xAt0 with 
