@@ -7,14 +7,14 @@ import * as FS from "fs";
 import * as Path from "path";
 import chalk from "chalk";
 import { MIREmitter } from "./../compiler/mir_emitter";
-import { PackageConfig, MIRAssembly, MIRInvokeBodyDecl } from "./../compiler/mir_assembly";
+import { PackageConfig, MIRAssembly } from "./../compiler/mir_assembly";
 
 interface PathFile {
     directory: string;
     fileName: string;
 }
 
-function bosqueToInvokeDecl(info: PathFile): Map<string, MIRInvokeBodyDecl> {
+function bosqueToMASM(info: PathFile): MIRAssembly {
 
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../"));
     let files: { relativePath: string, contents: string }[] = [];
@@ -45,7 +45,7 @@ function bosqueToInvokeDecl(info: PathFile): Map<string, MIRInvokeBodyDecl> {
     }
 
     try {
-        return (masm as MIRAssembly).invokeDecls;
+        return (masm as MIRAssembly);
     }
     catch (ex) {
         process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
@@ -63,4 +63,4 @@ function sanitizeName(name : string) : string {
     return result.charAt(0).toLowerCase() + result.slice(1);
 }
 
-export { bosqueToInvokeDecl, PathFile, sanitizeName };
+export { bosqueToMASM, PathFile, sanitizeName };

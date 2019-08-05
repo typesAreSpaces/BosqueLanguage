@@ -10,7 +10,7 @@ import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./express
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
-import { MIRInvokeBodyDecl } from "../compiler/mir_assembly";
+import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl } from "../compiler/mir_assembly";
 
 type StringTypeMangleNameWithFkey = string;
 
@@ -42,14 +42,18 @@ class TranslatorBosqueFStar {
     static readonly DEBUGGING = false;
     // types_seen : String[MangledNamewithFkey] -> TypeExpr
     static readonly types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
-
-    readonly mapDeclarations: Map<string, MIRInvokeBodyDecl>;
+    
+    readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
+    readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
+    readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
     readonly fileName: string;
     readonly function_declarations = [] as FStarDeclaration[];
     readonly isFkeyDeclared: Set<string>;
 
-    constructor(mapDeclarations: Map<string, MIRInvokeBodyDecl>, fileName: string) {
-        this.mapDeclarations = mapDeclarations;
+    constructor(masm: MIRAssembly, fileName: string) {
+        this.mapFuncDeclarations = masm.invokeDecls;
+        this.mapConceptDeclarations = masm.conceptDecls;
+        this.mapEntityDeclarations = masm.entityDecls;
         this.fileName = fileName;
         this.isFkeyDeclared = new Set<string>();
     }
@@ -317,7 +321,7 @@ class TranslatorBosqueFStar {
                 // The following line will keep pushing to 
                 // the stack_expressions stack
                 this.collectExpr(currentFunctionKey);
-                const resultType = TranslatorBosqueFStar.stringTypeToType((this.mapDeclarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
+                const resultType = TranslatorBosqueFStar.stringTypeToType((this.mapFuncDeclarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID + fkey),
                     resultType);
                 return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt, fkey),
@@ -565,7 +569,7 @@ class TranslatorBosqueFStar {
     }
 
     collectExpr(fkey: string) {
-        const declarations = (this.mapDeclarations.get(fkey) as MIRInvokeBodyDecl);
+        const declarations = (this.mapFuncDeclarations.get(fkey) as MIRInvokeBodyDecl);
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
             throw new Error("The program with fkey " + fkey + " is a string");
