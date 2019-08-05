@@ -288,11 +288,11 @@ class TranslatorBosqueFStar {
                 const opConstructorTuple = op as MIRConstructorTuple;
                 const types = opConstructorTuple.args.map(x => TranslatorBosqueFStar.typeArgumentToType(x, fkey));
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
-                    new TupleType(false, types)); // FIX: This not always should be a close Tuple
+                    new TupleType(false, types)); 
                 return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt, fkey),
                 new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
                     opConstructorTuple.args.map(x => TranslatorBosqueFStar.argumentToExpr(x, fkey)),
-                    new TupleType(false, types))]; // FIX: This not always should be a close Tuple
+                    new TupleType(false, types))];
             }
             case MIROpTag.MIRConstructorRecord: {
                 const opConstructorRecord = op as MIRConstructorRecord;
