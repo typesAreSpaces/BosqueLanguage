@@ -204,7 +204,7 @@ let hmm = maxWithTuple2'' tupleTypeExample (BInt 33)
 
 // let hmm2 = let whatt = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) in maxWithTuple2'' whatt (BInt 33)
 
-// let hmm3 = maxWithTuple2'' (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) (BInt 33)
+let hmm3 = maxWithTuple2'' (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) (BInt 33)
 
 val maxWithTuple3 : x:bosqueTerm{isTuple true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
