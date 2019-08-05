@@ -26,10 +26,9 @@ let rec getType x = match x with
 | BInt _ -> BIntType
 | BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
-| BTuple n SNil -> if (n <> 0) then BErrorType else BTupleType false 0 SNil
 | BTuple n y -> BTupleType false n (getTypeSeq n y)
 // FIX: The following is incomplete
-| BRecord _ _ -> BRecordType false 0 (SNil)
+| BRecord _ _ -> BRecordType false 0 SNil
 | BError -> BErrorType
 and
 getTypeSeq n x = match x with
@@ -67,11 +66,6 @@ let isGUID x = match x with
 | _ -> false 
 
 val isTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-// let isTuple b n seqTypes x = eqType (BTupleType b n seqTypes) (getType x)
-// let isTuple b n seqTypes x = match x with
-// | BTuple m seqTerms -> if (n = 0) then (eqType (getType (BTuple m seqTerms)) (BTupleType false 0 SNil))
-//   else (n = m) && (eqTypeSeq (mapTermsToTypes seqTerms) seqTypes)
-// | _ -> false
 let isTuple b n seqTypes x = match x with
 | BTuple m seqTerms -> (n = m) && eqType (BTupleType b n seqTypes) (getType x)
 | _ -> false
@@ -156,15 +150,15 @@ let greaterOrEq x y = match x, y with
 | _, _ -> BError
 
 (* Tuple projector *)
-val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm)
-let rec nthTuple index dimension y = match y with
-| BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
-| BTuple dimension'' (SCons x #dimension' xs) -> 
-  if (index < 0 || dimension <> dimension'') then BError else
-  if (index >= dimension) then BNone else
-  if index = 0 then x
-  else nthTuple (index-1) dimension' (BTuple dimension' xs)
-| _ -> BError
+assume val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm{eqType (getType y) BIntType})
+// let rec nthTuple index dimension y = match y with
+// | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+// | BTuple dimension'' (SCons x #dimension' xs) -> 
+//   if (index < 0 || dimension <> dimension'') then BError else
+//   if (index >= dimension) then BNone else
+//   if index = 0 then x
+//   else nthTuple (index-1) dimension' (BTuple dimension' xs)
+// | _ -> BError
 
 // FIX: Implement the following function
 // (* Record projector *)

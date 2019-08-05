@@ -104,19 +104,12 @@ let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BI
 && (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
 )
 
-// The following fails, as expected
+// // The following fails, as expected
 // let _ = assert (forall x y z. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt x) )
 // && extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt y))
 // && (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
 // && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
-
-// val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
-//   -> y:bosqueTerm{isInt y} 
-//   -> z:bosqueTerm{isInt z}
-// let maxWithTuple x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
-// | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
-// | _ -> BError
 
 val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
@@ -125,7 +118,7 @@ let maxWithTuple x y =
   let xAt0 = nthTuple 0 2 x in 
     if (extractBool (greaterOrEq xAt0 y)) then xAt0 
     else y
-
+    
 (* Testing: maxWithTuple *)
 let test4a = maxWithTuple (testb0) (BInt 1203)
 let test4b = maxWithTuple (testb0) (BInt (-12))
@@ -137,15 +130,17 @@ let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> ex
 val maxWithTuple2 : x:bosqueTerm{isTuple2 false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)) x} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
-let maxWithTuple2 x y = let xAt0 = nthTuple 0 2 x in match xAt0 with 
-| BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
-| _ -> BError
+let maxWithTuple2 x y = 
+  let xAt0 = nthTuple 0 2 x in 
+    match xAt0 with 
+    | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    | _ -> BError
 
 (* Testing: maxWithTuple2 *)
 let test5a = maxWithTuple2 (testb0) (BInt 1203)
 let test5b = maxWithTuple2 (testb0) (BInt (-12))
 
-let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
+// let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
 
 let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
 
