@@ -181,6 +181,13 @@ let withOpenTuple2 x = match x with
 | BTuple 3 seq -> true
 | BTuple m seq -> true
 
+let ahhhh1 = BTuple 1 (SCons (BInt 3) 0 SNil)
+let ahhhh2 = BTuple 2 (SCons (BBool true) 1 (SCons (BInt 3) 0 SNil) )
+let ahhhh2' = BTuple 2 (SCons (BInt 0) 1 (SCons (BBool true) 0 SNil) )
+let ahhhh3 = BTuple 3 (SCons (BInt 0) 2 (SCons (BBool true) 1 (SCons (BInt 12) 0 SNil)) )
+// Demo: change the ahhhhx where x is {1, 2, 2', 3}
+let bhhhh = withOpenTuple2 ahhhh3
+
 let openTuple2_openTuple2Int_Bool_Bool = (BTupleType true 2 (SCons ((BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)))) 1 (SCons (BBoolType) 0 SNil)))
 
 val withOpenTupleTuple2 : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (bool)
@@ -192,15 +199,8 @@ let withOpenTupleTuple2 x = match x with
 val withOpenTupleTuple3 : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (y:bosqueTerm{isInt y})
 let withOpenTupleTuple3 x = match x with
 | BTuple 2 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
-| BTuple 3 seq -> BInt 3
-| BTuple m seq -> BInt 4
-
-let ahhhh1 = BTuple 1 (SCons (BInt 3) 0 SNil)
-let ahhhh2 = BTuple 2 (SCons (BBool true) 1 (SCons (BInt 3) 0 SNil) )
-let ahhhh2' = BTuple 2 (SCons (BInt 0) 1 (SCons (BBool true) 0 SNil) )
-let ahhhh3 = BTuple 3 (SCons (BInt 0) 2 (SCons (BBool true) 1 (SCons (BInt 12) 0 SNil)) )
-// Demo: change the ahhhhx where x is {1, 2, 2', 3}
-let bhhhh = withOpenTuple2 ahhhh3
+| BTuple 3 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
+| BTuple m seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
 
 // // Idk why the following doesn't work like withOpenTuple2'
 // val withOpenTuple2' : x:bosqueTerm{subtypeOf (BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType x)} -> Tot bool
@@ -208,6 +208,8 @@ let bhhhh = withOpenTuple2 ahhhh3
 // | BTuple 2 seq -> false
 // | BTuple 3 seq -> false 
 // | BTuple m seq -> true
+
+
 
 let tupleTypeExample = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil)))
 
