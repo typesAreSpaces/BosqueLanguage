@@ -81,22 +81,25 @@ class TranslatorBosqueFStar {
     static readonly types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
-    readonly isFkeyDeclared: Set<string>;
-    readonly function_declarations = [] as FunctionDeclaration[];
     readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
-    readonly isCkeyDeclared: Set<string>;
-    readonly concept_declarations = [] as ConceptDeclaration[];
     readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
+
+    readonly isFkeyDeclared: Set<string>;
+    readonly isCkeyDeclared: Set<string>;
     readonly isEkeyDeclared: Set<string>;
+
+    readonly function_declarations = [] as FunctionDeclaration[];
+    readonly concept_declarations = [] as ConceptDeclaration[];
     readonly entity_declarations = [] as EntityDeclaration[];
+
     readonly fileName: string;
     
     constructor(masm: MIRAssembly, fileName: string) {
         this.mapFuncDeclarations = masm.invokeDecls;
-        this.isFkeyDeclared = new Set<string>();
         this.mapConceptDeclarations = masm.conceptDecls;
-        this.isCkeyDeclared = new Set<string>();
         this.mapEntityDeclarations = masm.entityDecls;
+        this.isFkeyDeclared = new Set<string>();
+        this.isCkeyDeclared = new Set<string>();
         this.isEkeyDeclared = new Set<string>();
 
         console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
@@ -125,6 +128,7 @@ class TranslatorBosqueFStar {
 
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
+        // TODO: Change to the appropriate Prelude
         FS.writeSync(fd, `open BosqueOption\n`);
 
         FS.writeSync(fd, `\n`);
@@ -582,7 +586,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRPhi: {
                 const opPhi = op as MIRPhi;
-                // Use the right type 
+                // FIX: Use the right type 
                 // ?? I'm not so sure about this one
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
                     TranslatorBosqueFStar.intType); // I mean, this one
