@@ -16,6 +16,7 @@ abstract class TypeExpr {
     abstract getFStarTerm(): string;
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
+    abstract equalTo(ty: TypeExpr): boolean;
 }
 
 class AnyType extends TypeExpr {
@@ -28,6 +29,12 @@ class AnyType extends TypeExpr {
     getBosqueType() {
         return "NSCore::Any";
     }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof AnyType) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class SomeType extends TypeExpr {
@@ -39,6 +46,12 @@ class SomeType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::Some";
+    }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof SomeType) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -55,6 +68,12 @@ class TruthyType extends TypeExpr {
     getBosqueType() {
         return "NSCore::Truthy";
     }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof TruthyType) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class NoneType extends TypeExpr {
@@ -66,6 +85,12 @@ class NoneType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::None";
+    }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof NoneType) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -110,6 +135,13 @@ class UnionType extends TypeExpr {
             }
         }
     }
+    // FIX: This is incorrect
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof UnionType) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class BoolType extends TypeExpr {
@@ -121,6 +153,12 @@ class BoolType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::Bool";
+    }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof BoolType) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -134,6 +172,12 @@ class IntType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::Int";
+    }
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof IntType) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -152,6 +196,12 @@ class TypedStringType extends TypeExpr {
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
     }
+    equalTo(ty: TypeExpr): boolean {
+        if (ty instanceof TypedStringType) {
+            return this.ty.equalTo(ty.ty);
+        }
+        return false;
+    }
 }
 
 // TODO: Needs testing
@@ -168,7 +218,7 @@ class TupleType extends TypeExpr {
     }
     getFStarTerm() {
         return "(x:bosqueTerm{isTuple "
-            + this.isOpen 
+            + this.isOpen
             + " " + this.elements.length
             + " " + this.types
             + "})";
@@ -192,6 +242,22 @@ class TupleType extends TypeExpr {
             return "(SCons " + types[0].getFStarType() + " " + this.toFStarTuple(tail) + ")";
         }
     }
+    equalTo(ty: TypeExpr): boolean {
+        if (ty instanceof TupleType) {
+            if (this.elements.length != ty.elements.length) {
+                return false;
+            }
+            else {
+                for (let index = 0; index < this.elements.length; ++index) {
+                    if (!(this.elements[index].equalTo(ty.elements[index]))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 // TODO: Implement getBosqueType
@@ -211,6 +277,24 @@ class RecordType extends TypeExpr {
     }
     getBosqueType() {
         return "";
+    }
+    equalTo(ty: TypeExpr) : boolean {
+        if (ty instanceof RecordType) {
+            if (this.elements.length != ty.elements.length) {
+                return false;
+            }
+            else {
+                for (let index = 0; index < this.elements.length; ++index) {
+                    let src = this.elements[index];
+                    const target = ty.elements[index];
+                    if (src[0] != target[0] || !(src[1].equalTo(target[1]))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -236,9 +320,25 @@ class FuncType extends TypeExpr {
     getBosqueType() {
         return "";
     }
+    equalTo(ty: TypeExpr): boolean {
+        if (ty instanceof FuncType) {
+            if (this.domain.length != ty.domain.length) {
+                return false;
+            }
+            else {
+                for (let index = 0; index < this.domain.length; ++index) {
+                    if (!(this.domain[index].equalTo(ty.domain[index]))) {
+                        return false;
+                    }
+                }
+                return this.image.equalTo(ty.image);
+            }
+        }
+        return false;
+    }
 }
 
-// TODO:
+// TODO: Proper mplementation
 class ObjectType extends TypeExpr {
     getFStarTerm() {
         return "";
@@ -249,9 +349,15 @@ class ObjectType extends TypeExpr {
     getBosqueType() {
         return "";
     }
+    equalTo(ty: TypeExpr){
+        if(ty instanceof ObjectType){
+            return true;
+        }
+        return false;
+    }
 }
 
-// TODO:
+// TODO: Proper mplementation
 class EnumType extends TypeExpr {
     getFStarTerm() {
         return "";
@@ -262,9 +368,15 @@ class EnumType extends TypeExpr {
     getBosqueType() {
         return "";
     }
+    equalTo(ty: TypeExpr){
+        if(ty instanceof EnumType){
+            return true;
+        }
+        return false;
+    }
 }
 
-// TODO:
+// TODO: Proper mplementation
 class CustomKeyType extends TypeExpr {
     getFStarTerm() {
         return "";
@@ -275,9 +387,15 @@ class CustomKeyType extends TypeExpr {
     getBosqueType() {
         return "";
     }
+    equalTo(ty: TypeExpr){
+        if(ty instanceof CustomKeyType){
+            return true;
+        }
+        return false;
+    }
 }
 
-// TODO:
+// TODO: Proper mplementation
 class KeyedType {
     getFStarTerm() {
         return "";
@@ -287,6 +405,12 @@ class KeyedType {
     }
     getBosqueType() {
         return "";
+    }
+    equalTo(ty: TypeExpr){
+        if(ty instanceof KeyedType){
+            return true;
+        }
+        return false;
     }
 }
 

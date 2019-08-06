@@ -29,7 +29,7 @@ function identityUnion(x : Int | None | String | Bool) : Int | None | String | B
     return x;
 }
 
-function identity(x : [String, ...]): [String, ...] {
+function identityOpenTuple(x : [String, ...]): [String, ...] {
     return x;
 }
 
@@ -37,7 +37,7 @@ function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
-function identityTupleOptional(x : [Int, ?:Bool, Int, ?:None, ?:Bool, ...]) : [Int, ?:Bool, Int, ?:None, ?:Bool, ...] {
+function identityTupleOptional(x : [Int, Bool, Int, ?:None, ?:Bool, ...]) : [Int, Bool, Int, ?:None, ?:Bool, ...] {
     return x;
 }
 
@@ -63,14 +63,6 @@ function max2(x: Int, y: Int): Int
     // Tuple constructor
     var z = [x, y];
     var z1 = z.0;
-
-    // Record constructor
-    // var w = {f = 23234, g = true};
-
-    // Lambda constructor
-    // var lam = fn() : Int => 1;
-    // var lam2 = fn(ahh : Int) : Int => ahh;
-    // var lam3 = fn(ahh: Int, ahh2: Int, x : Int) : Int => { return x; };
 
     if(x >= y){
         return x;
@@ -116,14 +108,6 @@ function max5(x : Int, y : Int) : Int
     return internal_result;
 }
 
-// entity Baz {
-//     field x : Int;
-//     factory identity(x: Int): {f : Int} {
-//         return @{f = x};
-//     }
-// }
-
-
 entity PlayerMark provides Parsable {
     field mark: String;
 
@@ -133,40 +117,23 @@ entity PlayerMark provides Parsable {
 }
 
 entrypoint function main(): Int {
-    
-    var s = "hello1";
-    var s1 = PlayerMark'x';
+
+    var string_test = "string_test";
+    var player1 = PlayerMark'x';
     var n = none;
-     
-    var x = [10, 30];
-    var y = 20;
-    var z = max(x.0, y);
-
+    var xTuple2 = [10, 30];
     var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
-    var x3 = {f = 1, g = 2};
-    var x4 = x3.f;
-    var x5 = {g = 10, f = 20};
-    var x6 = x5.f;
-    
+    var xRecord = {f = 1, g = 2};
+    var xProjection = xRecord.f;
+    var xRecord2 = {g = 10, f = 20};
+    var xProjection2 = xRecord2.f;
+    var y = 20;
     var y2 = identityUnion(y);
-    
-    // var z = max0(x, y);
-    
+    var z = max(xTuple2.0, y);
+    var z_max_func_repeated = max(z, y);
     var z2 = identityTupleOptional([1, true, 2]);
-    // var z3 = identityTupleOptional([1]);
-    var z4 = identity(["hello"]);
-
-    
-    
-
-    var zTuple = [x, y];
-    // var zBaz = Baz@identity(1); 
-    // var maxTuple = max3(zTuple);
-
-    // var zRecord = {f = x, g = y};
-    // var maxRecord = max4(zRecord);
-
-    // var another_z = max5(x, y);
+    var z3 = identityOpenTuple(["hello"]);
+    var zTuple2 = [xTuple2, y];
     
     return z;
 }

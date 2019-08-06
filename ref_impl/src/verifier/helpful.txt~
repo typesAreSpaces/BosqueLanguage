@@ -1,0 +1,37 @@
+299:    // TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), TranslatorBosqueFStar.intType);        
+300:    // return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
+363:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opConstructorTuple.trgt.nameID + fkey),
+365:                return [TranslatorBosqueFStar.argumentToExpr(opConstructorTuple.trgt, fkey),
+373:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opConstructorRecord.trgt.nameID + fkey),
+375:                return [TranslatorBosqueFStar.argumentToExpr(opConstructorRecord.trgt, fkey),
+394:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opCallNamespaceFunction.trgt.nameID + fkey),
+396:                return [TranslatorBosqueFStar.argumentToExpr(opCallNamespaceFunction.trgt, fkey),
+410:                //     TranslatorBosqueFStar.types_seen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
+412:                //     return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.trgt, fkey),
+414:                //         [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromIndex.arg, fkey)],
+433:                //     TranslatorBosqueFStar.types_seen.set(sanitizeName(opMIRAccessFromProperty.trgt.nameID + fkey),
+435:                //     return [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromProperty.trgt, fkey),
+437:                //         [TranslatorBosqueFStar.argumentToExpr(opMIRAccessFromProperty.arg, fkey)],
+508:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPrefixOp.trgt.nameID + fkey),
+510:                return [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.trgt, fkey),
+512:                    [TranslatorBosqueFStar.argumentToExpr(opPrefixOp.arg, fkey)],
+517:                const lhs = TranslatorBosqueFStar.argumentToExpr(opBinOp.lhs, fkey);
+518:                const rhs = TranslatorBosqueFStar.argumentToExpr(opBinOp.rhs, fkey);
+519:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opBinOp.trgt.nameID + fkey),
+521:                return [TranslatorBosqueFStar.argumentToExpr(opBinOp.trgt, fkey),
+535:                const lhs = TranslatorBosqueFStar.argumentToExpr(opBinCmp.lhs, fkey);
+536:                const rhs = TranslatorBosqueFStar.argumentToExpr(opBinCmp.rhs, fkey);
+539:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opBinCmp.trgt.nameID + fkey),
+541:                return [TranslatorBosqueFStar.argumentToExpr(opBinCmp.trgt, fkey),
+554:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opVarStore.name.nameID + fkey),
+556:                return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name, fkey),
+557:                TranslatorBosqueFStar.argumentToExpr(opVarStore.src, fkey)];
+561:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opReturnAssign.name.nameID + fkey),
+563:                return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name, fkey),
+564:                TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src, fkey)];
+596:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+598:                return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey),
+599:                TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
+605:                TranslatorBosqueFStar.types_seen.set(sanitizeName(opIsTypeOfNone.trgt.nameID + fkey), TranslatorBosqueFStar.boolType);
+606:                return [TranslatorBosqueFStar.argumentToExpr(opIsTypeOfNone.trgt, fkey),
+695:            declarations.params.map(x => TranslatorBosqueFStar.types_seen.set(sanitizeName(x.name + fkey), TranslatorBosqueFStar.stringTypeToType(x.type)));
