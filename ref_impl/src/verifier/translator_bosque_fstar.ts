@@ -93,7 +93,7 @@ class TranslatorBosqueFStar {
     readonly entity_declarations = [] as EntityDeclaration[];
 
     readonly fileName: string;
-    
+
     constructor(masm: MIRAssembly, fileName: string) {
         this.mapFuncDeclarations = masm.invokeDecls;
         this.mapConceptDeclarations = masm.conceptDecls;
@@ -111,7 +111,7 @@ class TranslatorBosqueFStar {
             console.log();
         }));
         console.log("END Entity Declarations --------------------------------------------------------------------------------");
-        
+
         console.log("BEGIN Concept Declarations --------------------------------------------------------------------------------");
         console.log(this.mapConceptDeclarations.forEach((x, index) => {
             console.log(`${index} provides:`);
@@ -553,13 +553,15 @@ class TranslatorBosqueFStar {
                 const opVarStore = op as MIRVarStore;
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opVarStore.name.nameID + fkey),
                     TranslatorBosqueFStar.typeArgumentToType(opVarStore.src, fkey));
-                return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name, fkey), TranslatorBosqueFStar.argumentToExpr(opVarStore.src, fkey)];
+                return [TranslatorBosqueFStar.argumentToExpr(opVarStore.name, fkey),
+                TranslatorBosqueFStar.argumentToExpr(opVarStore.src, fkey)];
             }
             case MIROpTag.MIRReturnAssign: {
                 const opReturnAssign = op as MIRReturnAssign;
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opReturnAssign.name.nameID + fkey),
                     TranslatorBosqueFStar.typeArgumentToType(opReturnAssign.src, fkey));
-                return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name, fkey), TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src, fkey)];
+                return [TranslatorBosqueFStar.argumentToExpr(opReturnAssign.name, fkey),
+                TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src, fkey)];
             }
             case MIROpTag.MIRAbort: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRAbort Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
