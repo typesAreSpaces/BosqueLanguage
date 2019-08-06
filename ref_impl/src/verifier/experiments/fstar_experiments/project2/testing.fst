@@ -61,17 +61,22 @@ let testc4 = getType testc1
 
 (* Examples *)
 
-val maxWithUnion : termUnionIntBool -> bosqueTerm -> bosqueTerm
+val maxWithUnion : termUnionIntBool -> x:bosqueTerm{subtypeOf BIntType (getType x)} -> y:bosqueTerm{subtypeOf BIntType (getType x)}
 let maxWithUnion x y = match x with 
 | BBool z -> (match y with 
   | BInt x2 -> BInt x2
-  | _ -> BError
 ) 
 | BInt x1 -> (match y with 
   | BInt x2 -> if (x1 > x2) then BInt x1 else BInt x2
-  | _ -> BError
 )
-| _ -> BError
+
+// New version of maxWithUnion
+val maxWithUnion' : termUnionIntBool -> x:bosqueTerm{subtypeOf BIntType (getType x)} -> y:bosqueTerm{subtypeOf BIntType (getType x)}
+let maxWithUnion' x y = match x with 
+| BBool z -> y
+| BInt x1 -> (match y with 
+  | BInt x2 -> if (x1 > x2) then x else BInt x2
+)
 
 (* Testing: maxWithUnion *)
 let testd1 = maxWithUnion (BInt 12) (BInt 10)
@@ -83,6 +88,13 @@ let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion (BInt x) (B
 && extractBool (greaterOrEq (maxWithUnion (BInt x) (BInt y)) (BInt y))
 && (extractBool (eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt y)))
 && extractBool ((eqTerm (maxWithUnion (BBool z) (BInt x)) (BInt x)))
+)
+
+(* The following assertion proves that maxWithUnion' is correctly implemented *)
+let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion' (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (greaterOrEq (maxWithUnion' (BInt x) (BInt y)) (BInt y))
+&& (extractBool (eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt y)))
+&& extractBool ((eqTerm (maxWithUnion' (BBool z) (BInt x)) (BInt x)))
 )
 
 val maxWithUnion2 : termUnionIntBool -> termInt -> termInt
