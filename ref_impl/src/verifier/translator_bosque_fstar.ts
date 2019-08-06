@@ -14,7 +14,41 @@ import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl }
 
 type StringTypeMangleNameWithFkey = string;
 
-class FStarDeclaration {
+class FunctionDeclaration {
+    readonly fkey: string;
+    readonly args: string[];
+    readonly program: ExprExpr;
+    readonly type: FuncType;
+    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
+        this.fkey = fkey;
+        this.args = args;
+        this.program = program;
+        this.type = type;
+    }
+    print(fd: number): void {
+        FS.writeSync(fd, `val ${sanitizeName(this.fkey)} : ${this.type.getFStarTerm()}\n`);
+        FS.writeSync(fd, `let ${sanitizeName(this.fkey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+    }
+}
+
+class ConceptDeclaration {
+    readonly fkey: string;
+    readonly args: string[];
+    readonly program: ExprExpr;
+    readonly type: FuncType;
+    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
+        this.fkey = fkey;
+        this.args = args;
+        this.program = program;
+        this.type = type;
+    }
+    print(fd: number): void {
+        FS.writeSync(fd, `val ${sanitizeName(this.fkey)} : ${this.type.getFStarTerm()}\n`);
+        FS.writeSync(fd, `let ${sanitizeName(this.fkey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+    }
+}
+
+class EntityDeclaration {
     readonly fkey: string;
     readonly args: string[];
     readonly program: ExprExpr;
@@ -38,22 +72,32 @@ class TranslatorBosqueFStar {
     static readonly boolType = new BoolType();
     static readonly noneType = new NoneType();
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
+
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
+
     static readonly DEBUGGING = false;
+
     // types_seen : String[MangledNamewithFkey] -> TypeExpr
     static readonly types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
-    readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
-    readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
-    readonly fileName: string;
-    readonly function_declarations = [] as FStarDeclaration[];
     readonly isFkeyDeclared: Set<string>;
-
+    readonly function_declarations = [] as FunctionDeclaration[];
+    readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
+    readonly isCkeyDeclared: Set<string>;
+    readonly concept_declarations = [] as ConceptDeclaration[];
+    readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
+    readonly isEkeyDeclared: Set<string>;
+    readonly entity_declarations = [] as EntityDeclaration[];
+    readonly fileName: string;
+    
     constructor(masm: MIRAssembly, fileName: string) {
         this.mapFuncDeclarations = masm.invokeDecls;
+        this.isFkeyDeclared = new Set<string>();
         this.mapConceptDeclarations = masm.conceptDecls;
+        this.isCkeyDeclared = new Set<string>();
         this.mapEntityDeclarations = masm.entityDecls;
+        this.isEkeyDeclared = new Set<string>();
 
         console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
         console.log(this.mapEntityDeclarations.forEach((x, index) => {
@@ -75,9 +119,8 @@ class TranslatorBosqueFStar {
         }));
         console.log("END Concept Declarations --------------------------------------------------------------------------------");
         console.log();
-        
+
         this.fileName = fileName;
-        this.isFkeyDeclared = new Set<string>();
     }
 
     printPrelude(fd: number): void {
@@ -260,6 +303,7 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_LoadConst", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRLoadConstTypedString: {
+                // CONTINUE:
                 const opMIRLoadConstTypedString = op as MIRLoadConstTypedString;
                 console.log("The following provides the _location_ of the entity used");
                 console.log(opMIRLoadConstTypedString.tkey);
@@ -546,7 +590,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRIsTypeOfNone: { // IMPLEMENT:
                 const opIsTypeOfNone = op as MIRIsTypeOfNone;
-                console.log(opIsTypeOfNone);
+                // console.log(opIsTypeOfNone);
                 // FIX:
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opIsTypeOfNone.trgt.nameID + fkey), TranslatorBosqueFStar.boolType);
                 return [TranslatorBosqueFStar.argumentToExpr(opIsTypeOfNone.trgt, fkey),
@@ -642,10 +686,9 @@ class TranslatorBosqueFStar {
             const programType = new FuncType(
                 declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
                 returnType);
-            console.log(declarations.params);
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.function_declarations.push(
-                    new FStarDeclaration(fkey,
+                    new FunctionDeclaration(fkey,
                         declarations.params.map(x => x.name),
                         traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
                         programType));
