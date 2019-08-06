@@ -588,11 +588,15 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRPhi: {
                 const opPhi = op as MIRPhi;
+                console.log("Again --------------------------------------------------------------------");
+                console.log(opPhi);
+                console.log("Again --------------------------------------------------------------------");
                 // FIX: Use the right type 
                 // ?? I'm not so sure about this one
                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
                     TranslatorBosqueFStar.intType); // I mean, this one
-                return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey), TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
+                return [TranslatorBosqueFStar.argumentToExpr(opPhi.trgt, fkey),
+                TranslatorBosqueFStar.argumentToExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey)];
             }
             case MIROpTag.MIRIsTypeOfNone: { // IMPLEMENT:
                 const opIsTypeOfNone = op as MIRIsTypeOfNone;
