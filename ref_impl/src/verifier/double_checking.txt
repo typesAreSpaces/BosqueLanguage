@@ -1,0 +1,26 @@
+makeAutoMove
+	hasWinner -
+	isCellOccupied -
+		getCellContents -
+			at -
+	markCellWith -
+		set -
+	getOpenCells -
+		filter -
+		isCellOcupied -
+	uniform - 
+	update -
+	checkForWinner
+		checkSingleWinner
+			any -
+			winPositionOptions - 
+			checkSingleWinOption
+				all -
+				isCellOccupiedWith -
+					getCellContents -
+
+makeExplicitMove
+	isCellOccupied -
+	markCellWith -
+	update -
+	checkForWinner -
