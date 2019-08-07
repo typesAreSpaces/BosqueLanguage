@@ -71,7 +71,7 @@ let maxWithUnion x y = match x with
 )
 
 // New version of maxWithUnion
-val maxWithUnion' : termUnionIntBool -> x:bosqueTerm{subtypeOf BIntType (getType x)} -> y:bosqueTerm{subtypeOf BIntType (getType x)}
+val maxWithUnion' : termUnionIntBool -> x:bosqueTerm{subtypeOf BIntType (getType x)} -> y:bosqueTerm{subtypeOf BIntType (getType y)}
 let maxWithUnion' x y = match x with 
 | BBool z -> y
 | BInt x1 -> (match y with 

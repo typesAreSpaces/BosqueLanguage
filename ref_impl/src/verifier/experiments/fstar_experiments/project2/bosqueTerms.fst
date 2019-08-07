@@ -101,9 +101,10 @@ val extractBool2 : x:bosqueTerm{eqType BBoolType (getType x)} -> Tot bool
 let extractBool2 x = match x with
 | BBool y -> y 
 
-// val extractTuple : n:nat -> x:bosqueTerm{isTuple n x} -> sequence bosqueTerm n
-// let extractTuple n x = match x with
-// | BTuple _ seq -> seq
+// Hmmm2
+val extractBool3 : x:bosqueTerm{subtypeOf BBoolType (getType x)} -> Tot bool
+let extractBool3 x = match x with
+| BBool y -> y 
 (* ------------------------------------------------------------------------ *)
 
 (* Definition of equality relation on Bosque terms *)
@@ -132,21 +133,21 @@ eqTerm_aux n x y = match x with
          | _ -> BError
          )
 | SCons x1 m xs1 -> (match y with
-                 | SNil -> BError
-                 | SCons y1 m' ys1 -> (match (eqTerm x1 y1) with
-                                  | BBool b1 -> (match (eqTerm_aux m xs1 ys1) with
-                                               | BBool b2 -> BBool ((m = m') && b1 && b2)
-                                               | _ -> BError
-                                               )
-                                  | _ -> BError 
-                                  )
-                 )
+                   | SNil -> BError
+                   | SCons y1 m' ys1 -> (match (eqTerm x1 y1) with
+                                       | BBool b1 -> (match (eqTerm_aux m xs1 ys1) with
+                                                    | BBool b2 -> BBool ((m = m') && b1 && b2)
+                                                    | _ -> BError
+                                                    )
+                                       | _ -> BError 
+                                       )
+                   )
 
 (* Definition of greater than or equal relation on Bosque terms *)
 val greaterOrEq : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt x} -> Tot (x:bosqueTerm{isBool x \/ isError x})
 let greaterOrEq x y = match x, y with
 | BInt x1, BInt y1 -> BBool (x1 >= y1)
-// FIX: Include case for Strings
+// TODO: Include case for Strings
 | _, _ -> BError
 
 (* Tuple Type projector *)
@@ -161,7 +162,6 @@ let rec nthTupleType index dimension y = match y with
 | _ -> BErrorType
 
 (* Tuple projector *)
-// val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm{eqType (nthTupleType index dimension x) (getType y)})
 val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm)
 let rec nthTuple index dimension y = match y with
 | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
@@ -172,7 +172,7 @@ let rec nthTuple index dimension y = match y with
   else nthTuple (index-1) dimension' (BTuple dimension' xs')
 | _ -> BError
 
-// FIX: Implement the following function
+// TODO: Implement the Record Projector
 // (* Record projector *)
 // val nthRecord : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm
 // let rec nthRecord index dimension y = match y with

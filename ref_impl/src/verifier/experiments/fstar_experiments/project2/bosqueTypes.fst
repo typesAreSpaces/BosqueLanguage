@@ -72,13 +72,13 @@ let rec eqType x y = match x, y with
 and
 eqTypeSeq n x y = match x with
 | SNil -> (match y with 
-  | SNil -> true
-  | _ -> false
-  )
+         | SNil -> true
+         | _ -> false
+         )
 | SCons x1 m xs1 -> (match y with 
-                 | SNil -> false
-                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1
-                 )
+                   | SNil -> false
+                   | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1
+                   )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e. forall x y . subtypeOf x y <===> x :> y *)
@@ -86,12 +86,21 @@ val subtypeOfSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -
 val subtypeOf : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec subtypeOf x y = match x, y with
 | BAnyType, _ -> true
+| BSomeType, BAnyType -> false
+| BSomeType, BTruthyType -> false
+| BSomeType, BNoneType -> false
+| BSomeType, _ -> true
+| BTruthyType, BNoneType -> true
 | BNoneType, BNoneType -> true
-| BIntType, BIntType -> true
-| BBoolType, BBoolType -> true
 | BUnionType x1 y1, BUnionType x2 y2 -> (subtypeOf x1 x2 || subtypeOf y1 x2)
   && (subtypeOf x1 y2 || subtypeOf y1 y2)
 | BUnionType x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z 
+// | BParseabletype, ? -> ?
+| BBoolType, BBoolType -> true
+| BIntType, BIntType -> true
+// | BFloatType, ? -> ?
+// | BRegexType, ? -> ?
+| BTypedStringType t1, BTypedStringType t2 -> subtypeOf t1 t2
 | BTupleType b1 0 SNil, BTupleType b2 0 SNil -> b1 = b2
 | BTupleType b1 0 SNil, BTupleType _ _ _ -> b1
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> 
@@ -103,15 +112,21 @@ let rec subtypeOf x y = match x, y with
     else 
       if (n1 = n2) then (not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2
       else false 
+// | BRecordType, ? -> ?
+// | BFunctionType, ? -> ?
+// | BObjectType, ? -> ?
+// | BEnumType, ? -> ?
+// | BCustomType, ? -> ?
+// | BKeyedType, ? -> ?
 | BErrorType, BErrorType -> true
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with
 | SNil -> (match y with
-  | SNil -> true
-  | _ -> false
-  )
+         | SNil -> true
+         | _ -> false
+         )
 | SCons x1 m xs1 -> (match y with 
-                 | SNil -> false
-                 | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
-                 )
+                   | SNil -> false
+                   | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
+                   )
