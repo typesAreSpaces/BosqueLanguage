@@ -8,10 +8,10 @@ import { TranslatorBosqueFStar } from "../translator_bosque_fstar";
 
 setImmediate(() => {
     // Mac Machine
-    const directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
+    // const directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/max/"
     // const directory = "/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/"
     // Windows Machine
-    // const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
+    const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
     // const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
     const fileName = "main.bsq";
     const fkey = "NSMain::main";
