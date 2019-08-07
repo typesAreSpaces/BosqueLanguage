@@ -76,7 +76,7 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
 
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
-    static readonly DEBUGGING = true;
+    static readonly DEBUGGING = false;
 
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from
@@ -105,7 +105,7 @@ class TranslatorBosqueFStar {
             "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
             "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
             "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-        "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
+            "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
                 this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
 
         // console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
@@ -151,7 +151,7 @@ class TranslatorBosqueFStar {
     }
 
     static optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
-        let setOfTypes = new Set<TypeExpr>();
+        const setOfTypes = new Set<TypeExpr>();
         setOfTypes.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringTypeToType)));
         let accum = nonOptionals;
         const secondLastIndex = optionals.length - 2;
@@ -187,7 +187,7 @@ class TranslatorBosqueFStar {
             }
             default: {
                 if (s.charAt(0) == '[') {
-                    s = s.slice(1).slice(0, -1);
+                    s = s.slice(1, -1);
                     if (s.includes("...")) {
                         s = s.slice(0, -5); // Getting rid of the ellipsis and comma
                         if (s.includes("?:")) {
@@ -597,21 +597,21 @@ class TranslatorBosqueFStar {
                 else {
                     if (!currentType.equalTo(typeFromSrc)) {
                         if (currentType instanceof UnionType) {
-                            if(typeFromSrc instanceof UnionType){
+                            if (typeFromSrc instanceof UnionType) {
                                 currentType.elements.forEach(x => typeFromSrc.elements.add(x));
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
                             }
-                            else{
+                            else {
                                 currentType.elements.add(typeFromSrc);
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), currentType);
                             }
                         }
                         else {
-                            if(typeFromSrc instanceof UnionType){
+                            if (typeFromSrc instanceof UnionType) {
                                 typeFromSrc.elements.add(currentType);
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
                             }
-                            else{
+                            else {
                                 const newCurrentType = new UnionType(new Set<TypeExpr>([typeFromSrc, currentType]));
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), newCurrentType);
                             }

@@ -123,10 +123,10 @@ entrypoint function main(): Int {
     var n = none;
     var xTuple2 = [10, 30];
     var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
-    var xRecord = {f = 1, g = 2};
-    var xProjection = xRecord.f;
-    var xRecord2 = {g = 10, f = 20};
-    var xProjection2 = xRecord2.f;
+    // var xRecord = {f = 1, g = 2};
+    // var xProjection = xRecord.f;
+    // var xRecord2 = {g = 10, f = 20};
+    // var xProjection2 = xRecord2.f;
     var y = 20;
     var y2 = identityUnion(y);
     var z = max(xTuple2.0, y);

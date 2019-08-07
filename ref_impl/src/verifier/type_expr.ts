@@ -6,12 +6,16 @@
 import * as FS from "fs";
 
 abstract class TypeExpr {
+    // String expression denoting the type 
+    // used inside function declaration in FStar
     abstract getFStarTerm(): string;
-    abstract getFStarType(): string;
+    // String name associated to the type in FStar
+    abstract getFStarType(): string; 
+    // String name associated to the type in Bosque
     abstract getBosqueType(): string;
     static declare_additional_types(fd: number): void {
         TypedStringType.declared.forEach(x => {
-            FS.writeSync(fd, `let bTypeStringType_${x.slice(1, -1)} = (BTypedStringType ${x})\n`);
+            FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
         });
         FS.writeSync(fd, "\n");
     }
@@ -23,7 +27,7 @@ class AnyType extends TypeExpr {
         return "(bosqueTerm)";
     }
     getFStarType() {
-        return "(BAnyType)";
+        return "BAnyType";
     }
     getBosqueType() {
         return "NSCore::Any";
@@ -38,10 +42,10 @@ class AnyType extends TypeExpr {
 
 class SomeType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf (BSomeType) (getType x)})";
+        return "(x:bosqueTerm{subtypeOf BSomeType (getType x)})";
     }
     getFStarType() {
-        return "(BSomeType)";
+        return "BSomeType";
     }
     getBosqueType() {
         return "NSCore::Some";
@@ -64,7 +68,7 @@ class TruthyType extends TypeExpr {
         return "(bosqueTerm)";
     }
     getFStarType() {
-        return "(BTruthyType)";
+        return "BTruthyType";
     }
     getBosqueType() {
         return "NSCore::Truthy";
@@ -79,10 +83,10 @@ class TruthyType extends TypeExpr {
 
 class NoneType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf (BNoneType) (getType x)})";
+        return "(x:bosqueTerm{subtypeOf BNoneType (getType x)})";
     }
     getFStarType() {
-        return "(BNoneType)";
+        return "BNoneType";
     }
     getBosqueType() {
         return "NSCore::None";
@@ -150,10 +154,10 @@ class UnionType extends TypeExpr {
 
 class BoolType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf (BBoolType) (getType x)})";
+        return "(x:bosqueTerm{subtypeOf BBoolType (getType x)})";
     }
     getFStarType() {
-        return "(BBoolType)";
+        return "BBoolType";
     }
     getBosqueType() {
         return "NSCore::Bool";
@@ -168,11 +172,11 @@ class BoolType extends TypeExpr {
 
 class IntType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf (BIntType) (getType x)})";
+        return "(x:bosqueTerm{subtypeOf BIntType (getType x)})";
 
     }
     getFStarType() {
-        return "(BIntType)";
+        return "BIntType";
     }
     getBosqueType() {
         return "NSCore::Int";
@@ -200,7 +204,7 @@ class TypedStringType extends TypeExpr {
         return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
     }
     getFStarType() {
-        return "(bTypeStringType_" + this.ty.getFStarType().slice(1, -1) + ")";
+        return "bTypeStringType_" + this.ty.getFStarType();
     }
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
