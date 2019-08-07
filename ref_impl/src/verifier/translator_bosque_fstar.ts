@@ -584,9 +584,6 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRPhi: {
                 const opPhi = op as MIRPhi;
-                console.log("Again --------------------------------------------------------------------");
-                console.log(opPhi);
-                console.log("Again --------------------------------------------------------------------");
                 const currentType = TranslatorBosqueFStar.types_seen.get(sanitizeName(opPhi.trgt.nameID + fkey));
                 const typeFromSrc = TranslatorBosqueFStar.typeArgumentToType(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey);
                 if (currentType == undefined) {
@@ -595,10 +592,24 @@ class TranslatorBosqueFStar {
                 else {
                     if (!currentType.equalTo(typeFromSrc)) {
                         if (currentType instanceof UnionType) {
-                            
+                            if(typeFromSrc instanceof UnionType){
+                                currentType.elements.forEach(x => typeFromSrc.elements.add(x));
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
+                            }
+                            else{
+                                currentType.elements.add(typeFromSrc);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), currentType);
+                            }
                         }
                         else {
-
+                            if(typeFromSrc instanceof UnionType){
+                                typeFromSrc.elements.add(currentType);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
+                            }
+                            else{
+                                const newCurrentType = new UnionType(new Set<TypeExpr>([typeFromSrc, currentType]));
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), newCurrentType);
+                            }
                         }
                     }
                 }
@@ -718,7 +729,7 @@ class TranslatorBosqueFStar {
                         programType));
                 this.isFkeyDeclared.add(fkey);
             }
-            // console.log(TranslatorBosqueFStar.types_seen);
+            console.log(TranslatorBosqueFStar.types_seen);
         }
     }
 
