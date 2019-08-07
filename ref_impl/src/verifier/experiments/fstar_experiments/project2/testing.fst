@@ -108,6 +108,17 @@ let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (
 && (extractBool ((eqTerm (maxWithUnion2 (BBool z) (BInt x)) (BInt x))))
 )
 
+val maxWithUnion3 : termUnionIntBool -> termInt -> termInt
+let maxWithUnion3 x y = match x with 
+| BBool _ -> y 
+| _ -> if (extractBool (greaterOrEq x y)) then x else y
+
+let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (greaterOrEq (maxWithUnion3 (BInt x) (BInt y)) (BInt y))
+&& (extractBool (eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt y)))
+&& (extractBool ((eqTerm (maxWithUnion3 (BBool z) (BInt x)) (BInt x))))
+)
+
 (* ----------------------------------------------------------------------------------------------------------------------------------------------------------- *)
 
 val max : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> z:bosqueTerm{isInt z}
