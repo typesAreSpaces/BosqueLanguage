@@ -1,19 +1,22 @@
 module NSMain__main_main
 open BosqueOption
 
-val nSMain__id : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+let bTypeStringType_BAnyType = (BTypedStringType (BAnyType))
+let bTypeStringType_BNoneType = (BTypedStringType (BNoneType))
+
+val nSMain__id : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSMain__id x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSCore__List__set<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+val nSCore__List__set<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSCore__List__set<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__Board__markCellWith : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isString BNoneType x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__Board__markCellWith : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (bTypeStringType_BNoneType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BNoneType) (getType x)})
 let nSMain__Board__markCellWith this x y mark = 
     let _MIRAccessFromField = 0 in 
         let __tmp_9 = (op_Multiply y 3) in 
@@ -24,13 +27,13 @@ let nSMain__Board__markCellWith this x y mark =
                             let _return_ = __ir_ret__ in 
                                 _return_
 
-val nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+val nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__Board__checkSingleWinner : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isString BNoneType x}) -> Tot (x:bosqueTerm{isBool x})
+val nSMain__Board__checkSingleWinner : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (bTypeStringType_BNoneType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BBoolType) (getType x)})
 let nSMain__Board__checkSingleWinner this mark = 
     let _MIRAccessConstantValue = 0 in 
         let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
@@ -38,7 +41,7 @@ let nSMain__Board__checkSingleWinner this mark =
                 let _return_ = __ir_ret__ in 
                     _return_
 
-val nSMain__Board__checkForWinner : (x:bosqueTerm{isNone x}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType BNoneType (BTypeStringType BNoneType)) (getType x)})
+val nSMain__Board__checkForWinner : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType (BNoneType) (bTypeStringType_BNoneType)) (getType x)})
 let nSMain__Board__checkForWinner this = 
     let _MIRAccessConstantValue = 0 in 
         let __tmp_0 = (nSMain__Board__checkSingleWinner this __tmp_2) in 
@@ -63,13 +66,13 @@ let nSMain__Board__checkForWinner this =
                                     let _return_ = __ir_ret___3 in 
                                         _return_
 
-val nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+val nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__Board__getOpenCells : (x:bosqueTerm{isNone x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__Board__getOpenCells : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BNoneType) (getType x)})
 let nSMain__Board__getOpenCells this = 
     let _MIRAccessConstantValue = 0 in 
         let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
@@ -77,19 +80,19 @@ let nSMain__Board__getOpenCells this =
                 let _return_ = __ir_ret__ in 
                     _return_
 
-val nSCore__List__uniform<T=[NSCore__Int, NSCore__Int]> : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+val nSCore__List__uniform<T=[NSCore__Int, NSCore__Int]> : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSCore__List__uniform<T=[NSCore__Int, NSCore__Int]> x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSCore__List__at<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> : (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isInt x})
+val nSCore__List__at<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> : (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BIntType) (getType x)})
 let nSCore__List__at<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__Board__getCellContents : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType BNoneType (BTypeStringType BNoneType)) (getType x)})
+val nSMain__Board__getCellContents : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BUnionType (BNoneType) (bTypeStringType_BNoneType)) (getType x)})
 let nSMain__Board__getCellContents this x y = 
     let _MIRAccessFromField = 0 in 
         let __tmp_6 = (op_Multiply y 3) in 
@@ -99,7 +102,7 @@ let nSMain__Board__getCellContents this x y =
                         let _return_ = __ir_ret__ in 
                             _return_
 
-val nSMain__Board__isCellOccupied : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isBool x})
+val nSMain__Board__isCellOccupied : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BBoolType) (getType x)})
 let nSMain__Board__isCellOccupied this x y = 
     let __tmp_1 = (nSMain__Board__getCellContents this x y) in 
         let _MIRIsTypeOfSome = 0 in 
@@ -107,7 +110,7 @@ let nSMain__Board__isCellOccupied this x y =
                 let _return_ = __ir_ret__ in 
                     _return_
 
-val nSMain__Game__makeAutoMove : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isString BNoneType x}) -> (x:bosqueTerm{isInt x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__Game__makeAutoMove : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (bTypeStringType_BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BNoneType) (getType x)})
 let nSMain__Game__makeAutoMove this mark rnd = 
     let _MIRAccessFromField = 0 in 
         let __tmp_5 = (nSMain__Board__isCellOccupied __tmp_4 1 1) in 
@@ -140,7 +143,7 @@ let nSMain__Game__makeAutoMove this mark rnd =
                                                                             let _return_ = __ir_ret__ in 
                                                                                 _return_
 
-val nSMain__Game__makeExplicitMove : (x:bosqueTerm{isNone x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isInt x}) -> (x:bosqueTerm{isString BNoneType x}) -> Tot (x:bosqueTerm{isNone x})
+val nSMain__Game__makeExplicitMove : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (BIntType) (getType x)}) -> (x:bosqueTerm{subtypeOf (bTypeStringType_BNoneType) (getType x)}) -> Tot (x:bosqueTerm{subtypeOf (BNoneType) (getType x)})
 let nSMain__Game__makeExplicitMove this x y mark = 
     let _MIRAccessFromField = 0 in 
         let __tmp_3 = (nSMain__Board__markCellWith __tmp_2 x y mark) in 
@@ -151,7 +154,7 @@ let nSMain__Game__makeExplicitMove this x y mark =
                             let _return_ = __ir_ret__ in 
                                 _return_
 
-val nSMain__main : (x:bosqueTerm{isNone x})
+val nSMain__main : (x:bosqueTerm{subtypeOf (BNoneType) (getType x)})
 let nSMain__main  = 
     let __tmp_0 = (nSMain__id 1) in 
         let x = __tmp_0 in 

@@ -31,6 +31,7 @@ class FunctionDeclaration {
     }
 }
 
+// TODO: Wrong implementation
 class ConceptDeclaration {
     readonly ckey: string;
     readonly args: string[];
@@ -48,6 +49,7 @@ class ConceptDeclaration {
     }
 }
 
+// TODO: Wrong implementation
 class EntityDeclaration {
     readonly ekey: string;
     readonly args: string[];
@@ -74,20 +76,19 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
 
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
+    static readonly DEBUGGING = true;
 
-    static readonly DEBUGGING = false;
-
+    // String[MangledNamewithFkey] means that the string
+    // takes into consideration the scope where it comes from
     // types_seen : String[MangledNamewithFkey] -> TypeExpr
     static readonly types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
     readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
     readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
-
-    readonly isFkeyDeclared: Set<string>;
-    readonly isCkeyDeclared: Set<string>;
-    readonly isEkeyDeclared: Set<string>;
-
+    readonly isFkeyDeclared: Set<string> = new Set<string>();
+    readonly isCkeyDeclared: Set<string> = new Set<string>();
+    readonly isEkeyDeclared: Set<string> = new Set<string>();
     readonly function_declarations = [] as FunctionDeclaration[];
     readonly concept_declarations = [] as ConceptDeclaration[];
     readonly entity_declarations = [] as EntityDeclaration[];
@@ -98,9 +99,6 @@ class TranslatorBosqueFStar {
         this.mapFuncDeclarations = masm.invokeDecls;
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
-        this.isFkeyDeclared = new Set<string>();
-        this.isCkeyDeclared = new Set<string>();
-        this.isEkeyDeclared = new Set<string>();
 
         // FIX: This is wrong, but temporarily useful
         ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
@@ -167,6 +165,8 @@ class TranslatorBosqueFStar {
     }
 
     // TODO: Add more types as needed
+    // String[Type] means that the string is a type which 
+    // description comes from a Type expression
     // stringTypeToType : String[Type] -> TypeExpr
     static stringTypeToType(s: string): TypeExpr {
         switch (s) {
@@ -251,6 +251,8 @@ class TranslatorBosqueFStar {
     }
 
     // TODO: Add more types as needed
+    // String[ValueType] means that the string is a type which
+    // description comes from a Value expression
     // stringConstToType : String[ValueType] -> TypeExpr
     static stringConstToType(s: string): TypeExpr {
         let stringConst = s.slice(1);
@@ -332,7 +334,8 @@ class TranslatorBosqueFStar {
             // case MIROpTag.AccessConstField:
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
                 const opMIRLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
-                console.log(opMIRLoadFieldDefaultValue);
+                opMIRLoadFieldDefaultValue;
+                // console.log(opMIRLoadFieldDefaultValue);
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -536,8 +539,10 @@ class TranslatorBosqueFStar {
                 const opBinCmp = op as MIRBinCmp;
                 const lhs = TranslatorBosqueFStar.argumentToExpr(opBinCmp.lhs, fkey, undefined);
                 const rhs = TranslatorBosqueFStar.argumentToExpr(opBinCmp.rhs, fkey, undefined);
-                // TODO: Is still necessary check if the type is either
+                // Q: Is still necessary check if the type is either
                 // an int or a string?
+                // A: Yes, because that will tell which `operation code` should be used
+                // TODO: Implement the above
                 return [TranslatorBosqueFStar.argumentToExpr(opBinCmp.trgt, fkey, TranslatorBosqueFStar.boolType),
                 new FuncTerm((TermExpr.binOpToFStar.get(opBinCmp.op) as string), [lhs, rhs], TranslatorBosqueFStar.boolType)];
             }
@@ -729,7 +734,7 @@ class TranslatorBosqueFStar {
                         programType));
                 this.isFkeyDeclared.add(fkey);
             }
-            console.log(TranslatorBosqueFStar.types_seen);
+            // console.log(TranslatorBosqueFStar.types_seen);
         }
     }
 
@@ -737,6 +742,7 @@ class TranslatorBosqueFStar {
         const fd = FS.openSync(this.fileName, 'w');
         this.collectExpr(fkey);
         this.printPrelude(fd);
+        TypeExpr.declare_additional_types(fd);
         this.function_declarations.map(x => x.print(fd));
         TranslatorBosqueFStar.closeFS(fd);
     }

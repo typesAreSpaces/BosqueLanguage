@@ -3,19 +3,18 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-// TODO: Add more elements to the 
-// abstract class TypeExpr once we 
-// have formalized the type system
-// for Bosque. Actually, it is already
-// established on the documentation,
-// however, it needs additional formalization
-// to deal with some rules and inference
-// (Current approach to accomplish the latter: take 
-// the grouded ast and build a `table` using
+import * as FS from "fs";
+
 abstract class TypeExpr {
     abstract getFStarTerm(): string;
     abstract getFStarType(): string;
     abstract getBosqueType(): string;
+    static declare_additional_types(fd: number): void {
+        TypedStringType.declared.forEach(x => {
+            FS.writeSync(fd, `let bTypeStringType_${x.slice(1, -1)} = (BTypedStringType ${x})\n`);
+        });
+        FS.writeSync(fd, "\n");
+    }
     abstract equalTo(ty: TypeExpr): boolean;
 }
 
@@ -24,7 +23,7 @@ class AnyType extends TypeExpr {
         return "(bosqueTerm)";
     }
     getFStarType() {
-        return "BAnyType";
+        return "(BAnyType)";
     }
     getBosqueType() {
         return "NSCore::Any";
@@ -39,10 +38,10 @@ class AnyType extends TypeExpr {
 
 class SomeType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{isSome x})";
+        return "(x:bosqueTerm{subtypeOf (BSomeType) (getType x)})";
     }
     getFStarType() {
-        return "BSomeType";
+        return "(BSomeType)";
     }
     getBosqueType() {
         return "NSCore::Some";
@@ -55,15 +54,17 @@ class SomeType extends TypeExpr {
     }
 }
 
-// getFStarTerm returns (bosqueTerm), but ideally
-// getFStarTerm should never be called on a TruthyType
-// because it is a concept, not an identity
+// getFStarTerm returns (bosqueTerm). Ideally,
+// getFStarTerm should never be called on a TruthyType term
+// because there is no such term. 
+// Truthy is a concept, i.e. there is no term 
+// with type TruthyType
 class TruthyType extends TypeExpr {
     getFStarTerm() {
         return "(bosqueTerm)";
     }
     getFStarType() {
-        return "BTruthyType";
+        return "(BTruthyType)";
     }
     getBosqueType() {
         return "NSCore::Truthy";
@@ -78,10 +79,10 @@ class TruthyType extends TypeExpr {
 
 class NoneType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{isNone x})";
+        return "(x:bosqueTerm{subtypeOf (BNoneType) (getType x)})";
     }
     getFStarType() {
-        return "BNoneType";
+        return "(BNoneType)";
     }
     getBosqueType() {
         return "NSCore::None";
@@ -94,7 +95,10 @@ class NoneType extends TypeExpr {
     }
 }
 
+// TODO
 class UnionType extends TypeExpr {
+    static declared : Set<string>;
+    static mapDeclared : Map<string, UnionType>;
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
     readonly types: string;
 
@@ -146,10 +150,10 @@ class UnionType extends TypeExpr {
 
 class BoolType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{isBool x})";
+        return "(x:bosqueTerm{subtypeOf (BBoolType) (getType x)})";
     }
     getFStarType() {
-        return "BBoolType";
+        return "(BBoolType)";
     }
     getBosqueType() {
         return "NSCore::Bool";
@@ -164,11 +168,11 @@ class BoolType extends TypeExpr {
 
 class IntType extends TypeExpr {
     getFStarTerm() {
-        return "(x:bosqueTerm{isInt x})";
+        return "(x:bosqueTerm{subtypeOf (BIntType) (getType x)})";
 
     }
     getFStarType() {
-        return "BIntType";
+        return "(BIntType)";
     }
     getBosqueType() {
         return "NSCore::Int";
@@ -182,16 +186,21 @@ class IntType extends TypeExpr {
 }
 
 class TypedStringType extends TypeExpr {
+    static declared : Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
         super();
         this.ty = ty;
+        const stringType = ty.getFStarType();
+        if(!TypedStringType.declared.has(stringType)){
+            TypedStringType.declared.add(stringType);
+        }
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{isString " + this.ty.getFStarType() + " x})";
+        return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
     }
     getFStarType() {
-        return "(BTypeStringType " + this.ty.getFStarType() + ")";
+        return "(bTypeStringType_" + this.ty.getFStarType().slice(1, -1) + ")";
     }
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
