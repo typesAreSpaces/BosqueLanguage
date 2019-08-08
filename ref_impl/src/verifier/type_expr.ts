@@ -8,31 +8,44 @@ import * as FS from "fs";
 abstract class TypeExpr {
     // String expression denoting the type 
     // used inside function declaration in FStar
+    readonly id : string;
+    constructor(id: string){
+        this.id = id;
+    }
     abstract getFStarTerm(): string;
     // String name associated to the type in FStar
-    abstract getFStarType(): string;
+    getFStarTypeName(): string{
+        return this.id;
+    }
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
     static declare_additional_types(fd: number): void {
         TypedStringType.declared.forEach(x => {
-            FS.writeSync(fd, `let bTypeStringType_${x} = \
-            (BTypedStringType ${x})\n`);
+            FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
         });
+        FS.writeSync(fd, "\n");
         UnionType.declared.forEach(x => {
-            FS.writeSync(fd, `let bUnionType_${x} = \
-            ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
+            FS.writeSync(fd, `let bUnionType_${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
         });
+        FS.writeSync(fd, "\n");
+        TupleType.declared.forEach(x => {
+            const [b, typeArray] = TupleType.mapDeclared.get(x) as [boolean, TypeExpr[]];
+            const dimension = typeArray.length;
+            FS.writeSync(fd, `let bTupleType_${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
+        });
+        FS.writeSync(fd, "\n");
+
         FS.writeSync(fd, "\n");
     }
     abstract equalTo(ty: TypeExpr): boolean;
 }
 
 class AnyType extends TypeExpr {
+    constructor(){
+        super("BAnyType");
+    }
     getFStarTerm() {
         return "(bosqueTerm)";
-    }
-    getFStarType() {
-        return "BAnyType";
     }
     getBosqueType() {
         return "NSCore::Any";
@@ -46,11 +59,11 @@ class AnyType extends TypeExpr {
 }
 
 class SomeType extends TypeExpr {
+    constructor(){
+        super("BSomeType");
+    }
     getFStarTerm() {
         return "(x:bosqueTerm{subtypeOf BSomeType (getType x)})";
-    }
-    getFStarType() {
-        return "BSomeType";
     }
     getBosqueType() {
         return "NSCore::Some";
@@ -69,11 +82,11 @@ class SomeType extends TypeExpr {
 // Truthy is a concept, i.e. there is no term 
 // with type TruthyType
 class TruthyType extends TypeExpr {
+    constructor(){
+        super("BTruthyType");
+    }
     getFStarTerm() {
         return "(bosqueTerm)";
-    }
-    getFStarType() {
-        return "BTruthyType";
     }
     getBosqueType() {
         return "NSCore::Truthy";
@@ -87,11 +100,11 @@ class TruthyType extends TypeExpr {
 }
 
 class NoneType extends TypeExpr {
+    constructor(){
+        super("BNoneType");
+    }
     getFStarTerm() {
         return "(x:bosqueTerm{subtypeOf BNoneType (getType x)})";
-    }
-    getFStarType() {
-        return "BNoneType";
     }
     getBosqueType() {
         return "NSCore::None";
@@ -104,30 +117,21 @@ class NoneType extends TypeExpr {
     }
 }
 
-// TODO
 class UnionType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
     static mapDeclared: Map<string, TypeExpr[]> = new Map<string, TypeExpr[]>();
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
-    readonly stringTypes: string;
 
     constructor(elements: Set<TypeExpr>) {
-        super();
+        super("bUnionType_" + Array.from(elements).sort().map(x => x.getFStarTypeName()).join("_"));
         this.elements = elements;
-        const types = Array.from(elements).sort();
-        this.stringTypes = types.map(x => x.getFStarType()).join("_");
-        if (!UnionType.declared.has(this.stringTypes)) {
-            console.log(this.stringTypes);
-            UnionType.declared.add(this.stringTypes);
-            UnionType.mapDeclared.set(this.stringTypes, types);
+        if (!UnionType.declared.has(this.id)) {
+            UnionType.declared.add(this.id);
+            UnionType.mapDeclared.set(this.id, Array.from(elements).sort());
         }
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
-    }
-    getFStarType() {
-        // CONTINUE:
-        return "bUnionType_" + this.stringTypes;
+        return "(x:bosqueTerm{subtypeOf " + this.getFStarTypeName() + " (getType x)})";
     }
     getBosqueType() {
         if (this.elements.size <= 2) {
@@ -140,8 +144,8 @@ class UnionType extends TypeExpr {
     static toFStarUnion(x: TypeExpr[]): string {
         if (x.length == 2) {
             return "(BUnionType "
-                + x[0].getFStarType()
-                + " " + x[1].getFStarType() + ")"
+                + x[0].getFStarTypeName()
+                + " " + x[1].getFStarTypeName() + ")"
         }
         else {
             if (x.length < 2) {
@@ -149,25 +153,24 @@ class UnionType extends TypeExpr {
             }
             else {
                 const tail = x.slice(1);
-                return "(BUnionType " + x[0].getFStarType() + " " + UnionType.toFStarUnion(tail) + ")";
+                return "(BUnionType " + x[0].getFStarTypeName() + " " + UnionType.toFStarUnion(tail) + ")";
             }
         }
     }
-    // FIX: This is incorrect
-    equalTo(ty: TypeExpr) {
+    equalTo(ty: TypeExpr) : boolean {
         if (ty instanceof UnionType) {
-            return true;
+            return this.id == ty.id;
         }
         return false;
     }
 }
 
 class BoolType extends TypeExpr {
+    constructor(){
+        super("BBoolType");
+    }
     getFStarTerm() {
         return "(x:bosqueTerm{subtypeOf BBoolType (getType x)})";
-    }
-    getFStarType() {
-        return "BBoolType";
     }
     getBosqueType() {
         return "NSCore::Bool";
@@ -181,12 +184,11 @@ class BoolType extends TypeExpr {
 }
 
 class IntType extends TypeExpr {
+    constructor(){
+        super("BIntType");
+    }
     getFStarTerm() {
         return "(x:bosqueTerm{subtypeOf BIntType (getType x)})";
-
-    }
-    getFStarType() {
-        return "BIntType";
     }
     getBosqueType() {
         return "NSCore::Int";
@@ -203,18 +205,17 @@ class TypedStringType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
-        super();
+        super("bTypeStringType_" + ty.getFStarTypeName());
         this.ty = ty;
-        const stringType = ty.getFStarType();
+        const stringType = ty.getFStarTypeName();
         if (!TypedStringType.declared.has(stringType)) {
             TypedStringType.declared.add(stringType);
         }
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
-    }
-    getFStarType() {
-        return "bTypeStringType_" + this.ty.getFStarType();
+        return "(x:bosqueTerm{subtypeOf "
+            + this.getFStarTypeName()
+            + " (getType x)})";
     }
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
@@ -227,35 +228,26 @@ class TypedStringType extends TypeExpr {
     }
 }
 
-// TODO: Needs testing
 class TupleType extends TypeExpr {
+    static declared: Set<string> = new Set<string>();
+    static mapDeclared: Map<string, [boolean, TypeExpr[]]> = new Map<string, [boolean, TypeExpr[]]>();
     readonly isOpen: boolean;
     readonly elements: TypeExpr[];
-    readonly types: string;
 
     constructor(isOpen: boolean, elements: TypeExpr[]) {
-        super();
+        super("bTupleType_" + elements.length + elements.map(x => x.getFStarTypeName()).join("_") + isOpen);
         this.isOpen = isOpen;
         this.elements = elements;
-        this.types = TupleType.toFStarTuple(this.elements);
+        if (!TupleType.declared.has(this.id)) {
+            TupleType.declared.add(this.id);
+            TupleType.mapDeclared.set(this.id,
+                [this.isOpen, this.elements]);
+        }
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{isTuple "
-            + this.isOpen
-            + " " + this.elements.length
-            + " " + this.types
-            + "})";
-    }
-    // getFStarType() {
-    //     return "BTupleType"
-    //         + " " + this.isOpen
-    //         + " " + this.elements.length
-    //         + " " + this.types;
-    // }
-    getFStarType() {
-        return "bTupleType_"
-            + this.isOpen + this.elements.length
-            + this.types;
+        return "(x:bosqueTerm{subtypeOf "
+            + this.getFStarTypeName()
+            + " (getType x)})";
     }
     getBosqueType() {
         return "[" + this.elements.map(x => x.getBosqueType()).join(" | ") + "]";
@@ -267,7 +259,7 @@ class TupleType extends TypeExpr {
         }
         else {
             const tail = types.slice(1);
-            return "(SCons " + types[0].getFStarType() + " " + this.toFStarTuple(tail) + ")";
+            return "(SCons " + types[0].getFStarTypeName() + " " + this.toFStarTuple(tail) + ")";
         }
     }
     equalTo(ty: TypeExpr): boolean {
@@ -293,14 +285,10 @@ class RecordType extends TypeExpr {
     readonly elements: [string, TypeExpr][];
 
     constructor(elements: [string, TypeExpr][]) {
-        super();
+        super("bRecordType_");
         this.elements = elements;
     }
     getFStarTerm() {
-        return "";
-    }
-    getFStarType() {
-        // this.elements.map(x => x[1].getFStarType()).join(" ")
         return "";
     }
     getBosqueType() {
@@ -327,13 +315,13 @@ class RecordType extends TypeExpr {
 }
 
 // TODO: Implement getBosqueType 
-// TODO: Implement getFstarType, just double check 
+// TODO: Implement getFStarTypeName, just double check 
 class FuncType extends TypeExpr {
     readonly domain: TypeExpr[];
     readonly image: TypeExpr;
 
     constructor(domain: TypeExpr[], image: TypeExpr) {
-        super();
+        super("bFunctionType_");
         this.domain = domain;
         this.image = image;
     }
@@ -341,10 +329,10 @@ class FuncType extends TypeExpr {
         return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getFStarTerm()).join(" -> ") + " -> Tot ")
             + this.image.getFStarTerm();
     }
-    getFStarType() {
-        return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getFStarType()).join(" -> ") + " -> Tot ")
-            + this.image.getFStarType();
-    }
+    // getFStarTypeName() {
+    //     return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getFStarTypeName()).join(" -> ") + " -> Tot ")
+    //         + this.image.getFStarTypeName();
+    // }
     getBosqueType() {
         return "";
     }
@@ -368,10 +356,10 @@ class FuncType extends TypeExpr {
 
 // TODO: Proper mplementation
 class ObjectType extends TypeExpr {
-    getFStarTerm() {
-        return "";
+    constructor(){
+        super("bObjectType_");
     }
-    getFStarType() {
+    getFStarTerm() {
         return "";
     }
     getBosqueType() {
@@ -387,10 +375,10 @@ class ObjectType extends TypeExpr {
 
 // TODO: Proper mplementation
 class EnumType extends TypeExpr {
-    getFStarTerm() {
-        return "";
+    constructor(){
+        super("bEnumType_");
     }
-    getFStarType() {
+    getFStarTerm() {
         return "";
     }
     getBosqueType() {
@@ -406,10 +394,10 @@ class EnumType extends TypeExpr {
 
 // TODO: Proper mplementation
 class CustomKeyType extends TypeExpr {
-    getFStarTerm() {
-        return "";
+    constructor(){
+        super("bCustomKeyType_");
     }
-    getFStarType() {
+    getFStarTerm() {
         return "";
     }
     getBosqueType() {
@@ -424,11 +412,11 @@ class CustomKeyType extends TypeExpr {
 }
 
 // TODO: Proper mplementation
-class KeyedType {
-    getFStarTerm() {
-        return "";
+class KeyedType extends TypeExpr {
+    constructor(){
+        super("bKeyedType");
     }
-    getFStarType() {
+    getFStarTerm() {
         return "";
     }
     getBosqueType() {
@@ -441,7 +429,6 @@ class KeyedType {
         return false;
     }
 }
-
 
 export {
     TypeExpr,

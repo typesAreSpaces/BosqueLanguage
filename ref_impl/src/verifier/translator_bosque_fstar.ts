@@ -76,7 +76,7 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
 
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
-    static readonly DEBUGGING = false;
+    static readonly DEBUGGING = true;
 
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from
@@ -100,21 +100,21 @@ class TranslatorBosqueFStar {
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
 
-        // // FIX: This is wrong, but temporarily useful
-        // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
-        //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-        //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
-        //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
-
-        // FIX: This is wrong, but temporarily useful
+        // FIX: This is wrong, but temporarily useful For Windows Machine
         ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
             "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
             "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
                 this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
+
+        // // FIX: This is wrong, but temporarily useful For Mac Machine
+        // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
+        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+        //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
+        //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
+        //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
 
         // console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
         // console.log(this.mapEntityDeclarations.forEach((x, index) => {
