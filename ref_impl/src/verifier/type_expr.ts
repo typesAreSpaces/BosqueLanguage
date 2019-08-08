@@ -113,9 +113,10 @@ class UnionType extends TypeExpr {
         this.types = UnionType.toFStarUnion(canonical_order);
     }
     getFStarTerm() {
-        return "(x:bosqueTerm{subtypeOf " + this.types + " (getType x)})";
+        return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
     }
     getFStarType() {
+        // CONTINUE:
         return "BUnionType";
 
     }
