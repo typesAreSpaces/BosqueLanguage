@@ -10,12 +10,17 @@ abstract class TypeExpr {
     // used inside function declaration in FStar
     abstract getFStarTerm(): string;
     // String name associated to the type in FStar
-    abstract getFStarType(): string; 
+    abstract getFStarType(): string;
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
     static declare_additional_types(fd: number): void {
         TypedStringType.declared.forEach(x => {
-            FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
+            FS.writeSync(fd, `let bTypeStringType_${x} = \
+            (BTypedStringType ${x})\n`);
+        });
+        UnionType.declared.forEach(x => {
+            FS.writeSync(fd, `let bUnionType_${x} = \
+            ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
         });
         FS.writeSync(fd, "\n");
     }
@@ -101,24 +106,28 @@ class NoneType extends TypeExpr {
 
 // TODO
 class UnionType extends TypeExpr {
-    static declared : Set<string>;
-    static mapDeclared : Map<string, UnionType>;
+    static declared: Set<string> = new Set<string>();
+    static mapDeclared: Map<string, TypeExpr[]> = new Map<string, TypeExpr[]>();
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
-    readonly types: string;
+    readonly stringTypes: string;
 
     constructor(elements: Set<TypeExpr>) {
         super();
         this.elements = elements;
-        const canonical_order = Array.from(elements).sort();
-        this.types = UnionType.toFStarUnion(canonical_order);
+        const types = Array.from(elements).sort();
+        this.stringTypes = types.map(x => x.getFStarType()).join("_");
+        if (!UnionType.declared.has(this.stringTypes)) {
+            console.log(this.stringTypes);
+            UnionType.declared.add(this.stringTypes);
+            UnionType.mapDeclared.set(this.stringTypes, types);
+        }
     }
     getFStarTerm() {
         return "(x:bosqueTerm{subtypeOf " + this.getFStarType() + " (getType x)})";
     }
     getFStarType() {
         // CONTINUE:
-        return "BUnionType";
-
+        return "bUnionType_" + this.stringTypes;
     }
     getBosqueType() {
         if (this.elements.size <= 2) {
@@ -191,13 +200,13 @@ class IntType extends TypeExpr {
 }
 
 class TypedStringType extends TypeExpr {
-    static declared : Set<string> = new Set<string>();
+    static declared: Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
         super();
         this.ty = ty;
         const stringType = ty.getFStarType();
-        if(!TypedStringType.declared.has(stringType)){
+        if (!TypedStringType.declared.has(stringType)) {
             TypedStringType.declared.add(stringType);
         }
     }
@@ -237,11 +246,16 @@ class TupleType extends TypeExpr {
             + " " + this.types
             + "})";
     }
+    // getFStarType() {
+    //     return "BTupleType"
+    //         + " " + this.isOpen
+    //         + " " + this.elements.length
+    //         + " " + this.types;
+    // }
     getFStarType() {
-        return "(BTupleType"
-            + " " + this.isOpen
-            + " " + this.elements.length
-            + " " + this.types + ")";
+        return "bTupleType_"
+            + this.isOpen + this.elements.length
+            + this.types;
     }
     getBosqueType() {
         return "[" + this.elements.map(x => x.getBosqueType()).join(" | ") + "]";
@@ -292,7 +306,7 @@ class RecordType extends TypeExpr {
     getBosqueType() {
         return "";
     }
-    equalTo(ty: TypeExpr) : boolean {
+    equalTo(ty: TypeExpr): boolean {
         if (ty instanceof RecordType) {
             if (this.elements.length != ty.elements.length) {
                 return false;
@@ -363,8 +377,8 @@ class ObjectType extends TypeExpr {
     getBosqueType() {
         return "";
     }
-    equalTo(ty: TypeExpr){
-        if(ty instanceof ObjectType){
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof ObjectType) {
             return true;
         }
         return false;
@@ -382,8 +396,8 @@ class EnumType extends TypeExpr {
     getBosqueType() {
         return "";
     }
-    equalTo(ty: TypeExpr){
-        if(ty instanceof EnumType){
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof EnumType) {
             return true;
         }
         return false;
@@ -401,8 +415,8 @@ class CustomKeyType extends TypeExpr {
     getBosqueType() {
         return "";
     }
-    equalTo(ty: TypeExpr){
-        if(ty instanceof CustomKeyType){
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof CustomKeyType) {
             return true;
         }
         return false;
@@ -420,8 +434,8 @@ class KeyedType {
     getBosqueType() {
         return "";
     }
-    equalTo(ty: TypeExpr){
-        if(ty instanceof KeyedType){
+    equalTo(ty: TypeExpr) {
+        if (ty instanceof KeyedType) {
             return true;
         }
         return false;
