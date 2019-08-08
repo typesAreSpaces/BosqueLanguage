@@ -250,7 +250,8 @@ class TranslatorBosqueFStar {
                             }
                             // FIX: This is wrong, but temporarily useful
                             return TranslatorBosqueFStar.noneType;
-                            throw new Error(s + " lid constant value type, yet");
+                            console.log(s + " is constant value type, yet");
+                            throw new Error(s + " is constant value type, yet");
                         }
                     }
                 }
@@ -283,7 +284,7 @@ class TranslatorBosqueFStar {
             }
             default: {
                 // FIX: This is wrong, but temporarily useful
-                return TranslatorBosqueFStar.noneType;
+                // return TranslatorBosqueFStar.noneType;
                 throw new Error("The case " + stringConst + " is not implemented yet");
             }
         }
