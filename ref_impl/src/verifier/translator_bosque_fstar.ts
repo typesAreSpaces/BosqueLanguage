@@ -10,7 +10,7 @@ import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./express
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
-import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl } from "../compiler/mir_assembly";
+import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 
 type StringTypeMangleNameWithFkey = string;
 
@@ -38,7 +38,7 @@ class FunctionDeclaration {
 
 // TODO: Incomplete implementation
 class ConceptDeclaration {
-    readonly declarations: MIRConceptTypeDecl; 
+    readonly declarations: MIRConceptTypeDecl;
     constructor(declarations: MIRConceptTypeDecl) {
         this.declarations = declarations;
     }
@@ -56,6 +56,19 @@ class EntityDeclaration {
     }
     // TODO: Figure out how to include the following fields:
     // 1) invariants, 2) fields, 3) vcallMap, 4) provides
+    print(fd: number): void {
+        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+    }
+}
+
+class ConstantDeclaration {
+    readonly declarations: MIRConstantDecl;
+    constructor(declarations: MIRConstantDecl) {
+        this.declarations = declarations;
+        // this.declarations.tkey is the 'name'
+    }
+    // TODO: Implement
     print(fd: number): void {
         // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
         // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
@@ -81,6 +94,7 @@ class TranslatorBosqueFStar {
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
     readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
     readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
+    readonly mapConstantDeclarations: Map<string, MIRConstantDecl>;
     readonly isFkeyDeclared: Set<string> = new Set<string>();
     readonly isCkeyDeclared: Set<string> = new Set<string>();
     readonly isEkeyDeclared: Set<string> = new Set<string>();
@@ -94,6 +108,9 @@ class TranslatorBosqueFStar {
         this.mapFuncDeclarations = masm.invokeDecls;
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
+        this.mapConstantDeclarations = masm.constantDecls;
+        console.log(masm.constantDecls);
+        console.log(masm.subtypeOf);
 
         // FIX: This is wrong, but temporarily useful For Windows Machine
         ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
@@ -110,27 +127,6 @@ class TranslatorBosqueFStar {
         //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
         //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
         //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
-
-        // console.log("BEGIN Entity Declarations --------------------------------------------------------------------------------");
-        // console.log(this.mapEntityDeclarations.forEach((x, index) => {
-        //     console.log(`${index} provides:`);
-        //     x.provides.map(y => y.options.map(z => {
-        //         console.log(`Key: ${y.trkey}; Options ${z.jemit}`);
-        //     }));
-        //     console.log();
-        // }));
-        // console.log("END Entity Declarations --------------------------------------------------------------------------------");
-
-        // console.log("BEGIN Concept Declarations --------------------------------------------------------------------------------");
-        // console.log(this.mapConceptDeclarations.forEach((x, index) => {
-        //     console.log(`${index} provides:`);
-        //     x.provides.map(y => y.options.map(z => {
-        //         console.log(`Key: ${y.trkey}; Options ${z.jemit}`);
-        //     }));
-        //     console.log();
-        // }));
-        // console.log("END Concept Declarations --------------------------------------------------------------------------------");
-        // console.log();
 
         this.fileName = fileName;
     }
@@ -613,47 +609,28 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
                 }
                 else {
-                    // if (!currentType.equalTo(typeFromSrc)) {
-                    //     if (currentType instanceof UnionType) {
-                    //         if (typeFromSrc instanceof UnionType) {
-                    //             currentType.elements.forEach(x => typeFromSrc.elements.add(x));
-                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(typeFromSrc.elements));
-                    //         }
-                    //         else {
-                    //             currentType.elements.add(typeFromSrc);
-                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(currentType.elements));
-                    //         }
-                    //     }
-                    //     else {
-                    //         if (typeFromSrc instanceof UnionType) {
-                    //             typeFromSrc.elements.add(currentType);
-                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(typeFromSrc.elements));
-                    //         }
-                    //         else {
-                    //             const newCurrentType = new UnionType(new Set<TypeExpr>([typeFromSrc, currentType]));
-                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), newCurrentType);
-                    //         }
-                    //     }
-                    // }
                     if (!currentType.equalTo(typeFromSrc)) {
                         if (currentType instanceof UnionType) {
                             if (typeFromSrc instanceof UnionType) {
                                 currentType.elements.forEach(x => typeFromSrc.elements.add(x));
-                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                                    new UnionType(typeFromSrc.elements));
                             }
                             else {
                                 currentType.elements.add(typeFromSrc);
-                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), currentType);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                                    new UnionType(currentType.elements));
                             }
                         }
                         else {
                             if (typeFromSrc instanceof UnionType) {
                                 typeFromSrc.elements.add(currentType);
-                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                                    new UnionType(typeFromSrc.elements));
                             }
                             else {
-                                const newCurrentType = new UnionType(new Set<TypeExpr>([typeFromSrc, currentType]));
-                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), newCurrentType);
+                                TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                                    new UnionType(new Set<TypeExpr>([typeFromSrc, currentType])));
                             }
                         }
                     }
@@ -772,7 +749,7 @@ class TranslatorBosqueFStar {
                     new FunctionDeclaration(declarations,
                         traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry")));
             }
-            console.log(TranslatorBosqueFStar.types_seen);
+            // console.log(TranslatorBosqueFStar.types_seen);
         }
     }
 

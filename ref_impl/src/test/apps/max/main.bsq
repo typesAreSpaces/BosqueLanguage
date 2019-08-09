@@ -57,12 +57,12 @@ function max(x: Int | None, y: Int): Int
     }
 }
 
-function maxx(x: Int) : Int? {
-    if (x > 0){
+function maxx(x: Bool | None, y : Int) : Int | None | Bool {
+    if (y > 0){
         return x; 
     }
     else{
-        return none;
+        return y;
     }
 }
 
@@ -142,8 +142,7 @@ entrypoint function main(): Int {
     var z_max_func_repeated = max(z, y);
     var z2 = identityTupleOptional([1, true, 2]);
     var z3 = identityOpenTuple(["hello"]);
-    // var z4 = maxx(3); // Problematic
+    var z4 = maxx(false, 3);
     var zTuple2 = [xTuple2, y];
-    
     return z;
 }
