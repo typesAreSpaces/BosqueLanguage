@@ -62,7 +62,7 @@ class EntityDeclaration {
     }
 }
 
-class ConstantDeclaration {
+export class ConstantDeclaration {
     readonly declarations: MIRConstantDecl;
     constructor(declarations: MIRConstantDecl) {
         this.declarations = declarations;
@@ -70,8 +70,7 @@ class ConstantDeclaration {
     }
     // TODO: Implement
     print(fd: number): void {
-        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
-        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.declarations.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 
@@ -109,24 +108,30 @@ class TranslatorBosqueFStar {
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
         this.mapConstantDeclarations = masm.constantDecls;
-        console.log(masm.constantDecls);
-        console.log(masm.subtypeOf);
+        console.log("Values: ------------------------------------------------------------");
+        masm.constantDecls.forEach(x => {
+            console.log(x.cname);
+            console.log(x.value.body);
+            console.log(x.declaredType);
+            console.log("");
+        });
+        console.log("Values: ------------------------------------------------------------");
 
-        // FIX: This is wrong, but temporarily useful For Windows Machine
-        ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
-            "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-            "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
-                this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
-
-        // // FIX: This is wrong, but temporarily useful For Mac Machine
+        // // FIX: This is wrong, but temporarily useful For Windows Machine
         // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
         //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
         //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
         //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
+
+        // FIX: This is wrong, but temporarily useful For Mac Machine
+        ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
+            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+            "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
+            "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
+                this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
 
         this.fileName = fileName;
     }
@@ -353,12 +358,12 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRConstructorPrimary: { // IMPLEMENT:
                 const opConstructorPrimary = op as MIRConstructorPrimary;
                 const current_tkey = opConstructorPrimary.tkey
-                console.log(current_tkey + "---------------------------------------------------");
-                console.log(this.mapEntityDeclarations.get(current_tkey));
-                console.log("---------------------------------------------------");
-                console.log("NSMain::Board" + "---------------------------------------------------");
-                console.log(this.mapEntityDeclarations.get("NSMain::Board"));
-                console.log("---------------------------------------------------");
+                // console.log(current_tkey + "---------------------------------------------------");
+                // console.log(this.mapEntityDeclarations.get(current_tkey));
+                // console.log("---------------------------------------------------");
+                // console.log("NSMain::Board" + "---------------------------------------------------");
+                // console.log(this.mapEntityDeclarations.get("NSMain::Board"));
+                // console.log("---------------------------------------------------");
                 // CONTINUE:
                 if (!this.isEkeyDeclared.has(current_tkey)) {
                     this.isEkeyDeclared.add(current_tkey);
