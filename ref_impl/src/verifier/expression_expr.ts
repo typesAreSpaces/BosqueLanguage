@@ -7,7 +7,7 @@ import { VarTerm, TermExpr } from "./term_expr";
 
 abstract class ExprExpr {
     readonly tabSymbol = "    ";
-    abstract toML(indentatioLevel: number): string;
+    abstract toML(indentatioLevel: number, offset: number): string;
 }
 
 class ReturnExpr extends ExprExpr {
@@ -31,10 +31,10 @@ class AssignmentExpr extends ExprExpr {
         this.rhs = rhs;
         this.continuation = continuation;
     }
-    toML(indentatioLevel: number) {
+    toML(indentatioLevel: number, offset: number) {
         return this.tabSymbol.repeat(indentatioLevel)
             + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-            + this.continuation.toML(indentatioLevel + 1);
+            + this.continuation.toML(indentatioLevel + offset, offset);
     }
 }
 
@@ -48,13 +48,13 @@ class ConditionalExpr extends ExprExpr {
         this.ifBranch = ifBranch;
         this.elseBranch = elseBranch;
     }
-    toML(indentatioLevel: number) {
+    toML(indentatioLevel: number, offset : number) {
         return this.tabSymbol.repeat(indentatioLevel)
             + "if " + this.condition.toML() + " then \n"
-            + this.ifBranch.toML(indentatioLevel + 1) + "\n"
+            + this.ifBranch.toML(indentatioLevel + offset, offset) + "\n"
             + this.tabSymbol.repeat(indentatioLevel) + "else \n"
-            + this.elseBranch.toML(indentatioLevel + 1);
-    }
+            + this.elseBranch.toML(indentatioLevel + offset, offset);
+    } 
 }
 
 export { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr }

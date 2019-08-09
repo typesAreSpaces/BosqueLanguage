@@ -32,7 +32,7 @@ class FunctionDeclaration {
         // TODO: Figure out how to include the following fields:
         // 1) recursive, 2) preconditions, 3) postconditions
         FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
-        FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+        FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1, 1)}\n\n`);
     }
 }
 
@@ -757,7 +757,15 @@ class TranslatorBosqueFStar {
         TypeExpr.declareTypeNames(fd);
         FS.writeSync(fd, "\n");
 
-        FS.writeSync(fd, "(* Constants *)\n");
+        FS.writeSync(fd, "(* Concept Declarations *)\n");
+        // TODO: Implement
+        FS.writeSync(fd, "\n");
+
+        FS.writeSync(fd, "(* Entity Declarations *)\n");
+        // TODO: Implement
+        FS.writeSync(fd, "\n");
+
+        FS.writeSync(fd, "(* Constant Declarations *)\n");
         this.mapConstantDeclarations.forEach(constant_decl => {
             // Constant declaration generally have only two blocks: entry and exit
             // We just `declare` the entry block
@@ -766,15 +774,15 @@ class TranslatorBosqueFStar {
                     const returnType = TranslatorBosqueFStar.stringTypeToType(constant_decl.declaredType);
                     const continuation = () => new ReturnExpr(new VarTerm("__ir_ret__", returnType));
                     TranslatorBosqueFStar.types_seen.set(sanitizeName(constant_decl.cname), returnType);
-                    FS.writeSync(fd, `let ${sanitizeName(constant_decl.cname)} = \n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1)}\n`);
+                    FS.writeSync(fd, `let ${sanitizeName(constant_decl.cname)} = \n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1, 0)}\n`);
                 }
             });
         });
         FS.writeSync(fd, "\n");
 
-        FS.writeSync(fd, "(* Functions *)\n");
+        FS.writeSync(fd, "(* Function Declarations *)\n");
         this.function_declarations.map(x => x.print(fd));
-        
+
         TranslatorBosqueFStar.closeFS(fd);
     }
 }
