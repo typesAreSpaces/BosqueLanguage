@@ -9,12 +9,12 @@ abstract class TypeExpr {
     // String expression denoting the type 
     // used inside function declaration in FStar
     readonly id : string;
-    constructor(id: string){
+    constructor(id: string) {
         this.id = id;
     }
     abstract getFStarTerm(): string;
     // String name associated to the type in FStar
-    getFStarTypeName(): string{
+    getFStarTypeName(): string {
         return this.id;
     }
     // String name associated to the type in Bosque
@@ -41,7 +41,7 @@ abstract class TypeExpr {
 }
 
 class AnyType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BAnyType");
     }
     getFStarTerm() {
@@ -59,7 +59,7 @@ class AnyType extends TypeExpr {
 }
 
 class SomeType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BSomeType");
     }
     getFStarTerm() {
@@ -82,7 +82,7 @@ class SomeType extends TypeExpr {
 // Truthy is a concept, i.e. there is no term 
 // with type TruthyType
 class TruthyType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BTruthyType");
     }
     getFStarTerm() {
@@ -100,7 +100,7 @@ class TruthyType extends TypeExpr {
 }
 
 class NoneType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BNoneType");
     }
     getFStarTerm() {
@@ -157,7 +157,7 @@ class UnionType extends TypeExpr {
             }
         }
     }
-    equalTo(ty: TypeExpr) : boolean {
+    equalTo(ty: TypeExpr): boolean {
         if (ty instanceof UnionType) {
             return this.id == ty.id;
         }
@@ -166,7 +166,7 @@ class UnionType extends TypeExpr {
 }
 
 class BoolType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BBoolType");
     }
     getFStarTerm() {
@@ -184,7 +184,7 @@ class BoolType extends TypeExpr {
 }
 
 class IntType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("BIntType");
     }
     getFStarTerm() {
@@ -356,7 +356,7 @@ class FuncType extends TypeExpr {
 
 // TODO: Proper mplementation
 class ObjectType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("bObjectType_");
     }
     getFStarTerm() {
@@ -375,7 +375,7 @@ class ObjectType extends TypeExpr {
 
 // TODO: Proper mplementation
 class EnumType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("bEnumType_");
     }
     getFStarTerm() {
@@ -394,7 +394,7 @@ class EnumType extends TypeExpr {
 
 // TODO: Proper mplementation
 class CustomKeyType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("bCustomKeyType_");
     }
     getFStarTerm() {
@@ -413,7 +413,7 @@ class CustomKeyType extends TypeExpr {
 
 // TODO: Proper mplementation
 class KeyedType extends TypeExpr {
-    constructor(){
+    constructor() {
         super("bKeyedType");
     }
     getFStarTerm() {

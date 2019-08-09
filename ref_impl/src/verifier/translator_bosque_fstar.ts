@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType } from "./type_expr";
@@ -15,55 +15,50 @@ import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl }
 type StringTypeMangleNameWithFkey = string;
 
 class FunctionDeclaration {
-    readonly fkey: string;
-    readonly args: string[];
+    readonly declarations: MIRInvokeBodyDecl;
     readonly program: ExprExpr;
-    readonly type: FuncType;
-    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
-        this.fkey = fkey;
-        this.args = args;
+
+    constructor(declarations: MIRInvokeBodyDecl, program: ExprExpr) {
+        this.declarations = declarations;
         this.program = program;
-        this.type = type;
     }
     print(fd: number): void {
-        FS.writeSync(fd, `val ${sanitizeName(this.fkey)} : ${this.type.getFStarTerm()}\n`);
-        FS.writeSync(fd, `let ${sanitizeName(this.fkey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+        const fkey = this.declarations.key;
+        const args = this.declarations.params.map(x => x.name);
+        const returnType = TranslatorBosqueFStar.stringTypeToType(this.declarations.resultType);
+        const type = new FuncType(
+            this.declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
+            returnType);
+        // TODO: Figure out how to include the following fields:
+        // 1) recursive, 2) preconditions, 3) postconditions
+        FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
+        FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 
-// TODO: Wrong implementation
+// TODO: Incomplete implementation
 class ConceptDeclaration {
-    readonly ckey: string;
-    readonly args: string[];
-    readonly program: ExprExpr;
-    readonly type: FuncType;
-    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
-        this.ckey = fkey;
-        this.args = args;
-        this.program = program;
-        this.type = type;
+    readonly declarations: MIRConceptTypeDecl; 
+    constructor(declarations: MIRConceptTypeDecl) {
+        this.declarations = declarations;
     }
     print(fd: number): void {
-        FS.writeSync(fd, `val ${sanitizeName(this.ckey)} : ${this.type.getFStarTerm()}\n`);
-        FS.writeSync(fd, `let ${sanitizeName(this.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+        // FS.writeSync(fd, `val ${sanitizeName(this.ckey)} : ${this.type.getFStarTerm()}\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 
-// TODO: Wrong implementation
 class EntityDeclaration {
-    readonly ekey: string;
-    readonly args: string[];
-    readonly program: ExprExpr;
-    readonly type: FuncType;
-    constructor(fkey: string, args: string[], program: ExprExpr, type: FuncType) {
-        this.ekey = fkey;
-        this.args = args;
-        this.program = program;
-        this.type = type;
+    readonly declarations: MIREntityTypeDecl;
+    constructor(declarations: MIREntityTypeDecl) {
+        this.declarations = declarations;
+        // this.declarations.tkey is the 'name'
     }
+    // TODO: Figure out how to include the following fields:
+    // 1) invariants, 2) fields, 3) vcallMap, 4) provides
     print(fd: number): void {
-        FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
-        FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 
@@ -76,7 +71,7 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
 
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
-    static readonly DEBUGGING = true;
+    static readonly DEBUGGING = false;
 
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from
@@ -283,7 +278,7 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                // FIX: This is wrong, but temporarily useful
+                // // FIX: This is wrong, but temporarily useful
                 // return TranslatorBosqueFStar.noneType;
                 throw new Error("The case " + stringConst + " is not implemented yet");
             }
@@ -330,7 +325,6 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_LoadConst", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRLoadConstTypedString: {
-                // CONTINUE:
                 const opMIRLoadConstTypedString = op as MIRLoadConstTypedString;
                 console.log("The following provides the _location_ of the entity used");
                 console.log(opMIRLoadConstTypedString.tkey);
@@ -343,8 +337,8 @@ class TranslatorBosqueFStar {
             // case MIROpTag.AccessConstField:
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
                 const opMIRLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
-                opMIRLoadFieldDefaultValue;
-                // console.log(opMIRLoadFieldDefaultValue);
+                console.log(opMIRLoadFieldDefaultValue);
+                // CONTINUE:
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -361,7 +355,22 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_AcessLocalVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRConstructorPrimary: { // IMPLEMENT:
-                // const opConstructorPrimary = op as MIRConstructorPrimary;
+                const opConstructorPrimary = op as MIRConstructorPrimary;
+                const current_tkey = opConstructorPrimary.tkey
+                console.log(current_tkey + "---------------------------------------------------");
+                console.log(this.mapEntityDeclarations.get(current_tkey));
+                console.log("---------------------------------------------------");
+                console.log("NSMain::Board" + "---------------------------------------------------");
+                console.log(this.mapEntityDeclarations.get("NSMain::Board"));
+                console.log("---------------------------------------------------");
+                // CONTINUE:
+                if (!this.isEkeyDeclared.has(current_tkey)) {
+                    this.isEkeyDeclared.add(current_tkey);
+                    this.entity_declarations.push(
+                        new EntityDeclaration(this.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl)
+                    );
+                }
+
                 TranslatorBosqueFStar.debugging("ConstructorPrimary Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimary", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -604,6 +613,28 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
                 }
                 else {
+                    // if (!currentType.equalTo(typeFromSrc)) {
+                    //     if (currentType instanceof UnionType) {
+                    //         if (typeFromSrc instanceof UnionType) {
+                    //             currentType.elements.forEach(x => typeFromSrc.elements.add(x));
+                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(typeFromSrc.elements));
+                    //         }
+                    //         else {
+                    //             currentType.elements.add(typeFromSrc);
+                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(currentType.elements));
+                    //         }
+                    //     }
+                    //     else {
+                    //         if (typeFromSrc instanceof UnionType) {
+                    //             typeFromSrc.elements.add(currentType);
+                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), new UnionType(typeFromSrc.elements));
+                    //         }
+                    //         else {
+                    //             const newCurrentType = new UnionType(new Set<TypeExpr>([typeFromSrc, currentType]));
+                    //             TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), newCurrentType);
+                    //         }
+                    //     }
+                    // }
                     if (!currentType.equalTo(typeFromSrc)) {
                         if (currentType instanceof UnionType) {
                             if (typeFromSrc instanceof UnionType) {
@@ -730,20 +761,18 @@ class TranslatorBosqueFStar {
                     }
                 }
             }
-            declarations.params.map(x => TranslatorBosqueFStar.types_seen.set(sanitizeName(x.name + fkey), TranslatorBosqueFStar.stringTypeToType(x.type)));
-            const programType = new FuncType(
-                declarations.params.map(x => TranslatorBosqueFStar.stringTypeToType(x.type)),
-                returnType);
+
+            declarations.params.map(x =>
+                TranslatorBosqueFStar.types_seen.set(sanitizeName(x.name + fkey),
+                    TranslatorBosqueFStar.stringTypeToType(x.type)));
 
             if (!this.isFkeyDeclared.has(fkey)) {
-                this.function_declarations.push(
-                    new FunctionDeclaration(fkey,
-                        declarations.params.map(x => x.name),
-                        traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"),
-                        programType));
                 this.isFkeyDeclared.add(fkey);
+                this.function_declarations.push(
+                    new FunctionDeclaration(declarations,
+                        traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry")));
             }
-            // console.log(TranslatorBosqueFStar.types_seen);
+            console.log(TranslatorBosqueFStar.types_seen);
         }
     }
 

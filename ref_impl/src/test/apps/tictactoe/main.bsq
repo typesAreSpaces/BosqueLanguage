@@ -143,6 +143,7 @@ function id(x : Int) : Int {
 
 entrypoint function main(): Game {
     var x = id(1);
+    
     var! game = Game{};
 
     game = game->makeAutoMove(Board::playerX, 0);
