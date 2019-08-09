@@ -62,18 +62,6 @@ class EntityDeclaration {
     }
 }
 
-export class ConstantDeclaration {
-    readonly declarations: MIRConstantDecl;
-    constructor(declarations: MIRConstantDecl) {
-        this.declarations = declarations;
-        // this.declarations.tkey is the 'name'
-    }
-    // TODO: Implement
-    print(fd: number): void {
-        // FS.writeSync(fd, `let ${sanitizeName(this.declarations.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
-    }
-}
-
 class TranslatorBosqueFStar {
     static readonly anyType = new AnyType();
     static readonly someType = new SomeType();
@@ -117,21 +105,21 @@ class TranslatorBosqueFStar {
         });
         console.log("Values: ------------------------------------------------------------");
 
-        // // FIX: This is wrong, but temporarily useful For Windows Machine
-        // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
-        //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-        //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
-        //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
-
-        // FIX: This is wrong, but temporarily useful For Mac Machine
+        // FIX: This is wrong, but temporarily useful For Windows Machine
         ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
             "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
             "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
                 this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
+
+        // // FIX: This is wrong, but temporarily useful For Mac Machine
+        // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
+        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
+        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
+        //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
+        //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
+        //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
 
         this.fileName = fileName;
     }
@@ -140,8 +128,6 @@ class TranslatorBosqueFStar {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         // TODO: Change to the appropriate Prelude
         FS.writeSync(fd, `open BosqueOption\n`);
-
-        FS.writeSync(fd, `\n`);
     }
 
     static closeFS(fd: number): void {
@@ -617,9 +603,10 @@ class TranslatorBosqueFStar {
                     if (!currentType.equalTo(typeFromSrc)) {
                         if (currentType instanceof UnionType) {
                             if (typeFromSrc instanceof UnionType) {
-                                currentType.elements.forEach(x => typeFromSrc.elements.add(x));
+                                const previousElementsSet = new Set(Array.from(typeFromSrc.elements));
+                                currentType.elements.forEach(x => previousElementsSet.add(x));
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
-                                    new UnionType(typeFromSrc.elements));
+                                    new UnionType(previousElementsSet));
                             }
                             else {
                                 currentType.elements.add(typeFromSrc);
@@ -629,9 +616,10 @@ class TranslatorBosqueFStar {
                         }
                         else {
                             if (typeFromSrc instanceof UnionType) {
-                                typeFromSrc.elements.add(currentType);
+                                const previousElementsSet = new Set(Array.from(typeFromSrc.elements));
+                                previousElementsSet.add(currentType);
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
-                                    new UnionType(typeFromSrc.elements));
+                                    new UnionType(previousElementsSet));
                             }
                             else {
                                 TranslatorBosqueFStar.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
@@ -696,11 +684,15 @@ class TranslatorBosqueFStar {
 
     collectExpr(fkey: string) {
         const declarations = (this.mapFuncDeclarations.get(fkey) as MIRInvokeBodyDecl);
+
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
             throw new Error("The program with fkey " + fkey + " is a string");
         }
         else {
+            declarations.params.map(x =>
+                TranslatorBosqueFStar.types_seen.set(sanitizeName(x.name + fkey),
+                    TranslatorBosqueFStar.stringTypeToType(x.type)));
             const returnType = TranslatorBosqueFStar.stringTypeToType(declarations.resultType);
             const flow = computeBlockLinks(mapBlocks);
 
@@ -744,10 +736,6 @@ class TranslatorBosqueFStar {
                 }
             }
 
-            declarations.params.map(x =>
-                TranslatorBosqueFStar.types_seen.set(sanitizeName(x.name + fkey),
-                    TranslatorBosqueFStar.stringTypeToType(x.type)));
-
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.isFkeyDeclared.add(fkey);
                 this.function_declarations.push(
@@ -759,10 +747,19 @@ class TranslatorBosqueFStar {
     }
 
     generateFStarCode(fkey: string) {
-        const fd = FS.openSync(this.fileName, 'w');
         this.collectExpr(fkey);
+        
+        const fd = FS.openSync(this.fileName, 'w');
         this.printPrelude(fd);
-        TypeExpr.declare_additional_types(fd);
+        FS.writeSync(fd, "\n");
+        TypeExpr.declareTypeNames(fd);
+        FS.writeSync(fd, "\n");
+        this.mapConstantDeclarations.forEach(value => {
+            value.value.body.forEach(value2 => {
+                value2.ops;
+                this.opsToExpr(value2.ops, "entry", "", );
+            });
+        })
         this.function_declarations.map(x => x.print(fd));
         TranslatorBosqueFStar.closeFS(fd);
     }

@@ -19,7 +19,7 @@ abstract class TypeExpr {
     }
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
-    static declare_additional_types(fd: number): void {
+    static declareTypeNames(fd: number): void {
         TypedStringType.declared.forEach(x => {
             FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
         });
@@ -33,8 +33,6 @@ abstract class TypeExpr {
             const dimension = typeArray.length;
             FS.writeSync(fd, `let bTupleType_${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
         });
-        FS.writeSync(fd, "\n");
-
         FS.writeSync(fd, "\n");
     }
     equalTo(ty: TypeExpr): boolean {
