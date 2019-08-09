@@ -748,19 +748,33 @@ class TranslatorBosqueFStar {
 
     generateFStarCode(fkey: string) {
         this.collectExpr(fkey);
-        
+
         const fd = FS.openSync(this.fileName, 'w');
         this.printPrelude(fd);
         FS.writeSync(fd, "\n");
+
+        FS.writeSync(fd, "(* Type names *)\n");
         TypeExpr.declareTypeNames(fd);
         FS.writeSync(fd, "\n");
-        this.mapConstantDeclarations.forEach(value => {
-            value.value.body.forEach(value2 => {
-                value2.ops;
-                this.opsToExpr(value2.ops, "entry", "", );
+
+        FS.writeSync(fd, "(* Constants *)\n");
+        this.mapConstantDeclarations.forEach(constant_decl => {
+            // Constant declaration generally have only two blocks: entry and exit
+            // We just `declare` the entry block
+            constant_decl.value.body.forEach(basicBlock => {
+                if (basicBlock.label == "entry") {
+                    const returnType = TranslatorBosqueFStar.stringTypeToType(constant_decl.declaredType);
+                    const continuation = () => new ReturnExpr(new VarTerm("__ir_ret__", returnType));
+                    TranslatorBosqueFStar.types_seen.set(sanitizeName(constant_decl.cname), returnType);
+                    FS.writeSync(fd, `let ${sanitizeName(constant_decl.cname)} = \n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1)}\n`);
+                }
             });
-        })
+        });
+        FS.writeSync(fd, "\n");
+
+        FS.writeSync(fd, "(* Functions *)\n");
         this.function_declarations.map(x => x.print(fd));
+        
         TranslatorBosqueFStar.closeFS(fd);
     }
 }

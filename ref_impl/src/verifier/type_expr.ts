@@ -23,17 +23,14 @@ abstract class TypeExpr {
         TypedStringType.declared.forEach(x => {
             FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
         });
-        FS.writeSync(fd, "\n");
         UnionType.declared.forEach(x => {
             FS.writeSync(fd, `let bUnionType_${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
         });
-        FS.writeSync(fd, "\n");
         TupleType.declared.forEach(x => {
             const [b, typeArray] = TupleType.mapDeclared.get(x) as [boolean, TypeExpr[]];
             const dimension = typeArray.length;
             FS.writeSync(fd, `let bTupleType_${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
         });
-        FS.writeSync(fd, "\n");
     }
     equalTo(ty: TypeExpr): boolean {
         return this.id == ty.id;
