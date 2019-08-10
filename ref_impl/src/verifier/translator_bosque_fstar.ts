@@ -3,6 +3,17 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
+// PRIORITIES:
+// LoadFieldDefaultValue Not implemented yet
+// ConstructorPrimary Not implemented yet
+// MIRAccessConstantValue Not implemented yet
+// MIRAccessFromField Not implemented yet
+// MIRModifyWithFields Not implemented yetcat
+// MIRAccessFromIndex Not implemented yet
+// MIRIsTypeOfSome Not implemented yet
+// LoadConstTypedString Not implemented yet
+// ConstructorPrimaryCollectionSingletons Not implemented yet
+
 import * as FS from "fs";
 import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
@@ -96,30 +107,14 @@ class TranslatorBosqueFStar {
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
         this.mapConstantDeclarations = masm.constantDecls;
-        console.log("Values: ------------------------------------------------------------");
-        masm.constantDecls.forEach(x => {
-            console.log(x.cname);
-            console.log(x.value.body);
-            console.log(x.declaredType);
-            console.log("");
+        
+        // masm.primitiveInvokeDecls contains all the functions
+
+        // used in the Bosque File from the Core and Collection library
+        // FIX: This is wrong, but temporarily useful
+        masm.primitiveInvokeDecls.forEach((value, index) => {
+            this.mapFuncDeclarations.set(index, (this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl))
         });
-        console.log("Values: ------------------------------------------------------------");
-
-        // FIX: This is wrong, but temporarily useful For Windows Machine
-        ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-            "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-            "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
-            "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-            "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
-                this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
-
-        // // FIX: This is wrong, but temporarily useful For Mac Machine
-        // ["NSCore::List::set<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>",
-        //     "NSCore::List::any<T=NSCore::List<[NSCore::Int, NSCore::Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0]",
-        //     "NSCore::List::filter<T=[NSCore::Int, NSCore::Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0]",
-        //     "NSCore::List::uniform<T=[NSCore::Int, NSCore::Int]>",
-        //     "NSCore::List::at<T=NSCore::None|NSCore::String<NSMain::PlayerMark>>"].map(x => this.mapFuncDeclarations.set(x,
-        //         this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl));
 
         this.fileName = fileName;
     }
@@ -214,7 +209,7 @@ class TranslatorBosqueFStar {
                 }
                 else {
                     if (s.charAt(0) == '{') {
-                        // FIX: Implement actual record type
+                        // FIX: Implement record type
                         return TranslatorBosqueFStar.noneType;
                     }
                     else {
@@ -307,25 +302,31 @@ class TranslatorBosqueFStar {
         switch (op.tag) {
             case MIROpTag.MIRLoadConst: {
                 const opMIRLoadConst = op as MIRLoadConst;
-                console.log(opMIRLoadConst);
+                opMIRLoadConst;
                 TranslatorBosqueFStar.debugging("LoadConst Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadConst", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRLoadConstTypedString: {
                 const opMIRLoadConstTypedString = op as MIRLoadConstTypedString;
-                console.log("The following provides the _location_ of the entity used");
-                console.log(opMIRLoadConstTypedString.tkey);
-                console.log("The following provides the _type_ of the Typed String declared");
-                console.log(opMIRLoadConstTypedString.tskey);
+                opMIRLoadConstTypedString;
+                // console.log("The following provides the _location_ of the entity used");
+                // console.log(opMIRLoadConstTypedString.tkey);
+                // console.log("The following provides the _type_ of the Typed String declared");
+                // console.log(opMIRLoadConstTypedString.tskey);
 
-                TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
+                TranslatorBosqueFStar.debugging("LoadConstTypedString Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadConstTypeString", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             // case MIROpTag.AccessConstField:
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
                 const opMIRLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
                 console.log(opMIRLoadFieldDefaultValue);
-                // CONTINUE:
+                // CONTINUE2:
+
+                // return [TranslatorBosqueFStar.argumentToExpr(opMIRLoadFieldDefaultValue.trgt, fkey, 
+                //     TranslatorBosqueFStar.typeArgumentToType(opReturnAssign.src, fkey)),
+                // TranslatorBosqueFStar.argumentToExpr(opReturnAssign.src, fkey, undefined)];
+
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -343,13 +344,8 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRConstructorPrimary: { // IMPLEMENT:
                 const opConstructorPrimary = op as MIRConstructorPrimary;
+                console.log(opConstructorPrimary);
                 const current_tkey = opConstructorPrimary.tkey
-                // console.log(current_tkey + "---------------------------------------------------");
-                // console.log(this.mapEntityDeclarations.get(current_tkey));
-                // console.log("---------------------------------------------------");
-                // console.log("NSMain::Board" + "---------------------------------------------------");
-                // console.log(this.mapEntityDeclarations.get("NSMain::Board"));
-                // console.log("---------------------------------------------------");
                 // CONTINUE:
                 if (!this.isEkeyDeclared.has(current_tkey)) {
                     this.isEkeyDeclared.add(current_tkey);
@@ -357,7 +353,6 @@ class TranslatorBosqueFStar {
                         new EntityDeclaration(this.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl)
                     );
                 }
-
                 TranslatorBosqueFStar.debugging("ConstructorPrimary Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimary", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
@@ -684,7 +679,6 @@ class TranslatorBosqueFStar {
 
     collectExpr(fkey: string) {
         const declarations = (this.mapFuncDeclarations.get(fkey) as MIRInvokeBodyDecl);
-
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
             throw new Error("The program with fkey " + fkey + " is a string");
@@ -750,6 +744,8 @@ class TranslatorBosqueFStar {
         this.collectExpr(fkey);
 
         const fd = FS.openSync(this.fileName, 'w');
+        // Check Concepts and Entities before emmiting Prelude
+
         this.printPrelude(fd);
         FS.writeSync(fd, "\n");
 
