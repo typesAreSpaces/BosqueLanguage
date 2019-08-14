@@ -102,7 +102,7 @@ let nSMain__id x =
 val nSMain__Board__checkSingleWinner : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
 let nSMain__Board__checkSingleWinner this mark = 
     let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
+        let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
             let __ir_ret__ = __tmp_2 in 
                 let _return_ = __ir_ret__ in 
                     _return_
@@ -141,7 +141,7 @@ let nSMain__id x =
 val nSMain__Board__getOpenCells : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
 let nSMain__Board__getOpenCells this = 
     let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
+        let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
             let __ir_ret__ = __tmp_2 in 
                 let _return_ = __ir_ret__ in 
                     _return_
