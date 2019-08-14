@@ -14,8 +14,8 @@ setImmediate(() => {
     // const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/max/";
     // const directory = "/Users/t-jocast/code/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
     // Linux Machine
-    // const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/";
-    const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
+    const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/";
+    // const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
     
     const fileName = "main.bsq";
     const fkey = "NSMain::main";

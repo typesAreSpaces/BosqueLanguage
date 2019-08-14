@@ -170,7 +170,7 @@ let maxWithTuple' x y =
 let teste0 = maxWithTuple (testb0) (BInt 1203)
 let teste1 = maxWithTuple (testb0) (BInt (-12))
 let teste0' = maxWithTuple' (testb0) (BInt 1203)
-let teste1' = maxWithTuple' (testb0) (BInt (-12))  
+let teste1' = maxWithTuple' (testb0) (BInt (-12))
 
 let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 

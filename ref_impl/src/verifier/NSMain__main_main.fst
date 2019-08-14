@@ -3,247 +3,110 @@ open BosqueOption
 
 (* Type names *)
 let bTypeStringType_BAnyType = (BTypedStringType BAnyType)
-let bTypeStringType_BNoneType = (BTypedStringType BNoneType)
-let bUnionType_bUnionType_BNoneType_bTypeStringType_BNoneType = (BUnionType BNoneType bTypeStringType_BNoneType)
+let bUnionType_bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypeStringType_BAnyType)))
+let bUnionType_bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
+let bUnionType_bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
+let bUnionType_bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
+let bUnionType_bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
+let bUnionType_bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
+let bTupleType_bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType (SCons BIntType SNil))
+let bTupleType_bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypeStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons bTupleType_2BIntType_BIntTypefalse (SCons bTypeStringType_BAnyType (SCons BBoolType (SCons BBoolType SNil))))))))))))))))
+let bTupleType_bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType (SCons BBoolType (SCons BIntType SNil)))
+let bTupleType_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = BTupleType true 4 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BBoolType SNil))))
+let bTupleType_bTupleType_1bTypeStringType_BAnyTypefalse = BTupleType false 1 (SCons bTypeStringType_BAnyType SNil)
+let bTupleType_bTupleType_1bTypeStringType_BAnyTypetrue = BTupleType true 1 (SCons bTypeStringType_BAnyType SNil)
+let bTupleType_bTupleType_2bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 2 (SCons bTupleType_2BIntType_BIntTypefalse (SCons BIntType SNil))
 
 (* Concept Declarations *)
 
 (* Entity Declarations *)
 
 (* Constant Declarations *)
-let nSMain__Board__playerO = 
-    let _LoadConstTypeString = 0 in 
-    let __ir_ret__ = __tmp_0 in 
-    __ir_ret__
-let nSMain__Board__playerX = 
-    let _LoadConstTypeString = 0 in 
-    let __ir_ret__ = __tmp_0 in 
-    __ir_ret__
-let nSMain__Board__winPositionOptions = 
-    let __tmp_2 = (Mktuple__2 0 0) in 
-    let __tmp_5 = (Mktuple__2 0 1) in 
-    let __tmp_8 = (Mktuple__2 0 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_12 = (Mktuple__2 0 1) in 
-    let __tmp_15 = (Mktuple__2 1 1) in 
-    let __tmp_18 = (Mktuple__2 2 1) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_22 = (Mktuple__2 0 2) in 
-    let __tmp_25 = (Mktuple__2 1 2) in 
-    let __tmp_28 = (Mktuple__2 2 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_32 = (Mktuple__2 0 0) in 
-    let __tmp_35 = (Mktuple__2 1 0) in 
-    let __tmp_38 = (Mktuple__2 2 0) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_42 = (Mktuple__2 1 0) in 
-    let __tmp_45 = (Mktuple__2 1 1) in 
-    let __tmp_48 = (Mktuple__2 1 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_52 = (Mktuple__2 2 0) in 
-    let __tmp_55 = (Mktuple__2 2 1) in 
-    let __tmp_58 = (Mktuple__2 2 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_62 = (Mktuple__2 0 0) in 
-    let __tmp_65 = (Mktuple__2 1 1) in 
-    let __tmp_68 = (Mktuple__2 2 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __tmp_72 = (Mktuple__2 0 2) in 
-    let __tmp_75 = (Mktuple__2 1 1) in 
-    let __tmp_78 = (Mktuple__2 2 0) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __ir_ret__ = __tmp_0 in 
-    __ir_ret__
-let nSMain__Board__allCellPositions = 
-    let __tmp_1 = (Mktuple__2 0 0) in 
-    let __tmp_4 = (Mktuple__2 1 0) in 
-    let __tmp_7 = (Mktuple__2 2 0) in 
-    let __tmp_10 = (Mktuple__2 0 1) in 
-    let __tmp_13 = (Mktuple__2 1 1) in 
-    let __tmp_16 = (Mktuple__2 2 1) in 
-    let __tmp_19 = (Mktuple__2 0 2) in 
-    let __tmp_22 = (Mktuple__2 1 2) in 
-    let __tmp_25 = (Mktuple__2 2 2) in 
-    let _ConstructorPrimaryCollectionSingletons = 0 in 
-    let __ir_ret__ = __tmp_0 in 
-    __ir_ret__
 
 (* Function Declarations *)
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
+val nSMain__identityUnion : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType (getType x)})
+let nSMain__identityUnion x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__Board__markCellWith : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
-let nSMain__Board__markCellWith this x y mark = 
-    let _MIRAccessFromField = 0 in 
-        let __tmp_9 = (op_Multiply y 3) in 
-            let __tmp_7 = (op_Addition x __tmp_9) in 
-                let __tmp_6 = (nSCore__List__set<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> __tmp_5 __tmp_7 mark) in 
-                    let _MIRModifyWithFields = 0 in 
-                        let __ir_ret__ = __tmp_2 in 
-                            let _return_ = __ir_ret__ in 
-                                _return_
-
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__Board__checkSingleWinner : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
-let nSMain__Board__checkSingleWinner this mark = 
-    let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
-            let __ir_ret__ = __tmp_2 in 
-                let _return_ = __ir_ret__ in 
-                    _return_
-
-val nSMain__Board__checkForWinner : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BNoneType_bTypeStringType_BNoneType (getType x)})
-let nSMain__Board__checkForWinner this = 
-    let _MIRAccessConstantValue = 0 in 
-        let __tmp_0 = (nSMain__Board__checkSingleWinner this __tmp_2) in 
-            if (op_Equality __tmp_0 true) then 
-                let _MIRAccessConstantValue = 0 in 
-                    let __ir_ret___2 = __tmp_3 in 
-                        let __ir_ret___3 = __ir_ret___2 in 
+val nSMain__max : (x:bosqueTerm{subtypeOf bUnionType_BIntType_BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
+let nSMain__max x y = 
+    let __tmp_0 = true in 
+        if (op_Equality __tmp_0 true) then 
+            let __ir_ret___2 = y in 
+                let __ir_ret___3 = __ir_ret___2 in 
+                    let _return_ = __ir_ret___3 in 
+                        _return_
+        else 
+            let __tmp_4 = (op_GreaterThanOrEqual x y) in 
+                if (op_Equality __tmp_4 true) then 
+                    let __ir_ret___1 = x in 
+                        let __ir_ret___3 = __ir_ret___1 in 
                             let _return_ = __ir_ret___3 in 
                                 _return_
-            else 
-                let _MIRAccessConstantValue = 0 in 
-                    let __tmp_4 = (nSMain__Board__checkSingleWinner this __tmp_6) in 
-                        if (op_Equality __tmp_4 true) then 
-                            let _MIRAccessConstantValue = 0 in 
-                                let __ir_ret___1 = __tmp_7 in 
-                                    let __ir_ret___3 = __ir_ret___1 in 
-                                        let _return_ = __ir_ret___3 in 
-                                            _return_
-                        else 
-                            let __ir_ret__ = none in 
-                                let __ir_ret___3 = __ir_ret__ in 
-                                    let _return_ = __ir_ret___3 in 
-                                        _return_
-
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__Board__getOpenCells : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
-let nSMain__Board__getOpenCells this = 
-    let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
-            let __ir_ret__ = __tmp_2 in 
-                let _return_ = __ir_ret__ in 
-                    _return_
-
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__id x = 
-    let __ir_ret__ = x in 
-        let _return_ = __ir_ret__ in 
-            _return_
-
-val nSMain__Board__getCellContents : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BNoneType_bTypeStringType_BNoneType (getType x)})
-let nSMain__Board__getCellContents this x y = 
-    let _MIRAccessFromField = 0 in 
-        let __tmp_6 = (op_Multiply y 3) in 
-            let __tmp_4 = (op_Addition x __tmp_6) in 
-                let __tmp_3 = (nSCore__List__at<T=NSCore__None|NSCore__String<NSMain__PlayerMark>> __tmp_2 __tmp_4) in 
-                    let __ir_ret__ = __tmp_3 in 
-                        let _return_ = __ir_ret__ in 
-                            _return_
-
-val nSMain__Board__isCellOccupied : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
-let nSMain__Board__isCellOccupied this x y = 
-    let __tmp_1 = (nSMain__Board__getCellContents this x y) in 
-        let _MIRIsTypeOfSome = 0 in 
-            let __ir_ret__ = __tmp_0 in 
-                let _return_ = __ir_ret__ in 
-                    _return_
-
-val nSMain__Game__makeAutoMove : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
-let nSMain__Game__makeAutoMove this mark rnd = 
-    let _MIRAccessFromField = 0 in 
-        let __tmp_5 = (nSMain__Board__isCellOccupied __tmp_4 1 1) in 
-            let __tmp_1 = (op_Negation __tmp_5) in 
-                if (op_Equality __tmp_1 true) then 
-                    let _MIRAccessFromField = 0 in 
-                        let __tmp_11 = (nSMain__Board__markCellWith __tmp_10 1 1 mark) in 
-                            let nboard_1 = __tmp_11 in 
-                                let nboard_2 = nboard_1 in 
-                                    let __tmp_34 = (nSMain__Board__checkForWinner nboard_2) in 
-                                        let _MIRModifyWithFields = 0 in 
-                                            let __ir_ret__ = __tmp_32 in 
-                                                let _return_ = __ir_ret__ in 
-                                                    _return_
                 else 
-                    let _MIRAccessFromField = 0 in 
-                        let __tmp_18 = (nSMain__Board__getOpenCells __tmp_17) in 
-                            let opts = __tmp_18 in 
-                                let __tmp_19 = (nSCore__List__uniform<T=[NSCore__Int, NSCore__Int]> opts rnd) in 
-                                    let tup = __tmp_19 in 
-                                        let _MIRAccessFromField = 0 in 
-                                            let _MIRAccessFromIndex = 0 in 
-                                                let _MIRAccessFromIndex = 0 in 
-                                                    let __tmp_25 = (nSMain__Board__markCellWith __tmp_24 __tmp_28 __tmp_29 mark) in 
-                                                        let nboard = __tmp_25 in 
-                                                            let nboard_2 = nboard in 
-                                                                let __tmp_34 = (nSMain__Board__checkForWinner nboard_2) in 
-                                                                    let _MIRModifyWithFields = 0 in 
-                                                                        let __ir_ret__ = __tmp_32 in 
-                                                                            let _return_ = __ir_ret__ in 
-                                                                                _return_
-
-val nSMain__Game__makeExplicitMove : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
-let nSMain__Game__makeExplicitMove this x y mark = 
-    let _MIRAccessFromField = 0 in 
-        let __tmp_3 = (nSMain__Board__markCellWith __tmp_2 x y mark) in 
-            let nboard = __tmp_3 in 
-                let __tmp_11 = (nSMain__Board__checkForWinner nboard) in 
-                    let _MIRModifyWithFields = 0 in 
-                        let __ir_ret__ = __tmp_9 in 
-                            let _return_ = __ir_ret__ in 
+                    let __ir_ret__ = y in 
+                        let __ir_ret___3 = __ir_ret__ in 
+                            let _return_ = __ir_ret___3 in 
                                 _return_
 
-val nSMain__main : (x:bosqueTerm{subtypeOf BNoneType (getType x)})
+val nSMain__identityTupleOptional : (x:bosqueTerm{subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType x)})
+let nSMain__identityTupleOptional x = 
+    let __ir_ret__ = x in 
+        let _return_ = __ir_ret__ in 
+            _return_
+
+val nSMain__identityOpenTuple : (x:bosqueTerm{subtypeOf bTupleType_1bTypeStringType_BAnyTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bTupleType_1bTypeStringType_BAnyTypetrue (getType x)})
+let nSMain__identityOpenTuple x = 
+    let __ir_ret__ = x in 
+        let _return_ = __ir_ret__ in 
+            _return_
+
+val nSMain__maxx : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType (getType x)})
+let nSMain__maxx x y = 
+    let __tmp_0 = (op_GreaterThan y 0) in 
+        if (op_Equality __tmp_0 true) then 
+            let __ir_ret___1 = x in 
+                let __ir_ret___2 = __ir_ret___1 in 
+                    let _return_ = __ir_ret___2 in 
+                        _return_
+        else 
+            let __ir_ret__ = y in 
+                let __ir_ret___2 = __ir_ret__ in 
+                    let _return_ = __ir_ret___2 in 
+                        _return_
+
+val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__main  = 
-    let __tmp_0 = (nSMain__id 1) in 
-        let x = __tmp_0 in 
-            let _LoadFieldDefaultValue = 0 in 
-                let _LoadFieldDefaultValue = 0 in 
-                    let _ConstructorPrimary = 0 in 
-                        let game = __tmp_2 in 
-                            let _MIRAccessConstantValue = 0 in 
-                                let __tmp_5 = (nSMain__Game__makeAutoMove game __tmp_7 0) in 
-                                    let game_1 = __tmp_5 in 
-                                        let _MIRAccessConstantValue = 0 in 
-                                            let __tmp_9 = (nSMain__Game__makeAutoMove game_1 __tmp_11 1) in 
-                                                let game_2 = __tmp_9 in 
-                                                    let _MIRAccessConstantValue = 0 in 
-                                                        let __tmp_13 = (nSMain__Game__makeAutoMove game_2 __tmp_15 2) in 
-                                                            let game_3 = __tmp_13 in 
-                                                                let _MIRAccessConstantValue = 0 in 
-                                                                    let __tmp_17 = (nSMain__Game__makeExplicitMove game_3 2 0 __tmp_21) in 
-                                                                        let game_4 = __tmp_17 in 
-                                                                            let _MIRAccessConstantValue = 0 in 
-                                                                                let __tmp_22 = (nSMain__Game__makeExplicitMove game_4 2 1 __tmp_26) in 
-                                                                                    let game_5 = __tmp_22 in 
-                                                                                        let __ir_ret__ = game_5 in 
-                                                                                            let _return_ = __ir_ret__ in 
-                                                                                                _return_
+    let string_test = "string_test" in 
+        let _LoadConstTypeString = 0 in 
+            let player1 = __tmp_1 in 
+                let n = none in 
+                    let __tmp_3 = (Mktuple__2 10 30) in 
+                        let xTuple2 = __tmp_3 in 
+                            let __tmp_19 = (Mktuple__2 1 1) in 
+                                let __tmp_6 = (Mktuple__16 1 1 1 1 1 1 1 1 1 1 1 1 __tmp_19 "hello" false true) in 
+                                    let x2 = __tmp_6 in 
+                                        let y = 20 in 
+                                            let __tmp_26 = (nSMain__identityUnion y) in 
+                                                let y2 = __tmp_26 in 
+                                                    let _MIRAccessFromIndex = 0 in 
+                                                        let __tmp_28 = (nSMain__max __tmp_31 y) in 
+                                                            let z = __tmp_28 in 
+                                                                let __tmp_33 = (nSMain__max z y) in 
+                                                                    let z_max_func_repeated = __tmp_33 in 
+                                                                        let __tmp_37 = (Mktuple__3 1 true 2) in 
+                                                                            let __tmp_36 = (nSMain__identityTupleOptional __tmp_37) in 
+                                                                                let z2 = __tmp_36 in 
+                                                                                    let __tmp_42 = (Mktuple__1 "hello") in 
+                                                                                        let __tmp_41 = (nSMain__identityOpenTuple __tmp_42) in 
+                                                                                            let z3 = __tmp_41 in 
+                                                                                                let __tmp_44 = (nSMain__maxx false 3) in 
+                                                                                                    let z4 = __tmp_44 in 
+                                                                                                        let __tmp_47 = (Mktuple__2 xTuple2 y) in 
+                                                                                                            let zTuple2 = __tmp_47 in 
+                                                                                                                let __ir_ret__ = z in 
+                                                                                                                    let _return_ = __ir_ret__ in 
+                                                                                                                        _return_
 

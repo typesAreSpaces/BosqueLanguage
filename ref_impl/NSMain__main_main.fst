@@ -1,13 +1,75 @@
 module NSMain__main_main
 open BosqueOption
 
+(* Type names *)
 let bTypeStringType_BAnyType = (BTypedStringType BAnyType)
 let bTypeStringType_BNoneType = (BTypedStringType BNoneType)
-
 let bUnionType_bUnionType_BNoneType_bTypeStringType_BNoneType = (BUnionType BNoneType bTypeStringType_BNoneType)
 
+(* Concept Declarations *)
 
+(* Entity Declarations *)
 
+(* Constant Declarations *)
+let nSMain__Board__playerO = 
+    let _LoadConstTypeString = 0 in 
+    let __ir_ret__ = __tmp_0 in 
+    __ir_ret__
+let nSMain__Board__playerX = 
+    let _LoadConstTypeString = 0 in 
+    let __ir_ret__ = __tmp_0 in 
+    __ir_ret__
+let nSMain__Board__winPositionOptions = 
+    let __tmp_2 = (Mktuple__2 0 0) in 
+    let __tmp_5 = (Mktuple__2 0 1) in 
+    let __tmp_8 = (Mktuple__2 0 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_12 = (Mktuple__2 0 1) in 
+    let __tmp_15 = (Mktuple__2 1 1) in 
+    let __tmp_18 = (Mktuple__2 2 1) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_22 = (Mktuple__2 0 2) in 
+    let __tmp_25 = (Mktuple__2 1 2) in 
+    let __tmp_28 = (Mktuple__2 2 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_32 = (Mktuple__2 0 0) in 
+    let __tmp_35 = (Mktuple__2 1 0) in 
+    let __tmp_38 = (Mktuple__2 2 0) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_42 = (Mktuple__2 1 0) in 
+    let __tmp_45 = (Mktuple__2 1 1) in 
+    let __tmp_48 = (Mktuple__2 1 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_52 = (Mktuple__2 2 0) in 
+    let __tmp_55 = (Mktuple__2 2 1) in 
+    let __tmp_58 = (Mktuple__2 2 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_62 = (Mktuple__2 0 0) in 
+    let __tmp_65 = (Mktuple__2 1 1) in 
+    let __tmp_68 = (Mktuple__2 2 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __tmp_72 = (Mktuple__2 0 2) in 
+    let __tmp_75 = (Mktuple__2 1 1) in 
+    let __tmp_78 = (Mktuple__2 2 0) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __ir_ret__ = __tmp_0 in 
+    __ir_ret__
+let nSMain__Board__allCellPositions = 
+    let __tmp_1 = (Mktuple__2 0 0) in 
+    let __tmp_4 = (Mktuple__2 1 0) in 
+    let __tmp_7 = (Mktuple__2 2 0) in 
+    let __tmp_10 = (Mktuple__2 0 1) in 
+    let __tmp_13 = (Mktuple__2 1 1) in 
+    let __tmp_16 = (Mktuple__2 2 1) in 
+    let __tmp_19 = (Mktuple__2 0 2) in 
+    let __tmp_22 = (Mktuple__2 1 2) in 
+    let __tmp_25 = (Mktuple__2 2 2) in 
+    let _ConstructorPrimaryCollectionSingletons = 0 in 
+    let __ir_ret__ = __tmp_0 in 
+    __ir_ret__
+
+(* Function Declarations *)
 val nSMain__id : (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__id x = 
     let __ir_ret__ = x in 
@@ -40,7 +102,7 @@ let nSMain__id x =
 val nSMain__Board__checkSingleWinner : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf bTypeStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
 let nSMain__Board__checkSingleWinner this mark = 
     let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
+        let __tmp_2 = (nSCore__List__any<T=NSCore__List<[NSCore__Int, NSCore__Int]>>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%78%0] __tmp_1 mark this) in 
             let __ir_ret__ = __tmp_2 in 
                 let _return_ = __ir_ret__ in 
                     _return_
@@ -79,7 +141,7 @@ let nSMain__id x =
 val nSMain__Board__getOpenCells : (x:bosqueTerm{subtypeOf BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BNoneType (getType x)})
 let nSMain__Board__getOpenCells this = 
     let _MIRAccessConstantValue = 0 in 
-        let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/Users/joseabelcastellanosjoo/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
+        let __tmp_2 = (nSCore__List__filter<T=[NSCore__Int, NSCore__Int]>[/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/main.bsq%44%0] __tmp_1 this) in 
             let __ir_ret__ = __tmp_2 in 
                 let _return_ = __ir_ret__ in 
                     _return_
