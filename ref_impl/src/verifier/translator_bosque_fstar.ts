@@ -122,7 +122,7 @@ class TranslatorBosqueFStar {
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         // TODO: Change to the appropriate Prelude
-        FS.writeSync(fd, `open BosqueOption\n`);
+        FS.writeSync(fd, `open BosqueTypes\n`);
     }
 
     static closeFS(fd: number): void {
@@ -744,6 +744,7 @@ class TranslatorBosqueFStar {
         this.collectExpr(fkey);
 
         const fd = FS.openSync(this.fileName, 'w');
+
         // Check Concepts and Entities before emmiting Prelude
 
         this.printPrelude(fd);

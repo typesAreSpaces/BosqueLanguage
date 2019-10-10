@@ -19,14 +19,17 @@ abstract class TypeExpr {
     }
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
+    
     static declareTypeNames(fd: number): void {
+        UnionType.mapDeclared.forEach((_, x) => {
+            FS.writeSync(fd, `let bUnionType_${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
+        });
+        
         TypedStringType.declared.forEach(x => {
             FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
         });
-        UnionType.declared.forEach(x => {
-            FS.writeSync(fd, `let bUnionType_${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
-        });
-        TupleType.declared.forEach(x => {
+        
+        TupleType.mapDeclared.forEach((_, x) => {
             const [b, typeArray] = TupleType.mapDeclared.get(x) as [boolean, TypeExpr[]];
             const dimension = typeArray.length;
             FS.writeSync(fd, `let bTupleType_${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
@@ -71,7 +74,7 @@ class TruthyType extends TypeExpr {
         super("BTruthyType");
     }
     getFStarTerm() {
-        return "(bosqueTerm)";
+        return "(bosqueTerm)"; // <- Does this need to be changed?
     }
     getBosqueType() {
         return "NSCore::Truthy";
@@ -91,15 +94,13 @@ class NoneType extends TypeExpr {
 }
 
 class UnionType extends TypeExpr {
-    static declared: Set<string> = new Set<string>();
     static mapDeclared: Map<string, TypeExpr[]> = new Map<string, TypeExpr[]>();
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
 
     constructor(elements: Set<TypeExpr>) {
         super("bUnionType_" + Array.from(elements).sort().map(x => x.getFStarTypeName()).join("_"));
         this.elements = elements;
-        if (!UnionType.declared.has(this.id)) {
-            UnionType.declared.add(this.id);
+        if (UnionType.mapDeclared.get(this.id) == undefined) {
             UnionType.mapDeclared.set(this.id, Array.from(elements).sort());
         }
     }
@@ -178,7 +179,6 @@ class TypedStringType extends TypeExpr {
 }
 
 class TupleType extends TypeExpr {
-    static declared: Set<string> = new Set<string>();
     static mapDeclared: Map<string, [boolean, TypeExpr[]]> = new Map<string, [boolean, TypeExpr[]]>();
     readonly isOpen: boolean;
     readonly elements: TypeExpr[];
@@ -187,8 +187,7 @@ class TupleType extends TypeExpr {
         super("bTupleType_" + elements.length + elements.map(x => x.getFStarTypeName()).join("_") + isOpen);
         this.isOpen = isOpen;
         this.elements = elements;
-        if (!TupleType.declared.has(this.id)) {
-            TupleType.declared.add(this.id);
+        if (TupleType.mapDeclared.get(this.id) == undefined) {
             TupleType.mapDeclared.set(this.id,
                 [this.isOpen, this.elements]);
         }

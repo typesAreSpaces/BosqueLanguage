@@ -1,14 +1,19 @@
 module NSMain__main_main
-open BosqueOption
+open BosqueTypes
 
 (* Type names *)
+
 let bTypeStringType_BAnyType = (BTypedStringType BAnyType)
+
 let bUnionType_bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypeStringType_BAnyType)))
 let bUnionType_bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
 let bUnionType_bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
 let bUnionType_bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
 let bUnionType_bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
 let bUnionType_bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
+
+
+
 let bTupleType_bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType (SCons BIntType SNil))
 let bTupleType_bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypeStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons bTupleType_2BIntType_BIntTypefalse (SCons bTypeStringType_BAnyType (SCons BBoolType (SCons BBoolType SNil))))))))))))))))
 let bTupleType_bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType (SCons BBoolType (SCons BIntType SNil)))

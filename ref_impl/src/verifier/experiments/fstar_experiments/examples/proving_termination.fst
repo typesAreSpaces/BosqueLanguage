@@ -4,10 +4,13 @@ val f0 : n:nat -> Tot nat (decreases (-n+1))
 let rec f0 n = if (n > 0) then 0 else f0 (n + 1)
 
 val f6 : n:nat -> Tot nat (decreases (-n + 7))
-let rec f6 n = if (n > 6) then 0 else f6 (n + 1)
+let rec f6 n = if (n > 6) then 0 else f6 (n + 1) 
 
-val lemma_f6 : n:nat -> Lemma (f6 n == 0)
+val lemma_f6 : n:nat -> Lemma (f6 n == 0) 
 let lemma_f6 n = ()
+
+val ff : nat -> Tot nat
+let rec ff x = if (x = 0) then 0 else ff (x - 1) + 1
 
 val f7 : n:nat -> Tot nat (decreases (-n + 8))
 let rec f7 n = if (n > 7) then 0 else f7 (n + 1) 

@@ -12,6 +12,7 @@ let rec append_assoc l1 l2 l3 = match l1 with
 | [] -> ()
 | _ :: tl -> append_assoc tl l2 l3
 
+
 let rec reverse = function
 | [] -> []
 | hd :: tl -> append (reverse tl) [hd]
