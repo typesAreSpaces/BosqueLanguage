@@ -107,7 +107,7 @@ class TranslatorBosqueFStar {
         this.mapConceptDeclarations = masm.conceptDecls;
         this.mapEntityDeclarations = masm.entityDecls;
         this.mapConstantDeclarations = masm.constantDecls;
-        
+
         // masm.primitiveInvokeDecls contains all the functions
 
         // used in the Bosque File from the Core and Collection library
@@ -122,7 +122,9 @@ class TranslatorBosqueFStar {
     printPrelude(fd: number): void {
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
         // TODO: Change to the appropriate Prelude
+        FS.writeSync(fd, `open Sequence\n`);
         FS.writeSync(fd, `open BosqueTypes\n`);
+        FS.writeSync(fd, `open BosqueTerms\n`);
     }
 
     static closeFS(fd: number): void {
@@ -681,7 +683,7 @@ class TranslatorBosqueFStar {
         const declarations = (this.mapFuncDeclarations.get(fkey) as MIRInvokeBodyDecl);
         const mapBlocks = (declarations.body as MIRBody).body;
         if (typeof (mapBlocks) === "string") {
-            throw new Error("The program with fkey " + fkey + " is a string");
+            throw new Error("The program with fkey " + fkey + " is just a string");
         }
         else {
             declarations.params.map(x =>

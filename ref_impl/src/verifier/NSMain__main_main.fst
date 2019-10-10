@@ -1,26 +1,23 @@
 module NSMain__main_main
+open Sequence
 open BosqueTypes
+open BosqueTerms
 
 (* Type names *)
-
-let bTypeStringType_BAnyType = (BTypedStringType BAnyType)
-
-let bUnionType_bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypeStringType_BAnyType)))
-let bUnionType_bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
-let bUnionType_bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
-let bUnionType_bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
-let bUnionType_bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
-let bUnionType_bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
-
-
-
-let bTupleType_bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType (SCons BIntType SNil))
-let bTupleType_bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypeStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons BIntType (SCons bTupleType_2BIntType_BIntTypefalse (SCons bTypeStringType_BAnyType (SCons BBoolType (SCons BBoolType SNil))))))))))))))))
-let bTupleType_bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType (SCons BBoolType (SCons BIntType SNil)))
-let bTupleType_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = BTupleType true 4 (SCons BIntType (SCons BBoolType (SCons BIntType (SCons BBoolType SNil))))
-let bTupleType_bTupleType_1bTypeStringType_BAnyTypefalse = BTupleType false 1 (SCons bTypeStringType_BAnyType SNil)
-let bTupleType_bTupleType_1bTypeStringType_BAnyTypetrue = BTupleType true 1 (SCons bTypeStringType_BAnyType SNil)
-let bTupleType_bTupleType_2bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 2 (SCons bTupleType_2BIntType_BIntTypefalse (SCons BIntType SNil))
+let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BIntType 0 SNil))
+let bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypedStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType 15 (SCons BIntType 14 (SCons BIntType 13 (SCons BIntType 12 (SCons BIntType 11 (SCons BIntType 10 (SCons BIntType 9 (SCons BIntType 8 (SCons BIntType 7 (SCons BIntType 6 (SCons BIntType 5 (SCons BIntType 4 (SCons bTupleType_2BIntType_BIntTypefalse 3 (SCons bTypedStringType_BAnyType 2 (SCons BBoolType 1 (SCons BBoolType 0 SNil))))))))))))))))
+let bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType 2 (SCons BBoolType 1 (SCons BIntType 0 SNil)))
+let bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = BTupleType true 4 (SCons BIntType 3 (SCons BBoolType 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))))
+let bTupleType_1bTypedStringType_BAnyTypefalse = BTupleType false 1 (SCons bTypedStringType_BAnyType 0 SNil)
+let bTupleType_1bTypedStringType_BAnyTypetrue = BTupleType true 1 (SCons bTypedStringType_BAnyType 0 SNil)
+let bTupleType_2bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 2 (SCons bTupleType_2BIntType_BIntTypefalse 1 (SCons BIntType 0 SNil))
+let bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypedStringType_BAnyType)))
+let bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
+let bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
+let bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
+let bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
+let bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
 
 (* Concept Declarations *)
 
@@ -29,7 +26,7 @@ let bTupleType_bTupleType_2bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BT
 (* Constant Declarations *)
 
 (* Function Declarations *)
-val nSMain__identityUnion : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypeStringType_BAnyType (getType x)})
+val nSMain__identityUnion : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType (getType x)})
 let nSMain__identityUnion x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 
@@ -62,7 +59,7 @@ let nSMain__identityTupleOptional x =
         let _return_ = __ir_ret__ in 
             _return_
 
-val nSMain__identityOpenTuple : (x:bosqueTerm{subtypeOf bTupleType_1bTypeStringType_BAnyTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bTupleType_1bTypeStringType_BAnyTypetrue (getType x)})
+val nSMain__identityOpenTuple : (x:bosqueTerm{subtypeOf bTupleType_1bTypedStringType_BAnyTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bTupleType_1bTypedStringType_BAnyTypetrue (getType x)})
 let nSMain__identityOpenTuple x = 
     let __ir_ret__ = x in 
         let _return_ = __ir_ret__ in 

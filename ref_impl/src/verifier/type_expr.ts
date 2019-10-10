@@ -8,7 +8,7 @@ import * as FS from "fs";
 abstract class TypeExpr {
     // String expression denoting the type 
     // used inside function declaration in FStar
-    readonly id : string;
+    readonly id: string;
     constructor(id: string) {
         this.id = id;
     }
@@ -19,21 +19,34 @@ abstract class TypeExpr {
     }
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
-    
+
     static declareTypeNames(fd: number): void {
-        UnionType.mapDeclared.forEach((_, x) => {
-            FS.writeSync(fd, `let bUnionType_${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
-        });
-        
+        // ----------------------------
+        // This needs to be reorganized
+
         TypedStringType.declared.forEach(x => {
-            FS.writeSync(fd, `let bTypeStringType_${x} = (BTypedStringType ${x})\n`);
+            // Adding bTypedStringType at the beginning here is necessary
+            // because TypedStringType.declared only keeps track of the elements
+            // of the constructor type
+            FS.writeSync(fd, `let bTypedStringType_${x} = (BTypedStringType ${x})\n`);
         });
-        
+
         TupleType.mapDeclared.forEach((_, x) => {
             const [b, typeArray] = TupleType.mapDeclared.get(x) as [boolean, TypeExpr[]];
             const dimension = typeArray.length;
-            FS.writeSync(fd, `let bTupleType_${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
+            // Here the index contains the constructor information
+            // Hence, the constructor information is not added
+            FS.writeSync(fd, `let ${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
         });
+
+        UnionType.mapDeclared.forEach((_, x) => {
+            // Here the index contains the constructor information
+            // Hence, the constructor information is not added
+            FS.writeSync(fd, `let ${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
+        });
+
+        
+        // ----------------------------
     }
     equalTo(ty: TypeExpr): boolean {
         return this.id == ty.id;
@@ -161,7 +174,7 @@ class TypedStringType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
-        super("bTypeStringType_" + ty.getFStarTypeName());
+        super("bTypedStringType_" + ty.getFStarTypeName());
         this.ty = ty;
         const stringType = ty.getFStarTypeName();
         if (!TypedStringType.declared.has(stringType)) {
@@ -175,7 +188,7 @@ class TypedStringType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
-    }    
+    }
 }
 
 class TupleType extends TypeExpr {
@@ -207,7 +220,8 @@ class TupleType extends TypeExpr {
         }
         else {
             const tail = types.slice(1);
-            return "(SCons " + types[0].getFStarTypeName() + " " + this.toFStarTuple(tail) + ")";
+            return "(SCons " + types[0].getFStarTypeName() + " "
+                + (types.length - 1) + " " + this.toFStarTuple(tail) + ")";
         }
     }
 }
