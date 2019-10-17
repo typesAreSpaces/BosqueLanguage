@@ -78,6 +78,9 @@ let maxWithUnion' x y = match x with
   | BInt x2 -> if (x1 > x2) then x else BInt x2
 )
 
+
+
+
 (* Testing: maxWithUnion *)
 let testd1 = maxWithUnion (BInt 12) (BInt 10)
 let testd2 = maxWithUnion (BInt 10) (BInt 12)
@@ -107,6 +110,8 @@ let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (
 && (extractBool (eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt y)))
 && (extractBool ((eqTerm (maxWithUnion2 (BBool z) (BInt x)) (BInt x))))
 )
+
+// type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)}
 
 val maxWithUnion3 : termUnionIntBool -> termInt -> termInt
 let maxWithUnion3 x y = match x with 

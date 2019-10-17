@@ -5,12 +5,66 @@
 
 import * as FS from "fs";
 
+abstract class TypeDecl {
+    abstract emit(fd: number): void;
+}
+
+class TypedStringTypeDecl extends TypeDecl {
+    readonly stringType: string;
+    constructor(stringType: string) {
+        super();
+        this.stringType = stringType;
+    }
+    emit(fd: number) {
+        // Adding bTypedStringType at the beginning here is necessary
+        // because TypedStringType.declared only keeps track of the elements
+        // of the constructor type
+        FS.writeSync(fd, `let bTypedStringType_${this.stringType} = (BTypedStringType ${this.stringType})\n`);
+    }
+}
+
+class TupleTypeDecl extends TypeDecl {
+    readonly stringType: string;
+    readonly b: boolean;
+    readonly typeArray: TypeExpr[];
+    constructor(stringType: string, b: boolean, typeArray: TypeExpr[]) {
+        super();
+        this.stringType = stringType;
+        this.b = b;
+        this.typeArray = typeArray;
+    }
+    emit(fd: number) {
+        // Here the index contains the constructor informati    on
+        // Hence, the constructor information is not added  
+        FS.writeSync(fd, `let ${this.stringType} = BTupleType ${this.b} ${this.typeArray.length} ${TupleType.toFStarTuple(this.typeArray)}\n`);
+    }
+}
+
+class UnionTypeDecl extends TypeDecl {
+    readonly stringType: string;
+    readonly typeArray: TypeExpr[];
+    constructor(stringType: string, typeArray: TypeExpr[]) {
+        super();
+        this.stringType = stringType;
+        this.typeArray = typeArray;
+    }
+    emit(fd: number) {
+        // Here the index contains the constructor information
+        // Hence, the constructor information is not added
+        FS.writeSync(fd, `let ${this.stringType} = ${UnionType.toFStarUnion(this.typeArray)}\n`);
+    }
+}
+
 abstract class TypeExpr {
     // String expression denoting the type 
     // used inside function declaration in FStar
     readonly id: string;
+    readonly serialID: number;
+    static counterSerialID = 0;
     constructor(id: string) {
         this.id = id;
+        this.serialID = TypeExpr.counterSerialID;
+        ++TypeExpr.counterSerialID;
     }
     abstract getFStarTerm(): string;
     // String name associated to the type in FStar
@@ -21,32 +75,20 @@ abstract class TypeExpr {
     abstract getBosqueType(): string;
 
     static declareTypeNames(fd: number): void {
-        // ----------------------------
-        // This needs to be reorganized
-
-        TypedStringType.declared.forEach(x => {
-            // Adding bTypedStringType at the beginning here is necessary
-            // because TypedStringType.declared only keeps track of the elements
-            // of the constructor type
-            FS.writeSync(fd, `let bTypedStringType_${x} = (BTypedStringType ${x})\n`);
+        const declarator = new Map<number, TypeDecl>();
+        UnionType.mapDeclared.forEach((y, x) => {
+            const [typeArray, serialID] = y;
+            declarator.set(serialID, new UnionTypeDecl(x, typeArray))
+        });
+        TypedStringType.declared.forEach((y, x) => {
+            declarator.set(y, new TypedStringTypeDecl(x));
+        });
+        TupleType.mapDeclared.forEach((y, x) => {
+            const [b, typeArray, serialID] = y;
+            declarator.set(serialID, new TupleTypeDecl(x, b, typeArray));
         });
 
-        TupleType.mapDeclared.forEach((_, x) => {
-            const [b, typeArray] = TupleType.mapDeclared.get(x) as [boolean, TypeExpr[]];
-            const dimension = typeArray.length;
-            // Here the index contains the constructor information
-            // Hence, the constructor information is not added
-            FS.writeSync(fd, `let ${x} = BTupleType ${b} ${dimension} ${TupleType.toFStarTuple(typeArray)}\n`);
-        });
-
-        UnionType.mapDeclared.forEach((_, x) => {
-            // Here the index contains the constructor information
-            // Hence, the constructor information is not added
-            FS.writeSync(fd, `let ${x} = ${UnionType.toFStarUnion(UnionType.mapDeclared.get(x) as TypeExpr[])}\n`);
-        });
-
-        
-        // ----------------------------
+        (new Map([...declarator.entries()].sort((a, b) => a[0] - b[0]))).forEach((y, _) => y.emit(fd));
     }
     equalTo(ty: TypeExpr): boolean {
         return this.id == ty.id;
@@ -107,14 +149,14 @@ class NoneType extends TypeExpr {
 }
 
 class UnionType extends TypeExpr {
-    static mapDeclared: Map<string, TypeExpr[]> = new Map<string, TypeExpr[]>();
+    static mapDeclared: Map<string, [TypeExpr[], number]> = new Map<string, [TypeExpr[], number]>();
     readonly elements: Set<TypeExpr> = new Set<TypeExpr>();
 
     constructor(elements: Set<TypeExpr>) {
         super("bUnionType_" + Array.from(elements).sort().map(x => x.getFStarTypeName()).join("_"));
         this.elements = elements;
         if (UnionType.mapDeclared.get(this.id) == undefined) {
-            UnionType.mapDeclared.set(this.id, Array.from(elements).sort());
+            UnionType.mapDeclared.set(this.id, [Array.from(elements).sort(), this.serialID]);
         }
     }
     getFStarTerm() {
@@ -171,14 +213,14 @@ class IntType extends TypeExpr {
 }
 
 class TypedStringType extends TypeExpr {
-    static declared: Set<string> = new Set<string>();
+    static declared: Map<string, number> = new Map<string, number>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
-        super("bTypedStringType_" + ty.getFStarTypeName());
-        this.ty = ty;
         const stringType = ty.getFStarTypeName();
-        if (!TypedStringType.declared.has(stringType)) {
-            TypedStringType.declared.add(stringType);
+        super("bTypedStringType_" + stringType);
+        this.ty = ty;
+        if (!TypedStringType.declared.get(stringType)) {
+            TypedStringType.declared.set(stringType, this.serialID);
         }
     }
     getFStarTerm() {
@@ -192,7 +234,7 @@ class TypedStringType extends TypeExpr {
 }
 
 class TupleType extends TypeExpr {
-    static mapDeclared: Map<string, [boolean, TypeExpr[]]> = new Map<string, [boolean, TypeExpr[]]>();
+    static mapDeclared: Map<string, [boolean, TypeExpr[], number]> = new Map<string, [boolean, TypeExpr[], number]>();
     readonly isOpen: boolean;
     readonly elements: TypeExpr[];
 
@@ -202,7 +244,7 @@ class TupleType extends TypeExpr {
         this.elements = elements;
         if (TupleType.mapDeclared.get(this.id) == undefined) {
             TupleType.mapDeclared.set(this.id,
-                [this.isOpen, this.elements]);
+                [this.isOpen, this.elements, this.serialID]);
         }
     }
     getFStarTerm() {

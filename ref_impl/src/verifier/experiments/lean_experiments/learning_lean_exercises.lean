@@ -38,6 +38,12 @@ assume p : Prop,
 assume hyp1, 
 hyp1 (or.intro_right p (assume hyp : p, hyp1 (or.intro_left (p → false) hyp)))
 
+theorem neg_neg_excludded_middle_3 : Π p : Prop, ((p ∨ (p → false)) → false) → false :=
+assume p : Prop,
+assume f : (p ∨ (p → false)) → false, 
+let subproof1  := assume g : p, f (or.intro_left (p → false) g) in
+let subproof2 := or.intro_right p subproof1 in
+f subproof2
 
 end final_exercise
 

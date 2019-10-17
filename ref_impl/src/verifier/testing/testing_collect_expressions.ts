@@ -16,13 +16,11 @@ setImmediate(() => {
     // Linux Machine
     const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/";
     // const directory = "/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/tictactoe/";
-    
     const fileName = "main.bsq";
     const fkey = "NSMain::main";
-
     const masm = bosqueToMASM({ directory: directory, fileName: fileName }); 
-    let fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
-    fstarFileName = fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1);
+    const fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
 
-    (new TranslatorBosqueFStar(masm, fstarFileName)).generateFStarCode(fkey);
+    (new TranslatorBosqueFStar(masm, 
+        fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1))).generateFStarCode(fkey);
 });

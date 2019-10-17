@@ -35,7 +35,7 @@ function bosqueToMASM(info: PathFile): MIRAssembly {
         throw new Error(`Read failed with exception -- ${ex}\n`);
     }
 
-    const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), files);
+    const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), true, true, true, files);
 
     if (errors.length !== 0) {
         for (let i = 0; i < errors.length; ++i) {

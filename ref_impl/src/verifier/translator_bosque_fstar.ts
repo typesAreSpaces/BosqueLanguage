@@ -112,7 +112,7 @@ class TranslatorBosqueFStar {
 
         // used in the Bosque File from the Core and Collection library
         // FIX: This is wrong, but temporarily useful
-        masm.primitiveInvokeDecls.forEach((value, index) => {
+        masm.primitiveInvokeDecls.forEach((_, index) => {
             this.mapFuncDeclarations.set(index, (this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl))
         });
 
@@ -682,6 +682,13 @@ class TranslatorBosqueFStar {
     collectExpr(fkey: string) {
         const declarations = (this.mapFuncDeclarations.get(fkey) as MIRInvokeBodyDecl);
         const mapBlocks = (declarations.body as MIRBody).body;
+        // ---------------------------------------------------------
+        // Checking vtypes -----------------------------------------
+        // const valueTypes = (declarations.body as MIRBody).vtypes;
+        // console.log(`Inside ${fkey}`);
+        // console.log(valueTypes);
+        // console.log("\n");
+        // ---------------------------------------------------------
         if (typeof (mapBlocks) === "string") {
             throw new Error("The program with fkey " + fkey + " is just a string");
         }
@@ -745,7 +752,7 @@ class TranslatorBosqueFStar {
     generateFStarCode(fkey: string) {
         this.collectExpr(fkey);
 
-        const fd = FS.openSync(this.fileName, 'w');
+        const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
 
         // Check Concepts and Entities before emmiting Prelude
 
