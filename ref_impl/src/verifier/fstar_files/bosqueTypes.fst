@@ -118,7 +118,6 @@ let rec subtypeOf x y = match x, y with
 // | BEnumType, ? -> ?
 // | BCustomType, ? -> ?
 // | BKeyedType, ? -> ?
-| BErrorType, BErrorType -> true
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with

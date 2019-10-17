@@ -42,8 +42,8 @@ let nSMain__max x y =
           let _return_ = __ir_ret___3 in 
             _return_
     else 
-      let __tmp_4 = (op_GreaterThanOrEqual x y) in 
-        if (op_Equality __tmp_4 true) then 
+      let __tmp_4 = (op_greaterOrEq x y) in 
+        if (op_Equality (extractBool __tmp_4) true) then 
           let __ir_ret___1 = x in 
             let __ir_ret___3 = __ir_ret___1 in 
               let _return_ = __ir_ret___3 in 
@@ -68,7 +68,7 @@ let nSMain__identityOpenTuple x =
 
 val nSMain__maxx : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType (getType x)})
 let nSMain__maxx x y = 
-  let __tmp_0 = (op_GreaterThan y 0) in 
+  let __tmp_0 = (op_greater y 0) in 
     if (op_Equality __tmp_0 true) then 
       let __ir_ret___1 = x in 
         let __ir_ret___2 = __ir_ret___1 in 

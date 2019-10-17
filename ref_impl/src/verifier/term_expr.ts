@@ -10,14 +10,14 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     // TODO: Add more reserved words from FStar
     static readonly binOpToFStar: Map<string, string> = new Map<string, string>([
-        ["&&", "op_AmpAmp"], ["||", "op_BarBar"],
-        ["*", "op_Multiply"], ["-", "op_Subtraction"], ["+", "op_Addition"], ["%", "op_Modulus"], ["/", "op_Division"],
-        ["<=", "op_LessThanOrEqual"], [">", "op_GreaterThan"], [">=", "op_GreaterThanOrEqual"], ["<", "op_LessThan"],
-        ["==", "op_Equality"], ["!=", "op_disEquality"]
+        ["&&", "op_and"], ["||", "op_or"],
+        ["*", "op_mult"], ["-", "op_sub"], ["+", "op_add"], ["%", "op_mod"], ["/", "op_div"],
+        ["<=", "op_lessOrEq"], [">", "op_greater"], [">=", "op_greaterOrEq"], ["<", "op_less"],
+        ["==", "op_eqTerm"], ["!=", "op_notEqTerm"] 
     ]);
     static readonly unaryOpToFStar: Map<string, string> = new Map<string, string>([
-        ["!", "op_Negation"],
-        ["-", "op_Minus"]
+        ["!", "op_not"],
+        ["-", "op_neg"]
     ]);
     constructor(symbolName: string, ty: TypeExpr) {
         this.symbolName = symbolName;

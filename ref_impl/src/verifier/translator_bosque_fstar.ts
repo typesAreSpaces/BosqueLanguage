@@ -82,7 +82,7 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
 
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType);
-    static readonly DEBUGGING = false;
+    static readonly DEBUGGING = true;
 
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from

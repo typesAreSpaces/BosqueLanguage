@@ -87,28 +87,28 @@ let testd2 = maxWithUnion (BInt 10) (BInt 12)
 let testd3 = maxWithUnion (BBool false) (BInt 12)
 
 (* The following assertion proves that maxWithUnion is correctly implemented *)
-let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion (BInt x) (BInt y)) (BInt x)) 
-&& extractBool (greaterOrEq (maxWithUnion (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt y)))
-&& extractBool ((eqTerm (maxWithUnion (BBool z) (BInt x)) (BInt x)))
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion (BInt x) (BInt y)) (BInt y)))
+&& extractBool ((op_eqTerm (maxWithUnion (BBool z) (BInt x)) (BInt x)))
 )
 
 (* The following assertion proves that maxWithUnion' is correctly implemented *)
-let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion' (BInt x) (BInt y)) (BInt x)) 
-&& extractBool (greaterOrEq (maxWithUnion' (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt y)))
-&& extractBool ((eqTerm (maxWithUnion' (BBool z) (BInt x)) (BInt x)))
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion' (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion' (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion' (BInt x) (BInt y)) (BInt y)))
+&& extractBool ((op_eqTerm (maxWithUnion' (BBool z) (BInt x)) (BInt x)))
 )
 
 val maxWithUnion2 : termUnionIntBool -> termInt -> termInt
 let maxWithUnion2 x y = match x with 
 | BBool _ -> y 
-| BInt _ -> if (extractBool (greaterOrEq x y)) then x else y 
+| BInt _ -> if (extractBool (op_greaterOrEq_num x y)) then x else y 
 
-let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) 
-&& extractBool (greaterOrEq (maxWithUnion2 (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt y)))
-&& (extractBool ((eqTerm (maxWithUnion2 (BBool z) (BInt x)) (BInt x))))
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion2 (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion2 (BInt x) (BInt y)) (BInt y)))
+&& (extractBool ((op_eqTerm (maxWithUnion2 (BBool z) (BInt x)) (BInt x))))
 )
 
 // type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)}
@@ -116,38 +116,56 @@ let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion2 (BInt x) (
 val maxWithUnion3 : termUnionIntBool -> termInt -> termInt
 let maxWithUnion3 x y = match x with 
 | BBool _ -> y 
-| _ -> if (extractBool (greaterOrEq x y)) then x else y
+| _ -> if (extractBool (op_greaterOrEq_num x y)) then x else y
 
-let _ = assert (forall x y z. extractBool (greaterOrEq (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) 
-&& extractBool (greaterOrEq (maxWithUnion3 (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt y)))
-&& (extractBool ((eqTerm (maxWithUnion3 (BBool z) (BInt x)) (BInt x))))
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion3 (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion3 (BInt x) (BInt y)) (BInt y)))
+&& (extractBool ((op_eqTerm (maxWithUnion3 (BBool z) (BInt x)) (BInt x))))
 )
 
-(* ----------------------------------------------------------------------------------------------------------------------------------------------------------- *)
+val maxWithUnion4 : termUnionIntBool -> termInt -> termInt
+let maxWithUnion4 x y = if (isBool x) then y else if (extractBool (op_greaterOrEq_num x y)) then x else y
+
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion4 (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion4 (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion4 (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion4 (BInt x) (BInt y)) (BInt y)))
+   && (extractBool ((op_eqTerm (maxWithUnion4 (BBool z) (BInt x)) (BInt x))))) 
+
+let unionTypeIntBool = BUnionType BIntType BBoolType
+
+val maxWithUnion5 : x:bosqueTerm{subtypeOf unionTypeIntBool (getType x)} -> x:bosqueTerm{subtypeOf BIntType (getType x)} -> x:bosqueTerm{subtypeOf BIntType (getType x)}
+let maxWithUnion5 x y = if (isBool x) then y else if (extractBool (op_greaterOrEq_num x y)) then x else y
+
+let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (maxWithUnion5 (BInt x) (BInt y)) (BInt x)) 
+&& extractBool (op_greaterOrEq_num (maxWithUnion5 (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (maxWithUnion5 (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (maxWithUnion5 (BInt x) (BInt y)) (BInt y)))
+   && (extractBool ((op_eqTerm (maxWithUnion5 (BBool z) (BInt x)) (BInt x))))) 
+
+(* ------------------------------------------------------------------------------------------------------------------------------------ *)
 
 val max : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> z:bosqueTerm{isInt z}
-let max x y = if (extractBool (greaterOrEq x y)) then x else y
+let max x y = if (extractBool (op_greaterOrEq_num x y)) then x else y
 
-let _ = assert (forall x y. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt x) )
-&& extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
+let _ = assert (forall x y. extractBool (op_greaterOrEq_num (max (BInt x) (BInt y)) (BInt x) )
+&& extractBool (op_greaterOrEq_num (max (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (max (BInt x) (BInt y)) (BInt y)))
 )
 
 // New version of max using subtypeOf
 val max' : x:bosqueTerm{subtypeOf (BIntType) (getType x)} -> y:bosqueTerm{subtypeOf (BIntType) (getType y)} -> z:bosqueTerm{subtypeOf (BIntType) (getType z)}
-let max' x y = if (extractBool (greaterOrEq x y)) then x else y
+let max' x y = if (extractBool (op_greaterOrEq_num x y)) then x else y
 
-let _ = assert (forall x y. extractBool (greaterOrEq (max' (BInt x) (BInt y)) (BInt x) )
-&& extractBool (greaterOrEq (max' (BInt x) (BInt y)) (BInt y))
-&& (extractBool (eqTerm (max' (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max' (BInt x) (BInt y)) (BInt y)))
+let _ = assert (forall x y. extractBool (op_greaterOrEq_num (max' (BInt x) (BInt y)) (BInt x) )
+&& extractBool (op_greaterOrEq_num (max' (BInt x) (BInt y)) (BInt y))
+&& (extractBool (op_eqTerm (max' (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (max' (BInt x) (BInt y)) (BInt y)))
 )
 
 // // The following fails, as expected
-// let _ = assert (forall x y z. extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt x) )
-// && extractBool (greaterOrEq (max (BInt x) (BInt y)) (BInt y))
-// && (extractBool (eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (eqTerm (max (BInt x) (BInt y)) (BInt y)))
-// && (extractBool (eqTerm (max (BInt x) (BBool z)) (BInt x)))
+// let _ = assert (forall x y z. extractBool (op_greaterOrEq_num (max (BInt x) (BInt y)) (BInt x) )
+// && extractBool (op_greaterOrEq_num (max (BInt x) (BInt y)) (BInt y))
+// && (extractBool (op_eqTerm (max (BInt x) (BInt y)) (BInt x)) || extractBool (op_eqTerm (max (BInt x) (BInt y)) (BInt y)))
+// && (extractBool (op_eqTerm (max (BInt x) (BBool z)) (BInt x)))
 // )
 
 (* ----------------------------------------------------------------------------------------------------------------------------------------------------------- *)
@@ -157,7 +175,7 @@ val maxWithTuple : x:bosqueTerm{isTuple false 2 (SCons (BIntType) 1 (SCons (BBoo
   -> z:bosqueTerm{isInt z}
 let maxWithTuple x y = 
   let xAt0 = nthTuple 0 2 x in 
-    if (extractBool (greaterOrEq xAt0 y)) then xAt0 
+    if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 
     else y
 
 let typeTuple2BIntBBool = BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))
@@ -168,7 +186,7 @@ val maxWithTuple' : x:bosqueTerm{subtypeOf typeTuple2BIntBBool (getType x)}
   -> z:bosqueTerm{isInt z}
 let maxWithTuple' x y = 
   let xAt0 = nthTuple 0 2 x in 
-    if (extractBool (greaterOrEq xAt0 y)) then xAt0 
+    if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 
     else y
     
 (* Testing: maxWithTuple *)
@@ -177,9 +195,9 @@ let teste1 = maxWithTuple (testb0) (BInt (-12))
 let teste0' = maxWithTuple' (testb0) (BInt 1203)
 let teste1' = maxWithTuple' (testb0) (BInt (-12))
 
-let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . extractBool (op_greaterOrEq_num (maxWithTuple x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (op_greaterOrEq_num (maxWithTuple x y) (nthTuple 0 2 x)))
 
 (* ----------------------------------------------------------------------------------------------------------------------------------------------------------- *)
 
@@ -190,16 +208,16 @@ let maxWithTuple'' x y = match x with
 | BTuple 2 seq -> 
   let xAt0 = nthTuple 0 2 x in 
     match xAt0 with 
-    | BInt x1 -> if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    | BInt x1 -> if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 else y
     | _ -> BError
 
 (* Testing: maxWithTuple'' *)
 let test5a = maxWithTuple'' (testb0) (BInt 1203)
 let test5b = maxWithTuple'' (testb0) (BInt (-12))
 
-// let _ = assert (forall x y . extractBool (greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
+// let _ = assert (forall x y . extractBool (op_greaterOrEq_num (maxWithTuple2 x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (greaterOrEq (maxWithTuple'' x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (op_greaterOrEq_num (maxWithTuple'' x y) (nthTuple 0 2 x)))
 
 (* ----------------------------------------------------------------------------------------------------------------------------------------------------------- *)
 
@@ -212,14 +230,14 @@ val maxWithTuple''' : x:bosqueTerm{(subtypeOf closedTuple2_Int_Bool (getType x))
 let maxWithTuple''' x y = match x with 
 | BTuple 2 seq -> 
   let xAt0 = nthTuple 0 2 x in 
-    if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 else y
 
 // New version of maxWithTuple''' (shorter representation)
 val maxWithTuple'''' : x:bosqueTerm{(subtypeOf closedTuple2_Int_Bool (getType x))} 
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple'''' x y = let xAt0 = nthTuple 0 2 x in 
-    if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+    if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 else y
   
 // // Idk why the following doesn't work like maxWithTuple''''
 // val maxWithTuple''''' : x:bosqueTerm{subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType x)} 
@@ -228,7 +246,7 @@ let maxWithTuple'''' x y = let xAt0 = nthTuple 0 2 x in
 // let maxWithTuple''''' x y = match x with 
 // | BTuple 2 seq -> 
 //   let xAt0 = nthTuple 0 2 x in 
-//     if (extractBool (greaterOrEq xAt0 y)) then xAt0 else y
+//     if (extractBool (op_greaterOrEq_num xAt0 y)) then xAt0 else y
 
 // // The following two examples are interesting because they maxWithTuple'''' fails to
 // // type check the fact that (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) has

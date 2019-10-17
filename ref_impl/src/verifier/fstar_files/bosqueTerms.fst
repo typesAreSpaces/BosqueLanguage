@@ -55,6 +55,12 @@ let isInt x = match x with
 | BInt _ -> true
 | _ -> false 
 
+val isNonZero : x:bosqueTerm -> Tot bool
+let isNonZero x = match x with 
+| BInt 0 -> false
+| BInt _ -> true
+| _ -> false
+
 val isTypedString : bosqueType -> bosqueTerm -> Tot bool
 let isTypedString ty x = match x with 
 | BTypedString _ ty' -> eqType ty ty'
@@ -107,48 +113,105 @@ let extractBool3 x = match x with
 | BBool y -> y 
 (* ------------------------------------------------------------------------ *)
 
+(* Boolean Operations *)
+
 (* Definition of equality relation on Bosque terms *)
-val eqTerm_aux : n:nat 
+val op_eqTerm_aux : n:nat 
   -> (x:sequence bosqueTerm n) 
   -> sequence bosqueTerm n 
-  -> Tot (z:bosqueTerm{isBool z \/ isError z}) (decreases x)
-val eqTerm : x:bosqueTerm 
+  -> Tot (z:bosqueTerm{isBool z}) (decreases x)
+val op_eqTerm : x:bosqueTerm 
   -> bosqueTerm 
-  -> Tot (z:bosqueTerm{isBool z \/ isError z})  (decreases x)
-let rec eqTerm x y = match x, y with
+  -> Tot (z:bosqueTerm{isBool z})  (decreases x)
+let rec op_eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
 | BBool x1, BBool y1 -> BBool (x1 = y1)
 | BInt x1, BInt y1 -> BBool (x1 = y1)
 | BTypedString s1 ty1, BTypedString s2 ty2 -> BBool (s1 = s2 && eqType ty1 ty2)
 | BGUID s1 n1, BGUID s2 n2 -> BBool (s1 = s2 && n1 = n2)
-| BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BError
-                                   else eqTerm_aux n1 seq1 seq2
+| BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BBool (false)
+                                   else op_eqTerm_aux n1 seq1 seq2
 // FIX: Include case for BRecord
 // | BError, BError -> BBool true
-| _, _ -> BError
+| _, _ -> BBool (false)
 and 
-eqTerm_aux n x y = match x with
+op_eqTerm_aux n x y = match x with
 | SNil -> (match y with
          | SNil -> BBool true
-         | _ -> BError
+         | _ -> BBool (false)
          )
 | SCons x1 m xs1 -> (match y with
-                   | SNil -> BError
-                   | SCons y1 m' ys1 -> (match (eqTerm x1 y1) with
-                                       | BBool b1 -> (match (eqTerm_aux m xs1 ys1) with
+                   | SNil -> BBool (false)
+                   | SCons y1 m' ys1 -> (match (op_eqTerm x1 y1) with
+                                       | BBool b1 -> (match (op_eqTerm_aux m xs1 ys1) with
                                                     | BBool b2 -> BBool ((m = m') && b1 && b2)
-                                                    | _ -> BError
+                                                    | _ -> BBool (false)
                                                     )
-                                       | _ -> BError 
+                                       | _ -> BBool (false) 
                                        )
                    )
 
-(* Definition of greater than or equal relation on Bosque terms *)
-val greaterOrEq : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt x} -> Tot (x:bosqueTerm{isBool x \/ isError x})
-let greaterOrEq x y = match x, y with
-| BInt x1, BInt y1 -> BBool (x1 >= y1)
+val op_notEqTerm : x:bosqueTerm 
+  -> bosqueTerm 
+  -> Tot (z:bosqueTerm{isBool z})  (decreases x)
+let op_notEqTerm x y = match (op_eqTerm x y) with
+| BBool result -> BBool (not result)
+
+val op_not : x:bosqueTerm{isBool x} -> Tot (z:bosqueTerm{isBool z}) 
+let op_not x = match x with
+| BBool x1 -> BBool (not x1) 
+
+val op_and : x:bosqueTerm{isBool x} -> y:bosqueTerm{isBool y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_and x y = match x, y with
+| BBool x1, BBool y1 -> BBool (x1 && y1) 
+
+val op_or : x:bosqueTerm{isBool x} -> y:bosqueTerm{isBool y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_or x y = match x, y with
+| BBool x1, BBool y1 -> BBool (x1 || y1) 
+
+(* Number operations *)
+val op_mult : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isInt z})
+let op_mult x y = match x, y with
+| BInt x1, BInt y1 -> BInt (op_Multiply x1 y1)
+
+val op_sub : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isInt z})
+let op_sub x y = match x, y with
+| BInt x1, BInt y1 -> BInt (x1 - y1)
+
+val op_add : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isInt z})
+let op_add x y = match x, y with
+| BInt x1, BInt y1 -> BInt (x1 + y1)
+
+val op_neg : x:bosqueTerm{isInt x} -> Tot (z:bosqueTerm{isInt z})
+let op_neg x = match x with
+| BInt x1 -> BInt (-x1)
+
+val op_mod : x:bosqueTerm{isInt x} -> y:bosqueTerm{isNonZero y} -> Tot (z:bosqueTerm{isInt z})
+let op_mod x y = match x, y with
+| BInt x1, BInt y1 -> BInt (x1 % y1)
+
+val op_div : x:bosqueTerm{isInt x} -> y:bosqueTerm{isNonZero y} -> Tot (z:bosqueTerm{isInt z})
+let op_div x y = match x, y with
+| BInt x1, BInt y1 -> BInt (x1 / y1)
+
+// --------------------------------------------------------------------------------------------------
 // TODO: Include case for Strings
-| _, _ -> BError
+val op_greaterOrEq : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_greaterOrEq x y = match x, y with
+| BInt x1, BInt y1 -> BBool (x1 >= y1) 
+
+val op_greater : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_greater x y = match x, y with
+| BInt x1, BInt y1 -> BBool (x1 > y1) 
+
+val op_lessOrEq : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_lessOrEq x y = match x, y with
+| BInt x1, BInt y1 -> BBool (x1 <= y1) 
+
+val op_less : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) 
+let op_less x y = match x, y with
+| BInt x1, BInt y1 -> BBool (x1 < y1) 
+// --------------------------------------------------------------------------------------------------
 
 (* Tuple Type projector *)
 val nthTupleType : index:int -> dimension:nat -> x:bosqueTerm -> Tot (bosqueType)

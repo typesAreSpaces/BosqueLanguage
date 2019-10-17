@@ -34,7 +34,7 @@ class TupleTypeDecl extends TypeDecl {
         this.typeArray = typeArray;
     }
     emit(fd: number) {
-        // Here the index contains the constructor informati    on
+        // Here the index contains the constructor information
         // Hence, the constructor information is not added  
         FS.writeSync(fd, `let ${this.stringType} = BTupleType ${this.b} ${this.typeArray.length} ${TupleType.toFStarTuple(this.typeArray)}\n`);
     }
