@@ -1,0 +1,720 @@
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'string_test',
+       rtype: 'NSCore::String' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRConstantString],
+       name: [MIRVariable] },
+     MIRConstructorPrimary {
+       tag: 'MIRConstructorPrimary',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       tkey: 'NSMain::PlayerMark',
+       args: [Array] },
+     MIRConstructorPrimary {
+       tag: 'MIRConstructorPrimary',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       tkey: 'NSMain::Dude',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'node',
+       rtype: 'NSMain::Dude' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorPrimary {
+       tag: 'MIRConstructorPrimary',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       tkey: 'NSMain::PlayerMark',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'player1',
+       rtype: 'NSMain::PlayerMark' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRLoadConstTypedString {
+       tag: 'MIRLoadConstTypedString',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       ivalue: '\'x\'',
+       tkey: 'NSMain::PlayerMark',
+       tskey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
+       pfunckey: 'NSMain::PlayerMark::tryParse' },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'player2',
+       rtype: 'NSCore::StringOf<T=NSMain::PlayerMark>' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorPrimary {
+       tag: 'MIRConstructorPrimary',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       tkey: 'NSMain::Dude',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'node1',
+       rtype: 'NSMain::Dude' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorPrimary {
+       tag: 'MIRConstructorPrimary',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       tkey: 'NSMain::Dude',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'node2',
+       rtype: 'NSMain::Dude' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'n',
+       rtype: 'NSCore::None' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRConstantNone],
+       name: [MIRVariable] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType: '[NSCore::Int, NSCore::Int]',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'xTuple2',
+       rtype: '[NSCore::Int, NSCore::Int]' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType: '[NSCore::Int, NSCore::Int]',
+       args: [Array] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType:
+        '[NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, [NSCore::Int, NSCore::Int], NSCore::String, NSCore::Bool, NSCore::Bool]',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'x2',
+       rtype:
+        '[NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, NSCore::Int, [NSCore::Int, NSCore::Int], NSCore::String, NSCore::Bool, NSCore::Bool]' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'y',
+       rtype: 'NSCore::Int' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRConstantInt],
+       name: [MIRVariable] },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType: 'NSCore::Bool | NSCore::Int | NSCore::None | NSCore::String',
+       mkey: 'NSMain::identityUnion',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'y2',
+       rtype: 'NSCore::Bool | NSCore::Int | NSCore::None | NSCore::String' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRAccessFromIndex {
+       tag: 'MIRAccessFromIndex',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultAccessType: 'NSCore::Int',
+       arg: [MIRVariable],
+       idx: 0 },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType: 'NSCore::Int',
+       mkey: 'NSMain::max',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'z',
+       rtype: 'NSCore::Int' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType: 'NSCore::Int',
+       mkey: 'NSMain::max',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'z_max_func_repeated',
+       rtype: 'NSCore::Int' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType: '[NSCore::Int, NSCore::Bool, NSCore::Int]',
+       args: [Array] },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType:
+        '[NSCore::Int, NSCore::Bool, NSCore::Int, ?:NSCore::None, ?:NSCore::Bool, ...]',
+       mkey: 'NSMain::identityTupleOptional',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'z2',
+       rtype:
+        '[NSCore::Int, NSCore::Bool, NSCore::Int, ?:NSCore::None, ?:NSCore::Bool, ...]' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType: '[NSCore::String]',
+       args: [Array] },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType: '[NSCore::String, ...]',
+       mkey: 'NSMain::identityOpenTuple',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'z3',
+       rtype: '[NSCore::String, ...]' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRInvokeFixedFunction {
+       tag: 'MIRInvokeFixedFunction',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultType: 'NSCore::Bool | NSCore::Int | NSCore::None',
+       mkey: 'NSMain::maxx',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'z4',
+       rtype: 'NSCore::Bool | NSCore::Int | NSCore::None' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRConstructorTuple {
+       tag: 'MIRConstructorTuple',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       resultTupleType: '[[NSCore::Int, NSCore::Int], NSCore::Int]',
+       args: [Array] },
+     MIRVarLifetimeStart {
+       tag: 'MIRVarLifetimeStart',
+       sinfo: [SourceInfo],
+       name: 'zTuple2',
+       rtype: '[[NSCore::Int, NSCore::Int], NSCore::Int]' },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRTempRegister],
+       name: [MIRVariable] },
+     MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 142,
+  ops:
+   [ 'v-begin string_test',
+     'string_test = "string_test"',
+     '_#tmp_6 = NSMain::PlayerMark@("o")',
+     '_#tmp_1 = NSMain::Dude@(100, true, "Cornell", "Chris", _#tmp_6)',
+     'v-begin node',
+     'node = _#tmp_1',
+     '_#tmp_8 = NSMain::PlayerMark@("x")',
+     'v-begin player1',
+     'player1 = _#tmp_8',
+     '_#tmp_10 = \'x\'#NSMain::PlayerMark',
+     'v-begin player2',
+     'player2 = _#tmp_10',
+     '_#tmp_11 = NSMain::Dude@(100, true, "Pan", "Peter", player1)',
+     'v-begin node1',
+     'node1 = _#tmp_11',
+     '_#tmp_17 = NSMain::Dude@(100, true, "Cornell", "Chris", player1)',
+     'v-begin node2',
+     'node2 = _#tmp_17',
+     'v-begin n',
+     'n = none',
+     '_#tmp_24 = [10, 30]',
+     'v-begin xTuple2',
+     'xTuple2 = _#tmp_24',
+     '_#tmp_40 = [1, 1]',
+     '_#tmp_27 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, _#tmp_40, "hello", false, true]',
+     'v-begin x2',
+     'x2 = _#tmp_27',
+     'v-begin y',
+     'y = 20',
+     '_#tmp_47 = NSMain::identityUnion::(y)',
+     'v-begin y2',
+     'y2 = _#tmp_47',
+     '_#tmp_52 = xTuple2[0]',
+     '_#tmp_49 = NSMain::max::(_#tmp_52, y)',
+     'v-begin z',
+     'z = _#tmp_49',
+     '_#tmp_54 = NSMain::max::(z, y)',
+     'v-begin z_max_func_repeated',
+     'z_max_func_repeated = _#tmp_54',
+     '_#tmp_58 = [1, true, 2]',
+     '_#tmp_57 = NSMain::identityTupleOptional::(_#tmp_58)',
+     'v-begin z2',
+     'z2 = _#tmp_57',
+     '_#tmp_63 = ["hello"]',
+     '_#tmp_62 = NSMain::identityOpenTuple::(_#tmp_63)',
+     'v-begin z3',
+     'z3 = _#tmp_62',
+     '_#tmp_65 = NSMain::maxx::(false, 3)',
+     'v-begin z4',
+     'z4 = _#tmp_65',
+     '_#tmp_68 = [xTuple2, y]',
+     'v-begin zTuple2',
+     'zTuple2 = _#tmp_68',
+     '__ir_ret__ = z',
+     'jump exit' ] }
+{ label: 'exit', line: -1, ops: [ '_return_ = __ir_ret__' ] }
+MIRLoadConstTypedString {
+  tag: 'MIRLoadConstTypedString',
+  sinfo: SourceInfo { line: 147, column: 0, pos: 3120, span: 10 },
+  trgt: MIRTempRegister { nameID: '_#tmp_10', regID: 10 },
+  ivalue: '\'x\'',
+  tkey: 'NSMain::PlayerMark',
+  tskey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
+  pfunckey: 'NSMain::PlayerMark::tryParse' }
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 29,
+  ops: [ '__ir_ret__ = x', 'jump exit' ] }
+{ label: 'exit', line: -1, ops: [ '_return_ = __ir_ret__' ] }
+MIRAccessFromIndex Not implemented yet
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRIsTypeOfNone {
+       tag: 'MIRIsTypeOfNone',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       arg: [MIRVariable] },
+     MIRJumpCond {
+       tag: 'MIRJumpCond',
+       sinfo: [SourceInfo],
+       arg: [MIRTempRegister],
+       trueblock: 'Lifstmt_0true_3',
+       falseblock: 'Lifstmt_0false_4' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRPhi {
+       tag: 'MIRPhi',
+       sinfo: [SourceInfo],
+       src: [Map],
+       trgt: [MIRVariable] },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+MIRBasicBlock { label: 'Lifstmt_done_2', ops: [] }
+MIRBasicBlock {
+  label: 'Lifstmt_0true_3',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'Lifstmt_0false_4',
+  ops:
+   [ MIRBinCmp {
+       tag: 'MIRBinCmp',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       lhs: [MIRVariable],
+       op: '>=',
+       rhs: [MIRVariable] },
+     MIRJumpCond {
+       tag: 'MIRJumpCond',
+       sinfo: [SourceInfo],
+       arg: [MIRTempRegister],
+       trueblock: 'Lifstmt_0true_6',
+       falseblock: 'Lifstmt_0false_7' } ] }
+MIRBasicBlock { label: 'Lifstmt_done_5', ops: [] }
+MIRBasicBlock {
+  label: 'Lifstmt_0true_6',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'Lifstmt_0false_7',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 47,
+  ops:
+   [ '_#tmp_0 = $isNoneType(x)',
+     'cjump _#tmp_0 Lifstmt_0true_3 Lifstmt_0false_4' ] }
+{ label: 'exit',
+  line: 46,
+  ops:
+   [ '__ir_ret__$3 = (__ir_ret__ -- Lifstmt_0false_7, __ir_ret__$1 -- Lifstmt_0true_6, __ir_ret__$2 -- Lifstmt_0true_3)',
+     '_return_ = __ir_ret__$3' ] }
+{ label: 'Lifstmt_done_2', line: -1, ops: [] }
+{ label: 'Lifstmt_0true_3',
+  line: 48,
+  ops: [ '__ir_ret__$2 = y', 'jump exit' ] }
+{ label: 'Lifstmt_0false_4',
+  line: 51,
+  ops:
+   [ '_#tmp_4 = x>=y',
+     'cjump _#tmp_4 Lifstmt_0true_6 Lifstmt_0false_7' ] }
+{ label: 'Lifstmt_done_5', line: -1, ops: [] }
+{ label: 'Lifstmt_0true_6',
+  line: 52,
+  ops: [ '__ir_ret__$1 = x', 'jump exit' ] }
+{ label: 'Lifstmt_0false_7',
+  line: 55,
+  ops: [ '__ir_ret__ = y', 'jump exit' ] }
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRIsTypeOfNone {
+       tag: 'MIRIsTypeOfNone',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       arg: [MIRVariable] },
+     MIRJumpCond {
+       tag: 'MIRJumpCond',
+       sinfo: [SourceInfo],
+       arg: [MIRTempRegister],
+       trueblock: 'Lifstmt_0true_3',
+       falseblock: 'Lifstmt_0false_4' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRPhi {
+       tag: 'MIRPhi',
+       sinfo: [SourceInfo],
+       src: [Map],
+       trgt: [MIRVariable] },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+MIRBasicBlock { label: 'Lifstmt_done_2', ops: [] }
+MIRBasicBlock {
+  label: 'Lifstmt_0true_3',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'Lifstmt_0false_4',
+  ops:
+   [ MIRBinCmp {
+       tag: 'MIRBinCmp',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       lhs: [MIRVariable],
+       op: '>=',
+       rhs: [MIRVariable] },
+     MIRJumpCond {
+       tag: 'MIRJumpCond',
+       sinfo: [SourceInfo],
+       arg: [MIRTempRegister],
+       trueblock: 'Lifstmt_0true_6',
+       falseblock: 'Lifstmt_0false_7' } ] }
+MIRBasicBlock { label: 'Lifstmt_done_5', ops: [] }
+MIRBasicBlock {
+  label: 'Lifstmt_0true_6',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'Lifstmt_0false_7',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 47,
+  ops:
+   [ '_#tmp_0 = $isNoneType(x)',
+     'cjump _#tmp_0 Lifstmt_0true_3 Lifstmt_0false_4' ] }
+{ label: 'exit',
+  line: 46,
+  ops:
+   [ '__ir_ret__$3 = (__ir_ret__ -- Lifstmt_0false_7, __ir_ret__$1 -- Lifstmt_0true_6, __ir_ret__$2 -- Lifstmt_0true_3)',
+     '_return_ = __ir_ret__$3' ] }
+{ label: 'Lifstmt_done_2', line: -1, ops: [] }
+{ label: 'Lifstmt_0true_3',
+  line: 48,
+  ops: [ '__ir_ret__$2 = y', 'jump exit' ] }
+{ label: 'Lifstmt_0false_4',
+  line: 51,
+  ops:
+   [ '_#tmp_4 = x>=y',
+     'cjump _#tmp_4 Lifstmt_0true_6 Lifstmt_0false_7' ] }
+{ label: 'Lifstmt_done_5', line: -1, ops: [] }
+{ label: 'Lifstmt_0true_6',
+  line: 52,
+  ops: [ '__ir_ret__$1 = x', 'jump exit' ] }
+{ label: 'Lifstmt_0false_7',
+  line: 55,
+  ops: [ '__ir_ret__ = y', 'jump exit' ] }
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 41,
+  ops: [ '__ir_ret__ = x', 'jump exit' ] }
+{ label: 'exit', line: -1, ops: [ '_return_ = __ir_ret__' ] }
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 33,
+  ops: [ '__ir_ret__ = x', 'jump exit' ] }
+{ label: 'exit', line: -1, ops: [ '_return_ = __ir_ret__' ] }
+More detailed Blocks:---------------------------------------------------------
+MIRBasicBlock {
+  label: 'entry',
+  ops:
+   [ MIRBinCmp {
+       tag: 'MIRBinCmp',
+       sinfo: [SourceInfo],
+       trgt: [MIRTempRegister],
+       lhs: [MIRVariable],
+       op: '>',
+       rhs: [MIRConstantInt] },
+     MIRJumpCond {
+       tag: 'MIRJumpCond',
+       sinfo: [SourceInfo],
+       arg: [MIRTempRegister],
+       trueblock: 'Lifstmt_0true_3',
+       falseblock: 'Lifstmt_0false_4' } ] }
+MIRBasicBlock {
+  label: 'exit',
+  ops:
+   [ MIRPhi {
+       tag: 'MIRPhi',
+       sinfo: [SourceInfo],
+       src: [Map],
+       trgt: [MIRVariable] },
+     MIRVarStore {
+       tag: 'MIRVarStore',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] } ] }
+MIRBasicBlock { label: 'Lifstmt_done_2', ops: [] }
+MIRBasicBlock {
+  label: 'Lifstmt_0true_3',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+MIRBasicBlock {
+  label: 'Lifstmt_0false_4',
+  ops:
+   [ MIRReturnAssign {
+       tag: 'MIRReturnAssign',
+       sinfo: [SourceInfo],
+       src: [MIRVariable],
+       name: [MIRVariable] },
+     MIRJump { tag: 'MIRJump', sinfo: [SourceInfo], trgtblock: 'exit' } ] }
+More detailed++ Blocks:-------------------------------------------------------
+{ label: 'entry',
+  line: 61,
+  ops:
+   [ '_#tmp_0 = y>0',
+     'cjump _#tmp_0 Lifstmt_0true_3 Lifstmt_0false_4' ] }
+{ label: 'exit',
+  line: 60,
+  ops:
+   [ '__ir_ret__$2 = (__ir_ret__ -- Lifstmt_0false_4, __ir_ret__$1 -- Lifstmt_0true_3)',
+     '_return_ = __ir_ret__$2' ] }
+{ label: 'Lifstmt_done_2', line: -1, ops: [] }
+{ label: 'Lifstmt_0true_3',
+  line: 62,
+  ops: [ '__ir_ret__$1 = x', 'jump exit' ] }
+{ label: 'Lifstmt_0false_4',
+  line: 65,
+  ops: [ '__ir_ret__ = y', 'jump exit' ] }

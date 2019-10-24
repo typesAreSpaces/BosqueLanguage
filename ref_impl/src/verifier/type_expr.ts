@@ -4,6 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
+import { sanitizeName } from "./util";
 
 abstract class TypeDecl {
     abstract emit(fd: number): void;
@@ -347,11 +348,31 @@ class KeyedType extends TypeExpr {
     }
 }
 
+// For the moment
+// TODO: Proper implementation
+class ConstructorType extends TypeExpr {
+    readonly fields: [string, TypeExpr][];
+    constructor(constructorName: string, fields: [string, TypeExpr][]) {
+        super(constructorName);
+        this.fields = fields;
+    }
+    getFStarTerm() {
+        const missingStuff = "";
+        return "(x:bosqueTerm{subtypeOf B"
+            + sanitizeName(this.id) + "Type " + missingStuff + "(getType x))";
+
+    }
+    getBosqueType() {
+        return this.id;
+    }
+}
+
 export {
     TypeExpr,
     AnyType, SomeType, TruthyType,
     NoneType, UnionType, BoolType,
     IntType, TypedStringType, TupleType,
     RecordType, FuncType, ObjectType,
-    EnumType, CustomKeyType, KeyedType
+    EnumType, CustomKeyType, KeyedType,
+    ConstructorType
 }; 

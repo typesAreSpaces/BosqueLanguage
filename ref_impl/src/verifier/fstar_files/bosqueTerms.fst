@@ -35,6 +35,24 @@ getTypeSeq n x = match x with
 | SNil -> SNil
 | SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)
 
+(* Definition of getType *)
+val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
+val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
+let rec getType x = match x with
+| BNone -> BNoneType
+| BBool _ -> BBoolType
+| BInt _ -> BIntType
+| BTypedString _ content_type -> BTypedStringType content_type
+| BGUID _ _ -> BGUIDType
+| BTuple n y -> BTupleType false n (getTypeSeq n y)
+// FIX: The following is incomplete
+| BRecord _ _ -> BRecordType false 0 SNil
+| BError -> BErrorType
+and
+getTypeSeq n x = match x with
+| SNil -> SNil
+| SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)
+
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
 val isNone : bosqueTerm -> Tot bool
@@ -102,12 +120,10 @@ val extractBool : x:bosqueTerm{isBool x} -> Tot bool
 let extractBool x = match x with
 | BBool y -> y 
 
-// Hmmm
 val extractBool2 : x:bosqueTerm{eqType BBoolType (getType x)} -> Tot bool
 let extractBool2 x = match x with
 | BBool y -> y 
 
-// Hmmm2
 val extractBool3 : x:bosqueTerm{subtypeOf BBoolType (getType x)} -> Tot bool
 let extractBool3 x = match x with
 | BBool y -> y 
@@ -246,11 +262,3 @@ let rec nthTuple index dimension y = match y with
 //   if index = 0 then x
 //   else nthTuple (index-1) dimension' (BTuple dimension' xs)
 // | _ -> BError
-
-(* ------------------------------------------------------------------------------------------- *)
-(* Type instantiation *)
-type typeUnionIntBool = x:bosqueType{subtypeOf (BUnionType BIntType BBoolType) x}
-type termUnionIntBool = x:bosqueTerm{subtypeOf (BUnionType BIntType BBoolType) (getType x)}
-(* Definition of IntType *)
-type termInt = x:bosqueTerm{isInt x} 
-(* ------------------------------------------------------------------------------------------- *)

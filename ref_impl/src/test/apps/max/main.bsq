@@ -117,6 +117,18 @@ function max5(x : Int, y : Int) : Int
     return internal_result;
 }
 
+entity Artist provides Parsable {
+    field name: String;
+    field id: Int;
+    field lastName: String;
+    field isGood: Bool;
+    field player: PlayerMark;
+
+    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): Artist | None {
+        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
+    }
+}
+
 entity PlayerMark provides Parsable {
     field mark: String;
 
@@ -128,7 +140,15 @@ entity PlayerMark provides Parsable {
 entrypoint function main(): Int {
 
     var string_test = "string_test";
-    var player1 = PlayerMark'x';
+    
+    var node = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
+
+    var player1 = PlayerMark{mark="x"};
+    var player2 = PlayerMark'x';
+
+    var node1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
+    var node2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
+
     var n = none;
     var xTuple2 = [10, 30];
     var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];

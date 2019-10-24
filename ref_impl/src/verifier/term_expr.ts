@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { TypeExpr } from "./type_expr";
+import { TypeExpr, IntType, BoolType, NoneType, TypedStringType } from "./type_expr";
 
 abstract class TermExpr {
     readonly symbolName: string;
@@ -37,7 +37,21 @@ class VarTerm extends TermExpr {
 
 class ConstTerm extends TermExpr {
     constructor(symbolName: string, ty: TypeExpr) {
-        super(symbolName, ty);
+        if(ty instanceof NoneType){
+            super("BNone", ty);
+        }
+        else if(ty instanceof BoolType){
+            super("(BBool " + symbolName + ")", ty);  
+        }
+        else if(ty instanceof IntType){
+            super("(BInt " + symbolName + ")", ty);
+        }
+        else if(ty instanceof TypedStringType){
+            super("(BTypedString " + symbolName + " " + ty.ty.id + ")", ty);
+        }
+        else{
+            super(symbolName, ty);
+        }
     }
     toML() {
         return this.symbolName;
