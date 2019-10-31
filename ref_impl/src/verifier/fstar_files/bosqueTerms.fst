@@ -1,5 +1,7 @@
 module BosqueTerms
 
+#set-options "--z3rlimit 100"
+
 open Sequence
 open BosqueTypes
 
@@ -35,23 +37,59 @@ getTypeSeq n x = match x with
 | SNil -> SNil
 | SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)
 
-(* Definition of getType *)
-val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
-val getType : x:bosqueTerm -> Tot bosqueType (decreases x)
-let rec getType x = match x with
-| BNone -> BNoneType
-| BBool _ -> BBoolType
-| BInt _ -> BIntType
-| BTypedString _ content_type -> BTypedStringType content_type
-| BGUID _ _ -> BGUIDType
-| BTuple n y -> BTupleType false n (getTypeSeq n y)
-// FIX: The following is incomplete
-| BRecord _ _ -> BRecordType false 0 SNil
-| BError -> BErrorType
-and
-getTypeSeq n x = match x with
-| SNil -> SNil
-| SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)
+(* ------------------------------------------------------------------------- *)
+(* Extending the types with user defined classes --------------------------- *)
+type person = 
+| MkPerson : x:bosqueTerm{subtypeOf BIntType (getType x)} -> person
+
+type employer = 
+| MkEmployer : x:bosqueTerm{subtypeOf BIntType (getType x)} -> person -> employer
+
+let person1 = MkPerson (BInt 3)
+let person2 = MkPerson (BInt 4)
+
+let employer1 = MkEmployer (BInt 4) (MkPerson (BInt 3))
+let employer1' = MkEmployer (BInt 4) person1
+let employer2 = MkEmployer (BInt 4) person2
+
+let compareTestPerson = person1 = person2
+let compareTestEmployer1 = employer1 = employer1'
+let compareTestEmployer2 = employer1 = employer2 
+
+type string_string =
+| MkString_String : 
+  x1:bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x1)}
+  ->  x2:bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x2)}
+  -> string_string
+
+let test_ss =  MkString_String (BTypedString "Hello" BAnyType) (BTypedString "Bye" BIntType) 
+
+type string_tuple0 = 
+| MkString_Tuple0 : 
+  x1:bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x1)} 
+  -> x2:bosqueTerm{subtypeOf (BTupleType false 0 SNil) (getType x2)} 
+  -> string_tuple0
+  
+let test_st0 = MkString_Tuple0 (BTypedString "Hello" BAnyType) (BTuple 0 (SNil))
+
+type string_tuple1 = 
+| MkString_Tuple2 : 
+  x1:bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x1)} 
+  -> x2:bosqueTerm{subtypeOf (BTupleType true 1 (SCons (BIntType) 0 SNil)) (getType x2)}
+  -> string_tuple1
+
+let test_st1 = MkString_Tuple2 (BTypedString "Hello" BAnyType) 
+
+let what = getType ((BTuple 2 (SCons (BInt 3) 1 (SCons (BInt 4) 0 SNil))))  
+
+type string_tuple2 = 
+| MkString_Tuple2 : 
+  x1:bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x1)} 
+  -> x2:bosqueTerm{subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BIntType) 0 SNil))) (getType x2)} 
+  -> string_tuple2 
+
+let test_st2 = MkString_Tuple2 (BTypedString "Hello" BAnyType) (BTuple 2 (SCons (BInt 3) 1 (SCons (BInt 4) 0 SNil)))
+(* ------------------------------------------------------------------------- *)
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)

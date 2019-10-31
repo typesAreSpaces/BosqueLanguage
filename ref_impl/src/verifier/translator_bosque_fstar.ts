@@ -356,10 +356,10 @@ class TranslatorBosqueFStar {
                     this.entity_declarations.push(new EntityDeclaration(current_entity_decl));
                 }
 
-                // console.log(opConstructorPrimary.args); 
-                // console.log("Reee");
-                // console.log(current_entity_decl.name);
-                // console.log(resultPairTypeArray); // TODO: Keep working here
+                console.log(opConstructorPrimary.args); 
+                console.log("Reee");
+                console.log(current_entity_decl.name);
+                console.log(resultPairTypeArray); // TODO: Keep working here
 
                 return [
                     TranslatorBosqueFStar.argumentToExpr(opConstructorPrimary.trgt, fkey,
@@ -712,10 +712,10 @@ class TranslatorBosqueFStar {
             const returnType = TranslatorBosqueFStar.stringTypeToType(declarations.resultType);
             const flow = computeBlockLinks(mapBlocks);
 
-            console.log("More detailed Blocks:---------------------------------------------------------");
-            mapBlocks.forEach(x => console.log(x));
-            console.log("More detailed++ Blocks:-------------------------------------------------------");
-            mapBlocks.forEach(x => console.log(x.jsonify()));
+            // console.log("More detailed Blocks:---------------------------------------------------------");
+            // mapBlocks.forEach(x => console.log(x));
+            // console.log("More detailed++ Blocks:-------------------------------------------------------");
+            // mapBlocks.forEach(x => console.log(x.jsonify()));
 
             const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
                 const currentFlow = flow.get(block.label) as FlowLink;
