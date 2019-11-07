@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { sanitizeName } from "./util";
+import { sanitizeName, toFStarSequence } from "./util";
 
 abstract class TypeDecl {
     abstract emit(fd: number): void;
@@ -245,14 +245,15 @@ class TupleType extends TypeExpr {
     }
 
     static toFStarTuple(types: TypeExpr[]): string {
-        if (types.length == 0) {
-            return "SNil";
-        }
-        else {
-            const tail = types.slice(1);
-            return "(SCons " + types[0].getFStarTypeName() + " "
-                + (types.length - 1) + " " + this.toFStarTuple(tail) + ")";
-        }
+        // if (types.length == 0) {
+        //     return "SNil";
+        // }
+        // else {
+        //     const tail = types.slice(1);
+        //     return "(SCons " + types[0].getFStarTypeName() + " "
+        //         + (types.length - 1) + " " + this.toFStarTuple(tail) + ")";
+        // }
+        return toFStarSequence(types.map(x => x.getFStarTypeName()));
     }
 }
 

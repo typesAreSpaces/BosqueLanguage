@@ -15,11 +15,11 @@
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType } from "./type_expr";
-import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm } from "./term_expr";
+import { ConstTerm, VarTerm, FuncTerm, TermExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 
@@ -37,7 +37,7 @@ class FunctionDeclaration {
         const fkey = this.declarations.key;
         const args = this.declarations.params.map(x => x.name);
         const type = new FuncType(
-            this.declarations.params.map(x => TranslatorBosqueFStar.stringVarToTypeExpr(x.type)),
+            this.declarations.params.map(x => this.stringVarToTypeExpr(x.type)),
             TranslatorBosqueFStar.stringVarToTypeExpr(this.declarations.resultType));
         // TODO: Figure out how to include the following fields:
         // 1) recursive, 2) preconditions, 3) postconditions
@@ -86,7 +86,7 @@ class TranslatorBosqueFStar {
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from
     // types_seen : String[MangledNamewithFkey] -> TypeExpr
-    readonly types_seen: Map<StringTypeMangleNameWithFkey, TypeExpr>;
+    readonly types_seen : Map<StringTypeMangleNameWithFkey, TypeExpr>;
 
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
     readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
@@ -134,7 +134,7 @@ class TranslatorBosqueFStar {
         }
     }
 
-    static optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
+    optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
         const set_of_types = new Set<TypeExpr>();
         set_of_types.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
         let accum = nonOptionals;
@@ -186,7 +186,7 @@ class TranslatorBosqueFStar {
                         const types = s.split("?:");
                         const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
                         const optionals = types.slice(1);
-                        return TranslatorBosqueFStar.optionalTupleSugaring(isOpen, nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
+                        return this.optionalTupleSugaring(isOpen, nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                     }
                     else {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
@@ -296,7 +296,7 @@ class TranslatorBosqueFStar {
         }
     }
 
-    opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] | [VarTerm, TermExpr][] {
+    opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] {
         switch (op.tag) {
             case MIROpTag.MIRLoadConst: {
                 const opMIRLoadConst = op as MIRLoadConst;
@@ -340,25 +340,29 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("AcessLocalVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_AcessLocalVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRConstructorPrimary: {
+            case MIROpTag.MIRConstructorPrimary: { // IMPLEMENT:
                 const opConstructorPrimary = op as MIRConstructorPrimary;
                 const current_tkey = opConstructorPrimary.tkey
                 const current_entity_decl = this.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl;
-                const field_types = current_entity_decl.fields.map(x => [x.name,
+                const resultPairTypeArray = current_entity_decl.fields.map(x => [x.name,
                 TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][];
-                const assignments = opConstructorPrimary.args.map((x, index) => [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimary.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
-                    , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
-
+                const argsExpr = opConstructorPrimary.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined));
                 if (!this.isEkeyDeclared.has(current_tkey)) {
                     this.isEkeyDeclared.add(current_tkey);
                     this.entity_declarations.push(new EntityDeclaration(current_entity_decl));
                 }
 
-                assignments.unshift([
-                    this.MIRArgumentToTermExpr(opConstructorPrimary.trgt, fkey, new ConstructorType(current_tkey, field_types)),
-                    new FuncTerm("B" + sanitizeName(current_tkey), assignments.map(x => x[0]), new ConstructorType(current_tkey, field_types))
-                ]);
-                return assignments; 
+                console.log(opConstructorPrimary.args);
+                console.log("Reee");
+                console.log(current_entity_decl.name);
+                console.log(resultPairTypeArray); // TODO: Keep working here
+
+                return [
+                    this.MIRArgumentToTermExpr(opConstructorPrimary.trgt, fkey,
+                        new ConstructorType(current_tkey, resultPairTypeArray)),
+
+                    new FuncTerm("B" + sanitizeName(current_tkey), argsExpr, new ConstructorType(current_tkey, resultPairTypeArray))
+                ];
             }
             case MIROpTag.MIRConstructorPrimaryCollectionEmpty: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -380,12 +384,13 @@ class TranslatorBosqueFStar {
                 const opConstructorTuple = op as MIRConstructorTuple;
                 const types = opConstructorTuple.args.map(x => this.MIRArgumentToTypeExpr(x, fkey));
                 return [this.MIRArgumentToTermExpr(opConstructorTuple.trgt, fkey, new TupleType(false, types)),
-                new TupleTerm(opConstructorTuple.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)))];
+                new FuncTerm("Mktuple__" + opConstructorTuple.args.length,
+                    opConstructorTuple.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)),
+                    new TupleType(false, types))];
             }
             case MIROpTag.MIRConstructorRecord: {
                 const opConstructorRecord = op as MIRConstructorRecord;
                 const elements = opConstructorRecord.args.map(x => [x[0], this.MIRArgumentToTypeExpr(x[1], fkey)]) as [string, TypeExpr][];
-                // FIX: This is wrong
                 return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(elements)),
                 new FuncTerm("Mkrecord__" + opConstructorRecord.args.map(x => x[0]).join("_"),
                     opConstructorRecord.args.map(x => this.MIRArgumentToTermExpr(x[1], fkey, undefined)),
@@ -530,6 +535,7 @@ class TranslatorBosqueFStar {
                 new FuncTerm(TermExpr.binOpToFStar.get(opBinOp.op) as string,
                     [lhs, rhs],
                     TranslatorBosqueFStar.intType)];
+                // new FuncTerm("hahah", [], TranslatorBosqueFStar.boolType)
             }
             case MIROpTag.MIRBinEq: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRBinEq Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -632,19 +638,25 @@ class TranslatorBosqueFStar {
                     undefined),
                 this.MIRArgumentToTermExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey, undefined)];
             }
-            case MIROpTag.MIRIsTypeOfNone: {
+            case MIROpTag.MIRIsTypeOfNone: { // IMPLEMENT:
                 const opIsTypeOfNone = op as MIRIsTypeOfNone;
+                // console.log(opIsTypeOfNone);
+                // FIX: This is not properly implemented, it shouldnt return true all the time ... 
                 return [this.MIRArgumentToTermExpr(opIsTypeOfNone.trgt, fkey, TranslatorBosqueFStar.boolType),
-                new FuncTerm("isNone",
-                    [this.MIRArgumentToTermExpr(opIsTypeOfNone.arg, fkey, undefined)],
-                    TranslatorBosqueFStar.boolType)];
+                new ConstTerm("true", TranslatorBosqueFStar.boolType)];
+                // const regName = section + "_" + opIsTypeOfNone.trgt.nameID;
+                // stringVariableToStringType.set(regName, "NSCore::Bool");
+
+                // return new EqualityTerm(new VarExpr(regName, new TranslatorBosqueFStar.boolType()),
+                //     BoxFormulaExpr(new EqualityTerm(new FuncExpr("HasType", new UninterpretedType("BType"),
+                //         [argumentToTermExpr(opIsTypeOfNone.arg, section)]), BNone)));
+                // return [new VarTerm("_MIRIsTypeOfNone", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
-            case MIROpTag.MIRIsTypeOfSome: {
-                const opIsTypeOfSome = op as MIRIsTypeOfSome;
-                return [this.MIRArgumentToTermExpr(opIsTypeOfSome.trgt, fkey, TranslatorBosqueFStar.boolType),
-                new FuncTerm("isSome",
-                    [this.MIRArgumentToTermExpr(opIsTypeOfSome.arg, fkey, undefined)],
-                    TranslatorBosqueFStar.boolType)];
+            case MIROpTag.MIRIsTypeOfSome: { // IMPLEMENT:
+                TranslatorBosqueFStar.debugging("MIRIsTypeOfSome Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
+                // const opIsTypeOfSome = op as MIRIsTypeOfSome;
+                // console.log(opIsTypeOfSome);
+                return [new VarTerm("_MIRIsTypeOfSome", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             }
             case MIROpTag.MIRIsTypeOf: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRIsTypeOf Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -666,20 +678,12 @@ class TranslatorBosqueFStar {
             return program();
         }
         else {
-            const result = this.opToAssignment(ops[0], comingFrom, fkey);
-            if (result[0] instanceof VarTerm) {
-                const [lval, rval] = result as [VarTerm, TermExpr];
-                if (lval.symbolName == "_skip") {
-                    return this.opsToExpr(ops.slice(1), comingFrom, fkey, program);
-                }
-                else {
-                    return new AssignmentExpr(lval, rval, this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
-                }   
+            const [lval, rval] = this.opToAssignment(ops[0], comingFrom, fkey);
+            if (lval.symbolName == "_skip") {
+                return this.opsToExpr(ops.slice(1), comingFrom, fkey, program);
             }
             else {
-                return (result as [VarTerm, TermExpr][]).reduce((rest_expression, current_assignment) => {
-                    return new AssignmentExpr(current_assignment[0], current_assignment[1], rest_expression)
-                }, this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
+                return new AssignmentExpr(lval, rval, this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
             }
         }
     }
@@ -729,7 +733,8 @@ class TranslatorBosqueFStar {
                     case 2: {
                         const jumpCondOp = block.ops[block.ops.length - 1] as MIRJumpCond;
                         const regName = sanitizeName(jumpCondOp.arg.nameID);
-                        const condition = new VarTerm(regName, TranslatorBosqueFStar.boolType);
+                        const condition = new FuncTerm("op_Equality",
+                            [new VarTerm(regName, TranslatorBosqueFStar.boolType), new ConstTerm("true", TranslatorBosqueFStar.boolType)], TranslatorBosqueFStar.boolType);
                         const branchTrue = traverse(mapBlocks.get(jumpCondOp.trueblock) as MIRBasicBlock, block.label);
                         const branchFalse = traverse(mapBlocks.get(jumpCondOp.falseblock) as MIRBasicBlock, block.label);
                         const continuation = () => new ConditionalExpr(condition, branchTrue, branchFalse);

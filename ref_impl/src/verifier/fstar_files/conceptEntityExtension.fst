@@ -6,6 +6,21 @@ open BosqueTerms
 
 (* ------------------------------------------------------------------------- *)
 (* Extending the types with user defined classes --------------------------- *)
+
+type playerMark =
+| BnSMain__PlayerMark : x : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x)} -> playerMark 
+
+type artist =
+| BnSMain__Artist : x1 : bosqueTerm{subtypeOf (BIntType) (getType x1)}
+-> x2 : bosqueTerm{subtypeOf (BBoolType) (getType x2)}
+-> x3 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x3)}
+-> x4 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x4)}
+-> x5 : playerMark
+-> artist 
+
+type musician = 
+| BnSMain__Musician : x1 : artist -> x2 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x2)} -> musician
+
 type person = 
 | MkPerson : x:bosqueTerm{subtypeOf BIntType (getType x)} -> person
 

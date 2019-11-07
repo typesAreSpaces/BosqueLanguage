@@ -6,7 +6,7 @@
 import { VarTerm, TermExpr } from "./term_expr";
 
 abstract class ExprExpr {
-    readonly tabSymbol = "  ";
+    readonly tabSymbol = " ";
     abstract toML(indentatioLevel: number, offset: number): string;
 }
 

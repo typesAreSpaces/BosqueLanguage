@@ -63,4 +63,15 @@ function sanitizeName(name : string) : string {
     return result.charAt(0).toLowerCase() + result.slice(1);
 }
 
-export { bosqueToMASM, PathFile, sanitizeName };
+function toFStarSequence(seq : string[]) : string {
+    if(seq.length == 0){
+        return "SNil";
+    }
+    else{
+        const tail = seq.slice(1);
+        return "(SCons " + seq[0] + " "
+        + (seq.length - 1) + " " + toFStarSequence(tail) + ")";
+    }
+}
+
+export { bosqueToMASM, PathFile, sanitizeName, toFStarSequence };

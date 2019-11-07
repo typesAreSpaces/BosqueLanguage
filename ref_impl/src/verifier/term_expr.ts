@@ -3,7 +3,8 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { TypeExpr, IntType, BoolType, NoneType, TypedStringType } from "./type_expr";
+import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType } from "./type_expr";
+import { toFStarSequence } from "./util";
 
 abstract class TermExpr {
     readonly symbolName: string;
@@ -71,4 +72,18 @@ class FuncTerm extends TermExpr {
     }
 }
 
-export { TermExpr, VarTerm, ConstTerm, FuncTerm };
+class TupleTerm extends TermExpr {
+    readonly termSequence : TermExpr[];
+    constructor(termSequence : TermExpr[]){
+        super("BTuple", new TupleType(false, termSequence.map(x => x.ty)));
+        this.termSequence = termSequence;
+    }
+    toML(){
+        return "(BTuple " + this.termSequence.length + " "
+        + toFStarSequence(this.termSequence.map(x => x.toML()))
+        + ")";
+    }
+}
+
+
+export { TermExpr, VarTerm, ConstTerm, FuncTerm, TupleTerm };

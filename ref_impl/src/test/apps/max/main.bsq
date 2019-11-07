@@ -129,6 +129,15 @@ entity Artist provides Parsable {
     }
 }
 
+entity Musician provides Parsable {
+    field artist : Artist;
+    field instrument : String;
+
+    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): PlayerMark | None {
+        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
+    }
+}
+
 entity PlayerMark provides Parsable {
     field mark: String;
 
@@ -142,6 +151,7 @@ entrypoint function main(): Int {
     var string_test = "string_test";
     
     var node = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
+    var musician = Musician{artist = node, instrument = "Guitar"};
 
     var player1 = PlayerMark{mark="x"};
     var player2 = PlayerMark'x';
@@ -152,10 +162,10 @@ entrypoint function main(): Int {
     var n = none;
     var xTuple2 = [10, 30];
     var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
-    // var xRecord = {f = 1, g = 2};
-    // var xProjection = xRecord.f;
-    // var xRecord2 = {g = 10, f = 20};
-    // var xProjection2 = xRecord2.f;
+    var xRecord = {f = 1, g = 2};
+    var xProjection = xRecord.f;
+    var xRecord2 = {g = 10, f = 20};
+    var xProjection2 = xRecord2.f;
     var y = 20;
     var y2 = identityUnion(y);
     var z = max(xTuple2.0, y);
@@ -164,5 +174,6 @@ entrypoint function main(): Int {
     var z3 = identityOpenTuple(["hello"]);
     var z4 = maxx(false, 3);
     var zTuple2 = [xTuple2, y];
+    var z5 = identityTupleNoneable([y, false]);
     return z;
 }
