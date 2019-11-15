@@ -1,4 +1,4 @@
-module Sequence
+module Sequence 
 
 open FStar.Ghost
 

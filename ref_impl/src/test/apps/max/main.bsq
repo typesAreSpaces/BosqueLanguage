@@ -148,32 +148,37 @@ entity PlayerMark provides Parsable {
 
 entrypoint function main(): Int {
 
-    var string_test = "string_test";
+    // var string_test = "string_test";
     
-    var node = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
-    var musician = Musician{artist = node, instrument = "Guitar"};
+    // var node = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
+    // var musician = Musician{artist = node, instrument = "Guitar"};
 
-    var player1 = PlayerMark{mark="x"};
-    var player2 = PlayerMark'x';
+    // var player1 = PlayerMark{mark="x"};
+    // var player2 = PlayerMark'x';
 
-    var node1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
-    var node2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
+    // var node1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
+    // var node2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
 
-    var n = none;
+    // var n = none;
     var xTuple2 = [10, 30];
-    var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
-    var xRecord = {f = 1, g = 2};
-    var xProjection = xRecord.f;
-    var xRecord2 = {g = 10, f = 20};
-    var xProjection2 = xRecord2.f;
+    // var xTuple2_1 = [10, xTuple2];
+    // var xTuple2_2 = [10, [10, 3]];
+    // var xTuple_second = xTuple2_1.1;
+    // var xTuple_second_ = xTuple2_2.1;
+    // var proj_tuple = [[1, 2], [3, 4], 5].2;
+    // var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
+    // var xRecord = {f = 1, g = 2};
+    // var xProjection = xRecord.f;
+    // var xRecord2 = {g = 10, f = 20};
+    // var xProjection2 = xRecord2.f;
     var y = 20;
-    var y2 = identityUnion(y);
+    // var y2 = identityUnion(y);
     var z = max(xTuple2.0, y);
-    var z_max_func_repeated = max(z, y);
-    var z2 = identityTupleOptional([1, true, 2]);
-    var z3 = identityOpenTuple(["hello"]);
-    var z4 = maxx(false, 3);
-    var zTuple2 = [xTuple2, y];
-    var z5 = identityTupleNoneable([y, false]);
+    // var z_max_func_repeated = max(z, y);
+    // var z2 = identityTupleOptional([1, true, 2]);
+    // var z3 = identityOpenTuple(["hello"]);
+    // var z4 = maxx(false, 3);
+    // var zTuple2 = [xTuple2, y];
+    // var z5 = identityTupleNoneable([y, false]);
     return z;
 }

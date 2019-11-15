@@ -85,5 +85,23 @@ class TupleTerm extends TermExpr {
     }
 }
 
+class TupleProjExpr extends TermExpr {
+    readonly index : number;
+    readonly dimension : number;
+    readonly tuple : TermExpr; // Actually a term register
+    readonly ty : TypeExpr;
+    constructor(index : number, dimension : number, tuple : TermExpr, ty: TypeExpr){
+        super("nthTuple", ty);
+        this.index = index;
+        this.dimension = dimension;
+        this.tuple = tuple;
+        this.ty = ty;
+    }
+    toML(){
+        return "(nthTuple " + this.index + " " 
+        + this.dimension + " " + this.tuple.toML() + ")";
+    }
+}
 
-export { TermExpr, VarTerm, ConstTerm, FuncTerm, TupleTerm };
+
+export { TermExpr, VarTerm, ConstTerm, FuncTerm, TupleTerm, TupleProjExpr };

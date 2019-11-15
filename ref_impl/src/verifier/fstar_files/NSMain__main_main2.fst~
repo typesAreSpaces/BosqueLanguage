@@ -1,0 +1,103 @@
+module NSMain__main_main
+open Sequence
+open BosqueTypes
+open BosqueTerms
+
+(* Type names *)
+let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BIntType 0 SNil))
+let bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
+
+(* Concept Declarations *)
+
+(* Entity Declarations *)
+
+(* Constant Declarations *)
+
+(* Function Declarations *)
+val nSMain__max : (x1:bosqueTerm{subtypeOf bUnionType_BIntType_BNoneType (getType x1)}) -> (x2:bosqueTerm{subtypeOf BIntType (getType x2)}) -> Tot (x3:bosqueTerm{subtypeOf BIntType (getType x3)})
+let nSMain__max x y = 
+ let __tmp_0 = (isNone x) in 
+  if __tmp_0 then 
+   let __ir_ret___2 = y in 
+    let __ir_ret___3 = __ir_ret___2 in 
+     let _return_ = __ir_ret___3 in 
+      _return_
+  else 
+   let __tmp_4 = (extractBool (op_greaterOrEq x y)) in 
+    if __tmp_4 then 
+     let __ir_ret___1 = x in 
+      let __ir_ret___3 = __ir_ret___1 in 
+       let _return_ = __ir_ret___3 in 
+        _return_
+    else 
+     let __ir_ret__ = y in 
+      let __ir_ret___3 = __ir_ret__ in 
+       let _return_ = __ir_ret___3 in 
+        _return_ 
+
+
+// val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm)
+// let rec nthTuple index dimension y = match y with
+// | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+// | BTuple dimension'' (SCons x' dimension' xs') -> 
+//   if (index < 0 || dimension <> dimension'') then BError else
+//   if (index >= dimension) then BNone else
+//   if index = 0 then x'
+//   else nthTuple (index-1) dimension' (BTuple dimension' xs')
+// | _ -> BError
+
+// type sequence 'a : nat -> Type = 
+// | SNil : sequence 'a 0
+// | SCons : hd:'a -> n:nat -> tl : sequence 'a n -> sequence 'a (n + 1)
+
+// | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
+
+// (* Tuple Type projector *)
+val nthTupleType2 : index:int -> dimension:nat -> x:(sequence bosqueTerm dimension) -> Tot (bosqueType)
+let rec nthTupleType2 index dimension y = match y with
+| SNil -> if (index < 0 || dimension <> 0) then BErrorType else BNoneType
+| SCons z dimension' zs -> 
+  if (index < 0) then BErrorType else
+  if (index >= dimension) then BNoneType else
+  if index = 0 then (getType z)
+  else nthTupleType2 (index-1) dimension' zs
+| _ -> BErrorType 
+
+(* Tuple projector *)
+val nthTuple2 : index:int -> dimension:nat 
+  -> x:(sequence bosqueTerm dimension) 
+  -> Tot (y:bosqueTerm{eqType (nthTupleType2 index dimension x) (getType y)} )
+let rec nthTuple2 index dimension y = match y with
+| SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+| SCons z dimension' zs -> 
+  if (index < 0) then BError else
+  if (index >= dimension) then BNone else
+  if index = 0 then z
+  else nthTuple2 (index - 1) dimension' zs
+| _ -> BError
+
+(* Tuple projector *)
+val nthTuple2 : index:int -> dimension:nat 
+  -> x:(sequence bosqueTerm dimension) 
+  -> Tot (y:bosqueTerm{subtypeOf (nthTupleType2 index dimension x) (getType y)} )
+let rec nthTuple2 index dimension y = match y with
+| SNil -> if (index < 0 || dimension <> 0) then BError else BNone
+| SCons z dimension' zs -> 
+  if (index < 0) then BError else
+  if (index >= dimension) then BNone else
+  if index = 0 then z
+  else nthTuple2 (index - 1) dimension' zs 
+
+val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
+let nSMain__main  = 
+ let what = (SCons (BInt 10) 1 (SCons (BInt 30) 0 SNil)) in
+  let __tmp_0 = (BTuple 2 what) in 
+   let xTuple2 = __tmp_0 in 
+    let y = (BInt 20) in 
+     let __tmp_7 = (nthTuple2 0 2 what) in 
+      let __tmp_4 = (nSMain__max __tmp_7 y) in 
+       let z = __tmp_4 in 
+        let __ir_ret__ = z in 
+         let _return_ = __ir_ret__ in 
+          _return_

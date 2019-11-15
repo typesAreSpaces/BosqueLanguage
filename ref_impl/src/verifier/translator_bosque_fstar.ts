@@ -15,11 +15,11 @@
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType } from "./type_expr";
-import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm } from "./term_expr";
+import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr } from "./term_expr";
 import { sanitizeName } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 
@@ -313,7 +313,8 @@ class TranslatorBosqueFStar {
                 // console.log(opMIRLoadConstTypedString.tskey);
                 return [
                     this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, opMIRLoadConstTypedString.tkey, TranslatorBosqueFStar.intType),
-                    new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                    new ConstTerm("0", TranslatorBosqueFStar.intType)
+                ];
             }
             // case MIROpTag.AccessConstField:
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
@@ -415,8 +416,8 @@ class TranslatorBosqueFStar {
             //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
             case MIROpTag.MIRAccessFromIndex: {
-                // const opMIRAccessFromIndex = op as MIRAccessFromIndex;
-                // console.log(opMIRAccessFromIndex);
+                const opMIRAccessFromIndex = op as MIRAccessFromIndex;
+                console.log(opMIRAccessFromIndex);
                 // const typeOfTuple = this.types_seen.get(sanitizeName(opMIRAccessFromIndex.arg.nameID + fkey)) as TypeExpr;
                 // if (typeOfTuple instanceof TupleType) {
                 //     this.types_seen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
@@ -429,8 +430,11 @@ class TranslatorBosqueFStar {
                 // else {
                 //     throw new Error("Type " + typeOfTuple + " is not a TupleType");
                 // }
-                TranslatorBosqueFStar.debugging("MIRAccessFromIndex Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRAccessFromIndex", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
+                return [
+                    this.MIRArgumentToTermExpr(opMIRAccessFromIndex.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType)), 
+                    new TupleProjExpr(opMIRAccessFromIndex.idx, 10, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg, fkey, undefined), TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType))
+                    //new FuncTerm("nthTuple", [opMIRAccessFromIndex.idx, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg)], TranslatorBosqueFStar.intType)
+                ];
             }
             case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
