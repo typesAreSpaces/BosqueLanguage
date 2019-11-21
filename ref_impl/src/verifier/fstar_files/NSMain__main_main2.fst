@@ -3,6 +3,8 @@ open Sequence
 open BosqueTypes
 open BosqueTerms
 
+#set-options "--z3rlimit 20"
+
 (* Type names *)
 let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
 let bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BIntType 0 SNil))
@@ -76,34 +78,19 @@ let rec nthTuple2 index dimension y = match y with
 val lemma_eqType_refl : x:bosqueType -> Lemma (ensures eqType x x) (decreases x)
 val lemma_eqTypeSeq_refl : n:nat -> x:sequence bosqueType n -> Lemma (ensures eqTypeSeq n x x) (decreases x)
 let rec lemma_eqType_refl x = match x with
-| BAnyType -> ()
-| BSomeType -> ()
-| BTruthyType -> ()
-| BNoneType -> ()
 | BUnionType t1 t2 -> lemma_eqType_refl t1; lemma_eqType_refl t2
-| BParseableType -> ()
-| BBoolType -> ()
-| BIntType -> ()
-| BFloatType -> ()
-| BRegexType -> ()
 | BTypedStringType t -> lemma_eqType_refl t
-| BGUIDType -> ()
 | BTupleType _ n seq -> lemma_eqTypeSeq_refl n seq
 | BRecordType _ n seq -> lemma_eqTypeSeq_refl n seq
-| BFunctionType -> ()
-| BObjectType -> ()
-| BEnumType -> ()
-| BCustomKeyType -> ()
-| BKeyedType -> ()
-| BErrorType -> ()
+| _ -> ()
 and 
 lemma_eqTypeSeq_refl n x = match x with
 | SNil -> ()
 | SCons hd m tl -> lemma_eqType_refl hd; lemma_eqTypeSeq_refl m tl
 
-val lemma_nthTuple_index0 : dimension : nat -> x : (sequence bosqueTerm dimension) -> 
+val lemma_nthTuple_base_case : dimension : nat -> x : (sequence bosqueTerm dimension) -> 
 Lemma (ensures (eqType (nthTupleType2 0 dimension x) (getType (nthTuple2 0 dimension x))))
-let lemma_nthTuple_index0 dimension x = match x with
+let lemma_nthTuple_base_case dimension x = match x with
 | SNil -> ()
 | SCons z dimension' zs -> lemma_eqType_refl (getType z)
 
@@ -114,32 +101,64 @@ let rec lemma_nthTuple index dimension y = match y with
 | SCons z dimension' zs -> 
   if (index < 0) then () else
   if (index >= dimension) then () else 
-  if (index = 0) then lemma_nthTuple_index0 dimension (SCons z dimension' zs)
+  if (index = 0) then lemma_nthTuple_base_case dimension (SCons z dimension' zs)
   else lemma_nthTuple (index-1) dimension' zs
 
-val lemma_subtypeof_eqtype : t1 : bosqueType -> t2 : bosqueType -> t3 : bosqueType 
-  ->  Lemma (requires (subtypeOf t1 t2) /\ (eqType t2 t3)) (ensures subtypeOf t1 t3)
-let rec lemma_subtypeof_eqtype t1 t2 t3 = match t1 with
-| BAnyType -> ()
-| BSomeType -> ()
-| BTruthyType -> ()
-| BNoneType -> ()
-| BUnionType t1' t2' -> admit() // Keep working here
-| BParseableType -> ()
-| BBoolType -> ()
-| BIntType -> ()
-| BFloatType -> ()
-| BRegexType -> ()
-| BTypedStringType t' -> admit()
-| BGUIDType -> ()
-| BTupleType _ n seq -> admit()
-| BRecordType _ n seq -> admit()
-| BFunctionType -> ()
-| BObjectType -> ()
-| BEnumType -> ()
-| BCustomKeyType -> ()
-| BKeyedType -> ()
-| BErrorType -> ()
+// val lemma_subtypeof_eqtype_case_BUnion : 
+// t1 : bosqueType -> t2 : bosqueType 
+// -> t1' : bosqueType -> t2' : bosqueType
+// -> t1'' : bosqueType -> t2'' : bosqueType -> Lemma (requires (subtypeOf (BUnionType t1 t2) (BUnionType t1' t2')) /\ (eqType (BUnionType t1' t2') (BUnionType t1'' t2''))) (ensures (subtypeOf (BUnionType t1 t2) (BUnionType t1'' t2'')))
+// let rec lemma_subtypeof_eqtype_case_BUnion t1 t2 t1' t2' t1'' t2'' = admit()
+
+// // if (subtypeOf t1' t1'' && subtypeOf t1' t2'') then (lemma_subtypeof_eqtype t1' t1'' t1'''; lemma_subtypeof_eqtype t1' t2'' t2''') 
+// // else if (subtypeOf t1' t1'' && subtypeOf t2' t1'') then (lemma_subtypeof_eqtype t1' t1'' t1'''; lemma_subtypeof_eqtype t2' t1'' t1''') 
+// // else if (subtypeOf t2' t1'' && subtypeOf t2' t2'') then admit() else admit()
+
+// val lemma_subtypeof_eqtype : t1 : bosqueType -> t2 : bosqueType -> t3 : bosqueType 
+//   ->  Lemma (requires (subtypeOf t1 t2) /\ (eqType t2 t3)) (ensures subtypeOf t1 t3)
+// let rec lemma_subtypeof_eqtype t1 t2 t3 = match t1 with
+// | BUnionType t1' t2' -> (match t2 with
+//   | BUnionType t1'' t2'' -> (match t3 with
+//     | BUnionType t1''' t2''' ->  lemma_subtypeof_eqtype_case_BUnion t1' t2' t1'' t2'' t1''' t2'''
+//     | _ -> ()
+//     )
+//   | BTypedStringType t'' -> admit()
+//   | BTupleType _ n'' seq'' -> admit()
+//   | BRecordType _ n'' seq'' -> admit()
+//   | _ -> ()
+//   )
+// | BTypedStringType t' ->  (match t2 with
+//   | BTypedStringType t'' ->  (match t3 with
+//     | BTypedStringType t''' -> lemma_subtypeof_eqtype t' t'' t'''
+//     | _ -> ()
+//     )
+//   | _ -> ()
+//   )
+// | BTupleType _ n' seq' -> admit()
+// | BRecordType _ n' seq' -> admit()
+// | _ -> ()
+
+// val lemma_nthTuple :index : int -> dimension : nat -> x : (sequence bosqueTerm dimension) -> 
+// Lemma (ensures (eqType (nthTupleType2 index dimension x) (getType (nthTuple2 index dimension x))))
+
+
+val nSMain__main3 : (x:bosqueTerm{subtypeOf BIntType (getType x)}) 
+let nSMain__main3  = 
+ let what = (SCons (BInt 10) 1 (SCons (BInt 30) 0 SNil)) in
+  let __tmp_0 = (BTuple 2 what) in 
+   let xTuple2 = __tmp_0 in 
+    let y = (BInt 20) in 
+      (BInt 10) 
+
+val nSMain__main2 : (x:bosqueTerm) 
+let nSMain__main2  = 
+ let what = (SCons (BInt 10) 1 (SCons (BInt 30) 0 SNil)) in
+  let __tmp_0 = (BTuple 2 what) in 
+   let xTuple2 = __tmp_0 in 
+    let y = (BInt 20) in 
+      (nthTuple2 0 2 what) 
+     
+     
 
 val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__main  = 
@@ -149,6 +168,7 @@ let nSMain__main  =
     let y = (BInt 20) in 
     lemma_nthTuple 0 2 what;
      let __tmp_7 = (nthTuple2 0 2 what) in 
+     lemma_nthTuple 0 2 what;
       let __tmp_4 = (nSMain__max __tmp_7 y) in 
        let z = __tmp_4 in 
         let __ir_ret__ = z in 

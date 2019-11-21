@@ -37,6 +37,9 @@ type bosqueType =
 | BKeyedType
 | BErrorType
 
+val lemma_eq_type : a : bosqueType -> b : bosqueType -> c : bosqueType -> Lemma (requires (a = b /\ b = c)) (ensures a = c)
+let lemma_eq_type a b c = ()
+
 (* Definition of equality relation on Bosque types *)
 val eqTypeSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
 val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
