@@ -25,53 +25,6 @@ import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, 
 
 type StringTypeMangleNameWithFkey = string;
 
-class FunctionDeclaration {
-    readonly declarations: MIRInvokeBodyDecl;
-    readonly program: ExprExpr;
-
-    constructor(declarations: MIRInvokeBodyDecl, program: ExprExpr) {
-        this.declarations = declarations;
-        this.program = program;
-    }
-    print(fd: number): void {
-        const fkey = this.declarations.key;
-        const args = this.declarations.params.map(x => x.name);
-        const type = new FuncType(
-            this.declarations.params.map(x => TranslatorBosqueFStar.stringVarToTypeExpr(x.type)),
-            TranslatorBosqueFStar.stringVarToTypeExpr(this.declarations.resultType));
-        // TODO: Figure out how to include the following fields:
-        // 1) recursive, 2) preconditions, 3) postconditions
-        FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
-        FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1, 1)}\n\n`);
-    }
-}
-
-// TODO: Incomplete implementation
-class ConceptDeclaration {
-    readonly declarations: MIRConceptTypeDecl;
-    constructor(declarations: MIRConceptTypeDecl) {
-        this.declarations = declarations;
-    }
-    print(fd: number): void {
-        // FS.writeSync(fd, `val ${sanitizeName(this.ckey)} : ${this.type.getFStarTerm()}\n`);
-        // FS.writeSync(fd, `let ${sanitizeName(this.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
-    }
-}
-
-class EntityDeclaration {
-    readonly declarations: MIREntityTypeDecl;
-    constructor(declarations: MIREntityTypeDecl) {
-        this.declarations = declarations;
-        // this.declarations.tkey is the 'name'
-    }
-    // TODO: Figure out how to include the following fields:
-    // 1) invariants, 2) fields, 3) vcallMap, 4) provides
-    print(fd: number): void {
-        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
-        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
-    }
-}
-
 class TranslatorBosqueFStar {
     static readonly anyType = new AnyType();
     static readonly someType = new SomeType();
@@ -89,9 +42,12 @@ class TranslatorBosqueFStar {
     readonly types_seen: Map<StringTypeMangleNameWithFkey, TypeExpr>;
 
     readonly mapFuncDeclarations: Map<string, MIRInvokeBodyDecl>;
-    readonly mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
-    readonly mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
+    static mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
+    static mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
     readonly mapConstantDeclarations: Map<string, MIRConstantDecl>;
+
+    static conceptsUsed: Set<string>;
+    static entitiesUsed: Set<string>;
 
     readonly isFkeyDeclared: Set<string> = new Set<string>();
     readonly isCkeyDeclared: Set<string> = new Set<string>();
@@ -105,9 +61,21 @@ class TranslatorBosqueFStar {
     constructor(masm: MIRAssembly, fileName: string) {
         this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
         this.mapFuncDeclarations = masm.invokeDecls;
-        this.mapConceptDeclarations = masm.conceptDecls;
-        this.mapEntityDeclarations = masm.entityDecls;
+        TranslatorBosqueFStar.mapConceptDeclarations = masm.conceptDecls;
+        TranslatorBosqueFStar.mapEntityDeclarations = masm.entityDecls;
         this.mapConstantDeclarations = masm.constantDecls;
+
+        TranslatorBosqueFStar.conceptsUsed = new Set<string>();
+        TranslatorBosqueFStar.entitiesUsed = new Set<string>();
+
+        TranslatorBosqueFStar.mapConceptDeclarations.forEach((_, index) => {
+            if (!index.includes("NSCore"))
+                TranslatorBosqueFStar.conceptsUsed.add(index);
+        });
+        TranslatorBosqueFStar.mapEntityDeclarations.forEach((_, index) => {
+            if (!index.includes("NSCore"))
+                TranslatorBosqueFStar.entitiesUsed.add(index);
+        });
 
         // masm.primitiveInvokeDecls contains all the functions
 
@@ -126,6 +94,7 @@ class TranslatorBosqueFStar {
         FS.writeSync(fd, `open Sequence\n`);
         FS.writeSync(fd, `open BosqueTypes\n`);
         FS.writeSync(fd, `open BosqueTerms\n`);
+        FS.writeSync(fd, `open Util\n`);
     }
 
     static debugging(message: string, flag: boolean): void {
@@ -145,7 +114,7 @@ class TranslatorBosqueFStar {
         }
         accum += ", " + optionals[secondLastIndex + 1];
         set_of_types.add(new TupleType(isOpen, accum.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
-        return new UnionType(set_of_types);
+        return new UnionType(set_of_types);;
     }
 
     // TODO: Add more types as needed
@@ -153,6 +122,7 @@ class TranslatorBosqueFStar {
     // description comes from a Type expression
     // stringVarToTypeExpr : String[Type] -> TypeExpr
     static stringVarToTypeExpr(s: string): TypeExpr {
+
         switch (s) {
             case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
@@ -170,6 +140,19 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.noneType;
             }
             default: {
+                // Concept and Entities 
+                if (TranslatorBosqueFStar.conceptsUsed.has(s)) {
+                    const description = TranslatorBosqueFStar.mapConceptDeclarations.get(s) as MIREntityTypeDecl;
+                    return new ConstructorType(sanitizeName(description.tkey),
+                        description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
+                }
+
+                if (TranslatorBosqueFStar.entitiesUsed.has(s)) {
+                    const description = TranslatorBosqueFStar.mapEntityDeclarations.get(s) as MIREntityTypeDecl;
+                    return new ConstructorType(sanitizeName(description.tkey),
+                        description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
+                }
+
                 // Tuple
                 if (s.charAt(0) == '[') {
                     s = s.slice(1, -1);
@@ -192,34 +175,35 @@ class TranslatorBosqueFStar {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
                     }
                 }
-                else {
-                    // Record
-                    if (s.charAt(0) == '{') {
-                        // FIX: Implement record type
-                        return TranslatorBosqueFStar.noneType;
-                    }
-                    else {
-                        // Union
-                        if (s.includes("|")) {
-                            return new UnionType(new Set(s
-                                .split(" | ")
-                                .map(TranslatorBosqueFStar.stringVarToTypeExpr)
-                            ));
-                        }
-                        // Typed String
-                        else {
-                            if (s.includes("NSCore::String")) {
-                                const index = s.indexOf("=");
-                                s = s.substr(index + 1, s.length - index - 2);
-                                return new TypedStringType(TranslatorBosqueFStar.stringVarToTypeExpr(s));
-                            }
-                            // FIX: This is wrong, but temporarily useful
-                            return TranslatorBosqueFStar.noneType;
-                            console.log(s + " is constant value type, yet");
-                            throw new Error(s + " is constant value type, yet");
-                        }
-                    }
+                // Record
+                if (s.charAt(0) == '{') {
+                    // FIX: Implement record type
+                    return TranslatorBosqueFStar.noneType;
                 }
+                // Union
+                if (s.includes("|")) {
+                    return new UnionType(new Set(s
+                        .split(" | ")
+                        .map(TranslatorBosqueFStar.stringVarToTypeExpr)
+                    ));
+                }
+                // String 
+                if (s.includes("NSCore::String")) {
+                    const index = s.indexOf("=");
+                    // This branch handles untyped strings
+                    if (index == -1) {
+                        return new TypedStringType(TranslatorBosqueFStar.anyType);
+                    }
+                    // This branch handles typed strings
+                    else {
+                        s = s.substr(index + 1, s.length - index - 2);
+                        return new TypedStringType(TranslatorBosqueFStar.stringVarToTypeExpr(s));
+                    }
+
+                }
+                // FIX: This is wrong, but temporarily useful
+                console.log(`------ ERROR: Unknown typed ${s} found while executing stringVarToTypeExpr ------`);
+                return TranslatorBosqueFStar.noneType;
             }
         }
     }
@@ -229,6 +213,7 @@ class TranslatorBosqueFStar {
     // description comes from a Value expression
     // stringConstToTypeExpr : String[ValueType] -> TypeExpr
     static stringConstToTypeExpr(s: string): TypeExpr {
+
         let stringConst = s.slice(1);
         stringConst = stringConst.substr(0, stringConst.indexOf("="));
         switch (stringConst) {
@@ -268,6 +253,7 @@ class TranslatorBosqueFStar {
     // The fkey string helps to keep track the function where the variable came 
     // from
     MIRArgumentToTermExpr(arg: MIRArgument, fkey: string, ty: TypeExpr | undefined): TermExpr {
+        
         // This branch handles variables
         if (arg instanceof MIRRegisterArgument) {
             if (ty instanceof TypeExpr) {
@@ -287,6 +273,7 @@ class TranslatorBosqueFStar {
     // MIRArgumentToTypeExpr : MIRArgument -> TypeExpr
     MIRArgumentToTypeExpr(arg: MIRArgument, fkey: string): TypeExpr {
         // This branch handles variables
+        
         if (arg instanceof MIRRegisterArgument) {
             return (this.types_seen.get(sanitizeName(arg.nameID + fkey)) as TypeExpr);
         }
@@ -313,6 +300,7 @@ class TranslatorBosqueFStar {
                 // console.log(opMIRLoadConstTypedString.tskey);
                 return [
                     this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, opMIRLoadConstTypedString.tkey, TranslatorBosqueFStar.intType),
+                    // This is WRONG
                     new ConstTerm("0", TranslatorBosqueFStar.intType)
                 ];
             }
@@ -320,7 +308,6 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
                 const opMIRLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
                 console.log(opMIRLoadFieldDefaultValue);
-                // CONTINUE2:
 
                 // return [this.MIRArgumentToTermExpr(opMIRLoadFieldDefaultValue.trgt, fkey, 
                 //     this.MIRArgumentToTypeExpr(opReturnAssign.src, fkey)),
@@ -344,7 +331,7 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRConstructorPrimary: {
                 const opConstructorPrimary = op as MIRConstructorPrimary;
                 const current_tkey = opConstructorPrimary.tkey
-                const current_entity_decl = this.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl;
+                const current_entity_decl = TranslatorBosqueFStar.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl;
                 const field_types = current_entity_decl.fields.map(x => [x.name,
                 TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][];
                 const assignments = opConstructorPrimary.args.map((x, index) => [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimary.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
@@ -359,7 +346,7 @@ class TranslatorBosqueFStar {
                     this.MIRArgumentToTermExpr(opConstructorPrimary.trgt, fkey, new ConstructorType(current_tkey, field_types)),
                     new FuncTerm("B" + sanitizeName(current_tkey), assignments.map(x => x[0]), new ConstructorType(current_tkey, field_types))
                 ]);
-                return assignments; 
+                return assignments;
             }
             case MIROpTag.MIRConstructorPrimaryCollectionEmpty: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -404,8 +391,10 @@ class TranslatorBosqueFStar {
                 const currentFunctionKey = opCallNamespaceFunction.mkey;
                 // The following line will keep pushing to 
                 // the stack_expressions stack
+
                 this.collectExpr(currentFunctionKey);
                 const resultType = TranslatorBosqueFStar.stringVarToTypeExpr((this.mapFuncDeclarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
+
                 return [this.MIRArgumentToTermExpr(opCallNamespaceFunction.trgt, fkey, resultType),
                 new FuncTerm(sanitizeName(currentFunctionKey),
                     opCallNamespaceFunction.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)),
@@ -417,24 +406,15 @@ class TranslatorBosqueFStar {
             // }
             case MIROpTag.MIRAccessFromIndex: {
                 const opMIRAccessFromIndex = op as MIRAccessFromIndex;
-                console.log(opMIRAccessFromIndex);
-                // const typeOfTuple = this.types_seen.get(sanitizeName(opMIRAccessFromIndex.arg.nameID + fkey)) as TypeExpr;
-                // if (typeOfTuple instanceof TupleType) {
-                //     this.types_seen.set(sanitizeName(opMIRAccessFromIndex.trgt.nameID + fkey),
-                //         typeOfTuple.elements[opMIRAccessFromIndex.idx]);
-                //     return [this.MIRArgumentToTermExpr(opMIRAccessFromIndex.trgt, fkey),
-                //     new FuncTerm("Mktuple__" + typeOfTuple.elements.length + "?._" + (opMIRAccessFromIndex.idx + 1),
-                //         [this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg, fkey)],
-                //         typeOfTuple.elements[opMIRAccessFromIndex.idx])];
-                // }
-                // else {
-                //     throw new Error("Type " + typeOfTuple + " is not a TupleType");
-                // }
+                const dimension = (this.MIRArgumentToTypeExpr(opMIRAccessFromIndex.arg, fkey) as TupleType).elements.length;
+
                 return [
-                    this.MIRArgumentToTermExpr(opMIRAccessFromIndex.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType)), 
-                    new TupleProjExpr(opMIRAccessFromIndex.idx, 10, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg, fkey, undefined), TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType))
-                    //new FuncTerm("nthTuple", [opMIRAccessFromIndex.idx, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg)], TranslatorBosqueFStar.intType)
+                    this.MIRArgumentToTermExpr(opMIRAccessFromIndex.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType)),
+                    new TupleProjExpr(opMIRAccessFromIndex.idx, dimension,
+                        this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg, fkey, undefined),
+                        TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType))
                 ];
+                //new FuncTerm("nthTuple", [opMIRAccessFromIndex.idx, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg)], TranslatorBosqueFStar.intType)
             }
             case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -678,7 +658,7 @@ class TranslatorBosqueFStar {
                 }
                 else {
                     return new AssignmentExpr(lval, rval, this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
-                }   
+                }
             }
             else {
                 return (result as [VarTerm, TermExpr][]).reduce((rest_expression, current_assignment) => {
@@ -755,11 +735,13 @@ class TranslatorBosqueFStar {
     }
 
     generateFStarCode(fkey: string) {
-        this.collectExpr(fkey);
 
         const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
 
         // Check Concepts and Entities before emmiting Prelude
+
+        this.collectExpr(fkey);
+
         this.printPrelude(fd);
         FS.writeSync(fd, "\n");
 
@@ -767,12 +749,29 @@ class TranslatorBosqueFStar {
         TypeExpr.declareTypeNames(fd);
         FS.writeSync(fd, "\n");
 
+        // TODO: Concept Declarations needs testing
         FS.writeSync(fd, "(* Concept Declarations *)\n");
-        // TODO: Implement
+        TranslatorBosqueFStar.conceptsUsed.forEach(x => {
+            const entry = TranslatorBosqueFStar.mapConceptDeclarations.get(x) as MIRConceptTypeDecl;
+            const entityName = sanitizeName(entry.tkey);
+            const fieldArrows = entry.fields.map ( y => {
+                const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
+                return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type ) + " -> \n" ;
+            }).join("");
+            FS.writeSync(fd, "type " + entityName + " = \n| B" + sanitizeName(entry.tkey) + " : " + fieldArrows + entityName + "\n");
+        });
         FS.writeSync(fd, "\n");
 
         FS.writeSync(fd, "(* Entity Declarations *)\n");
-        // TODO: Implement
+        TranslatorBosqueFStar.entitiesUsed.forEach(x => {
+            const entry = TranslatorBosqueFStar.mapEntityDeclarations.get(x) as MIREntityTypeDecl;
+            const entityName = sanitizeName(entry.tkey);
+            const fieldArrows = entry.fields.map ( y => {
+                const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
+                return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type ) + " -> \n" ;
+            }).join("");
+            FS.writeSync(fd, "type " + entityName + " = \n| B" + sanitizeName(entry.tkey) + " : " + fieldArrows + entityName + "\n");
+        });
         FS.writeSync(fd, "\n");
 
         FS.writeSync(fd, "(* Constant Declarations *)\n");
@@ -794,6 +793,53 @@ class TranslatorBosqueFStar {
         this.function_declarations.map(x => x.print(fd));
 
         FS.closeSync(fd);
+    }
+}
+
+class FunctionDeclaration {
+    readonly declarations: MIRInvokeBodyDecl;
+    readonly program: ExprExpr;
+
+    constructor(declarations: MIRInvokeBodyDecl, program: ExprExpr) {
+        this.declarations = declarations;
+        this.program = program;
+    }
+    print(fd: number): void {
+        const fkey = this.declarations.key;
+        const args = this.declarations.params.map(x => x.name);
+        const type = new FuncType(
+            this.declarations.params.map(x => TranslatorBosqueFStar.stringVarToTypeExpr(x.type)),
+            TranslatorBosqueFStar.stringVarToTypeExpr(this.declarations.resultType));
+        // TODO: Figure out how to include the following fields:
+        // 1) recursive, 2) preconditions, 3) postconditions
+        FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
+        FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1, 1)}\n\n`);
+    }
+}
+
+// TODO: Incomplete implementation
+class ConceptDeclaration {
+    readonly declarations: MIRConceptTypeDecl;
+    constructor(declarations: MIRConceptTypeDecl) {
+        this.declarations = declarations;
+    }
+    print(fd: number): void {
+        // FS.writeSync(fd, `val ${sanitizeName(this.ckey)} : ${this.type.getFStarTerm()}\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
+    }
+}
+
+class EntityDeclaration {
+    readonly declarations: MIREntityTypeDecl;
+    constructor(declarations: MIREntityTypeDecl) {
+        this.declarations = declarations;
+        // this.declarations.tkey is the 'name'
+    }
+    // TODO: Figure out how to include the following fields:
+    // 1) invariants, 2) fields, 3) vcallMap, 4) provides
+    print(fd: number): void {
+        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
+        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 

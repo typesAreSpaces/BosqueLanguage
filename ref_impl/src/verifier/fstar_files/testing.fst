@@ -26,7 +26,7 @@ let oktest = BTuple 2 (SCons (BInt 3) 1 (SCons (BBool true) 0 SNil))
 let oktest2 = nthTupleType 10 2 oktest
 
 (* Testing: subtypeOf *)
-let testa0 = subtypeOf (BUnionType BIntType BBoolType) BIntType
+let testa0 = subtypeOf (BUnionType BIntType BBoolType) BIntType 
 let testa0' = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BBoolType BIntType)
 let testa1 = subtypeOf (BUnionType BIntType BBoolType) (BNoneType)
 let testa2 = subtypeOf (BUnionType BIntType BBoolType) (BUnionType BNoneType BBoolType)
@@ -208,7 +208,7 @@ let teste1' = maxWithTuple' (testb0) (BInt (-12))
 
 let _ = assert (forall x y . extractBool (op_greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (op_greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (BIntType = (getType (nthTuple 0 2 x))) ==> extractBool (op_greaterOrEq (maxWithTuple x y) (nthTuple 0 2 x)))
 
 (* -------------------------------------------------------------------------------------------------------------------------------------- *)
 
@@ -228,7 +228,7 @@ let test5b = maxWithTuple'' (testb0) (BInt (-12))
 
 // let _ = assert (forall x y . extractBool (op_greaterOrEq (maxWithTuple2 x y) (nthTuple 0 2 x)))
 
-let _ = assert (forall x y . (eqType (getType (nthTuple 0 2 x)) BIntType) ==> extractBool (op_greaterOrEq (maxWithTuple'' x y) (nthTuple 0 2 x)))
+let _ = assert (forall x y . (BIntType = (getType (nthTuple 0 2 x))) ==> extractBool (op_greaterOrEq (maxWithTuple'' x y) (nthTuple 0 2 x)))
 
 (* -------------------------------------------------------------------------------------------------------------------------------------- *)
 
@@ -248,7 +248,7 @@ val maxWithTuple'''' : x:bosqueTerm{(subtypeOf closedTuple2_Int_Bool (getType x)
   -> y:bosqueTerm{isInt y} 
   -> z:bosqueTerm{isInt z}
 let maxWithTuple'''' x y = let xAt0 = nthTuple 0 2 x in 
-    if (extractBool (op_greaterOrEq xAt0 y)) then xAt0 else y
+    if (extractBool (op_greaterOrEq xAt0 y)) then xAt0 else y 
   
 // // Idk why the following doesn't work like maxWithTuple''''
 // val maxWithTuple''''' : x:bosqueTerm{subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType x)} 
@@ -265,10 +265,10 @@ let maxWithTuple'''' x y = let xAt0 = nthTuple 0 2 x in
 // let testh0 = let whatt = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) in maxWithTuple'''' whatt (BInt 33)
 // let testh1 = maxWithTuple'''' (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) (BInt 33) 
 
-let tupleTypeExample = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil)))
+let tupleTypeExample = (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))) 
 
 let testg0 = subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType tupleTypeExample)
-let testg1 = subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil))))
+let testg1 = subtypeOf (BTupleType false 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))) (getType (BTuple 2 (SCons (BInt 2) 1 (SCons (BBool true) 0 SNil)))) 
 
 // This approach `fixes` testh0 and testh1
 let testg2 = maxWithTuple'''' tupleTypeExample (BInt 33)
@@ -297,7 +297,7 @@ val withOpenTuple2' : x:bosqueTerm{subtypeOf openTuple2_Int_Bool (getType x)} ->
 let withOpenTuple2' x = match x with
 | BTuple 2 seq -> false
 | BTuple 3 seq -> true
-| BTuple m seq -> true
+| BTuple m seq -> true 
 
 let testf0 = BTuple 1 (SCons (BInt 3) 0 SNil)
 let testf1 = BTuple 2 (SCons (BBool true) 1 (SCons (BInt 3) 0 SNil) )
@@ -306,18 +306,19 @@ let testf3 = BTuple 3 (SCons (BInt 0) 2 (SCons (BBool true) 1 (SCons (BInt 12) 0
 // Demo: change the testfx where x is {0, 1, 2, 3}
 let testf4 = withOpenTuple2' testf3
 
-let openTuple2_openTuple2Int_Bool_Bool = (BTupleType true 2 (SCons ((BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)))) 1 (SCons (BBoolType) 0 SNil)))
+let openTuple2_openTuple2Int_Bool_Bool = (BTupleType true 2 (SCons ((BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)))) 1 (SCons (BBoolType) 0 SNil)))  
 
 val withOpenTupleTuple : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (bool)
 let withOpenTupleTuple x = match x with
 | BTuple 2 seq -> false
 | BTuple 3 seq -> true
-| BTuple m seq -> true
+| BTuple m seq -> true  
 
 val withOpenTupleTuple' : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (y:bosqueTerm{isInt y})
 let withOpenTupleTuple' x = match x with
 | BTuple 2 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
 | BTuple 3 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
-| BTuple m seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
+| BTuple m seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2 
 
 (* -------------------------------------------------------------------------------------------------------------------------------------- *)
+

@@ -1,69 +1,57 @@
-module NSMain__main_main
+module NSMain__main_main_testing2
 open Sequence
 open BosqueTypes
 open BosqueTerms
-open Util
+open Util 
 
 (* Type names *)
 let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bTypedStringType_BNoneType = (BTypedStringType BNoneType)
 let bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BIntType 0 SNil))
 let bTupleType_2BIntType_bTupleType_2BIntType_BIntTypefalsefalse = BTupleType false 2 (SCons BIntType 1 (SCons bTupleType_2BIntType_BIntTypefalse 0 SNil))
 let bTupleType_3bTupleType_2BIntType_BIntTypefalse_bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 3 (SCons bTupleType_2BIntType_BIntTypefalse 2 (SCons bTupleType_2BIntType_BIntTypefalse 1 (SCons BIntType 0 SNil)))
 let bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypedStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType 15 (SCons BIntType 14 (SCons BIntType 13 (SCons BIntType 12 (SCons BIntType 11 (SCons BIntType 10 (SCons BIntType 9 (SCons BIntType 8 (SCons BIntType 7 (SCons BIntType 6 (SCons BIntType 5 (SCons BIntType 4 (SCons bTupleType_2BIntType_BIntTypefalse 3 (SCons bTypedStringType_BAnyType 2 (SCons BBoolType 1 (SCons BBoolType 0 SNil))))))))))))))))
-let bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypedStringType_BAnyType)))
+let bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BNoneType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypedStringType_BNoneType)))
 let bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
 let bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType 2 (SCons BBoolType 1 (SCons BIntType 0 SNil)))
 let bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = BTupleType true 4 (SCons BIntType 3 (SCons BBoolType 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))))
 let bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
 let bTupleType_1bTypedStringType_BAnyTypefalse = BTupleType false 1 (SCons bTypedStringType_BAnyType 0 SNil)
 let bTupleType_1bTypedStringType_BAnyTypetrue = BTupleType true 1 (SCons bTypedStringType_BAnyType 0 SNil)
+let bTupleType_1bTypedStringType_BNoneTypetrue = BTupleType true 1 (SCons bTypedStringType_BNoneType 0 SNil)
 let bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
 let bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
 let bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
 let bTupleType_2bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 2 (SCons bTupleType_2BIntType_BIntTypefalse 1 (SCons BIntType 0 SNil))
 let bTupleType_2BIntType_BBoolTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))
-let bTupleType_2BIntType_bUnionType_BBoolType_BNoneTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons bUnionType_BBoolType_BNoneType 0 SNil))
+let bTupleType_2BIntType_bUnionType_BBoolType_BNoneTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons bUnionType_BBoolType_BNoneType 0 SNil)) 
 
 (* Concept Declarations *)
 
 (* Entity Declarations *)
-type nSMain__Musician = 
-| BnSMain__Musician : artist : nSMain__Artist -> 
-instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
-nSMain__Musician
-type nSMain__Artist = 
-| BnSMain__Artist : id : bosqueTerm{BIntType = (getType id)} -> 
-isGood : bosqueTerm{BBoolType = (getType isGood)} -> 
-lastName : bosqueTerm{bTypedStringType_BAnyType = (getType lastName)} -> 
-name : bosqueTerm{bTypedStringType_BAnyType = (getType name)} -> 
-player : nSMain__PlayerMark -> 
-nSMain__Artist
-type nSMain__PlayerMark = 
-| BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
-nSMain__PlayerMark
 
 (* Constant Declarations *)
 
 (* Function Declarations *)
 val nSMain__max3 : (x:bosqueTerm{subtypeOf bTupleType_2BIntType_BIntTypefalse (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__max3 x = 
- let __tmp_3 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 x)) in 
-  let __tmp_6 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 2 x)) in 
+ let __tmp_3 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 10 x)) in 
+  let __tmp_6 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 10 x)) in 
    let __tmp_0 = (extractBool (op_greaterOrEq __tmp_3 __tmp_6)) in 
     if __tmp_0 then 
-     let __tmp_9 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 x)) in 
+     let __tmp_9 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 10 x)) in 
       let __ir_ret___1 = __tmp_9 in 
        let __ir_ret___2 = __ir_ret___1 in 
         let _return_ = __ir_ret___2 in 
          _return_
     else 
-     let __tmp_12 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 2 x)) in 
+     let __tmp_12 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 10 x)) in 
       let __ir_ret__ = __tmp_12 in 
        let __ir_ret___2 = __ir_ret__ in 
         let _return_ = __ir_ret___2 in 
          _return_
 
-val nSMain__identityUnion : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType (getType x)})
+val nSMain__identityUnion : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BNoneType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BNoneType (getType x)})
 let nSMain__identityUnion x = 
  let __ir_ret__ = x in 
   let _return_ = __ir_ret__ in 
@@ -122,8 +110,22 @@ let nSMain__identityTupleNoneable x =
   let _return_ = __ir_ret__ in 
    _return_
 
-val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
-let nSMain__main  = 
+type playerMark =
+| BnSMain__PlayerMark : x : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x)} -> playerMark 
+
+type artist =
+| BnSMain__Artist : x1 : bosqueTerm{subtypeOf (BIntType) (getType x1)}
+-> x2 : bosqueTerm{subtypeOf (BBoolType) (getType x2)}
+-> x3 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x3)}
+-> x4 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x4)}
+-> x5 : playerMark
+-> artist 
+
+type musician = 
+| BnSMain__Musician : x1 : artist -> x2 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x2)} -> musician
+
+//val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
+let a  = 
  let string_test = (BTypedString "string_test" BAnyType) in 
   let __tmp_6_arg_0 = (BTypedString "o" BAnyType) in 
    let __tmp_6 = (BnSMain__PlayerMark __tmp_6_arg_0) in 
@@ -165,9 +167,9 @@ let nSMain__main  =
                                        let __tmp_35 = (BTuple 2 (SCons (BInt 10) 1 (SCons (BInt 3) 0 SNil))) in 
                                         let __tmp_33 = (BTuple 2 (SCons (BInt 10) 1 (SCons __tmp_35 0 SNil))) in 
                                          let xTuple2_2 = __tmp_33 in 
-                                          let __tmp_40 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 2 xTuple2_1)) in 
+                                          let __tmp_40 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 10 xTuple2_1)) in 
                                            let xTuple_second = __tmp_40 in 
-                                            let __tmp_43 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 2 xTuple2_2)) in 
+                                            let __tmp_43 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 10 xTuple2_2)) in 
                                              let xTuple_second_ = __tmp_43 in 
                                               let __tmp_44 = (nSMain__max3 xTuple_second) in 
                                                let x_max_tuple = __tmp_44 in 
@@ -176,7 +178,7 @@ let nSMain__main  =
                                                   let __tmp_50 = (BTuple 2 (SCons (BInt 1) 1 (SCons (BInt 2) 0 SNil))) in 
                                                    let __tmp_53 = (BTuple 2 (SCons (BInt 3) 1 (SCons (BInt 4) 0 SNil))) in 
                                                     let __tmp_49 = (BTuple 3 (SCons __tmp_50 2 (SCons __tmp_53 1 (SCons (BInt 5) 0 SNil)))) in 
-                                                     let __tmp_57 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 2 3 __tmp_49)) in 
+                                                     let __tmp_57 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 2 10 __tmp_49)) in 
                                                       let proj_tuple = __tmp_57 in 
                                                        let __tmp_71 = (BTuple 2 (SCons (BInt 1) 1 (SCons (BInt 1) 0 SNil))) in 
                                                         let __tmp_58 = (BTuple 16 (SCons (BInt 1) 15 (SCons (BInt 1) 14 (SCons (BInt 1) 13 (SCons (BInt 1) 12 (SCons (BInt 1) 11 (SCons (BInt 1) 10 (SCons (BInt 1) 9 (SCons (BInt 1) 8 (SCons (BInt 1) 7 (SCons (BInt 1) 6 (SCons (BInt 1) 5 (SCons (BInt 1) 4 (SCons __tmp_71 3 (SCons (BTypedString "hello" BAnyType) 2 (SCons (BBool false) 1 (SCons (BBool true) 0 SNil))))))))))))))))) in 
@@ -184,7 +186,7 @@ let nSMain__main  =
                                                           let y = (BInt 20) in 
                                                            let __tmp_78 = (nSMain__identityUnion y) in 
                                                             let y2 = __tmp_78 in 
-                                                             let __tmp_83 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 xTuple2)) in 
+                                                             let __tmp_83 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 10 xTuple2)) in 
                                                               let __tmp_80 = (nSMain__max __tmp_83 y) in 
                                                                let z = __tmp_80 in 
                                                                 let __tmp_85 = (nSMain__max z y) in 
@@ -204,5 +206,12 @@ let nSMain__main  =
                                                                               let z5 = __tmp_102 in 
                                                                                let __ir_ret__ = z in 
                                                                                 let _return_ = __ir_ret__ in 
-                                                                                 _return_
+                                                                                 __tmp_93
 
+
+
+let b  = 
+                                                                     let __tmp_94 = (BTuple 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)) in 
+                                                                      let __tmp_93 = (nSMain__identityOpenTuple __tmp_94) in 
+                                                                       let z3 = __tmp_93 in 
+                                                                                 z3

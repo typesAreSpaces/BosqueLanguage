@@ -98,8 +98,10 @@ class TupleProjExpr extends TermExpr {
         this.ty = ty;
     }
     toML(){
-        return "(nthTuple " + this.index + " " 
-        + this.dimension + " " + this.tuple.toML() + ")";
+        return "(cast (bosqueTerm) (x:bosqueTerm{" 
+        + this.ty.getFStarTypeName() + "=(getType x)}) " 
+        + "(nthTuple " + this.index + " " 
+        + this.dimension + " " + this.tuple.toML() + "))";
     }
 }
 

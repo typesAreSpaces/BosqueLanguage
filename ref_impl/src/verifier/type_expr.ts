@@ -71,7 +71,7 @@ abstract class TypeExpr {
     }
     // String name associated to the type in Bosque
     abstract getBosqueType(): string;
-
+    
     static declareTypeNames(fd: number): void {
         TypeExpr.declarator.forEach(x => x.emit(fd));
     }

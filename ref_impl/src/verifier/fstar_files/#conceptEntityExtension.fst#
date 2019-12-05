@@ -6,6 +6,21 @@ open BosqueTerms
 
 (* ------------------------------------------------------------------------- *)
 (* Extending the types with user defined classes --------------------------- *)
+
+type playerMark =
+| BnSMain__PlayerMark : x : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x)} -> playerMark 
+
+type artist =
+| BnSMain__Artist : x1 : bosqueTerm{subtypeOf (BIntType) (getType x1)}
+-> x2 : bosqueTerm{subtypeOf (BBoolType) (getType x2)}
+-> x3 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x3)}
+-> x4 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x4)}
+-> x5 : playerMark
+-> artist 
+
+type musician = 
+| BnSMain__Musician : x1 : artist -> x2 : bosqueTerm{subtypeOf (BTypedStringType BAnyType) (getType x2)} -> musician
+
 type person = 
 | MkPerson : x:bosqueTerm{subtypeOf BIntType (getType x)} -> person
 
@@ -46,6 +61,7 @@ type string_tuple1 =
   -> string_tuple1
 
 let bt1 = (BTuple 1 (SCons (BInt 3) 0 SNil))
+let bt1_fake = (BTuple 1 (SCons (BNone) 0 SNil))
 
 val whatf : x2:bosqueTerm{subtypeOf (BTupleType false 1 (SCons (BIntType) 0 SNil)) (getType x2)} -> x2:bosqueTerm{subtypeOf (BTupleType false 1 (SCons (BIntType) 0 SNil)) (getType x2)}
 let whatf x = x
@@ -53,6 +69,9 @@ let whatf x = x
 let hmm = whatf bt1
 
 let test_st1 = MkString_Tuple1 (BTypedString "Hello" BAnyType) bt1
+
+// The following breaks
+// let test_st2 = MkString_Tuple1 (BTypedString "Hello" BAnyType) bt1_fake 
 
 (* ---------------------------------------------------------------------------------------------- *)
 (* This doesn't seems to work *)

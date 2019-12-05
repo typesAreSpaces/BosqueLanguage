@@ -15,7 +15,7 @@ type bosqueTerm =
 | BGUID : string -> int -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
 | BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm
-| BError : bosqueTerm
+| BError : bosqueTerm 
 
 (* Definition of getType *)
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -63,7 +63,7 @@ let isNonZero x = match x with
 
 val isTypedString : bosqueType -> bosqueTerm -> Tot bool
 let isTypedString ty x = match x with 
-| BTypedString _ ty' -> eqType ty ty'
+| BTypedString _ ty' -> ty = ty'
 | _ -> false 
 
 val isGUID : bosqueTerm -> Tot bool
@@ -73,19 +73,19 @@ let isGUID x = match x with
 
 val isTuple : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple b n seqTypes x = match x with
-| BTuple m seqTerms -> (n = m) && eqType (BTupleType b n seqTypes) (getType x)
+| BTuple m seqTerms -> (n = m) && (BTupleType b n seqTypes) = (getType x)
 | _ -> false
 
 val isTuple2 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple2 b n seqTypes x = match x with
-| BTuple m seqTerms -> eqType (BTupleType b n seqTypes) (getType x)
+| BTuple m seqTerms -> (BTupleType b n seqTypes) = (getType x)
 | _ -> false
 
 val isTuple3 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isTuple3 b n seqTypes x = eqType (BTupleType b n seqTypes) (getType x)
+let isTuple3 b n seqTypes x = (BTupleType b n seqTypes) = (getType x)
 
 val isRecord : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isRecord b n seqTypes x = eqType (getType x) (BRecordType b n seqTypes)
+let isRecord b n seqTypes x = (BRecordType b n seqTypes) = (getType x)
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
@@ -102,7 +102,7 @@ val extractBool : x:bosqueTerm{isBool x} -> Tot bool
 let extractBool x = match x with
 | BBool y -> y 
 
-val extractBool2 : x:bosqueTerm{eqType BBoolType (getType x)} -> Tot bool
+val extractBool2 : x:bosqueTerm{BBoolType = (getType x)} -> Tot bool
 let extractBool2 x = match x with
 | BBool y -> y 
 
@@ -125,7 +125,7 @@ let rec op_eqTerm x y = match x, y with
 | BNone, BNone -> BBool true
 | BBool x1, BBool y1 -> BBool (x1 = y1)
 | BInt x1, BInt y1 -> BBool (x1 = y1)
-| BTypedString s1 ty1, BTypedString s2 ty2 -> BBool (s1 = s2 && eqType ty1 ty2)
+| BTypedString s1 ty1, BTypedString s2 ty2 -> BBool (s1 = s2 && ty1 = ty2)
 | BGUID s1 n1, BGUID s2 n2 -> BBool (s1 = s2 && n1 = n2)
 | BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BBool (false)
                                    else op_eqTerm_aux n1 seq1 seq2
@@ -184,6 +184,11 @@ val op_neg : x:bosqueTerm{isInt x} -> Tot (z:bosqueTerm{isInt z})
 let op_neg x = match x with
 | BInt x1 -> BInt (-x1)
 
+(* Another option *)
+val op_neg2 : x:bosqueTerm{BIntType = (getType x)} -> Tot (y:bosqueTerm{squash (BIntType == (getType y))})
+let op_neg2 x = match x with
+| BInt x1 -> BInt (-x1)  
+
 val op_mod : x:bosqueTerm{isInt x} -> y:bosqueTerm{isNonZero y} -> Tot (z:bosqueTerm{isInt z})
 let op_mod x y = match x, y with
 | BInt x1, BInt y1 -> BInt (x1 % y1)
@@ -220,7 +225,7 @@ let rec nthTupleType index dimension y = match y with
   if (index >= dimension) then BNoneType else
   if index = 0 then getType x
   else nthTupleType (index-1) dimension' (BTuple dimension' xs)
-| _ -> BErrorType
+| _ -> BErrorType 
 
 (* Tuple projector *)
 val nthTuple : index:int -> dimension:nat -> x:bosqueTerm -> Tot (y:bosqueTerm)

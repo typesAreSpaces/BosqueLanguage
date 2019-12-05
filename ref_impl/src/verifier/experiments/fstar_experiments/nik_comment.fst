@@ -3,9 +3,7 @@ module Nik_comment
 //This is an unusual encoding of a tagged type
 //you'd be better off just using `either a b`
 type cases a b : Type u#1 = 
-  (t:Type u#0 & 
-     x:t &
-        either (squash (t == a)) (squash (t == b)))
+  t:Type u#0 & x:t & either (squash (t == a)) (squash (t == b))
 
 let elim_cases (#a #b #c:Type u#0) (x:cases a b) (f:a -> c) (g:b -> c) =
   let (| _, v, p |) = x in match p with
