@@ -74,22 +74,21 @@ function toFStarSequence(seq : string[]) : string {
     }
 }
 
-function topoVisit(n: MIRBasicBlock, tordered: MIRBasicBlock[], flow: Map<string, FlowLink>, blocks: Map<string, MIRBasicBlock>) {
-    if (tordered.findIndex((b) => b.label === n.label) !== -1) {
+function topoVisit(n: any, tordered: any[], neighbors : Map<any, Set<string>>, nodes: Map<string, any>) {
+    if (tordered.findIndex(element => element === n) !== -1) {
         return;
-    }
+    } 
 
-    const succs = (flow.get(n.label) as FlowLink).succs;
-    succs.forEach((succ) => topoVisit(blocks.get(succ) as MIRBasicBlock, tordered, flow, blocks));
+    const n_neighbors = neighbors.get(n) as Set<string>;
+    n_neighbors.forEach(succ => topoVisit(nodes.get(succ), tordered, neighbors, nodes));
 
     tordered.push(n);
 }
 
-function topologicalOrder(blocks: Map<string, MIRBasicBlock>): MIRBasicBlock[] {
-    let tordered: MIRBasicBlock[] = [];
-    const flow = computeBlockLinks(blocks);
+function topologicalOrder(nodes: Map<string, any>, neighbors: Map<any, Set<string>>): any[] {
+    let tordered: any[] = [];
 
-    topoVisit(blocks.get("entry") as MIRBasicBlock, tordered, flow, blocks);
+    nodes.forEach((node, _) => topoVisit(node, tordered, neighbors, nodes));
 
     return tordered.reverse();
 }

@@ -20,7 +20,7 @@ import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr } from "./term_expr";
-import { sanitizeName } from "./util";
+import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 
 type StringTypeMangleNameWithFkey = string;
@@ -60,37 +60,14 @@ class TranslatorBosqueFStar {
 
     constructor(masm: MIRAssembly, fileName: string) {
         this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
+        
         this.mapFuncDeclarations = masm.invokeDecls;
         TranslatorBosqueFStar.mapConceptDeclarations = masm.conceptDecls;
         TranslatorBosqueFStar.mapEntityDeclarations = masm.entityDecls;
         this.mapConstantDeclarations = masm.constantDecls;
 
-        TranslatorBosqueFStar.conceptsUsed = new Set<string>();
-        TranslatorBosqueFStar.entitiesUsed = new Set<string>();
-
-       // *************************************************************************
-        TranslatorBosqueFStar.mapConceptDeclarations.forEach((value, index) => {
-            if (!index.includes("NSCore")){
-                TranslatorBosqueFStar.conceptsUsed.add(index);
-                console.log(index);
-                console.log(value.provides.length);
-                value.provides.map(x => console.log(x));
-                console.log();
-            }
-                
-        });
-        TranslatorBosqueFStar.mapEntityDeclarations.forEach((value, index) => {
-            if (!index.includes("NSCore")){
-                TranslatorBosqueFStar.entitiesUsed.add(index);
-                console.log(index);
-                
-                console.log(value);
-
-                value.provides.map(x => console.log(x));
-                console.log();
-            }
-        });
-       // *************************************************************************
+        TranslatorBosqueFStar.conceptsUsed = this.serializeTypes(TranslatorBosqueFStar.mapConceptDeclarations);     
+        TranslatorBosqueFStar.entitiesUsed = this.serializeTypes(TranslatorBosqueFStar.mapEntityDeclarations);
 
         // masm.primitiveInvokeDecls contains all the functions
 
@@ -101,6 +78,34 @@ class TranslatorBosqueFStar {
         });
 
         this.fileName = fileName;
+    }
+
+    serializeTypes(declarations : Map<string, MIREntityTypeDecl | MIRConceptTypeDecl>) : Set<string> {
+        const nodes = new Map<string, string>();
+        const nodesNeighbors = new Map<string, Set<string>>();
+
+        declarations.forEach((value, index) => {
+            if (!index.includes("NSCore")){
+                nodes.set(index, index);
+
+                if(nodesNeighbors.get(index) == undefined){
+                    nodesNeighbors.set(index, new Set<string>());
+                }
+
+                const types_from_provides = value.provides.map(x => x.trkey).filter(x => !x.includes("NSCore"));
+                const types_from_fields = value.fields.map(x => x.declaredType).filter(x => !x.includes("NSCore"));
+                const all_types = types_from_provides.concat(types_from_fields);
+
+                all_types.map(x => {
+                    if(nodesNeighbors.get(x) == undefined){
+                        nodesNeighbors.set(x, new Set<string>());
+                    }
+                    (nodesNeighbors.get(x) as Set<string>).add(index)
+                });
+
+            }
+        });
+        return new Set(topologicalOrder(nodes, nodesNeighbors));
     }
 
     printPrelude(fd: number): void {

@@ -27,10 +27,9 @@ let bTupleType_2BIntType_bUnionType_BBoolType_BNoneTypefalse = BTupleType false 
 (* Concept Declarations *)
 
 (* Entity Declarations *)
-type nSMain__Musician = 
-| BnSMain__Musician : artist : nSMain__Artist -> 
-instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
-nSMain__Musician
+type nSMain__PlayerMark = 
+| BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
+nSMain__PlayerMark
 type nSMain__Artist = 
 | BnSMain__Artist : id : bosqueTerm{BIntType = (getType id)} -> 
 isGood : bosqueTerm{BBoolType = (getType isGood)} -> 
@@ -38,9 +37,10 @@ lastName : bosqueTerm{bTypedStringType_BAnyType = (getType lastName)} ->
 name : bosqueTerm{bTypedStringType_BAnyType = (getType name)} -> 
 player : nSMain__PlayerMark -> 
 nSMain__Artist
-type nSMain__PlayerMark = 
-| BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
-nSMain__PlayerMark
+type nSMain__Musician = 
+| BnSMain__Musician : artist : nSMain__Artist -> 
+instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
+nSMain__Musician
 
 (* Constant Declarations *)
 
