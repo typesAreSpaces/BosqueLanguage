@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { VarTerm, TermExpr } from "./term_expr";
+import { VarTerm, TermExpr, TupleProjExpr } from "./term_expr";
 
 abstract class ExprExpr {
     readonly tabSymbol = " ";
@@ -32,9 +32,17 @@ class AssignmentExpr extends ExprExpr {
         this.continuation = continuation;
     }
     toML(indentatioLevel: number, offset: number) {
-        return this.tabSymbol.repeat(indentatioLevel)
+
+        if(this.rhs instanceof TupleProjExpr){
+            return this.tabSymbol.repeat(indentatioLevel)
             + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
             + this.continuation.toML(indentatioLevel + offset, offset);
+        }
+        else{
+            return this.tabSymbol.repeat(indentatioLevel)
+            + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+            + this.continuation.toML(indentatioLevel + offset, offset);
+        }
     }
 }
 

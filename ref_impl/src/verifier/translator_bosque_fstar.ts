@@ -698,8 +698,9 @@ class TranslatorBosqueFStar {
         }
         else {
             declarations.params.map(x =>
-                this.types_seen.set(sanitizeName(x.name + fkey),
-                    TranslatorBosqueFStar.stringVarToTypeExpr(x.type)));
+                this.types_seen.set(sanitizeName(x.name + fkey), TranslatorBosqueFStar.stringVarToTypeExpr(x.type))
+            );
+            
             const returnType = TranslatorBosqueFStar.stringVarToTypeExpr(declarations.resultType);
             const flow = computeBlockLinks(mapBlocks);
 
@@ -743,8 +744,8 @@ class TranslatorBosqueFStar {
             if (!this.isFkeyDeclared.has(fkey)) {
                 this.isFkeyDeclared.add(fkey);
                 this.function_declarations.push(
-                    new FunctionDeclaration(declarations,
-                        traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry")));
+                    new FunctionDeclaration(declarations, traverse(mapBlocks.get("entry") as MIRBasicBlock, "entry"))
+                );
             }
         }
     }
@@ -752,8 +753,6 @@ class TranslatorBosqueFStar {
     generateFStarCode(fkey: string) {
 
         const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
-
-        // Check Concepts and Entities before emmiting Prelude
 
         this.collectExpr(fkey);
 
@@ -764,12 +763,11 @@ class TranslatorBosqueFStar {
         TypeExpr.declareTypeNames(fd);
         FS.writeSync(fd, "\n");
 
-        // TODO: Concept Declarations needs testing
         FS.writeSync(fd, "(* Concept Declarations *)\n");
         TranslatorBosqueFStar.conceptsUsed.forEach(x => {
             const entry = TranslatorBosqueFStar.mapConceptDeclarations.get(x) as MIRConceptTypeDecl;
             const entityName = sanitizeName(entry.tkey);
-            const fieldArrows = entry.fields.map ( y => {
+            const fieldArrows = entry.fields.map (y => {
                 const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
                 return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type ) + " -> \n" ;
             }).join("");
@@ -781,7 +779,7 @@ class TranslatorBosqueFStar {
         TranslatorBosqueFStar.entitiesUsed.forEach(x => {
             const entry = TranslatorBosqueFStar.mapEntityDeclarations.get(x) as MIREntityTypeDecl;
             const entityName = sanitizeName(entry.tkey);
-            const fieldArrows = entry.fields.map ( y => {
+            const fieldArrows = entry.fields.map (y => {
                 const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
                 return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type ) + " -> \n" ;
             }).join("");

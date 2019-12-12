@@ -169,7 +169,7 @@ let nSMain__main  =
                                            let xTuple_second = __tmp_40 in 
                                             let __tmp_43 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 2 xTuple2_2)) in 
                                              let xTuple_second_ = __tmp_43 in 
-                                              let __tmp_44 = (nSMain__max3 xTuple_second) in 
+                                               assert_norm(subtypeOf bTupleType_2BIntType_BIntTypefalse (getType xTuple_second)); let __tmp_44 = (nSMain__max3 xTuple_second) in 
                                                let x_max_tuple = __tmp_44 in 
                                                 let __tmp_46 = (nSMain__max3 xTuple_second_) in 
                                                  let x_max_tuple_ = __tmp_46 in 
@@ -190,7 +190,7 @@ let nSMain__main  =
                                                                 let __tmp_85 = (nSMain__max z y) in 
                                                                  let z_max_func_repeated = __tmp_85 in 
                                                                   let __tmp_89 = (BTuple 3 (SCons (BInt 1) 2 (SCons (BBool true) 1 (SCons (BInt 2) 0 SNil)))) in 
-                                                                   let __tmp_88 = (nSMain__identityTupleOptional __tmp_89) in 
+                                                                   assert_norm(subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType __tmp_89)); let __tmp_88 = (nSMain__identityTupleOptional __tmp_89) in 
                                                                     let z2 = __tmp_88 in 
                                                                      let __tmp_94 = (BTuple 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)) in 
                                                                       let __tmp_93 = (nSMain__identityOpenTuple __tmp_94) in 
