@@ -68,14 +68,29 @@ class TranslatorBosqueFStar {
         TranslatorBosqueFStar.conceptsUsed = new Set<string>();
         TranslatorBosqueFStar.entitiesUsed = new Set<string>();
 
-        TranslatorBosqueFStar.mapConceptDeclarations.forEach((_, index) => {
-            if (!index.includes("NSCore"))
+       // *************************************************************************
+        TranslatorBosqueFStar.mapConceptDeclarations.forEach((value, index) => {
+            if (!index.includes("NSCore")){
                 TranslatorBosqueFStar.conceptsUsed.add(index);
+                console.log(index);
+                console.log(value.provides.length);
+                value.provides.map(x => console.log(x));
+                console.log();
+            }
+                
         });
-        TranslatorBosqueFStar.mapEntityDeclarations.forEach((_, index) => {
-            if (!index.includes("NSCore"))
+        TranslatorBosqueFStar.mapEntityDeclarations.forEach((value, index) => {
+            if (!index.includes("NSCore")){
                 TranslatorBosqueFStar.entitiesUsed.add(index);
+                console.log(index);
+                
+                console.log(value);
+
+                value.provides.map(x => console.log(x));
+                console.log();
+            }
         });
+       // *************************************************************************
 
         // masm.primitiveInvokeDecls contains all the functions
 
@@ -140,13 +155,14 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.noneType;
             }
             default: {
-                // Concept and Entities 
+                // Concept
                 if (TranslatorBosqueFStar.conceptsUsed.has(s)) {
                     const description = TranslatorBosqueFStar.mapConceptDeclarations.get(s) as MIREntityTypeDecl;
                     return new ConstructorType(sanitizeName(description.tkey),
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
 
+                // Entities
                 if (TranslatorBosqueFStar.entitiesUsed.has(s)) {
                     const description = TranslatorBosqueFStar.mapEntityDeclarations.get(s) as MIREntityTypeDecl;
                     return new ConstructorType(sanitizeName(description.tkey),
@@ -175,6 +191,7 @@ class TranslatorBosqueFStar {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
                     }
                 }
+                
                 // Record
                 if (s.charAt(0) == '{') {
                     // FIX: Implement record type

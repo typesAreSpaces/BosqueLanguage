@@ -74,4 +74,24 @@ function toFStarSequence(seq : string[]) : string {
     }
 }
 
-export { bosqueToMASM, PathFile, sanitizeName, toFStarSequence };
+function topoVisit(n: MIRBasicBlock, tordered: MIRBasicBlock[], flow: Map<string, FlowLink>, blocks: Map<string, MIRBasicBlock>) {
+    if (tordered.findIndex((b) => b.label === n.label) !== -1) {
+        return;
+    }
+
+    const succs = (flow.get(n.label) as FlowLink).succs;
+    succs.forEach((succ) => topoVisit(blocks.get(succ) as MIRBasicBlock, tordered, flow, blocks));
+
+    tordered.push(n);
+}
+
+function topologicalOrder(blocks: Map<string, MIRBasicBlock>): MIRBasicBlock[] {
+    let tordered: MIRBasicBlock[] = [];
+    const flow = computeBlockLinks(blocks);
+
+    topoVisit(blocks.get("entry") as MIRBasicBlock, tordered, flow, blocks);
+
+    return tordered.reverse();
+}
+
+export { bosqueToMASM, PathFile, sanitizeName, toFStarSequence, topologicalOrder };
