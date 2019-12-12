@@ -53,8 +53,6 @@ class TranslatorBosqueFStar {
     readonly isCkeyDeclared: Set<string> = new Set<string>();
     readonly isEkeyDeclared: Set<string> = new Set<string>();
     readonly function_declarations = [] as FunctionDeclaration[];
-    readonly concept_declarations = [] as ConceptDeclaration[];
-    readonly entity_declarations = [] as EntityDeclaration[];
 
     readonly fileName: string;
 
@@ -190,7 +188,7 @@ class TranslatorBosqueFStar {
                         const types = s.split("?:");
                         const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
                         const optionals = types.slice(1);
-                        return TranslatorBosqueFStar.optionalTupleSugaring(isOpen, nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
+                        return this.optionalTupleSugaring(isOpen, nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                     }
                     else {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
@@ -358,11 +356,6 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][];
                 const assignments = opConstructorPrimary.args.map((x, index) => [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimary.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
                     , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
-
-                if (!this.isEkeyDeclared.has(current_tkey)) {
-                    this.isEkeyDeclared.add(current_tkey);
-                    this.entity_declarations.push(new EntityDeclaration(current_entity_decl));
-                }
 
                 assignments.unshift([
                     this.MIRArgumentToTermExpr(opConstructorPrimary.trgt, fkey, new ConstructorType(current_tkey, field_types)),
@@ -836,32 +829,6 @@ class FunctionDeclaration {
         // 1) recursive, 2) preconditions, 3) postconditions
         FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
         FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1, 1)}\n\n`);
-    }
-}
-
-// TODO: Incomplete implementation
-class ConceptDeclaration {
-    readonly declarations: MIRConceptTypeDecl;
-    constructor(declarations: MIRConceptTypeDecl) {
-        this.declarations = declarations;
-    }
-    print(fd: number): void {
-        // FS.writeSync(fd, `val ${sanitizeName(this.ckey)} : ${this.type.getFStarTerm()}\n`);
-        // FS.writeSync(fd, `let ${sanitizeName(this.ckey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
-    }
-}
-
-class EntityDeclaration {
-    readonly declarations: MIREntityTypeDecl;
-    constructor(declarations: MIREntityTypeDecl) {
-        this.declarations = declarations;
-        // this.declarations.tkey is the 'name'
-    }
-    // TODO: Figure out how to include the following fields:
-    // 1) invariants, 2) fields, 3) vcallMap, 4) provides
-    print(fd: number): void {
-        // FS.writeSync(fd, `val ${sanitizeName(this.ekey)} : ${this.type.getFStarTerm()}\n`);
-        // FS.writeSync(fd, `let ${sanitizeName(this.ekey)} ${this.args.join(" ")} = \n${this.program.toML(1)}\n\n`);
     }
 }
 
