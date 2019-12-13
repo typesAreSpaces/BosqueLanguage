@@ -47,17 +47,17 @@ nSMain__Musician
 (* Function Declarations *)
 val nSMain__max3 : (x:bosqueTerm{subtypeOf bTupleType_2BIntType_BIntTypefalse (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__max3 x = 
-  let __tmp_3 = (nthTuple 0 2 x) in 
-  let __tmp_6 = (nthTuple 1 2 x) in 
+ let __tmp_3 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 x)) in 
+  let __tmp_6 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 2 x)) in 
    let __tmp_0 = (extractBool (op_greaterOrEq __tmp_3 __tmp_6)) in 
     if __tmp_0 then 
-      let __tmp_9 = (nthTuple 0 2 x) in 
+     let __tmp_9 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 x)) in 
       let __ir_ret___1 = __tmp_9 in 
        let __ir_ret___2 = __ir_ret___1 in 
         let _return_ = __ir_ret___2 in 
          _return_
     else 
-      let __tmp_12 = (nthTuple 1 2 x) in 
+     let __tmp_12 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 1 2 x)) in 
       let __ir_ret__ = __tmp_12 in 
        let __ir_ret___2 = __ir_ret__ in 
         let _return_ = __ir_ret___2 in 
@@ -120,7 +120,7 @@ val nSMain__identityTupleNoneable : (x:bosqueTerm{subtypeOf bTupleType_2BIntType
 let nSMain__identityTupleNoneable x = 
  let __ir_ret__ = x in 
   let _return_ = __ir_ret__ in 
-   _return_
+   _return_ 
 
 val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__main  = 
@@ -165,18 +165,18 @@ let nSMain__main  =
                                        let __tmp_35 = (BTuple 2 (SCons (BInt 10) 1 (SCons (BInt 3) 0 SNil))) in 
                                         let __tmp_33 = (BTuple 2 (SCons (BInt 10) 1 (SCons __tmp_35 0 SNil))) in 
                                          let xTuple2_2 = __tmp_33 in 
-                                          let __tmp_40 = (nthTuple 1 2 xTuple2_1) in 
+                                          let __tmp_40 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 2 xTuple2_1)) in 
                                            let xTuple_second = __tmp_40 in 
-                                            assert_norm(subtypeOf bTupleType_2BIntType_BIntTypefalse (getType xTuple2_2); let __tmp_43 = (nthTuple 1 2 xTuple2_2) in 
+                                            let __tmp_43 = (cast (bosqueTerm) (x:bosqueTerm{bTupleType_2BIntType_BIntTypefalse=(getType x)}) (nthTuple 1 2 xTuple2_2)) in 
                                              let xTuple_second_ = __tmp_43 in 
-                                              let __tmp_44 = (nSMain__max3 xTuple_second) in 
+                                               assert_norm(subtypeOf bTupleType_2BIntType_BIntTypefalse (getType xTuple_second)); let __tmp_44 = (nSMain__max3 xTuple_second) in 
                                                let x_max_tuple = __tmp_44 in 
                                                 let __tmp_46 = (nSMain__max3 xTuple_second_) in 
                                                  let x_max_tuple_ = __tmp_46 in 
                                                   let __tmp_50 = (BTuple 2 (SCons (BInt 1) 1 (SCons (BInt 2) 0 SNil))) in 
                                                    let __tmp_53 = (BTuple 2 (SCons (BInt 3) 1 (SCons (BInt 4) 0 SNil))) in 
                                                     let __tmp_49 = (BTuple 3 (SCons __tmp_50 2 (SCons __tmp_53 1 (SCons (BInt 5) 0 SNil)))) in 
-                                                     let __tmp_57 = (nthTuple 2 3 __tmp_49) in 
+                                                     let __tmp_57 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 2 3 __tmp_49)) in 
                                                       let proj_tuple = __tmp_57 in 
                                                        let __tmp_71 = (BTuple 2 (SCons (BInt 1) 1 (SCons (BInt 1) 0 SNil))) in 
                                                         let __tmp_58 = (BTuple 16 (SCons (BInt 1) 15 (SCons (BInt 1) 14 (SCons (BInt 1) 13 (SCons (BInt 1) 12 (SCons (BInt 1) 11 (SCons (BInt 1) 10 (SCons (BInt 1) 9 (SCons (BInt 1) 8 (SCons (BInt 1) 7 (SCons (BInt 1) 6 (SCons (BInt 1) 5 (SCons (BInt 1) 4 (SCons __tmp_71 3 (SCons (BTypedString "hello" BAnyType) 2 (SCons (BBool false) 1 (SCons (BBool true) 0 SNil))))))))))))))))) in 
@@ -184,13 +184,13 @@ let nSMain__main  =
                                                           let y = (BInt 20) in 
                                                            let __tmp_78 = (nSMain__identityUnion y) in 
                                                             let y2 = __tmp_78 in 
-                                                             let __tmp_83 = (nthTuple 0 2 xTuple2) in 
+                                                             let __tmp_83 = (cast (bosqueTerm) (x:bosqueTerm{BIntType=(getType x)}) (nthTuple 0 2 xTuple2)) in 
                                                               let __tmp_80 = (nSMain__max __tmp_83 y) in 
                                                                let z = __tmp_80 in 
                                                                 let __tmp_85 = (nSMain__max z y) in 
                                                                  let z_max_func_repeated = __tmp_85 in 
                                                                   let __tmp_89 = (BTuple 3 (SCons (BInt 1) 2 (SCons (BBool true) 1 (SCons (BInt 2) 0 SNil)))) in 
-                                                                   let __tmp_88 = (nSMain__identityTupleOptional __tmp_89) in 
+                                                                   assert_norm(subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType __tmp_89)); let __tmp_88 = (nSMain__identityTupleOptional __tmp_89) in 
                                                                     let z2 = __tmp_88 in 
                                                                      let __tmp_94 = (BTuple 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)) in 
                                                                       let __tmp_93 = (nSMain__identityOpenTuple __tmp_94) in 
