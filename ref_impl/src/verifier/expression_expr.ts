@@ -25,6 +25,8 @@ class AssignmentExpr extends ExprExpr {
     readonly lhs: VarTerm;
     readonly rhs: TermExpr;
     readonly continuation: ExprExpr;
+    static assert_norm_flag: Set<string> = new Set<string>();
+
     constructor(lhs: VarTerm, rhs: TermExpr, continuation: ExprExpr) {
         super();
         this.lhs = lhs;
@@ -36,21 +38,52 @@ class AssignmentExpr extends ExprExpr {
         // to make sure FStar has enough information to infere the right information 
         if (this.rhs instanceof TupleProjExpr) {
             const arg = this.rhs.tuple;
-            const arg_type = this.rhs.ty;
-            const assertion_norm = "assert_norm(subtypeOf " + arg_type.getFStarTypeName() + " (getType (" + arg.toML() + ")); ";
-            return this.tabSymbol.repeat(indentatioLevel) 
-                + assertion_norm 
-                + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                + this.continuation.toML(indentatioLevel + offset, offset);
+
+            if (!AssignmentExpr.assert_norm_flag.has(arg.fkey + arg.symbolName)) {
+                AssignmentExpr.assert_norm_flag.add(arg.fkey + arg.symbolName);
+                const assertion_norm = "let _ = assert_norm(subtypeOf "
+                    + arg.ty.getFStarTypeName()
+                    + " (getType " + arg.toML() + ")) in";
+
+                return this.tabSymbol.repeat(indentatioLevel)
+                    + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
+                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                    + this.continuation.toML(indentatioLevel + offset, offset);
+            }
+            else {
+                return this.tabSymbol.repeat(indentatioLevel)
+                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                    + this.continuation.toML(indentatioLevel + offset, offset);
+            }
         }
 
         else {
             if (this.rhs instanceof FuncTerm) {
-                const assertion_norm = "";
-                return this.tabSymbol.repeat(indentatioLevel)
-                    + assertion_norm
-                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
+                const args = this.rhs.terms;
+                const assertion_norm = args.reduce((accum, current_expr) => {
+                    if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)) {
+                        AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbolName);
+                        const local_assertion_norm = "let _ = assert_norm(subtypeOf "
+                            + current_expr.ty.getFStarTypeName()
+                            + " (getType " + current_expr.toML() + ")) in";
+                        return local_assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel) + accum;
+                    }
+                    else {
+                        return accum;
+                    }
+                }, "");
+
+                if (assertion_norm.length != 0) {
+                    return this.tabSymbol.repeat(indentatioLevel)
+                        + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
+                        + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                        + this.continuation.toML(indentatioLevel + offset, offset);
+                }
+                else {
+                    return this.tabSymbol.repeat(indentatioLevel)
+                        + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                        + this.continuation.toML(indentatioLevel + offset, offset);
+                }
             }
             else {
                 return this.tabSymbol.repeat(indentatioLevel)

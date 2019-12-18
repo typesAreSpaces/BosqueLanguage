@@ -146,7 +146,7 @@ entity PlayerMark provides Parsable {
     }
 }
 
-entrypoint function main(): Int {
+entrypoint function main2(): Int {
 
     var string_test = "string_test";
     
@@ -195,4 +195,15 @@ entrypoint function main(): Int {
     var z5 = identityTupleNoneable([y, false]);
     
     return z;
+}
+
+entrypoint function main(): Int {
+    var xTuple2 = [10, 30];
+    var xTuple2_1 = [10, xTuple2];
+    var xTuple2_2 = [10, [10, 3]];
+    var xTuple_second = xTuple2_1.1;
+    var xTuple_second_ = xTuple2_2.1;
+    var x_max_tuple = max3(xTuple_second);
+    var x_max_tuple_ = max3(xTuple_second_);
+    return 2;
 }
