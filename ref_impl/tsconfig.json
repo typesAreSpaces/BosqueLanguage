@@ -15,15 +15,12 @@
         "./src/type_checker/*.ts",
         "./src/compiler/*.ts",
         "./src/test/*.ts",
-<<<<<<< HEAD
         "./src/verifier/*.ts",
-        "./src/verifier/testing/*.ts"
-=======
+        "./src/verifier/testing/*.ts",
         "./src/tooling/*.ts",
         "./src/tooling/aot/*.ts",
         "./src/tooling/bmc/*.ts",
         "./src/runtimes/exegen/*.ts",
         "./src/runtimes/symtest/*.ts"
->>>>>>> 011be1df489d493136d4b069d437378a0ad84bfd
     ]
 }

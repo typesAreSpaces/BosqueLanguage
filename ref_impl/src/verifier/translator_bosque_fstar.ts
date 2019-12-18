@@ -90,16 +90,18 @@ class TranslatorBosqueFStar {
                     nodesNeighbors.set(index, new Set<string>());
                 }
 
-                const types_from_provides = value.provides.map(x => x.trkey).filter(x => !x.includes("NSCore"));
-                const types_from_fields = value.fields.map(x => x.declaredType).filter(x => !x.includes("NSCore"));
-                const all_types = types_from_provides.concat(types_from_fields);
+                console.log(value.provides);
 
-                all_types.map(x => {
-                    if(nodesNeighbors.get(x) == undefined){
-                        nodesNeighbors.set(x, new Set<string>());
-                    }
-                    (nodesNeighbors.get(x) as Set<string>).add(index)
-                });
+                // const types_from_provides = value.provides.map(x => x.trkey).filter(x => !x.includes("NSCore"));
+                // const types_from_fields = value.fields.map(x => x.declaredType).filter(x => !x.includes("NSCore"));
+                // const all_types = types_from_provides.concat(types_from_fields);
+
+                // all_types.map(x => {
+                //     if(nodesNeighbors.get(x) == undefined){
+                //         nodesNeighbors.set(x, new Set<string>());
+                //     }
+                //     (nodesNeighbors.get(x) as Set<string>).add(index)
+                // });
 
             }
         });
