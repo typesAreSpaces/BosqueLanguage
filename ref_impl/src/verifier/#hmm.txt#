@@ -1,0 +1,264 @@
+MIRLoadConstTypedString {
+  tag: 'MIRLoadConstTypedString',
+  sinfo: SourceInfo { line: 157, column: 0, pos: 3575, span: 10 },
+  trgt: MIRTempRegister { nameID: '_#tmp_13', regID: 13 },
+  ivalue: "'x'",
+  tkey: 'NSMain::PlayerMark',
+  tskey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
+  pfunckey: 'NSMain::PlayerMark::tryParse'
+}
+FuncTerm {
+  symbolName: 'op_greaterOrEq',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::max3',
+  terms: [
+    VarTerm {
+      symbolName: '__tmp_3',
+      ty: [IntType],
+      fkey: 'NSMain::max3'
+    },
+    VarTerm {
+      symbolName: '__tmp_6',
+      ty: [IntType],
+      fkey: 'NSMain::max3'
+    }
+  ]
+}
+VarTerm {
+  symbolName: 'x',
+  ty: UnionType {
+    id: 'bUnionType_BIntType_BNoneType',
+    elements: Set { [IntType], [NoneType] }
+  },
+  fkey: 'NSMain::max'
+}
+FuncTerm {
+  symbolName: 'op_greaterOrEq',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::max',
+  terms: [
+    VarTerm { symbolName: 'x', ty: [UnionType], fkey: 'NSMain::max' },
+    VarTerm { symbolName: 'y', ty: [IntType], fkey: 'NSMain::max' }
+  ]
+}
+FuncTerm {
+  symbolName: 'op_greater',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::maxx',
+  terms: [
+    VarTerm { symbolName: 'y', ty: [IntType], fkey: 'NSMain::maxx' },
+    ConstTerm {
+      symbolName: '(BInt 0)',
+      ty: [IntType],
+      fkey: 'NSMain::maxx'
+    }
+  ]
+}
+VarTerm {
+  symbolName: '__tmp_6_arg_0',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_0',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_1',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_2',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_3',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_4',
+  ty:
+
+
+ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_8_arg_0',
+  ty: ConstructorType {
+    id: 'NSMain::Artist',
+    fields: [ [Array], [Array], [Array], [Array], [Array] ]
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_8_arg_1',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_11_arg_0',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_0',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_1',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_2',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_3',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_4',
+  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_0',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_1',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_2',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_3',
+  ty: TypedStringType {
+    id: 'bTypedStringType_BAnyType',
+    ty: AnyType { id: 'BAnyType' }
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_4',
+  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'xTuple_second',
+  ty: TupleType {
+    id: 'bTupleType_2BIntType_BIntTypefalse',
+    isOpen: false,
+    elements: [ [IntType], [IntType] ]
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'xTuple_second_',
+  ty: TupleType {
+    id: 'bTupleType_2BIntType_BIntTypefalse',
+    isOpen: false,
+    elements: [ [IntType], [IntType] ]
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'y',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_83',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'y',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'z',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: 'y',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_89',
+  ty: TupleType {
+    id: 'bTupleType_3BIntType_BBoolType_BIntTypefalse',
+    isOpen: false,
+    elements: [ [IntType], [BoolType], [IntType] ]
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_94',
+  ty: TupleType {
+    id: 'bTupleType_1bTypedStringType_BAnyTypefalse',
+    isOpen: false,
+    elements: [ [TypedStringType] ]
+  },
+  fkey: 'NSMain::main'
+}
+ConstTerm {
+  symbolName: '(BBool false)',
+  ty: BoolType { id: 'BBoolType' },
+  fkey: 'NSMain::main'
+}
+ConstTerm {
+  symbolName: '(BInt 3)',
+  ty: IntType { id: 'BIntType' },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_103',
+  ty: TupleType {
+    id: 'bTupleType_2BIntType_BBoolTypefalse',
+    isOpen: false,
+    elements: [ [IntType], [BoolType] ]
+  },
+  fkey: 'NSMain::main'
+}

@@ -4,6 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import { VarTerm, TermExpr, TupleProjExpr, FuncTerm } from "./term_expr";
+import { ConstructorType } from "./type_expr";
 
 abstract class ExprExpr {
     readonly tabSymbol = " ";
@@ -61,7 +62,8 @@ class AssignmentExpr extends ExprExpr {
             if (this.rhs instanceof FuncTerm) {
                 const args = this.rhs.terms;
                 const assertion_norm = args.reduce((accum, current_expr) => {
-                    if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)) {
+                    if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)
+                        && !(current_expr.ty instanceof ConstructorType)) {
                         AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbolName);
                         const local_assertion_norm = "let _ = assert_norm(subtypeOf "
                             + current_expr.ty.getFStarTypeName()

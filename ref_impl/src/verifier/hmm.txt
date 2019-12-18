@@ -1,0 +1,32 @@
+MIRLoadConstTypedString {
+  tag: 'MIRLoadConstTypedString',
+  sinfo: SourceInfo { line: 157, column: 0, pos: 3575, span: 10 },
+  trgt: MIRTempRegister { nameID: '_#tmp_13', regID: 13 },
+  ivalue: "'x'",
+  tkey: 'NSMain::PlayerMark',
+  tskey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
+  pfunckey: 'NSMain::PlayerMark::tryParse'
+}
+VarTerm {
+  symbolName: '__tmp_1_arg_4',
+  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_8_arg_0',
+  ty: ConstructorType {
+    id: 'NSMain::Artist',
+    fields: [ [Array], [Array], [Array], [Array], [Array] ]
+  },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_14_arg_4',
+  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
+VarTerm {
+  symbolName: '__tmp_20_arg_4',
+  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
+  fkey: 'NSMain::main'
+}
