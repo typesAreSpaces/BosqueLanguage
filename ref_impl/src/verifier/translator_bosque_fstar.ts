@@ -58,7 +58,7 @@ class TranslatorBosqueFStar {
 
     constructor(masm: MIRAssembly, fileName: string) {
         this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
-    
+        
         this.mapFuncDeclarations = masm.invokeDecls;
         TranslatorBosqueFStar.mapConceptDeclarations = masm.conceptDecls;
         TranslatorBosqueFStar.mapEntityDeclarations = masm.entityDecls;
@@ -68,9 +68,9 @@ class TranslatorBosqueFStar {
         TranslatorBosqueFStar.entitiesUsed = this.serializeTypes(TranslatorBosqueFStar.mapEntityDeclarations);
 
         // masm.primitiveInvokeDecls contains all the functions
-        // used in the Bosque File from the Core and Collection library
 
-        // FIX: This is wrong, but temporarily useful (?)
+        // used in the Bosque File from the Core and Collection library
+        // FIX: This is wrong, but temporarily useful
         masm.primitiveInvokeDecls.forEach((_, index) => {
             this.mapFuncDeclarations.set(index, (this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl))
         });
@@ -221,9 +221,9 @@ class TranslatorBosqueFStar {
                     }
 
                 }
-                console.log("Error at translator_bosque_fstar::stringVarToTypeExpr: The case " + s + " is not implemented yet");
-                throw new Error("Error at translator_bosque_fstar::stringVarToTypeExpr: The case " + s + " is not implemented yet");
-                
+                // FIX: This is wrong, but temporarily useful
+                console.log(`------ ERROR: Unknown typed ${s} found while executing stringVarToTypeExpr ------`);
+                return TranslatorBosqueFStar.noneType;
             }
         }
     }
@@ -253,8 +253,9 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                console.log("Error at translator_bosque_fstar::stringConstToTypeExpr: The case " + stringConst + " is not implemented yet");
-                throw new Error("Error at translator_bosque_fstar::stringConstToTypeExpr: The case " + stringConst + " is not implemented yet");
+                // // FIX: This is wrong, but temporarily useful
+                // return TranslatorBosqueFStar.noneType;
+                throw new Error("The case " + stringConst + " is not implemented yet");
             }
         }
     }
@@ -317,9 +318,8 @@ class TranslatorBosqueFStar {
                 // console.log(opMIRLoadConstTypedString.tkey);
                 // console.log("The following provides the _type_ of the Typed String declared");
                 // console.log(opMIRLoadConstTypedString.tskey);
-                console.log(this.types_seen);
                 return [
-                    this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, fkey, TranslatorBosqueFStar.intType),
+                    this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, opMIRLoadConstTypedString.tkey, TranslatorBosqueFStar.intType),
                     // This is WRONG
                     new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)
                 ];

@@ -37,7 +37,6 @@ class AssignmentExpr extends ExprExpr {
     toML(indentatioLevel: number, offset: number) {
         // Add assertion_norm statemenet to the arguments of a function call
         // to make sure FStar has enough information to infere the right information 
-        // TODO: Include more special cases for additional function calls
         if (this.rhs instanceof TupleProjExpr) {
             const arg = this.rhs.tuple;
 
@@ -59,38 +58,40 @@ class AssignmentExpr extends ExprExpr {
             }
         }
 
-        if (this.rhs instanceof FuncTerm) {
-            const args = this.rhs.terms;
-            const assertion_norm = args.reduce((accum, current_expr) => {
-                if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)
-                    && !(current_expr.ty instanceof ConstructorType)) {
-                    AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbolName);
-                    const local_assertion_norm = "let _ = assert_norm(subtypeOf "
-                        + current_expr.ty.getFStarTypeName()
-                        + " (getType " + current_expr.toML() + ")) in";
-                    return local_assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel) + accum;
+        else {
+            if (this.rhs instanceof FuncTerm) {
+                const args = this.rhs.terms;
+                const assertion_norm = args.reduce((accum, current_expr) => {
+                    if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)
+                        && !(current_expr.ty instanceof ConstructorType)) {
+                        AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbolName);
+                        const local_assertion_norm = "let _ = assert_norm(subtypeOf "
+                            + current_expr.ty.getFStarTypeName()
+                            + " (getType " + current_expr.toML() + ")) in";
+                        return local_assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel) + accum;
+                    }
+                    else {
+                        return accum;
+                    }
+                }, "");
+
+                if (assertion_norm.length != 0) {
+                    return this.tabSymbol.repeat(indentatioLevel)
+                        + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
+                        + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                        + this.continuation.toML(indentatioLevel + offset, offset);
                 }
                 else {
-                    return accum;
+                    return this.tabSymbol.repeat(indentatioLevel)
+                        + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
+                        + this.continuation.toML(indentatioLevel + offset, offset);
                 }
-            }, "");
-
-            if (assertion_norm.length != 0) {
-                return this.tabSymbol.repeat(indentatioLevel)
-                    + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
-                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
             }
             else {
                 return this.tabSymbol.repeat(indentatioLevel)
                     + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
                     + this.continuation.toML(indentatioLevel + offset, offset);
             }
-        }
-        else {
-            return this.tabSymbol.repeat(indentatioLevel)
-                + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                + this.continuation.toML(indentatioLevel + offset, offset);
         }
     }
 }

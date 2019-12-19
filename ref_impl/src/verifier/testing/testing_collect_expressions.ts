@@ -24,8 +24,7 @@ setImmediate(() => {
     const fkey = "NSMain::main";
     const masm = bosqueToMASM({ directory: directory, fileName: fileName }); 
     const fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
-
     const translator = new TranslatorBosqueFStar(masm, fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1));
+
     translator.generateFStarCode(fkey);
-    
 });
