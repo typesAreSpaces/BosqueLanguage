@@ -29,17 +29,17 @@ function identityUnion(x : Int | None | String | Bool) : Int | None | String | B
     return x;
 }
 
-function identityOpenTuple(x : [String, ...]): [String, ...] {
-    return x;
-}
+// function identityOpenTuple(x : [String, ...]): [String, ...] {
+//    return x;
+// }
 
 function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
-function identityTupleOptional(x : [Int, Bool, Int, ?:None, ?:Bool, ...]) : [Int, Bool, Int, ?:None, ?:Bool, ...] {
-    return x;
-}
+// function identityTupleOptional(x : [Int, Bool, Int, ?:None, ?:Bool, ...]) : [Int, Bool, Int, ?:None, ?:Bool, ...] {
+//     return x;
+// }
 
 function max(x: Int | None, y: Int): Int
     ensures _return_ == x || _return_ == y;
@@ -183,10 +183,6 @@ entrypoint function main(): Int {
 
     var z = max(xTuple2.0, y);
     var z_max_func_repeated = max(z, y);
-
-    var z2 = identityTupleOptional([1, true, 2]);
-
-    var z3 = identityOpenTuple(["hello"]);
     
     var z4 = maxx(false, 3);
     

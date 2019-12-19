@@ -12,11 +12,6 @@ let bTupleType_3bTupleType_2BIntType_BIntTypefalse_bTupleType_2BIntType_BIntType
 let bTupleType_16BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_BIntType_bTupleType_2BIntType_BIntTypefalse_bTypedStringType_BAnyType_BBoolType_BBoolTypefalse = BTupleType false 16 (SCons BIntType 15 (SCons BIntType 14 (SCons BIntType 13 (SCons BIntType 12 (SCons BIntType 11 (SCons BIntType 10 (SCons BIntType 9 (SCons BIntType 8 (SCons BIntType 7 (SCons BIntType 6 (SCons BIntType 5 (SCons BIntType 4 (SCons bTupleType_2BIntType_BIntTypefalse 3 (SCons bTypedStringType_BAnyType 2 (SCons BBoolType 1 (SCons BBoolType 0 SNil))))))))))))))))
 let bUnionType_BBoolType_BIntType_BNoneType_bTypedStringType_BAnyType = (BUnionType BBoolType (BUnionType BIntType (BUnionType BNoneType bTypedStringType_BAnyType)))
 let bUnionType_BIntType_BNoneType = (BUnionType BIntType BNoneType)
-let bTupleType_3BIntType_BBoolType_BIntTypefalse = BTupleType false 3 (SCons BIntType 2 (SCons BBoolType 1 (SCons BIntType 0 SNil)))
-let bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = BTupleType true 4 (SCons BIntType 3 (SCons BBoolType 2 (SCons BIntType 1 (SCons BBoolType 0 SNil))))
-let bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue = (BUnionType bTupleType_3BIntType_BBoolType_BIntTypefalse bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue)
-let bTupleType_1bTypedStringType_BAnyTypefalse = BTupleType false 1 (SCons bTypedStringType_BAnyType 0 SNil)
-let bTupleType_1bTypedStringType_BAnyTypetrue = BTupleType true 1 (SCons bTypedStringType_BAnyType 0 SNil)
 let bUnionType_BBoolType_BNoneType = (BUnionType BBoolType BNoneType)
 let bUnionType_BBoolType_BIntType_BNoneType = (BUnionType BBoolType (BUnionType BIntType BNoneType))
 let bUnionType_BBoolType_BNoneType_BIntType = (BUnionType BBoolType (BUnionType BNoneType BIntType))
@@ -96,18 +91,6 @@ let nSMain__max x y =
       let __ir_ret___3 = __ir_ret__ in 
        let _return_ = __ir_ret___3 in 
         _return_
-
-val nSMain__identityTupleOptional : (x:bosqueTerm{subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_bTupleType_3BIntType_BBoolType_BIntTypefalse_bTupleType_4BIntType_BBoolType_BIntType_BBoolTypetrue (getType x)})
-let nSMain__identityTupleOptional x = 
- let __ir_ret__ = x in 
-  let _return_ = __ir_ret__ in 
-   _return_
-
-val nSMain__identityOpenTuple : (x:bosqueTerm{subtypeOf bTupleType_1bTypedStringType_BAnyTypetrue (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bTupleType_1bTypedStringType_BAnyTypetrue (getType x)})
-let nSMain__identityOpenTuple x = 
- let __ir_ret__ = x in 
-  let _return_ = __ir_ret__ in 
-   _return_
 
 val nSMain__maxx : (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BNoneType (getType x)}) -> (x:bosqueTerm{subtypeOf BIntType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf bUnionType_BBoolType_BIntType_BNoneType (getType x)})
 let nSMain__maxx x y = 
@@ -233,29 +216,19 @@ let nSMain__main  =
                                                                 
                                                                 let __tmp_85 = (nSMain__max z y) in 
                                                                  let z_max_func_repeated = __tmp_85 in 
-                                                                  let __tmp_89 = (BTuple 3 (SCons (BInt 1) 2 (SCons (BBool true) 1 (SCons (BInt 2) 0 SNil)))) in 
-                                                                   let _ = assert_norm(subtypeOf bTupleType_3BIntType_BBoolType_BIntTypefalse (getType __tmp_89)) in
-                                                                   
-                                                                   let __tmp_88 = (nSMain__identityTupleOptional __tmp_89) in 
-                                                                    let z2 = __tmp_88 in 
-                                                                     let __tmp_94 = (BTuple 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)) in 
-                                                                      let _ = assert_norm(subtypeOf bTupleType_1bTypedStringType_BAnyTypefalse (getType __tmp_94)) in
-                                                                      
-                                                                      let __tmp_93 = (nSMain__identityOpenTuple __tmp_94) in 
-                                                                       let z3 = __tmp_93 in 
-                                                                        let _ = assert_norm(subtypeOf BIntType (getType (BInt 3))) in
-                                                                        let _ = assert_norm(subtypeOf BBoolType (getType (BBool false))) in
-                                                                        
-                                                                        let __tmp_96 = (nSMain__maxx (BBool false) (BInt 3)) in 
-                                                                         let z4 = __tmp_96 in 
-                                                                          let __tmp_99 = (BTuple 2 (SCons xTuple2 1 (SCons y 0 SNil))) in 
-                                                                           let zTuple2 = __tmp_99 in 
-                                                                            let __tmp_103 = (BTuple 2 (SCons y 1 (SCons (BBool false) 0 SNil))) in 
-                                                                             let _ = assert_norm(subtypeOf bTupleType_2BIntType_BBoolTypefalse (getType __tmp_103)) in
-                                                                             
-                                                                             let __tmp_102 = (nSMain__identityTupleNoneable __tmp_103) in 
-                                                                              let z5 = __tmp_102 in 
-                                                                               let __ir_ret__ = z in 
-                                                                                let _return_ = __ir_ret__ in 
-                                                                                 _return_
+                                                                  let _ = assert_norm(subtypeOf BIntType (getType (BInt 3))) in
+                                                                  let _ = assert_norm(subtypeOf BBoolType (getType (BBool false))) in
+                                                                  
+                                                                  let __tmp_88 = (nSMain__maxx (BBool false) (BInt 3)) in 
+                                                                   let z4 = __tmp_88 in 
+                                                                    let __tmp_91 = (BTuple 2 (SCons xTuple2 1 (SCons y 0 SNil))) in 
+                                                                     let zTuple2 = __tmp_91 in 
+                                                                      let __tmp_95 = (BTuple 2 (SCons y 1 (SCons (BBool false) 0 SNil))) in 
+                                                                       let _ = assert_norm(subtypeOf bTupleType_2BIntType_BBoolTypefalse (getType __tmp_95)) in
+                                                                       
+                                                                       let __tmp_94 = (nSMain__identityTupleNoneable __tmp_95) in 
+                                                                        let z5 = __tmp_94 in 
+                                                                         let __ir_ret__ = z in 
+                                                                          let _return_ = __ir_ret__ in 
+                                                                           _return_
 

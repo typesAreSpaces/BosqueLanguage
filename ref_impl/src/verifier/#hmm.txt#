@@ -1,264 +1,309 @@
+Map {
+  'NSCore::POD' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::POD',
+    tkey: 'NSCore::POD',
+    sourceLocation: SourceInfo { line: 47, column: 0, pos: 1797, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'POD',
+    terms: Map {},
+    provides: [ 'NSCore::Any', 'NSCore::Parsable' ]
+  },
+  'NSCore::Parsable' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Parsable',
+    tkey: 'NSCore::Parsable',
+    sourceLocation: SourceInfo { line: 42, column: 0, pos: 1630, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Parsable',
+    terms: Map {},
+    provides: [ 'NSCore::Any' ]
+  },
+  'NSCore::KeyType' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::KeyType',
+    tkey: 'NSCore::KeyType',
+    sourceLocation: SourceInfo { line: 38, column: 0, pos: 1499, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'KeyType',
+    terms: Map {},
+    provides: [ 'NSCore::Any', 'NSCore::Indexable' ]
+  },
+  'NSCore::Indexable' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Indexable',
+    tkey: 'NSCore::Indexable',
+    sourceLocation: SourceInfo { line: 29, column: 0, pos: 1151, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Indexable',
+    terms: Map {},
+    provides: [ 'NSCore::Any' ]
+  },
+  'NSCore::Truthy' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Truthy',
+    tkey: 'NSCore::Truthy',
+    sourceLocation: SourceInfo { line: 58, column: 0, pos: 2259, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Truthy',
+    terms: Map {},
+    provides: [ 'NSCore::POD' ]
+  },
+  'NSCore::Record' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Record',
+    tkey: 'NSCore::Record',
+    sourceLocation: SourceInfo { line: 142, column: 0, pos: 4893, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Record',
+    terms: Map {},
+    provides: [ 'NSCore::Some' ]
+  },
+  'NSCore::Tuple' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Tuple',
+    tkey: 'NSCore::Tuple',
+    sourceLocation: SourceInfo { line: 133, column: 0, pos: 4594, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Tuple',
+    terms: Map {},
+    provides: [ 'NSCore::Some' ]
+  },
+  'NSCore::Some' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Some',
+    tkey: 'NSCore::Some',
+    sourceLocation: SourceInfo { line: 22, column: 0, pos: 893, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Some',
+    terms: Map {},
+    provides: [ 'NSCore::Any' ]
+  },
+  'NSCore::Any' => MIRConceptTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Any',
+    tkey: 'NSCore::Any',
+    sourceLocation: SourceInfo { line: 10, column: 0, pos: 536, span: 7 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Any',
+    terms: Map {},
+    provides: []
+  }
+}
+Map {
+  'NSCore::String' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::String',
+    tkey: 'NSCore::String',
+    sourceLocation: SourceInfo { line: 86, column: 0, pos: 3069, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'String',
+    terms: Map {},
+    provides: [ 'NSCore::KeyType', 'NSCore::POD', 'NSCore::Some' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSCore::Int' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Int',
+    tkey: 'NSCore::Int',
+    sourceLocation: SourceInfo { line: 73, column: 0, pos: 2748, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Int',
+    terms: Map {},
+    provides: [ 'NSCore::KeyType', 'NSCore::POD', 'NSCore::Some' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSCore::Bool' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::Bool',
+    tkey: 'NSCore::Bool',
+    sourceLocation: SourceInfo { line: 68, column: 0, pos: 2583, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'Bool',
+    terms: Map {},
+    provides: [ 'NSCore::KeyType', 'NSCore::Some', 'NSCore::Truthy' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSCore::None' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::None',
+    tkey: 'NSCore::None',
+    sourceLocation: SourceInfo { line: 63, column: 0, pos: 2424, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'None',
+    terms: Map {},
+    provides: [ 'NSCore::KeyType', 'NSCore::Truthy' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSCore::StringOf<T=NSMain::PlayerMark>' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [],
+    vcallMap: Map {},
+    ooname: 'NSCore::StringOf',
+    tkey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
+    sourceLocation: SourceInfo { line: 91, column: 0, pos: 3236, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSCore',
+    name: 'StringOf',
+    terms: Map { 'T' => [MIRType] },
+    provides: [ 'NSCore::KeyType', 'NSCore::Some' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSMain::Musician' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [ [MIRFieldDecl], [MIRFieldDecl] ],
+    vcallMap: Map {},
+    ooname: 'NSMain::Musician',
+    tkey: 'NSMain::Musician',
+    sourceLocation: SourceInfo { line: 132, column: 0, pos: 2690, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSMain',
+    name: 'Musician',
+    terms: Map {},
+    provides: [ 'NSCore::Parsable' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSMain::Artist' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [
+      [MIRFieldDecl],
+      [MIRFieldDecl],
+      [MIRFieldDecl],
+      [MIRFieldDecl],
+      [MIRFieldDecl]
+    ],
+    vcallMap: Map {},
+    ooname: 'NSMain::Artist',
+    tkey: 'NSMain::Artist',
+    sourceLocation: SourceInfo { line: 120, column: 0, pos: 2247, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSMain',
+    name: 'Artist',
+    terms: Map {},
+    provides: [ 'NSCore::Parsable' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  },
+  'NSMain::PlayerMark' => MIREntityTypeDecl {
+    invariants: [],
+    fields: [ [MIRFieldDecl] ],
+    vcallMap: Map {},
+    ooname: 'NSMain::PlayerMark',
+    tkey: 'NSMain::PlayerMark',
+    sourceLocation: SourceInfo { line: 141, column: 0, pos: 3072, span: 6 },
+    srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+    attributes: [],
+    pragmas: [],
+    ns: 'NSMain',
+    name: 'PlayerMark',
+    terms: Map {},
+    provides: [ 'NSCore::Parsable' ],
+    isEnum: false,
+    isKey: false,
+    isCollectionEntityType: false,
+    isMapEntityType: false
+  }
+}
+[ 'NSCore::Parsable' ]
+[ 'NSCore::Parsable' ]
+[ 'NSCore::Parsable' ]
 MIRLoadConstTypedString {
   tag: 'MIRLoadConstTypedString',
-  sinfo: SourceInfo { line: 157, column: 0, pos: 3575, span: 10 },
+  sinfo: SourceInfo { line: 157, column: 0, pos: 3592, span: 10 },
   trgt: MIRTempRegister { nameID: '_#tmp_13', regID: 13 },
   ivalue: "'x'",
   tkey: 'NSMain::PlayerMark',
   tskey: 'NSCore::StringOf<T=NSMain::PlayerMark>',
   pfunckey: 'NSMain::PlayerMark::tryParse'
-}
-FuncTerm {
-  symbolName: 'op_greaterOrEq',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::max3',
-  terms: [
-    VarTerm {
-      symbolName: '__tmp_3',
-      ty: [IntType],
-      fkey: 'NSMain::max3'
-    },
-    VarTerm {
-      symbolName: '__tmp_6',
-      ty: [IntType],
-      fkey: 'NSMain::max3'
-    }
-  ]
-}
-VarTerm {
-  symbolName: 'x',
-  ty: UnionType {
-    id: 'bUnionType_BIntType_BNoneType',
-    elements: Set { [IntType], [NoneType] }
-  },
-  fkey: 'NSMain::max'
-}
-FuncTerm {
-  symbolName: 'op_greaterOrEq',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::max',
-  terms: [
-    VarTerm { symbolName: 'x', ty: [UnionType], fkey: 'NSMain::max' },
-    VarTerm { symbolName: 'y', ty: [IntType], fkey: 'NSMain::max' }
-  ]
-}
-FuncTerm {
-  symbolName: 'op_greater',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::maxx',
-  terms: [
-    VarTerm { symbolName: 'y', ty: [IntType], fkey: 'NSMain::maxx' },
-    ConstTerm {
-      symbolName: '(BInt 0)',
-      ty: [IntType],
-      fkey: 'NSMain::maxx'
-    }
-  ]
-}
-VarTerm {
-  symbolName: '__tmp_6_arg_0',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_1_arg_0',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_1_arg_1',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_1_arg_2',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_1_arg_3',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_1_arg_4',
-  ty:
-
-
-ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_8_arg_0',
-  ty: ConstructorType {
-    id: 'NSMain::Artist',
-    fields: [ [Array], [Array], [Array], [Array], [Array] ]
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_8_arg_1',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_11_arg_0',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_14_arg_0',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_14_arg_1',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_14_arg_2',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_14_arg_3',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_14_arg_4',
-  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_20_arg_0',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_20_arg_1',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_20_arg_2',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_20_arg_3',
-  ty: TypedStringType {
-    id: 'bTypedStringType_BAnyType',
-    ty: AnyType { id: 'BAnyType' }
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_20_arg_4',
-  ty: ConstructorType { id: 'NSMain::PlayerMark', fields: [ [Array] ] },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'xTuple_second',
-  ty: TupleType {
-    id: 'bTupleType_2BIntType_BIntTypefalse',
-    isOpen: false,
-    elements: [ [IntType], [IntType] ]
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'xTuple_second_',
-  ty: TupleType {
-    id: 'bTupleType_2BIntType_BIntTypefalse',
-    isOpen: false,
-    elements: [ [IntType], [IntType] ]
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'y',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_83',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'y',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'z',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: 'y',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_89',
-  ty: TupleType {
-    id: 'bTupleType_3BIntType_BBoolType_BIntTypefalse',
-    isOpen: false,
-    elements: [ [IntType], [BoolType], [IntType] ]
-  },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_94',
-  ty: TupleType {
-    id: 'bTupleType_1bTypedStringType_BAnyTypefalse',
-    isOpen: false,
-    elements: [ [TypedStringType] ]
-  },
-  fkey: 'NSMain::main'
-}
-ConstTerm {
-  symbolName: '(BBool false)',
-  ty: BoolType { id: 'BBoolType' },
-  fkey: 'NSMain::main'
-}
-ConstTerm {
-  symbolName: '(BInt 3)',
-  ty: IntType { id: 'BIntType' },
-  fkey: 'NSMain::main'
-}
-VarTerm {
-  symbolName: '__tmp_103',
-  ty: TupleType {
-    id: 'bTupleType_2BIntType_BBoolTypefalse',
-    isOpen: false,
-    elements: [ [IntType], [BoolType] ]
-  },
-  fkey: 'NSMain::main'
 }

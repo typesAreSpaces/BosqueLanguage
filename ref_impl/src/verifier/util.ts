@@ -19,10 +19,10 @@ function bosqueToMASM(info: PathFile): MIRAssembly {
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../"));
     let files: { relativePath: string, contents: string }[] = [];
     try {
-        const coredir = Path.join(bosque_dir, "src/core/core.bsq");
+        const coredir = Path.join(bosque_dir, "src/core/direct/core.bsq");
         const coredata = FS.readFileSync(coredir).toString();
 
-        const collectionsdir = Path.join(bosque_dir, "src/core/collections.bsq");
+        const collectionsdir = Path.join(bosque_dir, "src/core/direct/collections.bsq");
         const collectionsdata = FS.readFileSync(collectionsdir).toString();
 
         const appdir = info.directory + info.fileName;
