@@ -6,6 +6,7 @@ open Util
 
 (* Type names *)
 let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bTypedStringType_BnSMain__PlayerMarkType = (BTypedStringType BnSMain__PlayerMarkType)
 let bTupleType_2BIntType_BIntTypefalse = BTupleType false 2 (SCons BIntType 1 (SCons BIntType 0 SNil))
 let bTupleType_2BIntType_bTupleType_2BIntType_BIntTypefalsefalse = BTupleType false 2 (SCons BIntType 1 (SCons bTupleType_2BIntType_BIntTypefalse 0 SNil))
 let bTupleType_3bTupleType_2BIntType_BIntTypefalse_bTupleType_2BIntType_BIntTypefalse_BIntTypefalse = BTupleType false 3 (SCons bTupleType_2BIntType_BIntTypefalse 2 (SCons bTupleType_2BIntType_BIntTypefalse 1 (SCons BIntType 0 SNil)))
@@ -22,20 +23,20 @@ let bTupleType_2BIntType_bUnionType_BBoolType_BNoneTypefalse = BTupleType false 
 (* Concept Declarations *)
 
 (* Entity Declarations *)
-type nSMain__PlayerMark = 
-| BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
-nSMain__PlayerMark
-type nSMain__Artist = 
-| BnSMain__Artist : id : bosqueTerm{BIntType = (getType id)} -> 
-isGood : bosqueTerm{BBoolType = (getType isGood)} -> 
-lastName : bosqueTerm{bTypedStringType_BAnyType = (getType lastName)} -> 
-name : bosqueTerm{bTypedStringType_BAnyType = (getType name)} -> 
-player : nSMain__PlayerMark -> 
-nSMain__Artist
-type nSMain__Musician = 
-| BnSMain__Musician : artist : nSMain__Artist -> 
-instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
-nSMain__Musician
+// type nSMain__PlayerMark = 
+// | BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
+// nSMain__PlayerMark
+// type nSMain__Artist = 
+// | BnSMain__Artist : id : bosqueTerm{BIntType = (getType id)} -> 
+// isGood : bosqueTerm{BBoolType = (getType isGood)} -> 
+// lastName : bosqueTerm{bTypedStringType_BAnyType = (getType lastName)} -> 
+// name : bosqueTerm{bTypedStringType_BAnyType = (getType name)} -> 
+// player : BnSMain__PlayerMarkType -> 
+// nSMain__Artist
+// type nSMain__Musician = 
+// | BnSMain__Musician : artist : BnSMain__ArtistType -> 
+// instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
+// nSMain__Musician
 
 (* Constant Declarations *)
 
@@ -144,7 +145,7 @@ let nSMain__main  =
                 
                 let __tmp_11 = (BnSMain__PlayerMark __tmp_11_arg_0) in 
                  let player1 = __tmp_11 in 
-                  let __tmp_13 = (BInt 0) in 
+                  let __tmp_13 = (BTypedString "x" BnSMain__PlayerMarkType) in 
                    let player2 = __tmp_13 in 
                     let __tmp_14_arg_4 = player1 in 
                      let __tmp_14_arg_3 = (BTypedString "Peter" BAnyType) in 

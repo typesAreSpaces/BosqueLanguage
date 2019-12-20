@@ -354,7 +354,7 @@ class KeyedType extends TypeExpr {
 class ConstructorType extends TypeExpr {
     readonly fields: [string, TypeExpr][];
     constructor(constructorName: string, fields: [string, TypeExpr][]) {
-        super(constructorName);
+        super("B" + constructorName + "Type");
         this.fields = fields;
     }
     getFStarTerm() {

@@ -306,7 +306,9 @@ let testf3 = BTuple 3 (SCons (BInt 0) 2 (SCons (BBool true) 1 (SCons (BInt 12) 0
 // Demo: change the testfx where x is {0, 1, 2, 3}
 let testf4 = withOpenTuple2' testf3
 
-let openTuple2_openTuple2Int_Bool_Bool = (BTupleType true 2 (SCons ((BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil)))) 1 (SCons (BBoolType) 0 SNil)))  
+let openTuple2_openTuple2Int_Bool_Bool = (BTupleType true 2 (SCons 
+((BTupleType true 2 (SCons (BIntType) 1 (SCons (BBoolType) 0 SNil))))
+1 (SCons (BBoolType) 0 SNil)))  
 
 val withOpenTupleTuple : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (bool)
 let withOpenTupleTuple x = match x with
@@ -314,11 +316,11 @@ let withOpenTupleTuple x = match x with
 | BTuple 3 seq -> true
 | BTuple m seq -> true  
 
-val withOpenTupleTuple' : x:bosqueTerm{subtypeOf openTuple2_openTuple2Int_Bool_Bool (getType x)} -> Tot (y:bosqueTerm{isInt y})
+val withOpenTupleTuple' : x:bosqueTerm{openTuple2_openTuple2Int_Bool_Bool = (getType x)} -> Tot (y:bosqueTerm{isInt y})
 let withOpenTupleTuple' x = match x with
-| BTuple 2 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
+| BTuple 2 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in let _ = assert_norm(isInt temp2) in temp2
 | BTuple 3 seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
-| BTuple m seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2 
+| BTuple m seq -> let temp1 = nthTuple 0 2 x in let temp2 = nthTuple 0 2 temp1 in temp2
 
 (* -------------------------------------------------------------------------------------------------------------------------------------- *)
 

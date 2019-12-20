@@ -8,14 +8,38 @@ open BosqueTypes
 type bosqueTerm = 
 | BNone : bosqueTerm
 | BBool : bool -> bosqueTerm
-| BInt : int -> bosqueTerm
+| BInt : int -> bosqueTerm 
 // No support for Float
 // No support for Regex
 | BTypedString : value:string -> content_type:bosqueType -> bosqueTerm
 | BGUID : string -> int -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
 | BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm
-| BError : bosqueTerm 
+| BError : bosqueTerm
+// User-defined terms
+| BnSMain__PlayerMark : mark : bosqueTerm -> 
+bosqueTerm
+| BnSMain__Artist : id : bosqueTerm -> 
+isGood : bosqueTerm -> 
+lastName : bosqueTerm -> 
+name : bosqueTerm -> 
+player : bosqueTerm -> 
+bosqueTerm
+| BnSMain__Musician : artist : bosqueTerm -> 
+instrument : bosqueTerm -> 
+bosqueTerm
+
+// | BnSMain__PlayerMark : mark : bosqueTerm{bTypedStringType_BAnyType = (getType mark)} -> 
+// nSMain__PlayerMark
+// | BnSMain__Artist : id : bosqueTerm{BIntType = (getType id)} -> 
+// isGood : bosqueTerm{BBoolType = (getType isGood)} -> 
+// lastName : bosqueTerm{bTypedStringType_BAnyType = (getType lastName)} -> 
+// name : bosqueTerm{bTypedStringType_BAnyType = (getType name)} -> 
+// player : nSMain__PlayerMark -> 
+// nSMain__Artist
+// | BnSMain__Musician : artist : nSMain__Artist -> 
+// instrument : bosqueTerm{bTypedStringType_BAnyType = (getType instrument)} -> 
+// nSMain__Musician
 
 (* Definition of getType *)
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -30,6 +54,10 @@ let rec getType x = match x with
 // FIX: The following is incomplete
 | BRecord _ _ -> BRecordType false 0 SNil
 | BError -> BErrorType
+// User-defined terms
+| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
+| BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
+| BnSMain__Musician _ _ -> BnSMain__MusicianType
 and
 getTypeSeq n x = match x with
 | SNil -> SNil
@@ -170,7 +198,7 @@ let op_or x y = match x, y with
 (* Number operations *)
 val op_mult : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isInt z})
 let op_mult x y = match x, y with
-| BInt x1, BInt y1 -> BInt (op_Multiply x1 y1)
+| BInt x1, BInt y1 -> BInt (op_Multiply x1 y1) 
 
 val op_sub : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isInt z})
 let op_sub x y = match x, y with

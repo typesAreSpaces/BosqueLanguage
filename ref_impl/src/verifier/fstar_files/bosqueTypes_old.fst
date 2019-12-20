@@ -1,4 +1,4 @@
-module BosqueTypes_old
+module BosqueTypes
 
 open Sequence
 module Util=Util
@@ -36,56 +36,26 @@ type bosqueType =
 // FIX: The following is incomplete
 | BKeyedType
 | BErrorType
-
-val lemma_eq_type : a : bosqueType -> b : bosqueType -> c : bosqueType -> Lemma (requires (a = b /\ b = c)) (ensures a = c)
-let lemma_eq_type a b c = ()
+// User-defined types
+| BnSMain__PlayerMarkType
+| BnSMain__ArtistType
+| BnSMain__MusicianType
 
 (* Definition of equality relation on Bosque types *)
-val eqTypeSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
-val eqType : x:bosqueType -> bosqueType -> Tot bool (decreases x)
-let rec eqType x y = match x, y with
-| BAnyType, BAnyType -> true
-| BSomeType, BSomeType -> true
-| BTruthyType, BTruthyType -> true
-| BNoneType, BNoneType -> true
-// The following might be incomplete, but if Unions are normalized then it is complete
-| BUnionType x1 x2 , BUnionType y1 y2 -> eqType x1 y1 && eqType x2 y2
-| BParseableType, BParseableType -> true 
-| BBoolType, BBoolType -> true
-| BIntType, BIntType -> true
-| BFloatType, BFloatType -> true
-| BRegexType, BRegexType -> true
-| BTypedStringType t1, BTypedStringType t2 -> (eqType t1 t2)
-| BGUIDType, BGUIDType -> true 
-| BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> (b1 = b2) && (n1 = n2) && eqTypeSeq n1 seq1 seq2
-// FIX: The following is wrong
-| BRecordType _ _ _, BRecordType _ _ _ -> true
-// FIX: The following is incomplete
-| BFunctionType, BFunctionType -> true
-// FIX: The following is incomplete
-| BObjectType, BObjectType -> true
-// FIX: The following is incomplete
-| BEnumType, BEnumType -> true
-// FIX: The following is incomplete
-| BCustomKeyType, BCustomKeyType -> true
-// FIX: The following is incomplete
-| BKeyedType, BKeyedType -> true
-| BErrorType, BErrorType -> true
-| _, _ -> false
-and
-eqTypeSeq n x y = match x with
+val eqTypeSeq : n:nat -> sequence bosqueType n -> sequence bosqueType n -> Tot bool 
+let rec eqTypeSeq n x y = match x with
 | SNil -> (match y with 
          | SNil -> true
          | _ -> false
          )
 | SCons x1 m xs1 -> (match y with 
                    | SNil -> false
-                   | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1
+                   | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1
                    )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e. forall x y . subtypeOf x y <===> x :> y *)
-val subtypeOfSeq : n:nat -> (x:sequence bosqueType n) -> sequence bosqueType n -> Tot bool (decreases x)
+val subtypeOfSeq : n:nat -> x:sequence bosqueType n -> sequence bosqueType n -> Tot bool (decreases x)
 val subtypeOf : x:bosqueType -> bosqueType -> Tot bool (decreases x)
 let rec subtypeOf x y = match x, y with
 | BAnyType, _ -> true
@@ -95,8 +65,7 @@ let rec subtypeOf x y = match x, y with
 | BSomeType, _ -> true
 | BTruthyType, BNoneType -> true
 | BNoneType, BNoneType -> true
-| BUnionType x1 y1, BUnionType x2 y2 -> (subtypeOf x1 x2 || subtypeOf y1 x2)
-  && (subtypeOf x1 y2 || subtypeOf y1 y2)
+| BUnionType x1 y1, BUnionType x2 y2 -> (subtypeOf x1 x2 || subtypeOf x1 y2) && (subtypeOf y1 x2 || subtypeOf y1 y2)
 | BUnionType x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z 
 // | BParseabletype, ? -> ?
 | BBoolType, BBoolType -> true
@@ -121,6 +90,12 @@ let rec subtypeOf x y = match x, y with
 // | BEnumType, ? -> ?
 // | BCustomType, ? -> ?
 // | BKeyedType, ? -> ?
+// User-defined types: TODO: Implement proper subtyping
+// relations via the provide relation
+| BnSMain__PlayerMarkType, BnSMain__PlayerMarkType -> true
+| BnSMain__ArtistType, BnSMain__ArtistType -> true
+| BnSMain__MusicianType, BnSMain__MusicianType -> true
+
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with
@@ -130,5 +105,7 @@ subtypeOfSeq n x y = match x with
          )
 | SCons x1 m xs1 -> (match y with 
                    | SNil -> false
-                   | SCons y1 m' ys1 -> (m = m') && eqType x1 y1 && eqTypeSeq m xs1 ys1  
+                   | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  
                    )
+
+
