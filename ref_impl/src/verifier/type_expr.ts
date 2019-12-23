@@ -56,6 +56,7 @@ class UnionTypeDecl extends TypeDecl {
     }
 }
 
+
 abstract class TypeExpr {
     // String expression denoting the type 
     // used inside function declaration in FStar
@@ -175,6 +176,18 @@ class UnionType extends TypeExpr {
     }
 }
 
+class ParsableType extends TypeExpr {
+    constructor(){
+        super("BParsableType");
+    }
+    getFStarTerm(){
+        return "(x:bosqueTerm{subtypeOf BParsableType (getType x)})";
+    }
+    getBosqueType(){
+        return "NSCore::Parsable";
+    }
+}
+
 class BoolType extends TypeExpr {
     constructor() {
         super("BBoolType");
@@ -218,6 +231,18 @@ class TypedStringType extends TypeExpr {
     }
     getBosqueType() {
         return "NSCore::String<T=" + this.ty.getBosqueType() + ">";
+    }
+}
+
+class GUIDType extends TypeExpr{
+    constructor(){
+        super("bGUIDType");
+    }
+    getFStarTerm(){
+        return "(x:bosqueTerm{subtypeOf BGUIDType (getType x)})";
+    }
+    getBosqueType(){
+        return "NSCore::GUID";
     }
 }
 
@@ -371,8 +396,8 @@ class ConstructorType extends TypeExpr {
 export {
     TypeExpr,
     AnyType, SomeType, TruthyType,
-    NoneType, UnionType, BoolType,
-    IntType, TypedStringType, TupleType,
+    NoneType, UnionType, ParsableType, BoolType,
+    IntType, TypedStringType, GUIDType, TupleType,
     RecordType, FuncType, ObjectType,
     EnumType, CustomKeyType, KeyedType,
     ConstructorType

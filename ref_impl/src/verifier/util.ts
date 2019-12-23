@@ -74,21 +74,21 @@ function toFStarSequence(seq : string[]) : string {
     }
 }
 
-function topoVisit(n: any, tordered: any[], neighbors : Map<any, Set<string>>, nodes: Map<string, any>) {
+function topoVisit(n: any, tordered: any[], neighbors : Map<any, Set<any>>) {
     if (tordered.findIndex(element => element === n) !== -1) {
         return;
     } 
 
-    const n_neighbors = neighbors.get(n) as Set<string>;
-    n_neighbors.forEach(succ => topoVisit(nodes.get(succ), tordered, neighbors, nodes));
+    const n_neighbors = neighbors.get(n) as Set<any>;
+    n_neighbors.forEach(neighbor => topoVisit(neighbor, tordered, neighbors));
 
     tordered.push(n);
 }
 
-function topologicalOrder(nodes: Map<string, any>, neighbors: Map<any, Set<string>>): any[] {
+function topologicalOrder(neighbors: Map<any, Set<any>>): any[] {
     let tordered: any[] = [];
 
-    nodes.forEach((node, _) => topoVisit(node, tordered, neighbors, nodes));
+    neighbors.forEach((_, node) => topoVisit(node, tordered, neighbors));
 
     return tordered.reverse();
 }

@@ -18,7 +18,7 @@ import * as FS from "fs";
 import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType } from "./type_expr";
+import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType, ParsableType, GUIDType, TruthyType } from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr } from "./term_expr";
 import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
@@ -29,11 +29,13 @@ type StringTypeMangleNameWithFkey = string;
 class TranslatorBosqueFStar {
     static readonly anyType = new AnyType();
     static readonly someType = new SomeType();
-    static readonly intType = new IntType();
-    static readonly boolType = new BoolType();
+    static readonly truthyType = new TruthyType();
     static readonly noneType = new NoneType();
+    static readonly parsableType = new ParsableType();
+    static readonly boolType = new BoolType();
+    static readonly intType = new IntType();
+    static readonly guidType = new GUIDType();
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
-
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType, "_global");
     static readonly DEBUGGING = true;
 
@@ -46,9 +48,6 @@ class TranslatorBosqueFStar {
     static mapConceptDeclarations: Map<string, MIRConceptTypeDecl>;
     static mapEntityDeclarations: Map<string, MIREntityTypeDecl>;
     readonly mapConstantDeclarations: Map<string, MIRConstantDecl>;
-
-    static conceptsUsed: Set<string>;
-    static entitiesUsed: Set<string>;
 
     readonly isFkeyDeclared: Set<string> = new Set<string>();
     readonly isCkeyDeclared: Set<string> = new Set<string>();
@@ -63,15 +62,15 @@ class TranslatorBosqueFStar {
         this.mapFuncDeclarations = masm.invokeDecls;
         TranslatorBosqueFStar.mapConceptDeclarations = masm.conceptDecls;
         TranslatorBosqueFStar.mapEntityDeclarations = masm.entityDecls;
+
         this.mapConstantDeclarations = masm.constantDecls;
 
-        TranslatorBosqueFStar.conceptsUsed = this.serializeTypes(TranslatorBosqueFStar.mapConceptDeclarations);
-        TranslatorBosqueFStar.entitiesUsed = this.serializeTypes(TranslatorBosqueFStar.mapEntityDeclarations);
-
         // masm.primitiveInvokeDecls contains all the functions
-
         // used in the Bosque File from the Core and Collection library
-        // FIX: This is wrong, but temporarily useful
+
+        // FIX: This is wrong, because these function should have
+        // its actual FStar implementation. It's useful because
+        // momentarily these functions have 'valid definitions'.
         masm.primitiveInvokeDecls.forEach((_, index) => {
             this.mapFuncDeclarations.set(index, (this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl))
         });
@@ -79,41 +78,29 @@ class TranslatorBosqueFStar {
         this.fileName = fileName;
     }
 
-    serializeTypes(declarations: Map<string, MIREntityTypeDecl | MIRConceptTypeDecl>): Set<string> {
-        const nodes = new Map<string, string>();
+    extractProvidesRelation(declarations: Map<string, MIREntityTypeDecl | MIRConceptTypeDecl>): Map<string, Set<string>> {
         const nodesNeighbors = new Map<string, Set<string>>();
 
         declarations.forEach((value, index) => {
             if (!index.includes("NSCore")) {
-                nodes.set(index, index);
-
                 if (nodesNeighbors.get(index) == undefined) {
                     nodesNeighbors.set(index, new Set<string>());
                 }
 
-                const types_from_provides = value.provides.filter(x => !x.includes("NSCore"));
-                const types_from_fields = value.fields.map(x => x.declaredType).filter(x => !x.includes("NSCore"));
-                const all_types = types_from_provides.concat(types_from_fields);
-
-                all_types.map(x => {
+                value.provides.map(x => {
                     if (nodesNeighbors.get(x) == undefined) {
                         nodesNeighbors.set(x, new Set<string>());
                     }
                     (nodesNeighbors.get(x) as Set<string>).add(index)
                 });
-
             }
         });
-        return new Set(topologicalOrder(nodes, nodesNeighbors));
+        return nodesNeighbors;
     }
 
-    printPrelude(fd: number): void {
-        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
-        // TODO: Change to the appropriate Prelude
-        FS.writeSync(fd, `open Sequence\n`);
-        FS.writeSync(fd, `open BosqueTypes\n`);
-        FS.writeSync(fd, `open BosqueTerms\n`);
-        FS.writeSync(fd, `open Util\n`);
+    serializeTypes(declarations: Map<string, MIREntityTypeDecl | MIRConceptTypeDecl>): Set<string> {
+        const nodesNeighbors = this.extractProvidesRelation(declarations);
+        return new Set(topologicalOrder(nodesNeighbors));
     }
 
     static debugging(message: string, flag: boolean): void {
@@ -141,7 +128,6 @@ class TranslatorBosqueFStar {
     // description comes from a Type expression
     // stringVarToTypeExpr : String[Type] -> TypeExpr
     static stringVarToTypeExpr(s: string): TypeExpr {
-
         switch (s) {
             case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
@@ -149,25 +135,35 @@ class TranslatorBosqueFStar {
             case "NSCore::Some": {
                 return TranslatorBosqueFStar.someType;
             }
-            case "NSCore::Int": {
-                return TranslatorBosqueFStar.intType;
-            }
-            case "NSCore::Bool": {
-                return TranslatorBosqueFStar.boolType;
+            case "NSCore::Truthy": {
+                return TranslatorBosqueFStar.truthyType;
             }
             case "NSCore::None": {
                 return TranslatorBosqueFStar.noneType;
             }
+            case "NSCore::Parsable": {
+                return TranslatorBosqueFStar.parsableType;
+            }
+            case "NSCore::Bool": {
+                return TranslatorBosqueFStar.boolType;
+            }
+            case "NSCore::Int": {
+                return TranslatorBosqueFStar.intType;
+            }
+            case "NSCore::GUID": {
+                return TranslatorBosqueFStar.guidType;
+            }
+
             default: {
                 // Concept
-                if (TranslatorBosqueFStar.conceptsUsed.has(s)) {
+                if (TranslatorBosqueFStar.mapConceptDeclarations.has(s) && !s.includes("NSCore")) {
                     const description = TranslatorBosqueFStar.mapConceptDeclarations.get(s) as MIRConceptTypeDecl;
                     return new ConstructorType(sanitizeName(description.tkey),
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
 
                 // Entities
-                if (TranslatorBosqueFStar.entitiesUsed.has(s)) {
+                if (TranslatorBosqueFStar.mapEntityDeclarations.has(s) && !s.includes("NSCore")) {
                     const description = TranslatorBosqueFStar.mapEntityDeclarations.get(s) as MIREntityTypeDecl;
                     return new ConstructorType(sanitizeName(description.tkey),
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
@@ -198,8 +194,9 @@ class TranslatorBosqueFStar {
 
                 // Record
                 if (s.charAt(0) == '{') {
-                    // FIX: Implement record type
-                    return TranslatorBosqueFStar.noneType;
+                    // TODO: Implement record type
+                    console.log("Implement record type at stringVarToTypeExpr");
+                    throw new Error("Implement record type at stringVarToTypeExpr");
                 }
                 // Union
                 if (s.includes("|")) {
@@ -208,12 +205,12 @@ class TranslatorBosqueFStar {
                         .map(TranslatorBosqueFStar.stringVarToTypeExpr)
                     ));
                 }
-                // String 
+                // Typed String 
                 if (s.includes("NSCore::String")) {
                     const index = s.indexOf("=");
                     // This branch handles untyped strings
                     if (index == -1) {
-                        return new TypedStringType(TranslatorBosqueFStar.anyType);
+                        return TranslatorBosqueFStar.stringType;
                     }
                     // This branch handles typed strings
                     else {
@@ -222,9 +219,8 @@ class TranslatorBosqueFStar {
                     }
 
                 }
-                // FIX: This is wrong, but temporarily useful
                 console.log(`------ ERROR: Unknown typed ${s} found while executing stringVarToTypeExpr ------`);
-                return TranslatorBosqueFStar.noneType;
+                throw new Error("------ ERROR: Unknown typed found while executing stringVarToTypeExpr ------");
             }
         }
     }
@@ -254,8 +250,7 @@ class TranslatorBosqueFStar {
                 return TranslatorBosqueFStar.stringType;
             }
             default: {
-                // // FIX: This is wrong, but temporarily useful
-                // return TranslatorBosqueFStar.noneType;
+                console.log("The case " + stringConst + " is not implemented yet");
                 throw new Error("The case " + stringConst + " is not implemented yet");
             }
         }
@@ -398,7 +393,7 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRConstructorRecord: {
                 const opConstructorRecord = op as MIRConstructorRecord;
                 const elements = opConstructorRecord.args.map(x => [x[0], this.MIRArgumentToTypeExpr(x[1], fkey)]) as [string, TypeExpr][];
-                // FIX: This is wrong
+                // FIX: This is wrong due to improper implementation
                 return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(elements)),
                 new FuncTerm("Mkrecord__" + opConstructorRecord.args.map(x => x[0]).join("_"),
                     opConstructorRecord.args.map(x => this.MIRArgumentToTermExpr(x[1], fkey, undefined)),
@@ -762,41 +757,31 @@ class TranslatorBosqueFStar {
 
     generateFStarCode(fkey: string) {
 
-        printBosqueTypesFST();
+        // --------------------------------------------------------------------------------------------------------------
+        // BosqueTypes files
+        const user_defined_types_map: Map<string, MIRConceptTypeDecl | MIREntityTypeDecl>
+            = new Map([...TranslatorBosqueFStar.mapConceptDeclarations, ...TranslatorBosqueFStar.mapEntityDeclarations]);
+
+        const user_defined_types = this.extractProvidesRelation(user_defined_types_map);
+
+        printBosqueTypesFST(user_defined_types);        
+        // --------------------------------------------------------------------------------------------------------------
 
         const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
 
         this.collectExpr(fkey);
 
-        this.printPrelude(fd);
+        // Prelude 'main' file
+        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
+        // TODO: Change to the appropriate Prelude
+        FS.writeSync(fd, `open Sequence\n`);
+        FS.writeSync(fd, `open BosqueTypes\n`);
+        FS.writeSync(fd, `open BosqueTerms\n`);
+        FS.writeSync(fd, `open Util\n`);
         FS.writeSync(fd, "\n");
 
         FS.writeSync(fd, "(* Type names *)\n");
         TypeExpr.declareTypeNames(fd);
-        FS.writeSync(fd, "\n");
-
-        FS.writeSync(fd, "(* Concept Declarations *)\n");
-        TranslatorBosqueFStar.conceptsUsed.forEach(x => {
-            const entry = TranslatorBosqueFStar.mapConceptDeclarations.get(x) as MIRConceptTypeDecl;
-            const entityName = sanitizeName(entry.tkey);
-            const fieldArrows = entry.fields.map(y => {
-                const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
-                return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type) + " -> \n";
-            }).join("");
-            FS.writeSync(fd, "type " + entityName + " = \n| B" + sanitizeName(entry.tkey) + " : " + fieldArrows + entityName + "\n");
-        });
-        FS.writeSync(fd, "\n");
-
-        FS.writeSync(fd, "(* Entity Declarations *)\n");
-        TranslatorBosqueFStar.entitiesUsed.forEach(x => {
-            const entry = TranslatorBosqueFStar.mapEntityDeclarations.get(x) as MIREntityTypeDecl;
-            const entityName = sanitizeName(entry.tkey);
-            const fieldArrows = entry.fields.map(y => {
-                const type = TranslatorBosqueFStar.stringVarToTypeExpr(y.declaredType).getFStarTypeName();
-                return y.name + " : " + ((y.declaredType.includes("NSCore")) ? ("bosqueTerm{" + type + " = (getType " + y.name + ")" + "}") : type) + " -> \n";
-            }).join("");
-            FS.writeSync(fd, "type " + entityName + " = \n| B" + sanitizeName(entry.tkey) + " : " + fieldArrows + entityName + "\n");
-        });
         FS.writeSync(fd, "\n");
 
         FS.writeSync(fd, "(* Constant Declarations *)\n");

@@ -13,7 +13,7 @@ type bosqueType =
 | BTruthyType
 | BNoneType
 | BUnionType : bosqueType -> bosqueType -> bosqueType
-| BParseableType
+| BParsableType
 | BBoolType
 | BIntType
 | BFloatType // Bad news, FStar doesn't provide support for this type
@@ -36,18 +36,22 @@ type bosqueType =
 // FIX: The following is incomplete
 | BKeyedType
 | BErrorType
+// User-defined types
+| BnSMain__MusicianType
+| BnSMain__ArtistType
+| BnSMain__PlayerMarkType
 
 (* Definition of equality relation on Bosque types *)
 val eqTypeSeq : n:nat -> sequence bosqueType n -> sequence bosqueType n -> Tot bool 
 let rec eqTypeSeq n x y = match x with
 | SNil -> (match y with 
-            | SNil -> true
-            | _ -> false
-            )
+          | SNil -> true
+          | _ -> false
+          )
 | SCons x1 m xs1 -> (match y with 
-                       | SNil -> false
-                       | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1
-                       )
+                    | SNil -> false
+                    | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1
+                    )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e.forall x y.subtypeOf x y <===> x :> y *) 
@@ -87,14 +91,24 @@ let rec subtypeOf x y = match x, y with
 // | BCustomType, ? -> ?
 // | BKeyedType, ? -> ?
 
+// User-defined types
+// Reflexivity relation
+| BnSMain__MusicianType, BnSMain__MusicianType -> true
+| BnSMain__ArtistType, BnSMain__ArtistType -> true
+| BnSMain__PlayerMarkType, BnSMain__PlayerMarkType -> true
+// Provide relation
+| BParsableType, BnSMain__MusicianType -> true
+| BParsableType, BnSMain__ArtistType -> true
+| BParsableType, BnSMain__PlayerMarkType -> true
+
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with
 | SNil -> (match y with
-            | SNil -> true
-            | _ -> false
-            ) 
+          | SNil -> true
+          | _ -> false
+          ) 
 | SCons x1 m xs1 -> (match y with 
-                       | SNil -> false
-                       | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  
-                       ) 
+                    | SNil -> false
+                    | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  
+                    )

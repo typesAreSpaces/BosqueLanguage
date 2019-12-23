@@ -45,6 +45,9 @@ class AssignmentExpr extends ExprExpr {
                 const assertion_norm = "let _ = assert_norm(subtypeOf "
                     + arg.ty.getFStarTypeName()
                     + " (getType " + arg.toML() + ")) in";
+                // const assertion_norm = "let _ = assert_norm("
+                //     + arg.ty.getFStarTypeName()
+                //     + " = (getType " + arg.toML() + ")) in";
 
                 return this.tabSymbol.repeat(indentatioLevel)
                     + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
@@ -68,6 +71,9 @@ class AssignmentExpr extends ExprExpr {
                         const local_assertion_norm = "let _ = assert_norm(subtypeOf "
                             + current_expr.ty.getFStarTypeName()
                             + " (getType " + current_expr.toML() + ")) in";
+                        // const local_assertion_norm = "let _ = assert_norm("
+                        //     + current_expr.ty.getFStarTypeName()
+                        //     + " = (getType " + current_expr.toML() + ")) in";
                         return local_assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel) + accum;
                     }
                     else {
