@@ -236,7 +236,7 @@ class TypedStringType extends TypeExpr {
 
 class GUIDType extends TypeExpr{
     constructor(){
-        super("bGUIDType");
+        super("BGUIDType");
     }
     getFStarTerm(){
         return "(x:bosqueTerm{subtypeOf BGUIDType (getType x)})";
@@ -364,7 +364,7 @@ class CustomKeyType extends TypeExpr {
 // TODO: Proper mplementation
 class KeyedType extends TypeExpr {
     constructor() {
-        super("bKeyedType");
+        super("BKeyedType");
     }
     getFStarTerm() {
         return "";

@@ -1,4 +1,4 @@
-module HigherOrderEncoding
+module DependentBosqueTermEncoding
 
 type sequence 'a : nat -> Type = 
 | SNil : sequence 'a 0
@@ -23,6 +23,9 @@ type bosqueTerm : bosqueType -> Type =
 | BInt : int -> bosqueTerm (BIntType)
 | BUnionInj1 : t1:bosqueType ->  t2:bosqueType -> bosqueTerm t1 -> bosqueTerm (BUnionType t1 t2) 
 | BUnionInj2 : t1:bosqueType ->  t2:bosqueType -> bosqueTerm t2 -> bosqueTerm (BUnionType t1 t2)
+// The main problem with this encoding is dealing with Tuples since the 
+// previous encodings treat tuples as sequences, 
+// hence all bosqueTerm (?) should be homogeneous
 // | BTuple :  
 // b:bool -> n:nat -> seq:sequence bosqueType n 
 // -> sequence (bosqueTerm BAnyType) n -> bosqueTerm (BTupleType b n seq) 
@@ -46,6 +49,9 @@ let maxUnion x y = match x with
 val isInt : x:bosqueTerm (BUnionType BIntType BNoneType) -> Tot bool
 let isInt x = match x with
 | BUnionInj1 BIntType BNoneType _ -> true
-| _ -> false
+| _ -> false 
 
-let _ = assert (forall x y . isInt x -> extractInt (maxUnion x y) >= extractInt y)
+val simple : x:bosqueTerm (BUnionType (BIntType) (BNoneType)) -> y:bosqueTerm (BIntType) -> Lemma (requires (isInt x)) (ensures (extractInt (maxUnion x y) >= extractInt y))
+let simple x y = () 
+
+// let _ = assert (forall x y . isInt x -> extractInt (maxUnion x y) >= extractInt y)
