@@ -127,7 +127,7 @@ let nSMain__main  =
                 
                 let __tmp_11 = (BnSMain__PlayerMark __tmp_11_arg_0) in 
                  let player1 = __tmp_11 in 
-                  let __tmp_13 = (BTypedString "x" BnSMain__PlayerMarkType) in 
+                  let __tmp_13 = (BTypedString 'x' BnSMain__PlayerMarkType) in 
                    let player2 = __tmp_13 in 
                     let __tmp_14_arg_4 = player1 in 
                      let __tmp_14_arg_3 = (BTypedString "Peter" BAnyType) in 

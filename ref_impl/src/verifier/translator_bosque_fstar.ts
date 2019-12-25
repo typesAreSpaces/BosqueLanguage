@@ -22,7 +22,8 @@ import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, Reco
 import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr } from "./term_expr";
 import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
-import { printBosqueTypesFST } from "./bosqueTypesFST"
+import { printBosqueTypesFST } from "./bosqueTypesFST";
+import { printBosqueTermsFST } from "./bosqueTermsFST";
 
 type StringTypeMangleNameWithFkey = string;
 
@@ -766,6 +767,12 @@ class TranslatorBosqueFStar {
 
         printBosqueTypesFST(user_defined_types);        
         // --------------------------------------------------------------------------------------------------------------
+
+        // --------------------------------------------------------------------------------------------------------------
+        // BosqueTerms files
+        printBosqueTermsFST();
+        // --------------------------------------------------------------------------------------------------------------
+        
 
         const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
 
