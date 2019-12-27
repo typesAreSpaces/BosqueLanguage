@@ -9,9 +9,9 @@ import { TranslatorBosqueFStar } from "./translator_bosque_fstar";
 
 // TODO: Include parameter to print extended types
 
-function printBosqueTypesFST(user_defined_types: Map<string, Set<string>>) {
+function printBosqueTypesFST(fstar_files_directory: string, user_defined_types: Map<string, Set<string>>) {
 
-    const fd = FS.openSync("fstar_files/bosqueTypes.fst", 'w');
+    const fd = FS.openSync(fstar_files_directory + "bosqueTypes.fst", 'w');
 
     const fstar_program_core_decl = "module BosqueTypes\n\
 \n\

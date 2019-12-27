@@ -56,8 +56,9 @@ class TranslatorBosqueFStar {
     readonly function_declarations = [] as FunctionDeclaration[];
 
     readonly fileName: string;
+    readonly fstar_files_directory: string;
 
-    constructor(masm: MIRAssembly, fileName: string) {
+    constructor(masm: MIRAssembly, fileName: string, fstar_files_directory: string) {
         this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
         this.mapFuncDeclarations = masm.invokeDecls;
@@ -77,6 +78,7 @@ class TranslatorBosqueFStar {
         });
 
         this.fileName = fileName;
+        this.fstar_files_directory = fstar_files_directory;
     }
 
     extractProvidesRelation(declarations: Map<string, MIREntityTypeDecl | MIRConceptTypeDecl>): Map<string, Set<string>> {
@@ -765,16 +767,16 @@ class TranslatorBosqueFStar {
 
         const user_defined_types = this.extractProvidesRelation(user_defined_types_map);
 
-        printBosqueTypesFST(user_defined_types);        
+        printBosqueTypesFST(this.fstar_files_directory, user_defined_types);        
         // --------------------------------------------------------------------------------------------------------------
 
         // --------------------------------------------------------------------------------------------------------------
         // BosqueTerms files
-        printBosqueTermsFST();
+        printBosqueTermsFST(this.fstar_files_directory);
         // --------------------------------------------------------------------------------------------------------------
         
 
-        const fd = FS.openSync("fstar_files/" + this.fileName, 'w');
+        const fd = FS.openSync(this.fstar_files_directory + this.fileName, 'w');
 
         this.collectExpr(fkey);
 

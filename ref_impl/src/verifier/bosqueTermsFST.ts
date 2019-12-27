@@ -5,10 +5,10 @@
 
 import * as FS from "fs";
 
-function printBosqueTermsFST(){
+function printBosqueTermsFST(fstar_files_directory: string){
     // TODO: Keep working here
 
-    const fd = FS.openSync("fstar_files/bosqueTerms.fst", 'w');
+    const fd = FS.openSync(fstar_files_directory + "bosqueTerms.fst", 'w');
 
     const program = "module BosqueTerms\n\
 \n\
