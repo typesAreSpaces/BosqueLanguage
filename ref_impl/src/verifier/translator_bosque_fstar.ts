@@ -775,7 +775,6 @@ class TranslatorBosqueFStar {
         printBosqueTermsFST(this.fstar_files_directory);
         // --------------------------------------------------------------------------------------------------------------
         
-
         const fd = FS.openSync(this.fstar_files_directory + this.fileName, 'w');
 
         this.collectExpr(fkey);
