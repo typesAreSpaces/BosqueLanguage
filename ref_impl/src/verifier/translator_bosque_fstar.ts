@@ -51,8 +51,6 @@ class TranslatorBosqueFStar {
     readonly mapConstantDeclarations: Map<string, MIRConstantDecl>;
 
     readonly isFkeyDeclared: Set<string> = new Set<string>();
-    readonly isCkeyDeclared: Set<string> = new Set<string>();
-    readonly isEkeyDeclared: Set<string> = new Set<string>();
     readonly function_declarations = [] as FunctionDeclaration[];
 
     readonly fileName: string;
@@ -64,9 +62,9 @@ class TranslatorBosqueFStar {
         this.mapFuncDeclarations = masm.invokeDecls;
         TranslatorBosqueFStar.mapConceptDeclarations = masm.conceptDecls;
         TranslatorBosqueFStar.mapEntityDeclarations = masm.entityDecls;
-
         this.mapConstantDeclarations = masm.constantDecls;
 
+        // ---------------------------------------------------------------------------------------------------------
         // masm.primitiveInvokeDecls contains all the functions
         // used in the Bosque File from the Core and Collection library
 
@@ -76,6 +74,7 @@ class TranslatorBosqueFStar {
         masm.primitiveInvokeDecls.forEach((_, index) => {
             this.mapFuncDeclarations.set(index, (this.mapFuncDeclarations.get("NSMain::id") as MIRInvokeBodyDecl))
         });
+        // ---------------------------------------------------------------------------------------------------------
 
         this.fileName = fileName;
         this.fstar_files_directory = fstar_files_directory;
@@ -164,14 +163,12 @@ class TranslatorBosqueFStar {
                     return new ConstructorType(sanitizeName(description.tkey),
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
-
                 // Entities
                 if (TranslatorBosqueFStar.mapEntityDeclarations.has(s) && !s.includes("NSCore")) {
                     const description = TranslatorBosqueFStar.mapEntityDeclarations.get(s) as MIREntityTypeDecl;
                     return new ConstructorType(sanitizeName(description.tkey),
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
-
                 // Tuple
                 if (s.charAt(0) == '[') {
                     s = s.slice(1, -1);
@@ -194,10 +191,9 @@ class TranslatorBosqueFStar {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
                     }
                 }
-
+                // TODO: Implement record type
                 // Record
                 if (s.charAt(0) == '{') {
-                    // TODO: Implement record type
                     console.log("Implement record type at stringVarToTypeExpr");
                     throw new Error("Implement record type at stringVarToTypeExpr");
                 }
@@ -830,7 +826,7 @@ class FunctionDeclaration {
             TranslatorBosqueFStar.stringVarToTypeExpr(this.declarations.resultType));
         // TODO: Figure out how to include the following fields:
         // 1) recursive, 2) preconditions, 3) postconditions
-        FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.getFStarTerm()}\n`);
+        FS.writeSync(fd, `val ${sanitizeName(fkey)} : ${type.valDeclare()}\n`);
         FS.writeSync(fd, `let ${sanitizeName(fkey)} ${args.join(" ")} = \n${this.program.toML(1, 1)}\n\n`);
     }
 }

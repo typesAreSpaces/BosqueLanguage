@@ -51,33 +51,33 @@ function bosqueToMASM(info: PathFile): MIRAssembly {
         process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
         throw new Error(`fail with exception -- ${ex}\n`);
     }
-} 
+}
 
-function sanitizeName(name : string) : string {
+function sanitizeName(name: string): string {
     // TODO: Add more `replace operations' if the IR syntax (names)
     // conflicts with FStar syntax
     let result = name
-    .replace(new RegExp("#", 'g'), "_")
-    .replace(new RegExp("\\$", 'g'), "_")
-    .replace(new RegExp(":", 'g'), "_")
+        .replace(new RegExp("#", 'g'), "_")
+        .replace(new RegExp("\\$", 'g'), "_")
+        .replace(new RegExp(":", 'g'), "_")
     return result.charAt(0).toLowerCase() + result.slice(1);
 }
 
-function toFStarSequence(seq : string[]) : string {
-    if(seq.length == 0){
+function toFStarSequence(seq: string[]): string {
+    if (seq.length == 0) {
         return "SNil";
     }
-    else{
+    else {
         const tail = seq.slice(1);
         return "(SCons " + seq[0] + " "
-        + (seq.length - 1) + " " + toFStarSequence(tail) + ")";
+            + (seq.length - 1) + " " + toFStarSequence(tail) + ")";
     }
 }
 
-function topoVisit(n: any, tordered: any[], neighbors : Map<any, Set<any>>) {
+function topoVisit(n: any, tordered: any[], neighbors: Map<any, Set<any>>) {
     if (tordered.findIndex(element => element === n) !== -1) {
         return;
-    } 
+    }
 
     const n_neighbors = neighbors.get(n) as Set<any>;
     n_neighbors.forEach(neighbor => topoVisit(neighbor, tordered, neighbors));
@@ -93,4 +93,7 @@ function topologicalOrder(neighbors: Map<any, Set<any>>): any[] {
     return tordered.reverse();
 }
 
-export { bosqueToMASM, PathFile, sanitizeName, toFStarSequence, topologicalOrder };
+export {
+    bosqueToMASM, PathFile,
+    sanitizeName, toFStarSequence, topologicalOrder
+};
