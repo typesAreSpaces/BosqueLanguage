@@ -148,6 +148,7 @@ entrypoint function main(): Int {
 
     var player1 = PlayerMark{mark="x"};
     var player2 = PlayerMark'x';
+    var player3 = PlayerMark'hmm';
  
     var node1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
     var node2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};

@@ -160,13 +160,13 @@ class TranslatorBosqueFStar {
                 // Concept
                 if (TranslatorBosqueFStar.mapConceptDeclarations.has(s) && !s.includes("NSCore")) {
                     const description = TranslatorBosqueFStar.mapConceptDeclarations.get(s) as MIRConceptTypeDecl;
-                    return new ConstructorType(sanitizeName(description.tkey),
+                    return new ConstructorType(description.tkey,
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
                 // Entities
                 if (TranslatorBosqueFStar.mapEntityDeclarations.has(s) && !s.includes("NSCore")) {
                     const description = TranslatorBosqueFStar.mapEntityDeclarations.get(s) as MIREntityTypeDecl;
-                    return new ConstructorType(sanitizeName(description.tkey),
+                    return new ConstructorType(description.tkey,
                         description.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
                 // Tuple
@@ -300,7 +300,7 @@ class TranslatorBosqueFStar {
 
     opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] | [VarTerm, TermExpr][] {
         switch (op.tag) {
-            case MIROpTag.MIRLoadConst: {
+            case MIROpTag.MIRLoadConst: { // IMPLEMENT:
                 const opMIRLoadConst = op as MIRLoadConst;
                 opMIRLoadConst;
                 TranslatorBosqueFStar.debugging("LoadConst Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -314,17 +314,17 @@ class TranslatorBosqueFStar {
 
                 if (partial_decl == undefined) {
                     const actual_decl = TranslatorBosqueFStar.mapConceptDeclarations.get(current_tkey) as MIRConceptTypeDecl;
-                    current_type = new ConstructorType(sanitizeName(actual_decl.tkey),
+                    current_type = new ConstructorType(actual_decl.tkey,
                         actual_decl.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
                 else {
-                    current_type = new ConstructorType(sanitizeName(partial_decl.tkey),
+                    current_type = new ConstructorType(partial_decl.tkey,
                         partial_decl.fields.map(x => [x.name, TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][]);
                 }
 
                 return [
                     this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, opMIRLoadConstTypedString.tkey, new TypedStringType(current_type)),
-                    new ConstTerm(opMIRLoadConstTypedString.ivalue, new TypedStringType(current_type), fkey)
+                    new ConstTerm("\"" + opMIRLoadConstTypedString.ivalue.slice(1, -1) + "\"", new TypedStringType(current_type), fkey)
                 ];
             }
             // case MIROpTag.AccessConstField:
@@ -389,7 +389,7 @@ class TranslatorBosqueFStar {
                 return [this.MIRArgumentToTermExpr(opConstructorTuple.trgt, fkey, new TupleType(false, types)),
                 new TupleTerm(opConstructorTuple.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)), fkey)];
             }
-            case MIROpTag.MIRConstructorRecord: {
+            case MIROpTag.MIRConstructorRecord: { // IMPLEMENT
                 const opConstructorRecord = op as MIRConstructorRecord;
                 const elements = opConstructorRecord.args.map(x => [x[0], this.MIRArgumentToTypeExpr(x[1], fkey)]) as [string, TypeExpr][];
                 // FIX: This is wrong due to improper implementation
@@ -439,7 +439,7 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
-            case MIROpTag.MIRAccessFromProperty: {
+            case MIROpTag.MIRAccessFromProperty: { // IMPLEMENT
                 // const opMIRAccessFromProperty = op as MIRAccessFromProperty;
                 // console.log(opMIRAccessFromProperty);
                 // const typeOfTuple = this.types_seen.get(sanitizeName(opMIRAccessFromProperty.arg.nameID + fkey)) as TypeExpr;
@@ -595,7 +595,7 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRVarLifetimeEnd: {
                 return [TranslatorBosqueFStar.skipCommand, TranslatorBosqueFStar.skipCommand];
             }
-            case MIROpTag.MIRPhi: {
+            case MIROpTag.MIRPhi: { // DOUBLE CHECK
                 const opPhi = op as MIRPhi;
                 const currentType = this.types_seen.get(sanitizeName(opPhi.trgt.nameID + fkey));
                 const typeFromSrc = this.MIRArgumentToTypeExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey);
@@ -654,7 +654,7 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             // PRIORITY:
-            case MIROpTag.MIRAccessConstantValue: {
+            case MIROpTag.MIRAccessConstantValue: { // IMPLEMENT
                 TranslatorBosqueFStar.debugging("MIRAccessConstantValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRAccessConstantValue", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
@@ -680,9 +680,10 @@ class TranslatorBosqueFStar {
                 }
             }
             else {
-                return (result as [VarTerm, TermExpr][]).reduce((rest_expression, current_assignment) => {
-                    return new AssignmentExpr(current_assignment[0], current_assignment[1], rest_expression)
-                }, this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
+                return (result as [VarTerm, TermExpr][])
+                    .reduce((rest_expression, current_assignment) =>
+                        new AssignmentExpr(current_assignment[0], current_assignment[1], rest_expression),
+                        this.opsToExpr(ops.slice(1), comingFrom, fkey, program));
             }
         }
     }
@@ -763,31 +764,38 @@ class TranslatorBosqueFStar {
 
         const user_defined_types = this.extractProvidesRelation(user_defined_types_map);
 
-        printBosqueTypesFST(this.fstar_files_directory, user_defined_types);        
+        printBosqueTypesFST(this.fstar_files_directory, user_defined_types);
         // --------------------------------------------------------------------------------------------------------------
 
-        // --------------------------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // BosqueTerms files
-        printBosqueTermsFST(this.fstar_files_directory);
-        // --------------------------------------------------------------------------------------------------------------
-        
+        printBosqueTermsFST(this.fstar_files_directory, user_defined_types_map);
+        // ---------------------------------------------------------------------
+
         const fd = FS.openSync(this.fstar_files_directory + this.fileName, 'w');
 
         this.collectExpr(fkey);
 
-        // Prelude 'main' file
+        // --------------------------------------------------------------------------------------------------
+        // Main file
+
+        // --------------------------------------------------------
+        // Prelude
         FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
-        // TODO: Change to the appropriate Prelude
         FS.writeSync(fd, `open Sequence\n`);
         FS.writeSync(fd, `open BosqueTypes\n`);
         FS.writeSync(fd, `open BosqueTerms\n`);
         FS.writeSync(fd, `open Util\n`);
         FS.writeSync(fd, "\n");
+        // --------------------------------------------------------
 
+        // ------------------------------------
         FS.writeSync(fd, "(* Type names *)\n");
         TypeExpr.declareTypeNames(fd);
         FS.writeSync(fd, "\n");
+        // ------------------------------------
 
+        // --------------------------------------------------------------------------------------------------
         FS.writeSync(fd, "(* Constant Declarations *)\n");
         this.mapConstantDeclarations.forEach(constant_decl => {
             // Constant declaration generally have only two blocks: entry and exit
@@ -797,14 +805,21 @@ class TranslatorBosqueFStar {
                     const returnType = TranslatorBosqueFStar.stringVarToTypeExpr(constant_decl.declaredType);
                     const continuation = () => new ReturnExpr(new VarTerm("__ir_ret__", returnType, fkey));
                     this.types_seen.set(sanitizeName(constant_decl.cname), returnType);
-                    FS.writeSync(fd, `let ${sanitizeName(constant_decl.cname)} = \n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1, 0)}\n`);
+                    FS.writeSync(fd,
+                        `let ${sanitizeName(constant_decl.cname)} =\
+                         \n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1, 0)}\n`);
                 }
             });
         });
         FS.writeSync(fd, "\n");
+        // --------------------------------------------------------------------------------------------------
 
+        // -----------------------------------------------
         FS.writeSync(fd, "(* Function Declarations *)\n");
         this.function_declarations.map(x => x.print(fd));
+        // -----------------------------------------------
+
+        // --------------------------------------------------------------------------------------------------
 
         FS.closeSync(fd);
     }

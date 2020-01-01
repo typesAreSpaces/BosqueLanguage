@@ -4,11 +4,11 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { toFStarSequence } from "./util";
+import { sanitizeName, toFStarSequence } from "./util";
 
 abstract class TypeDecl {
     readonly stringType: string;
-    constructor(stringType: string){
+    constructor(stringType: string) {
         this.stringType = stringType;
     }
     abstract emit(fd: number): void;
@@ -257,7 +257,7 @@ class FuncType extends TypeExpr {
         this.domain = domain;
         this.image = image;
     }
-    valDeclare(){
+    valDeclare() {
         return ((this.domain.length == 0) ? "" : this.domain.map(x => x.getFStarTerm()).join(" -> ") + " -> Tot ")
             + this.image.getFStarTerm();
     }
@@ -309,12 +309,15 @@ class KeyedType extends TypeExpr {
 // TODO: Implement getBosqueType 
 class ConstructorType extends TypeExpr {
     readonly fields: [string, TypeExpr][];
+    readonly original_name: string;
+    
     constructor(constructorName: string, fields: [string, TypeExpr][]) {
-        super("B" + constructorName + "Type");
+        super("B" + sanitizeName(constructorName) + "Type");
         this.fields = fields;
+        this.original_name = constructorName
     }
     getBosqueType() {
-        return ""; 
+        return this.original_name;
     }
 }
 

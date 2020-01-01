@@ -4,13 +4,15 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
+import { MIRConceptTypeDecl, MIREntityTypeDecl } from "../compiler/mir_assembly";
+import { sanitizeName } from "./util";
 
-function printBosqueTermsFST(fstar_files_directory: string){
+function printBosqueTermsFST(fstar_files_directory: string, user_defined_types_map: Map<string, MIRConceptTypeDecl | MIREntityTypeDecl>) {
     // TODO: Keep working here
 
     const fd = FS.openSync(fstar_files_directory + "bosqueTerms.fst", 'w');
 
-    const program = "module BosqueTerms\n\
+    const program_initial = "module BosqueTerms\n\
 \n\
 open Sequence\n\
 open BosqueTypes\n\
@@ -25,20 +27,20 @@ type bosqueTerm = \n\
 | BGUID : string -> int -> bosqueTerm\n\
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
 | BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
-| BError : bosqueTerm\n\
-// User-defined terms\n\
-| BnSMain__PlayerMark : mark : bosqueTerm -> \n\
-bosqueTerm\n\
-| BnSMain__Artist : id : bosqueTerm -> \n\
-isGood : bosqueTerm -> \n\
-lastName : bosqueTerm -> \n\
-name : bosqueTerm -> \n\
-player : bosqueTerm -> \n\
-bosqueTerm\n\
-| BnSMain__Musician : artist : bosqueTerm -> \n\
-instrument : bosqueTerm -> \n\
-bosqueTerm\n\
-\n\
+| BError : bosqueTerm\n"
+
+    FS.writeSync(fd, program_initial);
+
+    FS.writeSync(fd, "// User-defined terms\n");
+    user_defined_types_map.forEach((value, index) => {
+        if (!index.includes("NSCore")) {
+            FS.writeSync(fd, "| B" + sanitizeName(index) + ": "
+                + ((value.fields.length == 0) ? "" : value.fields.map(x => x.name + ": bosqueTerm -> ").join(""))
+                + " bosqueTerm\n");
+        }
+    });
+
+    const program_middle = "\n\
 (* Definition of getType *)\n\
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)\n\
 val getType : x:bosqueTerm -> Tot bosqueType (decreases x)\n\
@@ -51,12 +53,19 @@ let rec getType x = match x with\n\
 | BTuple n y -> BTupleType false n (getTypeSeq n y)\n\
 // FIX: The following is incomplete\n\
 | BRecord _ _ -> BRecordType false 0 SNil\n\
-| BError -> BErrorType\n\
-// User-defined terms\n\
-| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType\n\
-| BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType\n\
-| BnSMain__Musician _ _ -> BnSMain__MusicianType\n\
-and\n\
+| BError -> BErrorType\n"
+
+    FS.writeSync(fd, program_middle);
+
+    FS.writeSync(fd, "// User-defined terms\n");
+    user_defined_types_map.forEach((value, index) => {
+        if (!index.includes("NSCore")) {
+            FS.writeSync(fd, "| B" + sanitizeName(index) + (" _").repeat(value.fields.length)
+                + " -> B" + sanitizeName(index) + "Type\n");
+        }
+    });
+
+    const program_rest = "and\n\
 getTypeSeq n x = match x with\n\
 | SNil -> SNil\n\
 | SCons y m ys -> SCons (getType y) m (getTypeSeq m ys)\n\
@@ -276,7 +285,7 @@ let rec nthTuple index dimension y = match y with\n\
 //   else nthTuple (index-1) dimension' (BTuple dimension' xs)\n\
 // | _ -> BError";
 
-    FS.writeSync(fd, program);
+    FS.writeSync(fd, program_rest);
 }
 
 export { printBosqueTermsFST }

@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 
 import { VarTerm, TermExpr, TupleProjExpr, FuncTerm } from "./term_expr";
-import { ConstructorType } from "./type_expr";
+// import { ConstructorType } from "./type_expr";
 
 abstract class ExprExpr {
     readonly tabSymbol = " ";
@@ -38,6 +38,7 @@ class AssignmentExpr extends ExprExpr {
     toML(indentatioLevel: number, offset: number) {
         // Add assertion_norm statemenet to the arguments of a function call
         // to make sure FStar has enough information to infere the right information 
+
         if (this.rhs instanceof TupleProjExpr) {
             const arg = this.rhs.tuple;
 
@@ -46,34 +47,26 @@ class AssignmentExpr extends ExprExpr {
                 const assertion_norm = "let _ = assert_norm(subtypeOf "
                     + arg.ty.id
                     + " (getType " + arg.toML() + ")) in";
-                // const assertion_norm = "let _ = assert_norm("
-                //     + arg.ty.id
-                //     + " = (getType " + arg.toML() + ")) in";
 
                 return this.tabSymbol.repeat(indentatioLevel)
-                    + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
+                    + assertion_norm + this.tabSymbol.repeat(indentatioLevel)
                     + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
+                    + this.continuation.toML(indentatioLevel, offset);
             }
             else {
                 return this.tabSymbol.repeat(indentatioLevel)
                     + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
+                    + this.continuation.toML(indentatioLevel, offset);
             }
         }
 
         if (this.rhs instanceof FuncTerm) {
             const args = this.rhs.terms;
             const assertion_norm = args.reduce((accum, current_expr) => {
-                if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)
-                    && !(current_expr.ty instanceof ConstructorType)) {
+                if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbolName)) {
                     AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbolName);
-                    const local_assertion_norm = "let _ = assert_norm(subtypeOf "
-                        + current_expr.ty.id
+                    const local_assertion_norm = "let _ = assert_norm(subtypeOf " + current_expr.ty.id
                         + " (getType " + current_expr.toML() + ")) in";
-                    // const local_assertion_norm = "let _ = assert_norm("
-                    //     + current_expr.ty.id
-                    //     + " = (getType " + current_expr.toML() + ")) in";
                     return local_assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel) + accum;
                 }
                 else {
@@ -83,20 +76,21 @@ class AssignmentExpr extends ExprExpr {
 
             if (assertion_norm.length != 0) {
                 return this.tabSymbol.repeat(indentatioLevel)
-                    + assertion_norm + "\n" + this.tabSymbol.repeat(indentatioLevel)
+                    + assertion_norm + this.tabSymbol.repeat(indentatioLevel)
                     + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
+                    + this.continuation.toML(indentatioLevel, offset);
             }
             else {
                 return this.tabSymbol.repeat(indentatioLevel)
                     + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                    + this.continuation.toML(indentatioLevel + offset, offset);
+                    + this.continuation.toML(indentatioLevel, offset);
             }
         }
+        
         else {
             return this.tabSymbol.repeat(indentatioLevel)
                 + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in \n"
-                + this.continuation.toML(indentatioLevel + offset, offset);
+                + this.continuation.toML(indentatioLevel, offset);
         }
     }
 }
@@ -105,7 +99,7 @@ class ConditionalExpr extends ExprExpr {
     readonly condition: TermExpr;
     readonly ifBranch: ExprExpr;
     readonly elseBranch: ExprExpr;
-    
+
     constructor(condition: TermExpr, ifBranch: ExprExpr, elseBranch: ExprExpr) {
         super();
         this.condition = condition;

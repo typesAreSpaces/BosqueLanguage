@@ -1,0 +1,36 @@
+translator_bosque_fstar.ts:303:            case MIROpTag.MIRLoadConst: { // IMPLEMENT:
+translator_bosque_fstar.ts:331:            case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
+translator_bosque_fstar.ts:342:            // case MIROpTag.AccessCapturedVariable: { // IMPLEMENT:
+translator_bosque_fstar.ts:346:            case MIROpTag.MIRAccessArgVariable: { // IMPLEMENT:
+translator_bosque_fstar.ts:350:            case MIROpTag.MIRAccessLocalVariable: { // IMPLEMENT:
+translator_bosque_fstar.ts:370:            case MIROpTag.MIRConstructorPrimaryCollectionEmpty: { // IMPLEMENT:
+translator_bosque_fstar.ts:374:            case MIROpTag.MIRConstructorPrimaryCollectionSingletons: { // IMPLEMENT:
+translator_bosque_fstar.ts:378:            case MIROpTag.MIRConstructorPrimaryCollectionCopies: { // IMPLEMENT:
+translator_bosque_fstar.ts:382:            case MIROpTag.MIRConstructorPrimaryCollectionMixed: { // IMPLEMENT:
+translator_bosque_fstar.ts:392:            case MIROpTag.MIRConstructorRecord: { // IMPLEMENT
+translator_bosque_fstar.ts:401:            // case MIROpTag.ConstructorLambda: { // IMPLEMENT:
+translator_bosque_fstar.ts:422:            // case MIROpTag.CallStaticFunction: { // IMPLEMENT:
+translator_bosque_fstar.ts:438:            case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
+translator_bosque_fstar.ts:442:            case MIROpTag.MIRAccessFromProperty: { // IMPLEMENT
+translator_bosque_fstar.ts:461:            case MIROpTag.MIRProjectFromProperties: { // IMPLEMENT:
+translator_bosque_fstar.ts:465:            case MIROpTag.MIRAccessFromField: { // IMPLEMENT:
+translator_bosque_fstar.ts:469:            case MIROpTag.MIRProjectFromFields: { // IMPLEMENT:
+translator_bosque_fstar.ts:473:            case MIROpTag.MIRProjectFromTypeTuple: { // IMPLEMENT:
+translator_bosque_fstar.ts:477:            case MIROpTag.MIRProjectFromTypeRecord: { // IMPLEMENT:
+translator_bosque_fstar.ts:481:            case MIROpTag.MIRProjectFromTypeConcept: { // IMPLEMENT:
+translator_bosque_fstar.ts:485:            case MIROpTag.MIRModifyWithIndecies: { // IMPLEMENT:
+translator_bosque_fstar.ts:489:            case MIROpTag.MIRModifyWithProperties: { // IMPLEMENT:
+translator_bosque_fstar.ts:493:            case MIROpTag.MIRModifyWithFields: { // IMPLEMENT:
+translator_bosque_fstar.ts:497:            case MIROpTag.MIRStructuredExtendTuple: { // IMPLEMENT:
+translator_bosque_fstar.ts:501:            case MIROpTag.MIRStructuredExtendRecord: { // IMPLEMENT:
+translator_bosque_fstar.ts:505:            case MIROpTag.MIRStructuredExtendObject: { // IMPLEMENT:
+translator_bosque_fstar.ts:509:            // case MIROpTag.MIRInvokeKnownTarget: { // IMPLEMENT:
+translator_bosque_fstar.ts:513:            case MIROpTag.MIRInvokeVirtualTarget: { // IMPLEMENT:
+translator_bosque_fstar.ts:517:            // case MIROpTag.MIRCallLambda: { // IMPLEMENT:
+translator_bosque_fstar.ts:537:            case MIROpTag.MIRBinEq: { // IMPLEMENT:
+translator_bosque_fstar.ts:557:            case MIROpTag.MIRRegAssign: { // IMPLEMENT:
+translator_bosque_fstar.ts:561:            case MIROpTag.MIRTruthyConvert: { // IMPLEMENT:
+translator_bosque_fstar.ts:575:            case MIROpTag.MIRAbort: { // IMPLEMENT:
+translator_bosque_fstar.ts:579:            case MIROpTag.MIRDebug: { // IMPLEMENT:
+translator_bosque_fstar.ts:652:            case MIROpTag.MIRIsTypeOf: { // IMPLEMENT:
+translator_bosque_fstar.ts:657:            case MIROpTag.MIRAccessConstantValue: { // IMPLEMENT
