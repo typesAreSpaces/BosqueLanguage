@@ -143,30 +143,38 @@ entrypoint function main(): Int {
 
     var string_test = "string_test";
     
-    var node = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
-    var musician = Musician{artist = node, instrument = "Guitar"};
+    var chris = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
+    var chris_but_musician = Musician{artist = chris, instrument = "Guitar"};
 
     var player1 = PlayerMark{mark="x"};
     var player2 = PlayerMark'x';
     var player3 = PlayerMark'hmm';
  
-    var node1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
-    var node2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
+    var artist1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
+    var artist2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
     
-    // This one is currently problematic due to the concept/entity encoding
-    // var player_tuple = [player1, player2]; 
+    var player_tuple = [player1, player2];
 
     var n = none;
-    var xTuple2 = [10, 30];
-    var xTuple2_1 = [10, xTuple2];
-    var xTuple2_2 = [10, [10, 3]];
-    var xTuple_second = xTuple2_1.1;
-    var xTuple_second_ = xTuple2_2.1;
-    var x_max_tuple = max3(xTuple_second);
-    var x_max_tuple_ = max3(xTuple_second_);
+    var xTuple = [10, 30];
+    var xTuple2 = [10, xTuple];
+    var xTuple3 = [10, [10, 3]];
+    var xTupleProj = xTuple2.1;
+    var xTupleProj2 = xTuple3.1;
+    var x_max_tuple = max3(xTupleProj);
+    var x_max_tuple2 = max3(xTupleProj2);
 
     var proj_tuple = [[1, 2], [3, 4], 5].2;
-    var x2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
+    var xTuple4 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
+    //var xTuple5 = xTuple4.[2, 0, 15, 2, 20];
+    //var xTuple6 = xTuple4.[0, 1, 15, 2, 20];
+    //var xTuple7 = xTuple4.[1, 0, 1, 15, 2, 20];
+
+    var hmm_tuple = [10, false, "hello"];
+    //var hmm_tuple2 = hmm_tuple.[2, 0, 1];
+    //var hmm_tuple3 = hmm_tuple.[0, 1, 2];
+    //var hmm_tuple4 = hmm_tuple.[0, 2, 1];
+
     // var xRecord = {f = 1, g = 2};
     // var xProjection = xRecord.f;
     // var xRecord2 = {g = 10, f = 20};
@@ -180,9 +188,9 @@ entrypoint function main(): Int {
     
     var z4 = maxx(false, 3);
     
-    var zTuple2 = [xTuple2, y];
+    var zTuple = [xTuple2, y];
     
     var z5 = identityTupleNoneable([y, false]);
     
-    return z;
+    return z_max_func_repeated;
 }

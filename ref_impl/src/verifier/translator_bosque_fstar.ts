@@ -15,7 +15,7 @@
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex, MIRProjectFromIndecies } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType, ParsableType, GUIDType, TruthyType } from "./type_expr";
@@ -229,7 +229,6 @@ class TranslatorBosqueFStar {
     // description comes from a Value expression
     // stringConstToTypeExpr : String[ValueType] -> TypeExpr
     static stringConstToTypeExpr(s: string): TypeExpr {
-
         let stringConst = s.slice(1);
         stringConst = stringConst.substr(0, stringConst.indexOf("="));
         switch (stringConst) {
@@ -288,7 +287,6 @@ class TranslatorBosqueFStar {
     // MIRArgumentToTypeExpr : MIRArgument -> TypeExpr
     MIRArgumentToTypeExpr(arg: MIRArgument, fkey: string): TypeExpr {
         // This branch handles variables
-
         if (arg instanceof MIRRegisterArgument) {
             return (this.types_seen.get(sanitizeName(arg.nameID + fkey)) as TypeExpr);
         }
@@ -301,8 +299,8 @@ class TranslatorBosqueFStar {
     opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] | [VarTerm, TermExpr][] {
         switch (op.tag) {
             case MIROpTag.MIRLoadConst: { // IMPLEMENT:
-                const opMIRLoadConst = op as MIRLoadConst;
-                opMIRLoadConst;
+                const opLoadConst = op as MIRLoadConst;
+                opLoadConst;
                 TranslatorBosqueFStar.debugging("LoadConst Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadConst", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
@@ -323,14 +321,14 @@ class TranslatorBosqueFStar {
                 }
 
                 return [
-                    this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, opMIRLoadConstTypedString.tkey, new TypedStringType(current_type)),
+                    this.MIRArgumentToTermExpr(opMIRLoadConstTypedString.trgt, fkey, new TypedStringType(current_type)),
                     new ConstTerm("\"" + opMIRLoadConstTypedString.ivalue.slice(1, -1) + "\"", new TypedStringType(current_type), fkey)
                 ];
             }
             // case MIROpTag.AccessConstField:
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
-                const opMIRLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
-                console.log(opMIRLoadFieldDefaultValue);
+                const opLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
+                console.log(opLoadFieldDefaultValue);
 
                 // return [this.MIRArgumentToTermExpr(opMIRLoadFieldDefaultValue.trgt, fkey, 
                 //     this.MIRArgumentToTypeExpr(opReturnAssign.src, fkey)),
@@ -437,7 +435,14 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+
+                const opProjectFromIndecies = op as MIRProjectFromIndecies;
+                console.log(opProjectFromIndecies); // Keep working here
+
+                return [
+                    new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType, fkey), 
+                    new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)
+                ];
             }
             case MIROpTag.MIRAccessFromProperty: { // IMPLEMENT
                 // const opMIRAccessFromProperty = op as MIRAccessFromProperty;
@@ -631,8 +636,7 @@ class TranslatorBosqueFStar {
                         }
                     }
                 }
-                return [this.MIRArgumentToTermExpr(opPhi.trgt, fkey,
-                    undefined),
+                return [this.MIRArgumentToTermExpr(opPhi.trgt, fkey, undefined),
                 this.MIRArgumentToTermExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey, undefined)];
             }
             case MIROpTag.MIRIsTypeOfNone: {

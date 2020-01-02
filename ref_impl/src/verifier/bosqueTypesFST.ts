@@ -79,15 +79,12 @@ val subtypeOfSeq: n: nat -> x: sequence bosqueType n -> sequence bosqueType n ->
 val subtypeOf: x: bosqueType -> bosqueType -> Tot bool(decreases x) \n\
 let rec subtypeOf x y = match x, y with\n\
 | BAnyType, _ -> true\n\
-| BSomeType, BAnyType -> false\n\
-| BSomeType, BTruthyType -> false\n\
-| BSomeType, BNoneType -> false\n\
 | BSomeType, _ -> true\n\
 | BTruthyType, BNoneType -> true\n\
 | BNoneType, BNoneType -> true\n\
-| BUnionType x1 y1, BUnionType x2 y2 -> (subtypeOf x1 x2 || subtypeOf x1 y2) && (subtypeOf y1 x2 || subtypeOf y1 y2) \n\
+| BUnionType x1 y1, BUnionType x2 y2 -> (x1 = x2 && subtypeOf y1 y2) || (subtypeOf y1 (BUnionType x2 y2))\n\
 | BUnionType x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z \n\
-// | BParseabletype, ? -> ?\n\
+| BParsableType, BParsableType -> true\n\
 | BBoolType, BBoolType -> true\n\
 | BIntType, BIntType -> true\n\
 // | BFloatType, ? -> ?\n\
@@ -100,8 +97,8 @@ let rec subtypeOf x y = match x, y with\n\
         if (n1 > n2) then false\n\
         else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2) \n\
     else \n\
-        if b2 then false \n\
-        else \n\
+        if b2 then false\n\
+        else\n\
             if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2\n\
             else false \n\
 // | BRecordType, ? -> ?\n\
@@ -112,7 +109,6 @@ let rec subtypeOf x y = match x, y with\n\
 // | BKeyedType, ? -> ?\n";
 
     FS.writeSync(fd, fstar_program_subtypeof_initial);
-    FS.writeSync(fd, "\n");
 
     FS.writeSync(fd, "// User-defined types\n");
     
@@ -134,7 +130,6 @@ let rec subtypeOf x y = match x, y with\n\
         
         value.forEach(element => FS.writeSync(fd, "| " + value_to_type + ", B" + sanitizeName(element) + "Type -> true\n"));
     });
-    FS.writeSync(fd, "\n");
 
     const fstar_program_subtypeof_rest = "| _, _ -> false\n\
 and \n\

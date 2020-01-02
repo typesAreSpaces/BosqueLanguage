@@ -59,15 +59,12 @@ val subtypeOfSeq: n: nat -> x: sequence bosqueType n -> sequence bosqueType n ->
 val subtypeOf: x: bosqueType -> bosqueType -> Tot bool(decreases x) 
 let rec subtypeOf x y = match x, y with
 | BAnyType, _ -> true
-| BSomeType, BAnyType -> false
-| BSomeType, BTruthyType -> false
-| BSomeType, BNoneType -> false
 | BSomeType, _ -> true
 | BTruthyType, BNoneType -> true
 | BNoneType, BNoneType -> true
-| BUnionType x1 y1, BUnionType x2 y2 -> (subtypeOf x1 x2 || subtypeOf x1 y2) && (subtypeOf y1 x2 || subtypeOf y1 y2) 
+| BUnionType x1 y1, BUnionType x2 y2 -> (x1 = x2 && subtypeOf y1 y2) || (subtypeOf y1 (BUnionType x2 y2))
 | BUnionType x1 y1, z -> subtypeOf x1 z || subtypeOf y1 z 
-// | BParseabletype, ? -> ?
+| BParsableType, BParsableType -> true
 | BBoolType, BBoolType -> true
 | BIntType, BIntType -> true
 // | BFloatType, ? -> ?
@@ -80,8 +77,8 @@ let rec subtypeOf x y = match x, y with
         if (n1 > n2) then false
         else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2) 
     else 
-        if b2 then false 
-        else 
+        if b2 then false
+        else
             if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2
             else false 
 // | BRecordType, ? -> ?
@@ -90,7 +87,6 @@ let rec subtypeOf x y = match x, y with
 // | BEnumType, ? -> ?
 // | BCustomType, ? -> ?
 // | BKeyedType, ? -> ?
-
 // User-defined types
 // Reflexivity relation
 | BnSMain__MusicianType, BnSMain__MusicianType -> true
@@ -100,7 +96,6 @@ let rec subtypeOf x y = match x, y with
 | BParsableType, BnSMain__MusicianType -> true
 | BParsableType, BnSMain__ArtistType -> true
 | BParsableType, BnSMain__PlayerMarkType -> true
-
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with
