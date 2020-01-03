@@ -39,7 +39,7 @@ type bosqueType =\n\
 | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType\n\
 // FIX: The following is wrong\n\
 // The bool indicates if the Record is open or not\n\
-| BRecordType : bool -> n:nat -> sequence bosqueType n -> bosqueType\n\
+| BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType\n\
 // FIX: The following is incomplete\n\
 | BFunctionType\n\
 // FIX: The following is incomplete\n\
@@ -101,7 +101,17 @@ let rec subtypeOf x y = match x, y with\n\
         else\n\
             if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2\n\
             else false \n\
-// | BRecordType, ? -> ?\n\
+| BRecordType b1 0 SNil SNil, BRecordType b2 0 SNil SNil -> b1 = b2\n\
+| BRecordType b1 0 SNil SNil, BRecordType _ _ _ _ -> b1\n\
+| BRecordType b1 n1 _ seq1, BRecordType b2 n2 _ seq2 ->\n\
+    if b1 then\n\
+        if (n1 > n2) then false\n\
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2)\n\
+    else\n\
+        if b2 then false\n\
+        else\n\
+            if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2\n\
+            else false\n\
 // | BFunctionType, ? -> ?\n\
 // | BObjectType, ? -> ?\n\
 // | BEnumType, ? -> ?\n\

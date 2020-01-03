@@ -26,7 +26,7 @@ type bosqueTerm = \n\
 | BTypedString : value:string -> content_type:bosqueType -> bosqueTerm\n\
 | BGUID : string -> int -> bosqueTerm\n\
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
-| BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
+| BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm\n\
 | BError : bosqueTerm\n"
 
     FS.writeSync(fd, program_initial);
@@ -51,8 +51,7 @@ let rec getType x = match x with\n\
 | BTypedString _ content_type -> BTypedStringType content_type\n\
 | BGUID _ _ -> BGUIDType\n\
 | BTuple n y -> BTupleType false n (getTypeSeq n y)\n\
-// FIX: The following is incomplete\n\
-| BRecord _ _ -> BRecordType false 0 SNil\n\
+| BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)\n\
 | BError -> BErrorType\n"
 
     FS.writeSync(fd, program_middle);
@@ -119,8 +118,8 @@ let isTuple2 b n seqTypes x = match x with\n\
 val isTuple3 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool\n\
 let isTuple3 b n seqTypes x = (BTupleType b n seqTypes) = (getType x)\n\
 \n\
-val isRecord : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool\n\
-let isRecord b n seqTypes x = (BRecordType b n seqTypes) = (getType x)\n\
+val isRecord : b:bool -> n:nat -> (sequence string n) -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool\n\
+let isRecord b n sseq seqTypes x = (BRecordType b n sseq seqTypes) = (getType x)\n\
 \n\
 val isError : bosqueTerm -> Tot bool\n\
 let isError x = match x with \n\
@@ -273,17 +272,14 @@ let rec nthTuple index dimension y = match y with\n\
   else nthTuple (index-1) dimension' (BTuple dimension' xs')\n\
 | _ -> BError\n\
 \n\
-// TODO: Implement the Record Projector\n\
-// (* Record projector *)\n\
-// val nthRecord : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm\n\
-// let rec nthRecord index dimension y = match y with\n\
-// | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone\n\
-// | BTuple dimension'' (SCons x #dimension' xs) -> \n\
-//   if (index < 0 || dimension <> dimension'') then BError else\n\
-//   if (index >= dimension) then BNone else\n\
-//   if index = 0 then x\n\
-//   else nthTuple (index-1) dimension' (BTuple dimension' xs)\n\
-// | _ -> BError";
+val nthRecord : property:string -> dimension:nat -> x:bosqueTerm -> Tot(y:bosqueTerm)\n\
+let rec nthRecord property dimension y = match y with\n\
+| BRecord 0 SNil SNil → if (dimension <> 0) then BError else BNone\n\
+| BRecord dimension'' (SCons s dimension' ss) (SCons x' dimension''' xs') ->\n\
+  if (dimension <> dimension'') then BError else\n\
+  if (s = property) then x'\n\
+  else nthRecord property dimension' (BRecord dimension' ss xs')\n\
+| _ -> BError\n";
 
     FS.writeSync(fd, program_rest);
 }

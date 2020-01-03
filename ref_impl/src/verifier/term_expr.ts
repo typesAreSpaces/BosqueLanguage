@@ -3,14 +3,14 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType } from "./type_expr";
+import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType, RecordType } from "./type_expr";
 import { toFStarSequence } from "./util";
 
 abstract class TermExpr {
     readonly symbolName: string;
     readonly ty: TypeExpr;
     readonly fkey: string;
-    
+
     // TODO: Add more reserved words from FStar
     static readonly binOpToFStar: Map<string, string> = new Map<string, string>([
         ["&&", "op_and"], ["||", "op_or"],
@@ -107,5 +107,40 @@ class TupleProjExpr extends TermExpr {
     }
 }
 
+class RecordTerm extends TermExpr {
+    readonly stringSequence: string[];
+    readonly termSequence: TermExpr[];
+    constructor(stringSequence: string[], termSequence: TermExpr[], fkey: string) {
+        super("BRecord", new RecordType(false, stringSequence, termSequence.map(x => x.ty)), fkey);
+        this.stringSequence = stringSequence;
+        this.termSequence = termSequence;
+    }
+    toML() {
+        return "(BRecord " + this.termSequence.length + " "
+            + toFStarSequence(this.stringSequence) + " "
+            + toFStarSequence(this.termSequence.map(x => x.toML()))
+            + ")";
+    }
+}
 
-export { TermExpr, VarTerm, ConstTerm, FuncTerm, TupleTerm, TupleProjExpr };
+class RecordProjExpr extends TermExpr {
+    readonly property: string;
+    readonly dimension: number;
+    readonly record: TermExpr;
+    readonly ty: TypeExpr;
+
+    constructor(property: string, dimension: number, record: TermExpr, ty: TypeExpr, fkey: string){
+        super("nthRecord", ty, fkey);
+        this.property = property;
+        this.dimension = dimension;
+        this.record = record;
+        this.ty = ty;
+    }
+    toML(){
+        return "(nthRecord " + this.property + " "
+        + this.dimension + " " + this.record.toML() + ")";
+    }
+}
+
+export { TermExpr, VarTerm, ConstTerm, FuncTerm, 
+    TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr };

@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { VarTerm, TermExpr, TupleProjExpr, FuncTerm } from "./term_expr";
+import { VarTerm, TermExpr, TupleProjExpr, FuncTerm, RecordProjExpr } from "./term_expr";
 // import { ConstructorType } from "./type_expr";
 
 abstract class ExprExpr {
@@ -48,7 +48,30 @@ class AssignmentExpr extends ExprExpr {
                 const assertion_norm = this.tabSymbol.repeat(indentatioLevel)
                     + "let _ = assert_norm(subtypeOf "
                     + arg.ty.id
-                    + " (getType " + arg.toML() + ")) in";
+                    + " (getType " + arg.toML() + ")) in\n";
+
+                return assertion_norm
+                    + this.tabSymbol.repeat(indentatioLevel)
+                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in\n"
+                    + this.continuation.toML(indentatioLevel, offset);
+            }
+            else {
+                return this.tabSymbol.repeat(indentatioLevel)
+                    + "let " + this.lhs.toML() + " = " + this.rhs.toML() + " in\n"
+                    + this.continuation.toML(indentatioLevel, offset);
+            }
+        }
+
+        if(this.rhs instanceof RecordProjExpr){
+            const arg = this.rhs.record;
+
+            if (!AssignmentExpr.assert_norm_flag.has(arg.fkey + arg.symbolName)) {
+                AssignmentExpr.assert_norm_flag.add(arg.fkey + arg.symbolName);
+
+                const assertion_norm = this.tabSymbol.repeat(indentatioLevel)
+                    + "let _ = assert_norm(subtypeOf "
+                    + arg.ty.id
+                    + " (getType " + arg.toML() + ")) in\n";
 
                 return assertion_norm
                     + this.tabSymbol.repeat(indentatioLevel)

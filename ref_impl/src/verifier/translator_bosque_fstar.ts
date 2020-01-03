@@ -5,21 +5,18 @@
 
 // PRIORITIES:
 // LoadFieldDefaultValue Not implemented yet
-// ConstructorPrimary Not implemented yet
 // MIRAccessConstantValue Not implemented yet
 // MIRAccessFromField Not implemented yet
 // MIRModifyWithFields Not implemented yetcat
-// MIRAccessFromIndex Not implemented yet
 // MIRIsTypeOfSome Not implemented yet
-// LoadConstTypedString Not implemented yet
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex, MIRProjectFromIndecies } from "../compiler/mir_ops";
+import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex, MIRProjectFromIndecies, MIRAccessFromProperty } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType, ParsableType, GUIDType, TruthyType } from "./type_expr";
-import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr } from "./term_expr";
+import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr } from "./term_expr";
 import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 import { printBosqueTypesFST } from "./bosqueTypesFST";
@@ -39,6 +36,8 @@ class TranslatorBosqueFStar {
     static readonly stringType = new TypedStringType(TranslatorBosqueFStar.anyType);
     static readonly skipCommand = new VarTerm("_skip", TranslatorBosqueFStar.boolType, "_global");
     static readonly DEBUGGING = true;
+
+    static fresh_count = 0;
 
     // String[MangledNamewithFkey] means that the string
     // takes into consideration the scope where it comes from
@@ -266,8 +265,14 @@ class TranslatorBosqueFStar {
     // to make it work
     // The fkey string helps to keep track the function where the variable came 
     // from
-    MIRArgumentToTermExpr(arg: MIRArgument, fkey: string, ty: TypeExpr | undefined): TermExpr {
-
+    MIRArgumentToTermExpr(arg: MIRArgument | string, fkey: string, ty: TypeExpr | undefined): TermExpr {
+        // This branch handles string names
+        // These encode fresh names
+        if (typeof arg === "string") {
+            const m_ty = ty as TypeExpr;
+            this.types_seen.set(sanitizeName(arg + fkey), m_ty);
+            return new VarTerm(sanitizeName(arg + fkey), m_ty, fkey);
+        }
         // This branch handles variables
         if (arg instanceof MIRRegisterArgument) {
             if (ty instanceof TypeExpr) {
@@ -384,17 +389,17 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRConstructorTuple: {
                 const opConstructorTuple = op as MIRConstructorTuple;
                 const types = opConstructorTuple.args.map(x => this.MIRArgumentToTypeExpr(x, fkey));
+                const elements = opConstructorTuple.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined));
                 return [this.MIRArgumentToTermExpr(opConstructorTuple.trgt, fkey, new TupleType(false, types)),
-                new TupleTerm(opConstructorTuple.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)), fkey)];
+                new TupleTerm(elements, fkey)];
             }
-            case MIROpTag.MIRConstructorRecord: { // IMPLEMENT
+            case MIROpTag.MIRConstructorRecord: {
                 const opConstructorRecord = op as MIRConstructorRecord;
-                const elements = opConstructorRecord.args.map(x => [x[0], this.MIRArgumentToTypeExpr(x[1], fkey)]) as [string, TypeExpr][];
-                // FIX: This is wrong due to improper implementation
-                return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(elements)),
-                new FuncTerm("Mkrecord__" + opConstructorRecord.args.map(x => x[0]).join("_"),
-                    opConstructorRecord.args.map(x => this.MIRArgumentToTermExpr(x[1], fkey, undefined)),
-                    new RecordType(elements), fkey)];
+                const field_names = opConstructorRecord.args.map(x => "\"" + x[0] + "\"");
+                const types_of_elements = opConstructorRecord.args.map(x => this.MIRArgumentToTypeExpr(x[1], fkey));
+                const elements = opConstructorRecord.args.map(x => this.MIRArgumentToTermExpr(x[1], fkey, undefined));
+                return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(false, field_names, types_of_elements)),
+                new RecordTerm(field_names, elements, fkey)];
             }
             // case MIROpTag.ConstructorLambda: { // IMPLEMENT:
             //     // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -422,46 +427,48 @@ class TranslatorBosqueFStar {
             //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
             case MIROpTag.MIRAccessFromIndex: {
-                const opMIRAccessFromIndex = op as MIRAccessFromIndex;
-                const dimension = (this.MIRArgumentToTypeExpr(opMIRAccessFromIndex.arg, fkey) as TupleType).elements.length;
+                const opAccessFromIndex = op as MIRAccessFromIndex;
+                const dimension = (this.MIRArgumentToTypeExpr(opAccessFromIndex.arg, fkey) as TupleType).elements.length;
 
                 return [
-                    this.MIRArgumentToTermExpr(opMIRAccessFromIndex.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType)),
-                    new TupleProjExpr(opMIRAccessFromIndex.idx, dimension,
-                        this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg, fkey, undefined),
-                        TranslatorBosqueFStar.stringVarToTypeExpr(opMIRAccessFromIndex.resultAccessType), fkey)
+                    this.MIRArgumentToTermExpr(opAccessFromIndex.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromIndex.resultAccessType)),
+                    new TupleProjExpr(opAccessFromIndex.idx, dimension,
+                        this.MIRArgumentToTermExpr(opAccessFromIndex.arg, fkey, undefined),
+                        TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromIndex.resultAccessType), fkey)
                 ];
                 //new FuncTerm("nthTuple", [opMIRAccessFromIndex.idx, this.MIRArgumentToTermExpr(opMIRAccessFromIndex.arg)], TranslatorBosqueFStar.intType)
             }
-            case MIROpTag.MIRProjectFromIndecies: { // IMPLEMENT:
-                TranslatorBosqueFStar.debugging("MIRProjectFromIndecies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-
+            case MIROpTag.MIRProjectFromIndecies: {
                 const opProjectFromIndecies = op as MIRProjectFromIndecies;
-                console.log(opProjectFromIndecies); // Keep working here
+                const arg_dimension = (this.MIRArgumentToTypeExpr(opProjectFromIndecies.arg, fkey) as TupleType).elements.length;
+                const actual_type = opProjectFromIndecies.resultProjectType.slice(1, -1).split(", ");
 
-                return [
-                    new VarTerm("_MIRProjectFromIndecies", TranslatorBosqueFStar.intType, fkey), 
-                    new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)
-                ];
+                const projected_args = opProjectFromIndecies.indecies.map((value, index) => [
+                    this.MIRArgumentToTermExpr("__fresh_name" + (TranslatorBosqueFStar.fresh_count + index), fkey, TranslatorBosqueFStar.stringVarToTypeExpr(actual_type[index])),
+                    new TupleProjExpr(value, arg_dimension,
+                        this.MIRArgumentToTermExpr(opProjectFromIndecies.arg, fkey, undefined),
+                        TranslatorBosqueFStar.stringVarToTypeExpr(actual_type[index]), fkey)
+                ]) as [VarTerm, TermExpr][];
+
+                TranslatorBosqueFStar.fresh_count += projected_args.length;
+
+                const lhs_term = this.MIRArgumentToTermExpr(opProjectFromIndecies.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opProjectFromIndecies.resultProjectType));
+                const rhs_term = new TupleTerm(projected_args.map(x => x[0]), fkey);
+
+                projected_args.unshift([lhs_term, rhs_term]);
+
+                return projected_args;
             }
-            case MIROpTag.MIRAccessFromProperty: { // IMPLEMENT
-                // const opMIRAccessFromProperty = op as MIRAccessFromProperty;
-                // console.log(opMIRAccessFromProperty);
-                // const typeOfTuple = this.types_seen.get(sanitizeName(opMIRAccessFromProperty.arg.nameID + fkey)) as TypeExpr;
-                // if (typeOfTuple instanceof RecordType) {
-                //     const keyTypes = new Map(typeOfTuple.elements);
-                //     this.types_seen.set(sanitizeName(opMIRAccessFromProperty.trgt.nameID + fkey),
-                //         (keyTypes.get(opMIRAccessFromProperty.property) as TypeExpr));
-                //     return [this.MIRArgumentToTermExpr(opMIRAccessFromProperty.trgt, fkey),
-                //     new FuncTerm("Mkrecord__" + typeOfTuple.signature + "?." + opMIRAccessFromProperty.property,
-                //         [this.MIRArgumentToTermExpr(opMIRAccessFromProperty.arg, fkey)],
-                //         (keyTypes.get(opMIRAccessFromProperty.property) as TypeExpr))];
-                // }
-                // else {
-                //     throw new Error("Type " + typeOfTuple + " is not a RecordType");
-                // }
-                TranslatorBosqueFStar.debugging("MIRAccessFromProperty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRAccessFromProperty", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+            case MIROpTag.MIRAccessFromProperty: {
+                const opAccessFromProperty = op as MIRAccessFromProperty;
+                const dimension = (this.MIRArgumentToTypeExpr(opAccessFromProperty.arg, fkey) as RecordType).elements.length;
+                
+                return [
+                    this.MIRArgumentToTermExpr(opAccessFromProperty.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType)), 
+                    new RecordProjExpr("\"" + opAccessFromProperty.property + "\"", dimension, 
+                    this.MIRArgumentToTermExpr(opAccessFromProperty.arg, fkey, undefined), 
+                    TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType), fkey)
+                ];
             }
             case MIROpTag.MIRProjectFromProperties: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);

@@ -12,12 +12,9 @@ type bosqueTerm =
 | BTypedString : value:string -> content_type:bosqueType -> bosqueTerm
 | BGUID : string -> int -> bosqueTerm
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
-| BRecord : n:nat -> sequence bosqueTerm n -> bosqueTerm
+| BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm
 | BError : bosqueTerm
 // User-defined terms
-| BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
-| BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
-| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 
 (* Definition of getType *)
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -29,13 +26,9 @@ let rec getType x = match x with
 | BTypedString _ content_type -> BTypedStringType content_type
 | BGUID _ _ -> BGUIDType
 | BTuple n y -> BTupleType false n (getTypeSeq n y)
-// FIX: The following is incomplete
-| BRecord _ _ -> BRecordType false 0 SNil
+| BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)
 | BError -> BErrorType
 // User-defined terms
-| BnSMain__Musician _ _ -> BnSMain__MusicianType
-| BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
-| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 and
 getTypeSeq n x = match x with
 | SNil -> SNil
@@ -90,8 +83,8 @@ let isTuple2 b n seqTypes x = match x with
 val isTuple3 : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
 let isTuple3 b n seqTypes x = (BTupleType b n seqTypes) = (getType x)
 
-val isRecord : b:bool -> n:nat -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
-let isRecord b n seqTypes x = (BRecordType b n seqTypes) = (getType x)
+val isRecord : b:bool -> n:nat -> (sequence string n) -> (sequence bosqueType n) -> x:bosqueTerm -> Tot bool
+let isRecord b n sseq seqTypes x = (BRecordType b n sseq seqTypes) = (getType x)
 
 val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
@@ -244,14 +237,11 @@ let rec nthTuple index dimension y = match y with
   else nthTuple (index-1) dimension' (BTuple dimension' xs')
 | _ -> BError
 
-// TODO: Implement the Record Projector
-// (* Record projector *)
-// val nthRecord : index:int -> dimension:nat -> bosqueTerm -> Tot bosqueTerm
-// let rec nthRecord index dimension y = match y with
-// | BTuple 0 SNil -> if (index < 0 || dimension <> 0) then BError else BNone
-// | BTuple dimension'' (SCons x #dimension' xs) -> 
-//   if (index < 0 || dimension <> dimension'') then BError else
-//   if (index >= dimension) then BNone else
-//   if index = 0 then x
-//   else nthTuple (index-1) dimension' (BTuple dimension' xs)
-// | _ -> BError
+val nthRecord : property:string -> dimension:nat -> x:bosqueTerm -> Tot(y:bosqueTerm)
+let rec nthRecord property dimension y = match y with
+| BRecord 0 SNil SNil → if (dimension <> 0) then BError else BNone
+| BRecord dimension'' (SCons s dimension' ss) (SCons x' dimension''' xs') ->
+  if (dimension <> dimension'') then BError else
+  if (s = property) then x'
+  else nthRecord property dimension' (BRecord dimension' ss xs')
+| _ -> BError

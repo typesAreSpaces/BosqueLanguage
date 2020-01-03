@@ -41,6 +41,21 @@ class TupleTypeDecl extends TypeDecl {
     }
 }
 
+class RecordTypeDecl extends TypeDecl {
+    readonly b: boolean;
+    readonly field_names: string[];
+    readonly typeArray: TypeExpr[];
+    constructor(stringType: string, b: boolean, field_names: string[], typeArray: TypeExpr[]){
+        super(stringType);
+        this.b = b;
+        this.field_names = field_names;
+        this.typeArray = typeArray;
+    }
+    emit(fd: number){
+        FS.writeSync(fd, `let ${this.stringType} = BRecordType ${this.b} ${this.typeArray.length} ${RecordType.toFStarRecord(this.field_names, this.typeArray)}\n`);
+    }
+}
+
 class UnionTypeDecl extends TypeDecl {
     readonly typeArray: TypeExpr[];
     constructor(stringType: string, typeArray: TypeExpr[]) {
@@ -221,12 +236,12 @@ class TupleType extends TypeExpr {
         // --------------------------------------------------------------------------------
         if (!TupleType.declared.has(this.id)) {
             TupleType.declared.add(this.id);
-            TypeExpr.declarator.add(new TupleTypeDecl(this.id, this.isOpen, this.elements))
+            TypeExpr.declarator.add(new TupleTypeDecl(this.id, this.isOpen, this.elements));
         }
         // --------------------------------------------------------------------------------
     }
     getBosqueType() {
-        return "[" + this.elements.map(x => x.getBosqueType()).join(" | ") + "]";
+        return "[" + this.elements.map(x => x.getBosqueType()).join(", ") + "]";
     }
 
     static toFStarTuple(types: TypeExpr[]): string {
@@ -234,16 +249,30 @@ class TupleType extends TypeExpr {
     }
 }
 
-// TODO: Implement the class
 class RecordType extends TypeExpr {
-    readonly elements: [string, TypeExpr][];
+    static declared: Set<string> = new Set<string>();
+    readonly isOpen: boolean;
+    readonly field_names: string[];
+    readonly elements: TypeExpr[];
 
-    constructor(elements: [string, TypeExpr][]) {
-        super("bRecordType_");
+    constructor(isOpen: boolean, field_names: string[], elements: TypeExpr[]) {
+        super("bRecordType_" + elements.length + elements.map((value, index) => field_names[index].slice(1, -1) + value.id).join("_") + isOpen);
+        this.isOpen = isOpen
+        this.field_names = field_names;
         this.elements = elements;
+        // --------------------------------------------------------------------------------
+        if (!RecordType.declared.has(this.id)) {
+            RecordType.declared.add(this.id);
+            TypeExpr.declarator.add(new RecordTypeDecl(this.id, this.isOpen, this.field_names, this.elements));
+        }
+        // --------------------------------------------------------------------------------
     }
     getBosqueType() {
-        return "";
+        return "{" + this.field_names.map((value, index) => value + ":" + this.elements[index].getBosqueType()).join(", ") + "}";
+    }
+
+    static toFStarRecord(fields: string[], types: TypeExpr[]): string {
+        return toFStarSequence(fields) + " " + toFStarSequence(types.map(x => x.id));
     }
 }
 

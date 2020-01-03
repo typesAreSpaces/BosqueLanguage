@@ -24,7 +24,7 @@ type bosqueType =
 | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType
 // FIX: The following is wrong
 // The bool indicates if the Record is open or not
-| BRecordType : bool -> n:nat -> sequence bosqueType n -> bosqueType
+| BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType
 // FIX: The following is incomplete
 | BFunctionType
 // FIX: The following is incomplete
@@ -37,9 +37,6 @@ type bosqueType =
 | BKeyedType
 | BErrorType
 // User-defined types
-| BnSMain__MusicianType
-| BnSMain__ArtistType
-| BnSMain__PlayerMarkType
 
 (* Definition of equality relation on Bosque types *)
 val eqTypeSeq : n:nat -> sequence bosqueType n -> sequence bosqueType n -> Tot bool 
@@ -81,7 +78,17 @@ let rec subtypeOf x y = match x, y with
         else
             if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2
             else false 
-// | BRecordType, ? -> ?
+| BRecordType b1 0 SNil SNil, BRecordType b2 0 SNil SNil -> b1 = b2
+| BRecordType b1 0 SNil SNil, BRecordType _ _ _ _ -> b1
+| BRecordType b1 n1 _ seq1, BRecordType b2 n2 _ seq2 ->
+    if b1 then
+        if (n1 > n2) then false
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2)
+    else
+        if b2 then false
+        else
+            if (n1 = n2) then(not b1) && (not b2) && (n1 = n2) && subtypeOfSeq n1 seq1 seq2
+            else false
 // | BFunctionType, ? -> ?
 // | BObjectType, ? -> ?
 // | BEnumType, ? -> ?
@@ -89,13 +96,7 @@ let rec subtypeOf x y = match x, y with
 // | BKeyedType, ? -> ?
 // User-defined types
 // Reflexivity relation
-| BnSMain__MusicianType, BnSMain__MusicianType -> true
-| BnSMain__ArtistType, BnSMain__ArtistType -> true
-| BnSMain__PlayerMarkType, BnSMain__PlayerMarkType -> true
 // Provide relation
-| BParsableType, BnSMain__MusicianType -> true
-| BParsableType, BnSMain__ArtistType -> true
-| BParsableType, BnSMain__PlayerMarkType -> true
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with

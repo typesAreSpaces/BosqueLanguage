@@ -139,7 +139,7 @@ entity PlayerMark provides Parsable {
     }
 }
 
-entrypoint function main(): Int {
+function main2(): Int {
 
     var string_test = "string_test";
     
@@ -166,19 +166,12 @@ entrypoint function main(): Int {
 
     var proj_tuple = [[1, 2], [3, 4], 5].2;
     var xTuple4 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
-    //var xTuple5 = xTuple4.[2, 0, 15, 2, 20];
-    //var xTuple6 = xTuple4.[0, 1, 15, 2, 20];
-    //var xTuple7 = xTuple4.[1, 0, 1, 15, 2, 20];
+    var xTuple5 = xTuple4.[2, 0, 15, 2, 20];
 
-    var hmm_tuple = [10, false, "hello"];
-    //var hmm_tuple2 = hmm_tuple.[2, 0, 1];
-    //var hmm_tuple3 = hmm_tuple.[0, 1, 2];
-    //var hmm_tuple4 = hmm_tuple.[0, 2, 1];
-
-    // var xRecord = {f = 1, g = 2};
-    // var xProjection = xRecord.f;
-    // var xRecord2 = {g = 10, f = 20};
-    // var xProjection2 = xRecord2.f;
+    var xRecord = {f = 1, g = 2};
+    //var xProjection = xRecord.f;
+    //var xRecord2 = {g = 10, f = 20};
+    //var xProjection2 = xRecord2.f;
     
     var y = 20;
     var y2 = identityUnion(y);
@@ -193,4 +186,10 @@ entrypoint function main(): Int {
     var z5 = identityTupleNoneable([y, false]);
     
     return z_max_func_repeated;
+}
+
+entrypoint function main(): Int {
+    var xRecord = {f = 1, g = 2};
+    var x_ProjectedRecord = xRecord.f;
+    return x_ProjectedRecord;
 }
