@@ -151,8 +151,11 @@ class TranslatorBosqueFStar {
         return new UnionType(set_of_types);
     }
 
-    static optionalRecordSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
+    static optionalRecordSugaring(isOpen: boolean, nonOptionalProperties: string, nonOptionalTypes: string, 
+        optionalTypes: string[], optionalProperties: string[]): UnionType {
         const set_of_types = new Set<TypeExpr>();
+        
+        return new UnionType(set_of_types);
 
     }
 
