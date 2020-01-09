@@ -12,10 +12,19 @@
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
-import { MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument, MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue, MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex, MIRProjectFromIndecies, MIRAccessFromProperty } from "../compiler/mir_ops";
+import {
+    MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument,
+    MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue,
+    MIRLoadConstTypedString, MIRLoadConst, MIRConstructorPrimary, MIRIsTypeOfSome, MIRVariable, MIRAccessFromIndex, MIRProjectFromIndecies,
+    MIRAccessFromProperty,
+    MIRProjectFromProperties
+} from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
-import { IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType, ConstructorType, ParsableType, GUIDType, TruthyType } from "./type_expr";
+import {
+    IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType,
+    ConstructorType, ParsableType, GUIDType, TruthyType
+} from "./type_expr";
 import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr } from "./term_expr";
 import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
@@ -110,18 +119,41 @@ class TranslatorBosqueFStar {
         }
     }
 
-    static optionalTupleSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
+    static powerSet(arr: any[]): any[][] {
+        let powers = [];
+        const total = Math.pow(2, arr.length);
+        
+        for (var i = 0; i < total; i++) {
+          let tempSet = [];
+          let num = i.toString(2);
+          while (num.length < arr.length) { num = '0' + num; }
+          
+          for (let b = 0; b < num.length; b++){
+            if (num[b] === '1') { 
+                tempSet.push(arr[b]); 
+            }
+          }
+          powers.push(tempSet);
+        }
+        
+        return powers;
+      }
+
+    static optionalTupleSugaring(nonOptionals: string, optionals: string[]): UnionType {
         const set_of_types = new Set<TypeExpr>();
         set_of_types.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
         let accum = nonOptionals;
-        const secondLastIndex = optionals.length - 2;
-        for (let index = 0; index < secondLastIndex; ++index) {
+        const num_optionals = optionals.length;
+        for (let index = 0; index < num_optionals; ++index) {
             accum += ", " + optionals[index];
             set_of_types.add(new TupleType(false, accum.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
         }
-        accum += ", " + optionals[secondLastIndex + 1];
-        set_of_types.add(new TupleType(isOpen, accum.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
-        return new UnionType(set_of_types);;
+        return new UnionType(set_of_types);
+    }
+
+    static optionalRecordSugaring(isOpen: boolean, nonOptionals: string, optionals: string[]): UnionType {
+        const set_of_types = new Set<TypeExpr>();
+
     }
 
     // TODO: Add more types as needed
@@ -129,6 +161,7 @@ class TranslatorBosqueFStar {
     // description comes from a Type expression
     // stringVarToTypeExpr : String[Type] -> TypeExpr
     static stringVarToTypeExpr(s: string): TypeExpr {
+        console.log(s);
         switch (s) {
             case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
@@ -184,7 +217,7 @@ class TranslatorBosqueFStar {
                         const types = s.split("?:");
                         const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
                         const optionals = types.slice(1);
-                        return this.optionalTupleSugaring(isOpen, nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
+                        return this.optionalTupleSugaring(nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
                     }
                     else {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
@@ -193,8 +226,25 @@ class TranslatorBosqueFStar {
                 // TODO: Implement record type
                 // Record
                 if (s.charAt(0) == '{') {
-                    console.log("Implement record type at stringVarToTypeExpr");
-                    throw new Error("Implement record type at stringVarToTypeExpr");
+                    s = s.slice(1, -1);
+                    let isOpen = false;
+                    // Open Record check
+                    if (s.includes("...")) {
+                        s = s.slice(0, -5); // Getting rid of the ellipsis and comma
+                        isOpen = true;
+                    }
+                    if (s.includes("?:")) {
+                        // This is based on the assumption that 
+                        // concrete types cannot follow optional types
+                        // inside tuples
+                        const types = s.split("?:");
+                        const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
+                        const optionals = types.slice(1);
+                        return this.optionalRecordSugaring();
+                    }
+                    else {
+                        return new RecordType();
+                    }
                 }
                 // Union
                 if (s.includes("|")) {
@@ -441,13 +491,13 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRProjectFromIndecies: {
                 const opProjectFromIndecies = op as MIRProjectFromIndecies;
                 const arg_dimension = (this.MIRArgumentToTypeExpr(opProjectFromIndecies.arg, fkey) as TupleType).elements.length;
-                const actual_type = opProjectFromIndecies.resultProjectType.slice(1, -1).split(", ");
+                const actual_type_array = opProjectFromIndecies.resultProjectType.slice(1, -1).split(", ");
 
                 const projected_args = opProjectFromIndecies.indecies.map((value, index) => [
-                    this.MIRArgumentToTermExpr("__fresh_name" + (TranslatorBosqueFStar.fresh_count + index), fkey, TranslatorBosqueFStar.stringVarToTypeExpr(actual_type[index])),
+                    this.MIRArgumentToTermExpr("__fresh_name" + (TranslatorBosqueFStar.fresh_count + index), fkey, TranslatorBosqueFStar.stringVarToTypeExpr(actual_type_array[index])),
                     new TupleProjExpr(value, arg_dimension,
                         this.MIRArgumentToTermExpr(opProjectFromIndecies.arg, fkey, undefined),
-                        TranslatorBosqueFStar.stringVarToTypeExpr(actual_type[index]), fkey)
+                        TranslatorBosqueFStar.stringVarToTypeExpr(actual_type_array[index]), fkey)
                 ]) as [VarTerm, TermExpr][];
 
                 TranslatorBosqueFStar.fresh_count += projected_args.length;
@@ -462,17 +512,36 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRAccessFromProperty: {
                 const opAccessFromProperty = op as MIRAccessFromProperty;
                 const dimension = (this.MIRArgumentToTypeExpr(opAccessFromProperty.arg, fkey) as RecordType).elements.length;
-                
+
                 return [
-                    this.MIRArgumentToTermExpr(opAccessFromProperty.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType)), 
-                    new RecordProjExpr("\"" + opAccessFromProperty.property + "\"", dimension, 
-                    this.MIRArgumentToTermExpr(opAccessFromProperty.arg, fkey, undefined), 
-                    TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType), fkey)
+                    this.MIRArgumentToTermExpr(opAccessFromProperty.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType)),
+                    new RecordProjExpr("\"" + opAccessFromProperty.property + "\"", dimension,
+                        this.MIRArgumentToTermExpr(opAccessFromProperty.arg, fkey, undefined),
+                        TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType), fkey)
                 ];
             }
             case MIROpTag.MIRProjectFromProperties: { // IMPLEMENT:
-                TranslatorBosqueFStar.debugging("MIRProjectFromProperties Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+                const opProjectFromIndecies = op as MIRProjectFromProperties;
+                console.log(opProjectFromIndecies);
+                const arg_dimension = (this.MIRArgumentToTypeExpr(opProjectFromIndecies.arg, fkey) as RecordType).elements.length;
+                const actual_type_array = opProjectFromIndecies.resultProjectType.slice(1, -1).split(", ").map(x => {
+                    const index = x.indexOf(":") + 1;
+                    return x.substring(index);
+                });
+
+                const projected_ars = opProjectFromIndecies.properties.map((value, index) => [
+                    this.MIRArgumentToTermExpr("__fresh_name" + (TranslatorBosqueFStar.fresh_count + index), fkey, TranslatorBosqueFStar.stringVarToTypeExpr(actual_type_array[index])),
+                    new RecordProjExpr(value, arg_dimension,
+                        this.MIRArgumentToTermExpr(opProjectFromIndecies.arg, fkey, undefined),
+                        TranslatorBosqueFStar.stringVarToTypeExpr(actual_type_array[index]), fkey)
+                ]) as [VarTerm, TermExpr][];
+
+                const lhs_term = this.MIRArgumentToTermExpr(opProjectFromIndecies.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opProjectFromIndecies.resultProjectType));
+                const rhs_term = new RecordTerm(opProjectFromIndecies.properties, projected_ars.map(x => x[0]), fkey);
+
+                projected_ars.unshift([lhs_term, rhs_term]);
+                return projected_ars;
+                // return [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             case MIROpTag.MIRAccessFromField: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRAccessFromField Not implemented yet", TranslatorBosqueFStar.DEBUGGING);

@@ -189,7 +189,8 @@ function main2(): Int {
 }
 
 entrypoint function main(): Int {
-    var xRecord = {f = 1, g = 2};
+    var xRecord = {f = 1, g = 2, h = 3};
     var x_ProjectedRecord = xRecord.f;
+    var x = xRecord.{g, f};
     return x_ProjectedRecord;
 }
