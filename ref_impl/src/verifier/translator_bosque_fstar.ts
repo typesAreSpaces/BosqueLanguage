@@ -166,21 +166,10 @@ class TranslatorBosqueFStar {
                     tempSetTypes.push(optionalTypes[b]);
                 }
             }
-
-            console.log(tempSetProperties);
-            console.log(tempSetTypes);
-            tempSetProperties.sort();
-            console.log(tempSetProperties);
-            console.log(tempSetTypes.slice().sort((x, y) => tempSetProperties.indexOf(x) - tempSetProperties.indexOf(y))); // Keep working here
-
-            set_of_types.add(new RecordType(false, tempSetProperties, tempSetTypes.slice().sort((x, y) => tempSetProperties[tempSetTypes.indexOf(x)] > tempSetProperties[tempSetTypes.indexOf(y)] ? 1 : -1)));
+            const entriesTemp = tempSetProperties.map((value, index) => [value, tempSetTypes[index]]) as [string, TypeExpr][];
+            entriesTemp.sort((x, y) => x[0].localeCompare(y[0]))
+            set_of_types.add(new RecordType(false, entriesTemp.map(x => x[0]), entriesTemp.map(x => x[1])));
         }
-
-        // console.log("AHHHHHHHHHHHHHHHHHHHHH BEGIN");
-        // set_of_types.forEach(x => {
-        //     console.log(x);
-        // })
-        // console.log("AHHHHHHHHHHHHHHHHHHHHH END");
 
         return new UnionType(set_of_types);
     }
@@ -562,9 +551,8 @@ class TranslatorBosqueFStar {
                         TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType), fkey)
                 ];
             }
-            case MIROpTag.MIRProjectFromProperties: { // IMPLEMENT:
+            case MIROpTag.MIRProjectFromProperties: { 
                 const opProjectFromIndecies = op as MIRProjectFromProperties;
-                console.log(opProjectFromIndecies);
                 const arg_dimension = (this.MIRArgumentToTypeExpr(opProjectFromIndecies.arg, fkey) as RecordType).elements.length;
                 const actual_type_array = opProjectFromIndecies.resultProjectType.slice(1, -1).split(", ").map(x => {
                     const index = x.indexOf(":") + 1;
@@ -583,7 +571,6 @@ class TranslatorBosqueFStar {
 
                 projected_ars.unshift([lhs_term, rhs_term]);
                 return projected_ars;
-                // return [new VarTerm("_MIRProjectFromProperties", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             case MIROpTag.MIRAccessFromField: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRAccessFromField Not implemented yet", TranslatorBosqueFStar.DEBUGGING);

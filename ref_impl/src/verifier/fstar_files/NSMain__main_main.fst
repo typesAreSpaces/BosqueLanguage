@@ -9,15 +9,14 @@ let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
 let bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse = BRecordType false 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons BBoolType 2 (SCons BIntType 1 (SCons bTypedStringType_BAnyType 0 SNil)))
 let bRecordType_2BBoolType_BIntTypefalse = BRecordType false 2 (SCons "f" 1 (SCons "g" 0 SNil)) (SCons BBoolType 1 (SCons BIntType 0 SNil))
 let bRecordType_1bTypedStringType_BAnyTypefalse = BRecordType false 1 (SCons "h" 0 SNil) (SCons bTypedStringType_BAnyType 0 SNil)
-let bRecordType_2bTypedStringType_BAnyType_BIntTypefalse = BRecordType false 2 (SCons "g" 1 (SCons "h" 0 SNil)) (SCons bTypedStringType_BAnyType 1 (SCons BIntType 0 SNil))
-let bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse = BRecordType false 2 (SCons "f" 1 (SCons "h" 0 SNil)) (SCons bTypedStringType_BAnyType 1 (SCons BBoolType 0 SNil))
-let bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse = BRecordType false 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons bTypedStringType_BAnyType 2 (SCons BBoolType 1 (SCons BIntType 0 SNil)))
-let bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2bTypedStringType_BAnyType_BIntTypefalse_bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse_bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse = (BUnionType bRecordType_1bTypedStringType_BAnyTypefalse (BUnionType bRecordType_2bTypedStringType_BAnyType_BIntTypefalse (BUnionType bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse)))
+let bRecordType_2BIntType_bTypedStringType_BAnyTypefalse = BRecordType false 2 (SCons "g" 1 (SCons "h" 0 SNil)) (SCons BIntType 1 (SCons bTypedStringType_BAnyType 0 SNil))
+let bRecordType_2BBoolType_bTypedStringType_BAnyTypefalse = BRecordType false 2 (SCons "f" 1 (SCons "h" 0 SNil)) (SCons BBoolType 1 (SCons bTypedStringType_BAnyType 0 SNil))
+let bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2BIntType_bTypedStringType_BAnyTypefalse_bRecordType_2BBoolType_bTypedStringType_BAnyTypefalse_bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse = (BUnionType bRecordType_1bTypedStringType_BAnyTypefalse (BUnionType bRecordType_2BIntType_bTypedStringType_BAnyTypefalse (BUnionType bRecordType_2BBoolType_bTypedStringType_BAnyTypefalse bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse)))
 
 (* Constant Declarations *)
 
 (* Function Declarations *)
-val nSMain__optionalRecordFunction : (x:bosqueTerm{subtypeOf bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2bTypedStringType_BAnyType_BIntTypefalse_bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse_bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
+val nSMain__optionalRecordFunction : (x:bosqueTerm{subtypeOf bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2BIntType_bTypedStringType_BAnyTypefalse_bRecordType_2BBoolType_bTypedStringType_BAnyTypefalse_bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
 let nSMain__optionalRecordFunction x = 
   let __ir_ret__ = (BBool true) in
   let _return_ = __ir_ret__ in
