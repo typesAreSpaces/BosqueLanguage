@@ -37,7 +37,6 @@ function optionalFunction(x: [?:Bool, ?:Int]): Bool {
     return true;
 }
 
-
 function max(x: Int | None, y: Int): Int
     ensures _return_ == x || _return_ == y;
 {
@@ -143,7 +142,7 @@ entity PlayerMark provides Parsable {
     }
 }
 
-entrypoint function main2(): Int {
+function main2(): Int {
 
     var string_test = "string_test";
     
@@ -198,19 +197,26 @@ function optionalRecordFunction(x: {f?:Bool, g?:Int, h: String}): Bool {
     return true;
 }
 
-//entity Baz {
-//    field f: Int;
-//    field g: Int;
-//    field k: Bool;
-//}
+concept Bar2 {
+    field f: Int;
+}
+
+entity Baz2 provides Bar2 {
+    field g: Int;
+    field k: Bool;
+}
 
 entrypoint function main(): Int {
     var xRecord = {f = true, g = 2, h = "hello"};
     var x_ProjectedRecord = xRecord.g;
     var x = xRecord.{g, f};
-    var y = optionalRecordFunction(xRecord);
+    // var y = optionalRecordFunction(xRecord);
 
-    // var e = Baz{ f=1, g=2, k=true };
+    var e = Baz2{ f=1, g=2, k=true };
+    var e2 = e.f;
+
+    var e3 = e->project<Bar2>();
+    var e4 = e->update(g=5);
 
     return x_ProjectedRecord;
 }

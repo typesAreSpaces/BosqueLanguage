@@ -51,8 +51,8 @@ type bosqueType =\n\
 // FIX: The following is incomplete\n\
 | BKeyedType\n\
 | BErrorType\n";
-
     FS.writeSync(fd, fstar_program_core_decl);
+
     FS.writeSync(fd, "// User-defined types\n");
     user_defined_types.forEach((_, index) => {
         if (!index.includes("NSCore")) {
@@ -117,11 +117,9 @@ let rec subtypeOf x y = match x, y with\n\
 // | BEnumType, ? -> ?\n\
 // | BCustomType, ? -> ?\n\
 // | BKeyedType, ? -> ?\n";
-
     FS.writeSync(fd, fstar_program_subtypeof_initial);
 
-    FS.writeSync(fd, "// User-defined types\n");
-    
+    FS.writeSync(fd, "// User-defined types\n");    
     FS.writeSync(fd, "// Reflexivity relation\n");
     user_defined_types.forEach((_, index) => {
         if (!index.includes("NSCore")) {
@@ -152,7 +150,6 @@ subtypeOfSeq n x y = match x with\n\
                     | SNil -> false\n\
                     | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  \n\
                     )\n";
-
     FS.writeSync(fd, fstar_program_subtypeof_rest);
     FS.closeSync(fd);
 }

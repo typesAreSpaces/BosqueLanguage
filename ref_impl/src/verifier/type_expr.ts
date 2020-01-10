@@ -295,13 +295,12 @@ class FuncType extends TypeExpr {
     }
 }
 
-// TODO: Implement getBosqueType 
 class ObjectType extends TypeExpr {
     constructor() {
         super("BObjectType");
     }
     getBosqueType() {
-        return "";
+        return "NSCore::Object";
     }
 }
 
