@@ -112,7 +112,7 @@ class RecordTerm extends TermExpr {
     readonly termSequence: TermExpr[];
     constructor(stringSequence: string[], termSequence: TermExpr[], fkey: string) {
         super("BRecord", new RecordType(false, stringSequence, termSequence.map(x => x.ty)), fkey);
-        this.stringSequence = stringSequence;
+        this.stringSequence = stringSequence.map(x => "\"" + x + "\"");
         this.termSequence = termSequence;
     }
     toML() {
@@ -129,18 +129,20 @@ class RecordProjExpr extends TermExpr {
     readonly record: TermExpr;
     readonly ty: TypeExpr;
 
-    constructor(property: string, dimension: number, record: TermExpr, ty: TypeExpr, fkey: string){
+    constructor(property: string, dimension: number, record: TermExpr, ty: TypeExpr, fkey: string) {
         super("nthRecord", ty, fkey);
         this.property = property;
         this.dimension = dimension;
         this.record = record;
         this.ty = ty;
     }
-    toML(){
-        return "(nthRecord " + this.property + " "
-        + this.dimension + " " + this.record.toML() + ")";
+    toML() {
+        return "(nthRecord \"" + this.property + "\" "
+            + this.dimension + " " + this.record.toML() + ")";
     }
 }
 
-export { TermExpr, VarTerm, ConstTerm, FuncTerm, 
-    TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr };
+export {
+    TermExpr, VarTerm, ConstTerm, FuncTerm,
+    TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr
+};

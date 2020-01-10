@@ -15,6 +15,9 @@ type bosqueTerm =
 | BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm
 | BError : bosqueTerm
 // User-defined terms
+| BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
+| BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
+| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 
 (* Definition of getType *)
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -29,6 +32,9 @@ let rec getType x = match x with
 | BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)
 | BError -> BErrorType
 // User-defined terms
+| BnSMain__Musician _ _ -> BnSMain__MusicianType
+| BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
+| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 and
 getTypeSeq n x = match x with
 | SNil -> SNil

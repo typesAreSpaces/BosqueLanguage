@@ -119,44 +119,70 @@ class TranslatorBosqueFStar {
         }
     }
 
-    static powerSet(arr: any[]): any[][] {
-        let powers = [];
-        const total = Math.pow(2, arr.length);
-        
-        for (var i = 0; i < total; i++) {
-          let tempSet = [];
-          let num = i.toString(2);
-          while (num.length < arr.length) { num = '0' + num; }
-          
-          for (let b = 0; b < num.length; b++){
-            if (num[b] === '1') { 
-                tempSet.push(arr[b]); 
-            }
-          }
-          powers.push(tempSet);
-        }
-        
-        return powers;
-      }
-
-    static optionalTupleSugaring(nonOptionals: string, optionals: string[]): UnionType {
+    static optionalTupleSugaring(nonOptionals: TypeExpr[], optionals: TypeExpr[]): UnionType {
         const set_of_types = new Set<TypeExpr>();
-        set_of_types.add(new TupleType(false, nonOptionals.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
-        let accum = nonOptionals;
+        // set_of_types.add(new TupleType(false, nonOptionals));
+
         const num_optionals = optionals.length;
         for (let index = 0; index < num_optionals; ++index) {
-            accum += ", " + optionals[index];
-            set_of_types.add(new TupleType(false, accum.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr)));
+            // Copy nonOptionals
+            let temp: TypeExpr[] = [];
+            for (let i = 0; i < nonOptionals.length; ++i) {
+                temp.push(nonOptionals[i]);
+            }
+            // Copy optionals
+            for (let i = 0; i < index; ++i) {
+                temp.push(optionals[i]);
+            }
+            set_of_types.add(new TupleType(false, temp));
         }
+
         return new UnionType(set_of_types);
     }
 
-    static optionalRecordSugaring(isOpen: boolean, nonOptionalProperties: string, nonOptionalTypes: string, 
-        optionalTypes: string[], optionalProperties: string[]): UnionType {
+    static optionalRecordSugaring(nonOptionalProperties: string[], nonOptionalTypes: TypeExpr[], optionalProperties: string[], optionalTypes: TypeExpr[]): UnionType {
         const set_of_types = new Set<TypeExpr>();
-        
-        return new UnionType(set_of_types);
 
+        const total = Math.pow(2, optionalProperties.length);
+        for (let i = 0; i < total; i++) {
+
+            let tempSetProperties: string[] = [];
+            let tempSetTypes: TypeExpr[] = [];
+
+            // Copy nonOptionals
+            for (let i = 0; i < nonOptionalProperties.length; ++i) {
+                tempSetProperties.push(nonOptionalProperties[i]);
+                tempSetTypes.push(nonOptionalTypes[i])
+            }
+
+            let num = i.toString(2);
+            while (num.length < optionalProperties.length) {
+                num = '0' + num;
+            }
+            for (let b = 0; b < num.length; b++) {
+                if (num[b] === '1') {
+                    // Copy optionals
+                    tempSetProperties.push(optionalProperties[b]);
+                    tempSetTypes.push(optionalTypes[b]);
+                }
+            }
+
+            console.log(tempSetProperties);
+            console.log(tempSetTypes);
+            tempSetProperties.sort();
+            console.log(tempSetProperties);
+            console.log(tempSetTypes.slice().sort((x, y) => tempSetProperties.indexOf(x) - tempSetProperties.indexOf(y))); // Keep working here
+
+            set_of_types.add(new RecordType(false, tempSetProperties, tempSetTypes.slice().sort((x, y) => tempSetProperties[tempSetTypes.indexOf(x)] > tempSetProperties[tempSetTypes.indexOf(y)] ? 1 : -1)));
+        }
+
+        // console.log("AHHHHHHHHHHHHHHHHHHHHH BEGIN");
+        // set_of_types.forEach(x => {
+        //     console.log(x);
+        // })
+        // console.log("AHHHHHHHHHHHHHHHHHHHHH END");
+
+        return new UnionType(set_of_types);
     }
 
     // TODO: Add more types as needed
@@ -164,7 +190,6 @@ class TranslatorBosqueFStar {
     // description comes from a Type expression
     // stringVarToTypeExpr : String[Type] -> TypeExpr
     static stringVarToTypeExpr(s: string): TypeExpr {
-        console.log(s);
         switch (s) {
             case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
@@ -218,15 +243,21 @@ class TranslatorBosqueFStar {
                         // concrete types cannot follow optional types
                         // inside tuples
                         const types = s.split("?:");
-                        const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
+                        const nonOptionals = types[0];
                         const optionals = types.slice(1);
-                        return this.optionalTupleSugaring(nonOptionals, optionals.map(x => x.includes(",") ? x.slice(0, -2) : x));
+                        if (nonOptionals.length == 0) {
+                            return this.optionalTupleSugaring([],
+                                optionals.map(x => x.includes(",") ? x.slice(0, -2) : x).map(TranslatorBosqueFStar.stringVarToTypeExpr));
+                        }
+                        else {
+                            return this.optionalTupleSugaring(nonOptionals.slice(0, -2).split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr),
+                                optionals.map(x => x.includes(",") ? x.slice(0, -2) : x).map(TranslatorBosqueFStar.stringVarToTypeExpr));
+                        }
                     }
                     else {
                         return new TupleType(isOpen, s.split(", ").map(TranslatorBosqueFStar.stringVarToTypeExpr));
                     }
                 }
-                // TODO: Implement record type
                 // Record
                 if (s.charAt(0) == '{') {
                     s = s.slice(1, -1);
@@ -236,17 +267,25 @@ class TranslatorBosqueFStar {
                         s = s.slice(0, -5); // Getting rid of the ellipsis and comma
                         isOpen = true;
                     }
+                    const entries = s.split(", ");
                     if (s.includes("?:")) {
                         // This is based on the assumption that 
                         // concrete types cannot follow optional types
                         // inside tuples
-                        const types = s.split("?:");
-                        const nonOptionals = types[0].slice(0, -2); // Getting rid of a comma
-                        const optionals = types.slice(1);
-                        return this.optionalRecordSugaring();
+
+                        const nonOptionalEntries = entries.filter(x => !x.includes("?:"));
+                        const optionalEntries = entries.filter(x => x.includes("?:"));
+                        const nonOptional_field_names = nonOptionalEntries.map(x => x.substring(0, x.indexOf(":")));
+                        const optional_field_names = optionalEntries.map(x => x.substring(0, x.indexOf("?:")));
+                        const nonOptional_types = nonOptionalEntries.map(x => x.substring(x.indexOf(":") + 1)).map(TranslatorBosqueFStar.stringVarToTypeExpr);
+                        const optional_types = optionalEntries.map(x => x.substring(x.indexOf("?:") + 2)).map(TranslatorBosqueFStar.stringVarToTypeExpr);
+
+                        return this.optionalRecordSugaring(nonOptional_field_names, nonOptional_types, optional_field_names, optional_types);
                     }
                     else {
-                        return new RecordType();
+                        const field_names = entries.map(x => x.substring(0, x.indexOf(":")));
+                        const types = entries.map(x => x.substring(x.indexOf(":") + 1)).map(TranslatorBosqueFStar.stringVarToTypeExpr);
+                        return new RecordType(isOpen, field_names, types);
                     }
                 }
                 // Union
@@ -448,7 +487,7 @@ class TranslatorBosqueFStar {
             }
             case MIROpTag.MIRConstructorRecord: {
                 const opConstructorRecord = op as MIRConstructorRecord;
-                const field_names = opConstructorRecord.args.map(x => "\"" + x[0] + "\"");
+                const field_names = opConstructorRecord.args.map(x => x[0]);
                 const types_of_elements = opConstructorRecord.args.map(x => this.MIRArgumentToTypeExpr(x[1], fkey));
                 const elements = opConstructorRecord.args.map(x => this.MIRArgumentToTermExpr(x[1], fkey, undefined));
                 return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(false, field_names, types_of_elements)),
@@ -518,7 +557,7 @@ class TranslatorBosqueFStar {
 
                 return [
                     this.MIRArgumentToTermExpr(opAccessFromProperty.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType)),
-                    new RecordProjExpr("\"" + opAccessFromProperty.property + "\"", dimension,
+                    new RecordProjExpr(opAccessFromProperty.property, dimension,
                         this.MIRArgumentToTermExpr(opAccessFromProperty.arg, fkey, undefined),
                         TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromProperty.resultAccessType), fkey)
                 ];

@@ -258,7 +258,7 @@ class RecordType extends TypeExpr {
     constructor(isOpen: boolean, field_names: string[], elements: TypeExpr[]) {
         super("bRecordType_" + elements.length + elements.map((value, index) => field_names[index].slice(1, -1) + value.id).join("_") + isOpen);
         this.isOpen = isOpen
-        this.field_names = field_names;
+        this.field_names = field_names.map(x => "\"" + x + "\"");
         this.elements = elements;
         // --------------------------------------------------------------------------------
         if (!RecordType.declared.has(this.id)) {

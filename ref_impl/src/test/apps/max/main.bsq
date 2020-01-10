@@ -33,6 +33,10 @@ function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
     return x;
 }
 
+function optionalFunction(x: [?:Bool, ?:Int]): Bool {
+    return true;
+}
+
 
 function max(x: Int | None, y: Int): Int
     ensures _return_ == x || _return_ == y;
@@ -139,7 +143,7 @@ entity PlayerMark provides Parsable {
     }
 }
 
-function main2(): Int {
+entrypoint function main2(): Int {
 
     var string_test = "string_test";
     
@@ -184,13 +188,20 @@ function main2(): Int {
     var zTuple = [xTuple2, y];
     
     var z5 = identityTupleNoneable([y, false]);
+
+    var a = optionalFunction([true]);
     
     return z_max_func_repeated;
 }
 
+function optionalRecordFunction(x: {f?:Bool, g?:Int, h: String}): Bool {
+    return true;
+}
+
 entrypoint function main(): Int {
-    var xRecord = {f = 1, g = 2, h = 3};
-    var x_ProjectedRecord = xRecord.f;
+    var xRecord = {f = true, g = 2, h = "hello"};
+    var x_ProjectedRecord = xRecord.g;
     var x = xRecord.{g, f};
+    var y = optionalRecordFunction(xRecord);
     return x_ProjectedRecord;
 }

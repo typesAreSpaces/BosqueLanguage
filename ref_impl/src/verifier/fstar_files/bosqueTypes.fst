@@ -37,6 +37,9 @@ type bosqueType =
 | BKeyedType
 | BErrorType
 // User-defined types
+| BnSMain__MusicianType
+| BnSMain__ArtistType
+| BnSMain__PlayerMarkType
 
 (* Definition of equality relation on Bosque types *)
 val eqTypeSeq : n:nat -> sequence bosqueType n -> sequence bosqueType n -> Tot bool 
@@ -96,7 +99,13 @@ let rec subtypeOf x y = match x, y with
 // | BKeyedType, ? -> ?
 // User-defined types
 // Reflexivity relation
+| BnSMain__MusicianType, BnSMain__MusicianType -> true
+| BnSMain__ArtistType, BnSMain__ArtistType -> true
+| BnSMain__PlayerMarkType, BnSMain__PlayerMarkType -> true
 // Provide relation
+| BParsableType, BnSMain__MusicianType -> true
+| BParsableType, BnSMain__ArtistType -> true
+| BParsableType, BnSMain__PlayerMarkType -> true
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with

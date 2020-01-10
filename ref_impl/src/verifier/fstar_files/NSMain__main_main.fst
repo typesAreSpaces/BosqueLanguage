@@ -1,0 +1,42 @@
+module NSMain__main_main
+open Sequence
+open BosqueTypes
+open BosqueTerms
+open Util
+
+(* Type names *)
+let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse = BRecordType false 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons BBoolType 2 (SCons BIntType 1 (SCons bTypedStringType_BAnyType 0 SNil)))
+let bRecordType_2BBoolType_BIntTypefalse = BRecordType false 2 (SCons "f" 1 (SCons "g" 0 SNil)) (SCons BBoolType 1 (SCons BIntType 0 SNil))
+let bRecordType_1bTypedStringType_BAnyTypefalse = BRecordType false 1 (SCons "h" 0 SNil) (SCons bTypedStringType_BAnyType 0 SNil)
+let bRecordType_2bTypedStringType_BAnyType_BIntTypefalse = BRecordType false 2 (SCons "g" 1 (SCons "h" 0 SNil)) (SCons bTypedStringType_BAnyType 1 (SCons BIntType 0 SNil))
+let bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse = BRecordType false 2 (SCons "f" 1 (SCons "h" 0 SNil)) (SCons bTypedStringType_BAnyType 1 (SCons BBoolType 0 SNil))
+let bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse = BRecordType false 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons bTypedStringType_BAnyType 2 (SCons BBoolType 1 (SCons BIntType 0 SNil)))
+let bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2bTypedStringType_BAnyType_BIntTypefalse_bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse_bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse = (BUnionType bRecordType_1bTypedStringType_BAnyTypefalse (BUnionType bRecordType_2bTypedStringType_BAnyType_BIntTypefalse (BUnionType bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse)))
+
+(* Constant Declarations *)
+
+(* Function Declarations *)
+val nSMain__optionalRecordFunction : (x:bosqueTerm{subtypeOf bUnionType_bRecordType_1bTypedStringType_BAnyTypefalse_bRecordType_2bTypedStringType_BAnyType_BIntTypefalse_bRecordType_2bTypedStringType_BAnyType_BBoolTypefalse_bRecordType_3bTypedStringType_BAnyType_BBoolType_BIntTypefalse (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BBoolType (getType x)})
+let nSMain__optionalRecordFunction x = 
+  let __ir_ret__ = (BBool true) in
+  let _return_ = __ir_ret__ in
+  _return_
+
+val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
+let nSMain__main  = 
+  let __tmp_0 = (BRecord 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons (BBool true) 2 (SCons (BInt 2) 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)))) in
+  let xRecord = __tmp_0 in
+  let _ = assert_norm(subtypeOf bRecordType_3BBoolType_BIntType_bTypedStringType_BAnyTypefalse (getType xRecord)) in
+  let __tmp_6 = (nthRecord "g" 3 xRecord) in
+  let x_ProjectedRecord = __tmp_6 in
+  let __fresh_name1NSMain__main = (nthRecord "g" 3 xRecord) in
+  let __fresh_name0NSMain__main = (nthRecord "f" 3 xRecord) in
+  let __tmp_9 = (BRecord 2 (SCons "f" 1 (SCons "g" 0 SNil)) (SCons __fresh_name0NSMain__main 1 (SCons __fresh_name1NSMain__main 0 SNil))) in
+  let x = __tmp_9 in
+  let __tmp_10 = (nSMain__optionalRecordFunction xRecord) in
+  let y = __tmp_10 in
+  let __ir_ret__ = x_ProjectedRecord in
+  let _return_ = __ir_ret__ in
+  _return_
+
