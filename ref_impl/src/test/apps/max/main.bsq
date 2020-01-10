@@ -198,10 +198,19 @@ function optionalRecordFunction(x: {f?:Bool, g?:Int, h: String}): Bool {
     return true;
 }
 
+//entity Baz {
+//    field f: Int;
+//    field g: Int;
+//    field k: Bool;
+//}
+
 entrypoint function main(): Int {
     var xRecord = {f = true, g = 2, h = "hello"};
     var x_ProjectedRecord = xRecord.g;
     var x = xRecord.{g, f};
     var y = optionalRecordFunction(xRecord);
+
+    // var e = Baz{ f=1, g=2, k=true };
+
     return x_ProjectedRecord;
 }

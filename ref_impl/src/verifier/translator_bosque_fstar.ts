@@ -180,6 +180,10 @@ class TranslatorBosqueFStar {
     // stringVarToTypeExpr : String[Type] -> TypeExpr
     static stringVarToTypeExpr(s: string): TypeExpr {
         switch (s) {
+            // FIX: This is wrong
+            case "NSCore::Object":{
+                return TranslatorBosqueFStar.anyType;
+            }
             case "NSCore::Any": {
                 return TranslatorBosqueFStar.anyType;
             }
