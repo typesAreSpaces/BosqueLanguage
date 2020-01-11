@@ -389,10 +389,10 @@ class TranslatorBosqueFStar {
 
     opToAssignment(op: MIROp, comingFrom: string, fkey: string): [VarTerm, TermExpr] | [VarTerm, TermExpr][] {
         switch (op.tag) {
-            case MIROpTag.MIRLoadConst: { // IMPLEMENT:
+            case MIROpTag.MIRLoadConst: { // IMPLEMENTIKNG
                 const opLoadConst = op as MIRLoadConst;
-                opLoadConst;
-                TranslatorBosqueFStar.debugging("LoadConst Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
+                console.log(opLoadConst);
+                 
                 return [new VarTerm("_LoadConst", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             case MIROpTag.MIRLoadConstTypedString: {

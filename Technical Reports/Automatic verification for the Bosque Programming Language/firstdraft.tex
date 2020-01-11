@@ -1,0 +1,93 @@
+%
+\documentclass[runningheads]{llncs}
+\usepackage{graphicx}
+%
+\begin{document}
+% Title
+\title{Automatic verification for the Bosque Programming Language}
+%\thanks{} % If we want to thank someone/org.
+%
+% Authors
+\author{Mark Marron$^1$,
+  Jose Abel Castellanos Joo$^2$}
+%
+\authorrunning{M. Marron and J.A. Castellanos Joo}
+%
+\institute{{$^1$Microsoft Research\\} {$^2$University of New Mexico}}
+%
+\maketitle
+%
+\begin{abstract}  
+  Automatic theorem proving tools has become extremely popular thanks to their application in software
+  analysis/verification. It provides formal guarantees about software correctness and useful mechanisms
+  for debugging highly non-trivial properties. However, these tools
+  require a large amount of knowledge from their users to be able to use them correctly. Hence, it is
+  complicated for many programmers to use verification in their projects.
+  
+  Bosque is a new programming language designed for the future of Cloud and IoT application development
+  with the intention to simplify the verification experience for application developers.
+  This paper discusses the Bosque language features of that allow the automatic verification of its
+  properties using a formal encoding in \{FStar, SMTLib\}.
+%
+\keywords{Formal Verification \and Language Design \and Software Engineering.}
+\end{abstract}
+%
+%
+%
+
+\section{Introduction}
+
+%
+%
+
+\section{Background}
+
+%
+%
+
+\section{Encoding}
+
+Bosque is a strongly-typed functional programming language supporting nominal and
+structural typing. Bosque has a small core library consisting of booleans, integers,
+typed strings, tuples, records, unions, and structure-like composite data types called
+concepts (non-instantiable types) and entities (instantable types).
+
+BEGIN META\{Things to have in mind\}
+
+\begin{itemize}
+\item High level verifiable language
+  \begin{itemize}
+  \item Semantics
+  \item Encoding
+  \end{itemize}
+
+
+\item Collections / Inductive data types
+  \begin{itemize}
+  \item Quantifiers
+  \end{itemize}
+\end{itemize}
+
+END META
+
+The intermediate representation of Bosque 
+
+\subsection{Encoding Core Library}
+\subsection{Encoding User-defined }
+%
+%
+
+\section{Evaluation}
+
+%
+%
+
+\section{Conclusion}
+
+%
+%
+
+\bibliography{bibliography/references}
+\bibliographystyle{unsrt}
+
+\end{document}

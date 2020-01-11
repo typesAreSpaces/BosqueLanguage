@@ -197,6 +197,10 @@ function optionalRecordFunction(x: {f?:Bool, g?:Int, h: String}): Bool {
     return true;
 }
 
+function selectF(x: Bool): Int {
+    return x ? 1 : 2;
+}
+
 concept Bar2 {
     field f: Int;
 }
@@ -217,6 +221,8 @@ entrypoint function main(): Int {
 
     var e3 = e->project<Bar2>();
     var e4 = e->update(g=5);
+
+    var f = selectF(true);
 
     return x_ProjectedRecord;
 }

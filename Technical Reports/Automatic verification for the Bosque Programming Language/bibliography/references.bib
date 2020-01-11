@@ -1,0 +1,29 @@
+@InProceedings{10.1007/978-3-319-41528-4_20,
+author="Leino, K. R. M.
+and Pit-Claudel, Cl{\'e}ment",
+editor="Chaudhuri, Swarat
+and Farzan, Azadeh",
+title="Trigger Selection Strategies to Stabilize Program Verifiers",
+booktitle="Computer Aided Verification",
+year="2016",
+publisher="Springer International Publishing",
+address="Cham",
+pages="361--381",
+abstract="SMT-based program verifiers often suffer from the so-called butterfly effect, in which minor modifications to the program source cause significant instabilities in verification times, which in turn may lead to spurious verification failures and a degraded user experience. This paper identifies matching loops (ill-behaved quantifiers causing an SMT solver to repeatedly instantiate a small set of quantified formulas) as a significant contributor to these instabilities, and describes some techniques to detect and prevent them. At their core, the contributed techniques move the trigger selection logic away from the SMT solver and into the high-level verifier: this move allows authors of verifiers to annotate, rewrite, and analyze user-written quantifiers to improve the solver's performance, using information that is easily available at the source level but would be hard to extract from the heavily encoded terms that the solver works with. The paper demonstrates three core techniques (quantifier splitting, trigger sharing, and matching loop detection) by extending the Dafny verifier with its own trigger selection routine, and demonstrates significant predictability and performance gains on both Dafny's test suite and large verification efforts using Dafny.",
+isbn="978-3-319-41528-4"
+}
+
+@InProceedings{10.1007/978-3-540-78800-3_24,
+author="de Moura, Leonardo
+and Bj{\o}rner, Nikolaj",
+editor="Ramakrishnan, C. R.
+and Rehof, Jakob",
+title="Z3: An Efficient SMT Solver",
+booktitle="Tools and Algorithms for the Construction and Analysis of Systems",
+year="2008",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="337--340",
+abstract="Satisfiability Modulo Theories (SMT) problem is a decision problem for logical first order formulas with respect to combinations of background theories such as: arithmetic, bit-vectors, arrays, and uninterpreted functions. Z3 is a new and efficient SMT Solver freely available from Microsoft Research. It is used in various software verification and analysis applications.",
+isbn="978-3-540-78800-3"
+}

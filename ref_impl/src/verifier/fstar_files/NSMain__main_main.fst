@@ -12,6 +12,21 @@ let bRecordType_2BBoolType_BIntTypefalse = BRecordType false 2 (SCons "f" 1 (SCo
 (* Constant Declarations *)
 
 (* Function Declarations *)
+val nSMain__selectF : (x:bosqueTerm{subtypeOf BBoolType (getType x)}) -> Tot (x:bosqueTerm{subtypeOf BIntType (getType x)})
+let nSMain__selectF x = 
+  if x then 
+    let _LoadConst = (BInt 0) in
+    let __tmp_0_2 = __tmp_0_1 in
+    let __ir_ret__ = __tmp_0_2 in
+    let _return_ = __ir_ret__ in
+    _return_
+  else 
+    let _LoadConst = (BInt 0) in
+    let __tmp_0_2 = __tmp_0 in
+    let __ir_ret__ = __tmp_0_2 in
+    let _return_ = __ir_ret__ in
+    _return_
+
 val nSMain__main : (x:bosqueTerm{subtypeOf BIntType (getType x)})
 let nSMain__main  = 
   let __tmp_0 = (BRecord 3 (SCons "f" 2 (SCons "g" 1 (SCons "h" 0 SNil))) (SCons (BBool true) 2 (SCons (BInt 2) 1 (SCons (BTypedString "hello" BAnyType) 0 SNil)))) in
@@ -37,6 +52,9 @@ let nSMain__main  =
   let e3 = __tmp_19 in
   let _MIRModifyWithFields = (BInt 0) in
   let e4 = __tmp_22 in
+  let _ = assert_norm(subtypeOf BBoolType (getType (BBool true))) in
+  let __tmp_24 = (nSMain__selectF (BBool true)) in
+  let f = __tmp_24 in
   let __ir_ret__ = x_ProjectedRecord in
   let _return_ = __ir_ret__ in
   _return_
