@@ -251,17 +251,23 @@ let rec nthRecord property dimension y = match y with
 | _ -> BError
 
 // User-define Projectors
-val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Bar2_f x = match x with
-| BnSMain__Bar2 f -> f
 
+val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm  
+let projectBnSMain__Bar2_f x = match x with 
+| BnSMain__Bar2 f ->  f
+ 
 val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_f x = match x with
-| BnSMain__Baz2 f _ _ -> f
+let projectBnSMain__Baz2_f x = match x with 
+| BnSMain__Baz2 f _ _ ->  f
+
 val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_g x = match x with
-| BnSMain__Baz2 _ g _ -> g
+let projectBnSMain__Baz2_g x = match x with 
+| BnSMain__Baz2 _ g _ ->  g
+
 val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_k x = match x with
-| BnSMain__Baz2 _ _ k -> k
+let projectBnSMain__Baz2_k x = match x with 
+| BnSMain__Baz2 _ _ k ->  k
+
+let example = BnSMain__Baz2 (BInt 3) (BInt 4) (BInt 5)
+let proj_example = projectBnSMain__Baz2_g example
 

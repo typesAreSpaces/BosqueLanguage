@@ -279,9 +279,47 @@ let rec nthRecord property dimension y = match y with\n\
   if (dimension <> dimension'') then BError else\n\
   if (s = property) then x'\n\
   else nthRecord property dimension' (BRecord dimension' ss xs')\n\
-| _ -> BError\n";
+| _ -> BError\n\n";
 
     FS.writeSync(fd, program_rest);
+
+    FS.writeSync(fd, "// User-define Projectors\n");
+
+    user_defined_types_map.forEach((value, index) => {
+        if(!index.includes("NSCore")){
+            const name = sanitizeName(index);
+            const num_params = value.fields.length;
+            let num_index = 0;
+            value.fields.map(field => {
+                const left_padding = num_index;
+                const right_padding = num_params - num_index - 1; 
+                FS.writeSync(fd, `val projectB${name}_${field.name} : x:bosqueTerm{B${name}Type = (getType x)} -> bosqueTerm\n`);
+                FS.writeSync(fd, `let projectB${name}_${field.name} x = match x with\n`);
+                FS.writeSync(fd, `| B${name}${(" _").repeat(left_padding)} ${field.name}${(" _").repeat(right_padding)} -> ${field.name}\n`);
+                num_index++;
+            })
+            FS.writeSync(fd, "\n");
+        }
+    });
 }
 
 export { printBosqueTermsFST }
+
+// val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} → bosqueTerm                                                                                                                                                                                                                                       
+// let projectBnSMain__Bar2_f x = match x with                                                                                                                                                                                                                                                                                   
+// | BnSMain__Bar2 f →  f                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                              
+// val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} → bosqueTerm                                                                                                                                                                                                                                       
+// let projectBnSMain__Baz2_f x = match x with                                                                                                                                                                                                                                                                                   
+// | BnSMain__Baz2 f _ _ →  f                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                              
+// val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} → bosqueTerm                                                                                                                                                                                                                                       
+// let projectBnSMain__Baz2_g x = match x with                                                                                                                                                                                                                                                                                   
+// | BnSMain__Baz2 _ g _ →  g                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                              
+// val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} → bosqueTerm                                                                                                                                                                                                                                       
+// let projectBnSMain__Baz2_k x = match x with                                                                                                                                                                                                                                                                                   
+// | BnSMain__Baz2 _ _ k →  k                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                              
+// let example = BnSMain__Baz2 (BInt 3) (BInt 4) (BInt 5)                                                                                                                                                                                                                                                                        
+// let proj_example = projectBnSMain__Baz2_g example  
