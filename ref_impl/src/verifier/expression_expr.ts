@@ -127,7 +127,7 @@ class ConditionalExpr extends ExprExpr {
     }
     toML(indentatioLevel: number, offset: number) {
         return this.tabSymbol.repeat(indentatioLevel)
-            + "if " + this.condition.toML() + " then \n"
+            + "if (extractBool " + this.condition.toML() + ") then \n"
             + this.ifBranch.toML(indentatioLevel + offset, offset) + "\n"
             + this.tabSymbol.repeat(indentatioLevel) + "else \n"
             + this.elseBranch.toML(indentatioLevel + offset, offset);

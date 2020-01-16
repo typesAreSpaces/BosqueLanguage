@@ -142,7 +142,7 @@ entity PlayerMark provides Parsable {
     }
 }
 
-function main2(): Int {
+entrypoint function main2(): Int {
 
     var string_test = "string_test";
     
@@ -205,7 +205,11 @@ concept Bar2 {
     field f: Int;
 }
 
-entity Baz2 provides Bar2 {
+concept Bar3 {
+    field f: Int;
+}
+
+entity Baz2 provides Bar2, Bar3 {
     field g: Int;
     field k: Bool;
 }
@@ -218,11 +222,12 @@ entrypoint function main(): Int {
 
     var e = Baz2{ f=1, g=2, k=true };
     var e2 = e.f;
+    var e3 = e.{f, k};
 
-    var e3 = e->project<Bar2>();
-    var e4 = e->update(g=5);
+    var e4 = e->project<Bar2>();
+    // var e5 = e->update(g=5);
 
-    var f = selectF(true);
+    // var f = selectF(true);
 
-    return x_ProjectedRecord;
+    return e2;
 }

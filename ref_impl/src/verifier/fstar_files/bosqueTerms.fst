@@ -16,7 +16,11 @@ type bosqueTerm =
 | BError : bosqueTerm
 // User-defined terms
 | BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
+| BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz2: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm ->  bosqueTerm
+| BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
+| BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
+| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 
 (* Definition of getType *)
 val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -32,7 +36,11 @@ let rec getType x = match x with
 | BError -> BErrorType
 // User-defined terms
 | BnSMain__Bar2 _ -> BnSMain__Bar2Type
+| BnSMain__Bar3 _ -> BnSMain__Bar3Type
 | BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
+| BnSMain__Musician _ _ -> BnSMain__MusicianType
+| BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
+| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 and
 getTypeSeq n x = match x with
 | SNil -> SNil
@@ -40,14 +48,6 @@ getTypeSeq n x = match x with
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
-val isNone : bosqueTerm -> Tot bool
-let isNone x = match x with 
-| BNone -> true
-| _ -> false
-
-val isSome : bosqueTerm -> Tot bool
-let isSome x = not (isNone x)
-
 val isBool : bosqueTerm -> Tot bool
 let isBool x = match x with 
 | BBool _ -> true
@@ -216,7 +216,19 @@ let op_lessOrEq x y = match x, y with
 
 val op_less : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) 
 let op_less x y = match x, y with
+// --------------------------------------------------------------------------------------------------
+(* Special functions *)
 | BInt x1, BInt y1 -> BBool (x1 < y1) 
+val isNone : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
+let isNone x = match x with
+| BNone -> BBool true
+| _ -> BBool false
+
+val isSome : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
+let isSome x = match x with
+| BNone -> BBool false
+| _ -> BBool true
+
 // --------------------------------------------------------------------------------------------------
 
 (* Tuple Type projector *)
@@ -250,10 +262,14 @@ let rec nthRecord property dimension y = match y with
   else nthRecord property dimension' (BRecord dimension' ss xs')
 | _ -> BError
 
-// User-define Projectors
+// User-defined Projectors
 val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Bar2_f x = match x with
 | BnSMain__Bar2 f -> f
+
+val projectBnSMain__Bar3_f : x:bosqueTerm{BnSMain__Bar3Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Bar3_f x = match x with
+| BnSMain__Bar3 f -> f
 
 val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_f x = match x with
@@ -264,4 +280,31 @@ let projectBnSMain__Baz2_g x = match x with
 val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_k x = match x with
 | BnSMain__Baz2 _ _ k -> k
+
+val projectBnSMain__Musician_artist : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
+let projectBnSMain__Musician_artist x = match x with
+| BnSMain__Musician artist _ -> artist
+val projectBnSMain__Musician_instrument : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
+let projectBnSMain__Musician_instrument x = match x with
+| BnSMain__Musician _ instrument -> instrument
+
+val projectBnSMain__Artist_id : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
+let projectBnSMain__Artist_id x = match x with
+| BnSMain__Artist id _ _ _ _ -> id
+val projectBnSMain__Artist_isGood : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
+let projectBnSMain__Artist_isGood x = match x with
+| BnSMain__Artist _ isGood _ _ _ -> isGood
+val projectBnSMain__Artist_lastName : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
+let projectBnSMain__Artist_lastName x = match x with
+| BnSMain__Artist _ _ lastName _ _ -> lastName
+val projectBnSMain__Artist_name : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
+let projectBnSMain__Artist_name x = match x with
+| BnSMain__Artist _ _ _ name _ -> name
+val projectBnSMain__Artist_player : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
+let projectBnSMain__Artist_player x = match x with
+| BnSMain__Artist _ _ _ _ player -> player
+
+val projectBnSMain__PlayerMark_mark : x:bosqueTerm{BnSMain__PlayerMarkType = (getType x)} -> bosqueTerm
+let projectBnSMain__PlayerMark_mark x = match x with
+| BnSMain__PlayerMark mark -> mark
 

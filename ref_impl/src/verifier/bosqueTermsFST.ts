@@ -71,14 +71,6 @@ getTypeSeq n x = match x with\n\
 \n\
 (* --------------------------------------------------------------- *)\n\
 (* Casting / Type checkers *)\n\
-val isNone : bosqueTerm -> Tot bool\n\
-let isNone x = match x with \n\
-| BNone -> true\n\
-| _ -> false\n\
-\n\
-val isSome : bosqueTerm -> Tot bool\n\
-let isSome x = not (isNone x)\n\
-\n\
 val isBool : bosqueTerm -> Tot bool\n\
 let isBool x = match x with \n\
 | BBool _ -> true\n\
@@ -247,7 +239,19 @@ let op_lessOrEq x y = match x, y with\n\
 \n\
 val op_less : x:bosqueTerm{isInt x} -> y:bosqueTerm{isInt y} -> Tot (z:bosqueTerm{isBool z}) \n\
 let op_less x y = match x, y with\n\
+// --------------------------------------------------------------------------------------------------\n\
+(* Special functions *)\n\
 | BInt x1, BInt y1 -> BBool (x1 < y1) \n\
+val isNone : bosqueTerm -> Tot (x:bosqueTerm{isBool x})\n\
+let isNone x = match x with\n\
+| BNone -> BBool true\n\
+| _ -> BBool false\n\
+\n\
+val isSome : bosqueTerm -> Tot (x:bosqueTerm{isBool x})\n\
+let isSome x = match x with\n\
+| BNone -> BBool false\n\
+| _ -> BBool true\n\
+\n\
 // --------------------------------------------------------------------------------------------------\n\
 \n\
 (* Tuple Type projector *)\n\
@@ -283,7 +287,7 @@ let rec nthRecord property dimension y = match y with\n\
 
     FS.writeSync(fd, program_rest);
 
-    FS.writeSync(fd, "// User-define Projectors\n");
+    FS.writeSync(fd, "// User-defined Projectors\n");
 
     user_defined_types_map.forEach((value, index) => {
         if(!index.includes("NSCore")){
