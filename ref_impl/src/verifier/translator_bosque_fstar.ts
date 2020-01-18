@@ -429,6 +429,10 @@ class TranslatorBosqueFStar {
                 ];
             }
             // case MIROpTag.AccessConstField:
+
+
+
+            // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
                 const opLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
                 console.log(opLoadFieldDefaultValue);
@@ -440,14 +444,16 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
+            // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
             // case MIROpTag.AccessCapturedVariable: { // IMPLEMENT:
             //     TranslatorBosqueFStar.debugging("AcessCapturedVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
             //     return [new VarTerm("_AccessCapturedVariable", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
             
-
-
-
 
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRAccessArgVariable: { // IMPLEMENT:
@@ -461,6 +467,8 @@ class TranslatorBosqueFStar {
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             
             
+
+
 
             case MIROpTag.MIRConstructorPrimary: {
                 const opConstructorPrimary = op as MIRConstructorPrimary;
@@ -655,6 +663,10 @@ class TranslatorBosqueFStar {
 
                 return projected_args;            
             }
+
+
+
+
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRProjectFromTypeTuple: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeTuple Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -668,11 +680,15 @@ class TranslatorBosqueFStar {
                 const opProjectFromTypeConcept = op as MIRProjectFromTypeConcept;
                 console.log(opProjectFromTypeConcept);
 
-                
+
 
                 return [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -691,6 +707,8 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRModifyWithFields", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 
@@ -748,6 +766,8 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.intType, fkey)];
             }
             
+
+
             
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRBinEq: { // IMPLEMENT:
@@ -758,7 +778,7 @@ class TranslatorBosqueFStar {
 
 
 
-            case MIROpTag.MIRBinCmp: {
+            case MIROpTag.MIRBinCmp: { // DOUBLE CHECK regarding strings
                 // The predicate returned is of type Bool
                 // because the operations to arrive at this
                 // point are <, <=, >, >= only
@@ -894,13 +914,14 @@ class TranslatorBosqueFStar {
                     [this.MIRArgumentToTermExpr(opIsTypeOfSome.arg, fkey, undefined)],
                     TranslatorBosqueFStar.boolType, fkey)];
             }
+            
+            
+            
+            // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRIsTypeOf: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("MIRIsTypeOf Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRIsTypeOf", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
-            
-            
-            // ----------------------------------------------------------------------------------------------------------------------------------------------------
             // PRIORITY:
             case MIROpTag.MIRAccessConstantValue: { // IMPLEMENT
                 TranslatorBosqueFStar.debugging("MIRAccessConstantValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -909,6 +930,7 @@ class TranslatorBosqueFStar {
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+            
 
             default:
                 console.log(op);
