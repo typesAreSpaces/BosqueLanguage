@@ -681,8 +681,8 @@ class TranslatorBosqueFStar {
 
                 console.log(this.types_seen.get(sanitizeName(opProjectFromTypeConcept.arg.nameID + fkey)));
 
-                return [this.MIRArgumentToTermExpr(opProjectFromTypeConcept.trgt, fkey, ), // KEEP WORKING HERE
-                    TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+                return [this.MIRArgumentToTermExpr(opProjectFromTypeConcept.trgt, fkey, TranslatorBosqueFStar.anyType),
+                new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
