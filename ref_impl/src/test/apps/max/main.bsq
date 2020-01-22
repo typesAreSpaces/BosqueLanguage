@@ -232,7 +232,7 @@ entrypoint function main(): Int {
     // var e5 = e->update(g=5);
 
     var m_list = List<Int>{1, 2, 3};
-    var checking = m_list->any(fn() : Bool )
+    var checking = m_list->filter(fn(id: Int): Bool => true);
 
     // var f = selectF(true);
 

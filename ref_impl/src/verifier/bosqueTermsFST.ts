@@ -27,7 +27,8 @@ type bosqueTerm = \n\
 | BGUID : string -> int -> bosqueTerm\n\
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
 | BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm\n\
-| BError : bosqueTerm\n"
+| BError : bosqueTerm\n\
+| BList : type : bosqueType -> sequence bosqueTerm n -> bosqueTerm\n"
 
     FS.writeSync(fd, program_initial);
 
@@ -52,7 +53,8 @@ let rec getType x = match x with\n\
 | BGUID _ _ -> BGUIDType\n\
 | BTuple n y -> BTupleType false n (getTypeSeq n y)\n\
 | BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)\n\
-| BError -> BErrorType\n"
+| BError -> BErrorType\
+| BList type _ -> BListType type\n"
 
     FS.writeSync(fd, program_middle);
 

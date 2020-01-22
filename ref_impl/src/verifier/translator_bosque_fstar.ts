@@ -306,8 +306,9 @@ class TranslatorBosqueFStar {
                     }
 
                 }
-                console.log(`------ ERROR: Unknown typed ${s} found while executing stringVarToTypeExpr ------`);
-                throw new Error("------ ERROR: Unknown typed found while executing stringVarToTypeExpr ------");
+                console.log(s);
+                console.log(`------ ERROR: Unknown type ${s} found while executing stringVarToTypeExpr ------`);
+                throw new Error("------ ERROR: Unknown typed found while executin stringVarToTypeExpr ------");
             }
         }
     }

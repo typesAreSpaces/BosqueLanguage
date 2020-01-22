@@ -50,7 +50,8 @@ type bosqueType =\n\
 | BCustomKeyType\n\
 // FIX: The following is incomplete\n\
 | BKeyedType\n\
-| BErrorType\n";
+| BErrorType\n\
+| BListType : bosqueType -> bosqueType";
     FS.writeSync(fd, fstar_program_core_decl);
 
     FS.writeSync(fd, "// User-defined types\n");
@@ -116,7 +117,8 @@ let rec subtypeOf x y = match x, y with\n\
 // | BObjectType, ? -> ?\n\
 // | BEnumType, ? -> ?\n\
 // | BCustomType, ? -> ?\n\
-// | BKeyedType, ? -> ?\n";
+// | BKeyedType, ? -> ?\n\
+| BListType t1 , BListType t2 -> subtypeOf t1 t2\n";
     FS.writeSync(fd, fstar_program_subtypeof_initial);
 
     FS.writeSync(fd, "// User-defined types\n");    
