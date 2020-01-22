@@ -1,0 +1,3750 @@
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Tuple',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Tuple',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::POD',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'POD',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Indexable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Indexable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::POD',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'POD',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Truthy',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Truthy',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::POD',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'POD',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Truthy',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Truthy',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Record',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Record',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Bar3',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Bar3',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Object',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Object',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSMain::Baz2',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/test/apps/max/main.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSMain',
+      name: 'Baz2',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: [Map],
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Indexable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Indexable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::POD',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'POD',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::KeyType',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'KeyType',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Truthy',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Truthy',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::POD',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'POD',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Some',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Some',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Parsable',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Parsable',
+      terms: [],
+      provides: [Array],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: [Map],
+      memberFields: Map(0) {},
+      memberMethods: Map(0) {}
+    },
+    binds: Map(0) {}
+  }
+]
+Printing from ResolvedConcepptAtomType
+[
+  ResolvedConceptAtomTypeEntry {
+    idStr: 'NSCore::Any',
+    concept: ConceptTypeDecl {
+      sourceLocation: [SourceInfo],
+      srcFile: '/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/core/direct/core.bsq',
+      pragmas: [],
+      attributes: [],
+      ns: 'NSCore',
+      name: 'Any',
+      terms: [],
+      provides: [],
+      invariants: [],
+      staticMembers: Map(0) {},
+      staticFunctions: Map(0) {},
+      memberFields: Map(0) {},
+      memberMethods: [Map]
+    },
+    binds: Map(0) {}
+  }
+]
+MIRProjectFromTypeConcept {
+  tag: 'MIRProjectFromTypeConcept',
+  sinfo: SourceInfo { line: 231, column: 0, pos: 5297, span: 2 },
+  trgt: MIRTempRegister { nameID: '_#tmp_23', regID: 23 },
+  resultProjectType: '{f:NSCore::Int, g:NSCore::Int, k:NSCore::Bool}',
+  arg: MIRVariable { nameID: 'e', lname: 'e' },
+  ctypes: [ 'NSMain::Baz2' ]
+}
+ConstructorType {
+  id: 'BnSMain__Baz3Type',
+  fields: [
+    [ 'f', [IntType] ],
+    [ 'g', [IntType] ],
+    [ 'k', [BoolType] ],
+    [ 'l', [BoolType] ]
+  ],
+  original_name: 'NSMain::Baz3'
+}
+MIRProjectFromTypeConcept {
+  tag: 'MIRProjectFromTypeConcept',
+  sinfo: SourceInfo { line: 231, column: 0, pos: 5297, span: 2 },
+  trgt: MIRTempRegister { nameID: '_#tmp_23', regID: 23 },
+  resultProjectType: '{f:NSCore::Int, g:NSCore::Int, k:NSCore::Bool}',
+  arg: MIRVariable { nameID: 'e', lname: 'e' },
+  ctypes: [ 'NSMain::Baz2' ]
+}
+ConstructorType {
+  id: 'BnSMain__Baz3Type',
+  fields: [
+    [ 'f', [IntType] ],
+    [ 'g', [IntType] ],
+    [ 'k', [BoolType] ],
+    [ 'l', [BoolType] ]
+  ],
+  original_name: 'NSMain::Baz3'
+}
+MIRProjectFromTypeConcept {
+  tag: 'MIRProjectFromTypeConcept',
+  sinfo: SourceInfo { line: 231, column: 0, pos: 5297, span: 2 },
+  trgt: MIRTempRegister { nameID: '_#tmp_23', regID: 23 },
+  resultProjectType: '{f:NSCore::Int, g:NSCore::Int, k:NSCore::Bool}',
+  arg: MIRVariable { nameID: 'e', lname: 'e' },
+  ctypes: [ 'NSMain::Baz2' ]
+}
+ConstructorType {
+  id: 'BnSMain__Baz3Type',
+  fields: [
+    [ 'f', [IntType] ],
+    [ 'g', [IntType] ],
+    [ 'k', [BoolType] ],
+    [ 'l', [BoolType] ]
+  ],
+  original_name: 'NSMain::Baz3'
+}
