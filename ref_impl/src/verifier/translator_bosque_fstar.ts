@@ -21,7 +21,8 @@ import {
     MIRProjectFromTypeConcept,
     MIRModifyWithFields,
     MIRAccessFromField,
-    MIRProjectFromFields
+    MIRProjectFromFields,
+    MIRConstructorPrimaryCollectionSingletons
 } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
@@ -493,8 +494,9 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionEmpty", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
-            case MIROpTag.MIRConstructorPrimaryCollectionSingletons: { // IMPLEMENT:
-                TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionSingletons Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
+            case MIROpTag.MIRConstructorPrimaryCollectionSingletons: { // IMPLEMENTING
+                const opConstructorPrimaryCollectionsSingletons = op as MIRConstructorPrimaryCollectionSingletons;
+                console.log(opConstructorPrimaryCollectionsSingletons);
                 return [new VarTerm("_ConstructorPrimaryCollectionSingletons", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             case MIROpTag.MIRConstructorPrimaryCollectionCopies: { // IMPLEMENT:
@@ -675,7 +677,7 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("MIRProjectFromTypeRecord Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_MIRProjectFromTypeRecord", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
-            case MIROpTag.MIRProjectFromTypeConcept: { // IMPLEMENTING
+            case MIROpTag.MIRProjectFromTypeConcept: { // IMPLEMET:
                 const opProjectFromTypeConcept = op as MIRProjectFromTypeConcept;
                 console.log(opProjectFromTypeConcept);
 

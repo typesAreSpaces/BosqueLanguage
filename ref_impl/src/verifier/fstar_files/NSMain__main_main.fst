@@ -41,8 +41,10 @@ let nSMain__main  =
   let __fresh_name0NSMain__main = (projectBnSMain__Baz3_f e) in
   let __tmp_20 = (BRecord 2 (SCons "f" 1 (SCons "k" 0 SNil)) (SCons __fresh_name0NSMain__main 1 (SCons __fresh_name1NSMain__main 0 SNil))) in
   let e3 = __tmp_20 in
-  let __tmp_23 = (BInt 0) in
+  let _MIRProjectFromTypeConcept = (BInt 0) in
   let e4 = __tmp_23 in
+  let _ConstructorPrimaryCollectionSingletons = (BInt 0) in
+  let m_list = __tmp_24 in
   let __ir_ret__ = e2 in
   let _return_ = __ir_ret__ in
   _return_

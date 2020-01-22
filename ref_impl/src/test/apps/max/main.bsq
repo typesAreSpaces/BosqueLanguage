@@ -228,8 +228,11 @@ entrypoint function main(): Int {
     var e2 = e.f;
     var e3 = e.{f, k};
 
-    var e4 = e->project<Baz2>();
+    var e4 = e->project<Bar2>();
     // var e5 = e->update(g=5);
+
+    var m_list = List<Int>{1, 2, 3};
+    var checking = m_list->any(fn() : Bool )
 
     // var f = selectF(true);
 

@@ -15,9 +15,9 @@ type bosqueTerm =
 | BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm
 | BError : bosqueTerm
 // User-defined terms
+| BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz2: g: bosqueTerm -> k: bosqueTerm -> f: bosqueTerm ->  bosqueTerm
 | BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
-| BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz3: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm -> l: bosqueTerm ->  bosqueTerm
 | BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
 | BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
@@ -36,9 +36,9 @@ let rec getType x = match x with
 | BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)
 | BError -> BErrorType
 // User-defined terms
+| BnSMain__Bar2 _ -> BnSMain__Bar2Type
 | BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
 | BnSMain__Bar3 _ -> BnSMain__Bar3Type
-| BnSMain__Bar2 _ -> BnSMain__Bar2Type
 | BnSMain__Baz3 _ _ _ _ -> BnSMain__Baz3Type
 | BnSMain__Musician _ _ -> BnSMain__MusicianType
 | BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
@@ -265,6 +265,10 @@ let rec nthRecord property dimension y = match y with
 | _ -> BError
 
 // User-defined Projectors
+val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Bar2_f x = match x with
+| BnSMain__Bar2 f -> f
+
 val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_g x = match x with
 | BnSMain__Baz2 g _ _ -> g
@@ -278,10 +282,6 @@ let projectBnSMain__Baz2_f x = match x with
 val projectBnSMain__Bar3_f : x:bosqueTerm{BnSMain__Bar3Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Bar3_f x = match x with
 | BnSMain__Bar3 f -> f
-
-val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Bar2_f x = match x with
-| BnSMain__Bar2 f -> f
 
 val projectBnSMain__Baz3_f : x:bosqueTerm{BnSMain__Baz3Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz3_f x = match x with
