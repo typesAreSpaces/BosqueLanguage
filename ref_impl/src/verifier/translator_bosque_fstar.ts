@@ -28,9 +28,9 @@ import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
 import {
     IntType, BoolType, FuncType, TypeExpr, TupleType, TypedStringType, RecordType, UnionType, NoneType, AnyType, SomeType,
-    ConstructorType, ParsableType, GUIDType, TruthyType, ObjectType
+    ConstructorType, ParsableType, GUIDType, TruthyType, ObjectType, ListType
 } from "./type_expr";
-import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr } from "./term_expr";
+import { ConstTerm, VarTerm, FuncTerm, TermExpr, TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr, ListTerm } from "./term_expr";
 import { sanitizeName, topologicalOrder } from "./util";
 import { MIRInvokeBodyDecl, MIRAssembly, MIRConceptTypeDecl, MIREntityTypeDecl, MIRConstantDecl } from "../compiler/mir_assembly";
 import { printBosqueTypesFST } from "./bosqueTypesFST";
@@ -478,8 +478,9 @@ class TranslatorBosqueFStar {
                 const current_entity_decl = TranslatorBosqueFStar.mapEntityDeclarations.get(current_tkey) as MIREntityTypeDecl;
                 const field_types = current_entity_decl.fields.map(x => [x.name,
                 TranslatorBosqueFStar.stringVarToTypeExpr(x.declaredType)]) as [string, TypeExpr][];
-                const assignments = opConstructorPrimary.args.map((x, index) => [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimary.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
-                    , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
+                const assignments = opConstructorPrimary.args.map((x, index) =>
+                    [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimary.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
+                        , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
 
                 assignments.unshift([
                     this.MIRArgumentToTermExpr(opConstructorPrimary.trgt, fkey, new ConstructorType(current_tkey, field_types)),
@@ -495,11 +496,28 @@ class TranslatorBosqueFStar {
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionEmpty Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionEmpty", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
-            case MIROpTag.MIRConstructorPrimaryCollectionSingletons: { // IMPLEMENTING
+            // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+            case MIROpTag.MIRConstructorPrimaryCollectionSingletons: {
                 const opConstructorPrimaryCollectionsSingletons = op as MIRConstructorPrimaryCollectionSingletons;
-                console.log(opConstructorPrimaryCollectionsSingletons);
-                return [new VarTerm("_ConstructorPrimaryCollectionSingletons", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+            
+                const current_tkey = opConstructorPrimaryCollectionsSingletons.tkey.slice(opConstructorPrimaryCollectionsSingletons.tkey.indexOf("=") + 1, -1);
+                const content_type = TranslatorBosqueFStar.stringVarToTypeExpr(current_tkey);
+
+                const assignments = opConstructorPrimaryCollectionsSingletons.args.map((x, index) =>
+                    [this.MIRArgumentToTermExpr(new MIRVariable(opConstructorPrimaryCollectionsSingletons.trgt.nameID + "_arg_" + index), fkey, this.MIRArgumentToTypeExpr(x, fkey))
+                        , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
+
+                assignments.unshift([this.MIRArgumentToTermExpr(opConstructorPrimaryCollectionsSingletons.trgt, fkey, new ListType(content_type)),
+                    new ListTerm(assignments.map(x => x[0]), content_type, fkey)
+                ]);
+
+                return assignments;
             }
+
+
+            
+            // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRConstructorPrimaryCollectionCopies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionCopies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
                 return [new VarTerm("_ConstructorPrimaryCollectionCopies", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
@@ -1056,8 +1074,9 @@ class TranslatorBosqueFStar {
         // Main file
         // --------------------------------------------------------
         // Prelude
-        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n`);
+        FS.writeSync(fd, `module ${this.fileName.slice(0, -4)}\n\n`);
         FS.writeSync(fd, `open Sequence\n`);
+        FS.writeSync(fd, `open List\n`);
         FS.writeSync(fd, `open BosqueTypes\n`);
         FS.writeSync(fd, `open BosqueTerms\n`);
         FS.writeSync(fd, `open Util\n`);

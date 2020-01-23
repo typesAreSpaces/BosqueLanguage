@@ -3,8 +3,8 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType, RecordType } from "./type_expr";
-import { toFStarSequence } from "./util";
+import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType, RecordType, ListType } from "./type_expr";
+import { toFStarSequence, toFStarList } from "./util";
 
 abstract class TermExpr {
     readonly symbolName: string;
@@ -142,7 +142,23 @@ class RecordProjExpr extends TermExpr {
     }
 }
 
+class ListTerm extends TermExpr {
+    readonly termList : TermExpr[];
+    readonly ty: TypeExpr;
+    constructor(termList: TermExpr[], ty: TypeExpr, fkey: string) {
+        super("BList", new ListType(ty), fkey);
+        this.termList = termList;
+        this.ty = ty;
+    }
+    toML(){
+        return `(BList ${this.ty.id} ${toFStarList(this.termList.map(x => x.toML()))})`;
+    }
+
+}
+
 export {
     TermExpr, VarTerm, ConstTerm, FuncTerm,
-    TupleTerm, TupleProjExpr, RecordTerm, RecordProjExpr
+    TupleTerm, TupleProjExpr, 
+    RecordTerm, RecordProjExpr,
+    ListTerm
 };

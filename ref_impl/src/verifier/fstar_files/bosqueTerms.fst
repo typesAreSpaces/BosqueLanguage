@@ -17,10 +17,9 @@ type bosqueTerm =
 | BError : bosqueTerm
 | BList : bosqueType -> list bosqueTerm -> bosqueTerm
 // User-defined terms
-| BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
-| BnSMain__Baz2: g: bosqueTerm -> k: bosqueTerm -> f: bosqueTerm ->  bosqueTerm
 | BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
-| BnSMain__Baz3: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm -> l: bosqueTerm ->  bosqueTerm
+| BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
+| BnSMain__Baz2: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm ->  bosqueTerm
 | BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
 | BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
 | BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
@@ -39,10 +38,9 @@ let rec getType x = match x with
 | BError -> BErrorType
 | BList content_type _ -> BListType content_type
 // User-defined terms
+| BnSMain__Bar3 _ -> BnSMain__Bar3Type
 | BnSMain__Bar2 _ -> BnSMain__Bar2Type
 | BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
-| BnSMain__Bar3 _ -> BnSMain__Bar3Type
-| BnSMain__Baz3 _ _ _ _ -> BnSMain__Baz3Type
 | BnSMain__Musician _ _ -> BnSMain__MusicianType
 | BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
 | BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
@@ -289,36 +287,23 @@ let rec nthRecord property dimension y = match y with
 | _ -> BError
 
 // User-defined Projectors
-val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Bar2_f x = match x with
-| BnSMain__Bar2 f -> f
-
-val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_g x = match x with
-| BnSMain__Baz2 g _ _ -> g
-val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_k x = match x with
-| BnSMain__Baz2 _ k _ -> k
-val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_f x = match x with
-| BnSMain__Baz2 _ _ f -> f
-
 val projectBnSMain__Bar3_f : x:bosqueTerm{BnSMain__Bar3Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Bar3_f x = match x with
 | BnSMain__Bar3 f -> f
 
-val projectBnSMain__Baz3_f : x:bosqueTerm{BnSMain__Baz3Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz3_f x = match x with
-| BnSMain__Baz3 f _ _ _ -> f
-val projectBnSMain__Baz3_g : x:bosqueTerm{BnSMain__Baz3Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz3_g x = match x with
-| BnSMain__Baz3 _ g _ _ -> g
-val projectBnSMain__Baz3_k : x:bosqueTerm{BnSMain__Baz3Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz3_k x = match x with
-| BnSMain__Baz3 _ _ k _ -> k
-val projectBnSMain__Baz3_l : x:bosqueTerm{BnSMain__Baz3Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz3_l x = match x with
-| BnSMain__Baz3 _ _ _ l -> l
+val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Bar2_f x = match x with
+| BnSMain__Bar2 f -> f
+
+val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_f x = match x with
+| BnSMain__Baz2 f _ _ -> f
+val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_g x = match x with
+| BnSMain__Baz2 _ g _ -> g
+val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_k x = match x with
+| BnSMain__Baz2 _ _ k -> k
 
 val projectBnSMain__Musician_artist : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
 let projectBnSMain__Musician_artist x = match x with

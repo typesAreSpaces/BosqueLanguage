@@ -209,26 +209,32 @@ concept Bar3 {
     field f: Int;
 }
 
-concept Baz2 provides Bar2, Bar3 {
+entity Baz2 provides Bar2, Bar3 {
     field g: Int;
     field k: Bool;
+}
+
+entrypoint function main() : Int {
+    var e = Baz2{ f=1, g=2, k=true };
+    var e2 = e->project<Bar2 & Bar3>();
+    return 0;
 }
 
 entity Baz3 provides Baz2 {
     field l: Bool;
 }
 
-entrypoint function main(): Int {
+entrypoint function main3(): Int {
     var xRecord = {f = true, g = 2, h = "hello"};
     var x_ProjectedRecord = xRecord.g;
     var x = xRecord.{g, f};
     // var y = optionalRecordFunction(xRecord);
 
-    var e = Baz3{ f=1, g=2, k=true, l=false };
+    var e = Baz2{ f=1, g=2, k=true };
     var e2 = e.f;
     var e3 = e.{f, k};
 
-    var e4 = e->project<Bar2>();
+    // var e4 = e->project<Bar2&Bar3>(); // Pending
     // var e5 = e->update(g=5);
 
     var m_list = List<Int>{1, 2, 3};

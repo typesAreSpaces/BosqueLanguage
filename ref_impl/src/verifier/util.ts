@@ -76,6 +76,16 @@ function toFStarSequence(seq: string[]): string {
     }
 }
 
+function toFStarList(seq: string[]): string {
+    if (seq.length == 0) {
+        return "LNil";
+    }
+    else {
+        const tail = seq.slice(1);
+        return "(LCons " + seq[0] + " " + toFStarList(tail) + ")";
+    }
+}
+
 function topoVisit(n: any, tordered: any[], neighbors: Map<any, Set<any>>) {
     if (tordered.findIndex(element => element === n) !== -1) {
         return;
@@ -97,5 +107,6 @@ function topologicalOrder(neighbors: Map<any, Set<any>>): any[] {
 
 export {
     bosqueToMASM, PathFile,
-    sanitizeName, toFStarSequence, topologicalOrder
+    sanitizeName, toFStarSequence, toFStarList,
+    topologicalOrder
 };

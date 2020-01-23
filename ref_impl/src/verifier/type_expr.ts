@@ -45,13 +45,13 @@ class RecordTypeDecl extends TypeDecl {
     readonly b: boolean;
     readonly field_names: string[];
     readonly typeArray: TypeExpr[];
-    constructor(stringType: string, b: boolean, field_names: string[], typeArray: TypeExpr[]){
+    constructor(stringType: string, b: boolean, field_names: string[], typeArray: TypeExpr[]) {
         super(stringType);
         this.b = b;
         this.field_names = field_names;
         this.typeArray = typeArray;
     }
-    emit(fd: number){
+    emit(fd: number) {
         FS.writeSync(fd, `let ${this.stringType} = BRecordType ${this.b} ${this.typeArray.length} ${RecordType.toFStarRecord(this.field_names, this.typeArray)}\n`);
     }
 }
@@ -66,6 +66,15 @@ class UnionTypeDecl extends TypeDecl {
         // Here the index contains the constructor information
         // Hence, the constructor information is not added
         FS.writeSync(fd, `let ${this.stringType} = ${UnionType.toFStarUnion(this.typeArray)}\n`);
+    }
+}
+
+class ListTypeDecl extends TypeDecl {
+    constructor(stringType: string) {
+        super(stringType);
+    }
+    emit(fd: number) {
+        FS.writeSync(fd, `let bListType_${this.stringType} = (BListType ${this.stringType})\n`);
     }
 }
 
@@ -338,7 +347,7 @@ class KeyedType extends TypeExpr {
 class ConstructorType extends TypeExpr {
     readonly fields: [string, TypeExpr][];
     readonly original_name: string;
-    
+
     constructor(constructorName: string, fields: [string, TypeExpr][]) {
         super("B" + sanitizeName(constructorName) + "Type");
         this.fields = fields;
@@ -349,6 +358,25 @@ class ConstructorType extends TypeExpr {
     }
 }
 
+class ListType extends TypeExpr {
+    static declared: Set<string> = new Set<string>();
+    readonly ty: TypeExpr;
+    constructor(ty: TypeExpr) {
+        const stringType = ty.id;
+        super("bListType_" + stringType);
+        this.ty = ty;
+        // --------------------------------------------------------------------------------
+        if (!ListType.declared.has(stringType)) {
+            ListType.declared.add(stringType);
+            ListType.declarator.add(new ListTypeDecl(stringType));
+        }
+        // --------------------------------------------------------------------------------
+    }
+    getBosqueType() {
+        return "NSCore::List<T=" + this.ty.getBosqueType() + ">";
+    }
+}
+
 export {
     TypeExpr,
     AnyType, SomeType, TruthyType,
@@ -356,5 +384,5 @@ export {
     IntType, TypedStringType, GUIDType, TupleType,
     RecordType, FuncType, ObjectType,
     EnumType, CustomKeyType, KeyedType,
-    ConstructorType
+    ConstructorType, ListType
 }; 

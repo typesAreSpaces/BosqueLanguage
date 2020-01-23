@@ -87,7 +87,7 @@ let rec eqTypeList x y = match x with\n\
 \n\
 (* Definition to encode the subtype relation on Bosque types \n\
    i.e.forall x y.subtypeOf x y <===> x :> y *) \n\
-val subtypeOfList: x: list bosqueType -> sequence bosqueType -> Tot bool(decreases x)\n\
+val subtypeOfList: x: list bosqueType -> list bosqueType -> Tot bool(decreases x)\n\
 val subtypeOfSeq: n: nat -> x: sequence bosqueType n -> sequence bosqueType n -> Tot bool(decreases x) \n\
 val subtypeOf: x: bosqueType -> bosqueType -> Tot bool(decreases x) \n\
 let rec subtypeOf x y = match x, y with\n\
