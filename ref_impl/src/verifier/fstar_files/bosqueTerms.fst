@@ -1,6 +1,7 @@
 module BosqueTerms
 
 open Sequence
+open List
 open BosqueTypes
 
 type bosqueTerm = 
@@ -14,6 +15,7 @@ type bosqueTerm =
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm
 | BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm
 | BError : bosqueTerm
+| BList : bosqueType -> list bosqueTerm -> bosqueTerm
 // User-defined terms
 | BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz2: g: bosqueTerm -> k: bosqueTerm -> f: bosqueTerm ->  bosqueTerm
@@ -35,6 +37,7 @@ let rec getType x = match x with
 | BTuple n y -> BTupleType false n (getTypeSeq n y)
 | BRecord n sseq y -> BRecordType false n sseq (getTypeSeq n y)
 | BError -> BErrorType
+| BList content_type _ -> BListType content_type
 // User-defined terms
 | BnSMain__Bar2 _ -> BnSMain__Bar2Type
 | BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
@@ -119,38 +122,59 @@ let extractBool3 x = match x with
 (* Boolean Operations *)
 
 (* Definition of equality relation on Bosque terms *)
-val op_eqTerm_aux : n:nat 
-    -> (x:sequence bosqueTerm n) 
-    -> sequence bosqueTerm n
-    -> Tot (z:bosqueTerm{isBool z}) (decreases x)
+val op_eqTerm_List :
+  x: list bosqueTerm
+  → list bosqueTerm
+  → Tot (z: bosqueTerm{isBool z}) (decreases x)
+val op_eqTerm_Seq : n:ℕ
+    → (x:sequence bosqueTerm n)
+    → sequence bosqueTerm n
+    → Tot (z:bosqueTerm{isBool z}) (decreases x)
 val op_eqTerm : x:bosqueTerm
-      -> bosqueTerm
-      -> Tot (z:bosqueTerm{isBool z})  (decreases x)
+      → bosqueTerm
+      → Tot (z:bosqueTerm{isBool z})  (decreases x)
 let rec op_eqTerm x y = match x, y with
-| BNone, BNone -> BBool true
-| BBool x1, BBool y1 -> BBool (x1 = y1)
-| BInt x1, BInt y1 -> BBool (x1 = y1)
-| BTypedString s1 ty1, BTypedString s2 ty2 -> BBool (s1 = s2 && ty1 = ty2)
-| BGUID s1 n1, BGUID s2 n2 -> BBool (s1 = s2 && n1 = n2)
-| BTuple n1 seq1, BTuple n2 seq2 -> if (n1 <> n2) then BBool (false)
-                                    else op_eqTerm_aux n1 seq1 seq2
+| BNone, BNone → BBool true
+| BBool x1, BBool y1 → BBool (x1 = y1)
+| BInt x1, BInt y1 → BBool (x1 = y1)
+| BTypedString s1 ty1, BTypedString s2 ty2 → BBool (s1 = s2 && ty1 = ty2)
+| BGUID s1 n1, BGUID s2 n2 → BBool (s1 = s2 && n1 = n2)
+| BTuple n1 seq1, BTuple n2 seq2 → if (n1 ≠ n2) then BBool (false)
+                                    else op_eqTerm_Seq n1 seq1 seq2
 // FIX: Include case for BRecord
+| BList t1 xs1, BList t2 xs2 →  if (t1 ≠ t2) then BBool false else op_eqTerm_List xs1 xs2
 // | BError, BError -> BBool true
-| _, _ -> BBool (false)
-and 
-op_eqTerm_aux n x y = match x with
-| SNil -> (match y with
-          | SNil -> BBool true
-          | _ -> BBool (false)
+| _, _ → BBool (false)
+and
+op_eqTerm_Seq n x y = match x with
+| SNil → (match y with
+          | SNil → BBool true
+          | _ → BBool (false)
           )
-| SCons x1 m xs1 -> (match y with
-                    | SNil -> BBool (false)
-                    | SCons y1 m' ys1 -> (match (op_eqTerm x1 y1) with
-                                         | BBool b1 -> (match (op_eqTerm_aux m xs1 ys1) with
-                                                       | BBool b2 -> BBool ((m = m') && b1 && b2)
-                                                       | _ -> BBool (false)
+| SCons x1 m xs1 → (match y with
+                    | SNil → BBool (false)
+                    | SCons y1 m' ys1 → (match (op_eqTerm x1 y1) with
+                                         | BBool b1 → (match (op_eqTerm_Seq m xs1 ys1) with
+                                                       | BBool b2 → BBool ((m = m') && b1 && b2)
+                                                       | _ → BBool (false)
                                                        )
-                                         | _ -> BBool (false)
+                                         | _ → BBool (false)
+                                         )
+                    )
+and
+op_eqTerm_List x y = match x with
+| LNil → (match y with
+          | LNil → BBool true
+          | _ → BBool (false)
+          )
+| LCons x1 xs1 → (match y with
+                 | LNil → BBool (false)
+                 | LCons y1 ys1 → (match (op_eqTerm x1 y1) with
+                                  | BBool b1 → (match (op_eqTerm_List xs1 ys1) with
+                                                       | BBool b2 → BBool (b1 && b2)
+                                                       | _ → BBool (false)
+                                                       )
+                                         | _ → BBool (false)
                                          )
                     )
 

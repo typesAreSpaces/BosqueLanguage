@@ -16,6 +16,7 @@ function printBosqueTypesFST(fstar_files_directory: string, user_defined_types: 
     const fstar_program_core_decl = "module BosqueTypes\n\
 \n\
 open Sequence\n\
+open List\n\
 module Util=Util\n\
 \n\
 // Convention with UnionTerm: \n\
@@ -73,6 +74,16 @@ let rec eqTypeSeq n x y = match x with\n\
                     | SNil -> false\n\
                     | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1\n\
                     )\n\
+val eqTypeList : list bosqueType → list bosqueType → Tot bool\n\
+let rec eqTypeList x y = match x with\n\
+| LNil → (match y with\n\
+         | LNil → true\n\
+         | _ → false\n\
+         )\n\
+| LCons x1 xs1 → (match y with\n\
+                 | LNil → false\n\
+                 | LCons y1 ys1 → x1 = y1 && eqTypeList xs1 ys1\n\
+                 )\n\
 \n\
 (* Definition to encode the subtype relation on Bosque types \n\
    i.e.forall x y.subtypeOf x y <===> x :> y *) \n\
@@ -152,7 +163,17 @@ subtypeOfSeq n x y = match x with\n\
 | SCons x1 m xs1 -> (match y with \n\
                     | SNil -> false\n\
                     | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  \n\
-                    )\n";
+                    )\n\
+and\n\
+subtypeOfList x y = match x with\n\
+| LNil → (match y with\n\
+         | LNil → true\n\
+         | _ → false\n\
+         )\n\
+| LCons x1 xs1 → (match y with\n\
+                 | LNil → false\n\
+                 | LCons y1 ys1 → subtypeOf x1 y1 && subtypeOfList xs1 ys1\n\
+                 )";
     FS.writeSync(fd, fstar_program_subtypeof_rest);
     FS.closeSync(fd);
 }
