@@ -41,9 +41,9 @@ let rec zipSequence' #a #b n x v1 v2 = match v1 with
   let SCons b m' tl2 = v2 in
   SCons (a, b) m (zipSequence' m x tl1 tl2)
 
-val take : #a:Type -> n:nat -> m:nat{m <= n} -> sequence a n -> sequence a m
-let rec take #a n m x = match x with
+val takeSequence : #a:Type -> n:nat -> m:nat{m <= n} -> sequence a n -> sequence a m
+let rec takeSequence #a n m x = match x with
 | SNil -> SNil
 | SCons hd m' tl -> 
   if (m = 0) then SNil 
-  else SCons hd (m - 1) (take m' (m - 1) tl)
+  else SCons hd (m - 1) (takeSequence m' (m - 1) tl)

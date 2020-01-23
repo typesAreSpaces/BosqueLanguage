@@ -76,6 +76,7 @@ let rec eqTypeSeq n x y = match x with\n\
 \n\
 (* Definition to encode the subtype relation on Bosque types \n\
    i.e.forall x y.subtypeOf x y <===> x :> y *) \n\
+val subtypeOfList: x: list bosqueType -> sequence bosqueType -> Tot bool(decreases x)\n\
 val subtypeOfSeq: n: nat -> x: sequence bosqueType n -> sequence bosqueType n -> Tot bool(decreases x) \n\
 val subtypeOf: x: bosqueType -> bosqueType -> Tot bool(decreases x) \n\
 let rec subtypeOf x y = match x, y with\n\
@@ -96,7 +97,7 @@ let rec subtypeOf x y = match x, y with\n\
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> \n\
     if b1 then \n\
         if (n1 > n2) then false\n\
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2) \n\
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2) \n\
     else \n\
         if b2 then false\n\
         else\n\
@@ -107,7 +108,7 @@ let rec subtypeOf x y = match x, y with\n\
 | BRecordType b1 n1 _ seq1, BRecordType b2 n2 _ seq2 ->\n\
     if b1 then\n\
         if (n1 > n2) then false\n\
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2)\n\
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2)\n\
     else\n\
         if b2 then false\n\
         else\n\

@@ -28,7 +28,7 @@ type bosqueTerm = \n\
 | BTuple : n:nat -> sequence bosqueTerm n -> bosqueTerm\n\
 | BRecord : n:nat -> sequence string n -> sequence bosqueTerm n -> bosqueTerm\n\
 | BError : bosqueTerm\n\
-| BList : type : bosqueType -> sequence bosqueTerm n -> bosqueTerm\n"
+| BList : type : bosqueType -> list bosqueTerm -> bosqueTerm\n"
 
     FS.writeSync(fd, program_initial);
 
