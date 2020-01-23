@@ -16,6 +16,7 @@ function printBosqueTypesFST(fstar_files_directory: string, user_defined_types: 
     const fstar_program_core_decl = "module BosqueTypes\n\
 \n\
 open Sequence\n\
+open List\n\
 module Util=Util\n\
 \n\
 // Convention with UnionTerm: \n\
@@ -73,6 +74,16 @@ let rec eqTypeSeq n x y = match x with\n\
                     | SNil -> false\n\
                     | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1\n\
                     )\n\
+val eqTypeList : list bosqueType → list bosqueType → Tot bool\n\
+let rec eqTypeList x y = match x with\n\
+| LNil → (match y with\n\
+         | LNil → true\n\
+         | _ → false\n\
+         )\n\
+| LCons x1 xs1 → (match y with\n\
+                 | LNil → false\n\
+                 | LCons y1 ys1 → x1 = y1 && eqTypeList xs1 ys1\n\
+                 )\n\
 \n\
 (* Definition to encode the subtype relation on Bosque types \n\
    i.e.forall x y.subtypeOf x y <===> x :> y *) \n\
@@ -96,7 +107,7 @@ let rec subtypeOf x y = match x, y with\n\
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> \n\
     if b1 then \n\
         if (n1 > n2) then false\n\
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2) \n\
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2) \n\
     else \n\
         if b2 then false\n\
         else\n\
@@ -107,7 +118,7 @@ let rec subtypeOf x y = match x, y with\n\
 | BRecordType b1 n1 _ seq1, BRecordType b2 n2 _ seq2 ->\n\
     if b1 then\n\
         if (n1 > n2) then false\n\
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2)\n\
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2)\n\
     else\n\
         if b2 then false\n\
         else\n\
@@ -151,7 +162,17 @@ subtypeOfSeq n x y = match x with\n\
 | SCons x1 m xs1 -> (match y with \n\
                     | SNil -> false\n\
                     | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  \n\
-                    )\n";
+                    )\n\
+and\n\
+subtypeOfList x y = match x with\n\
+| LNil → (match y with\n\
+         | LNil → true\n\
+         | _ → false\n\
+         )\n\
+| LCons x1 xs1 → (match y with\n\
+                 | LNil → false\n\
+                 | LCons y1 ys1 → subtypeOf x1 y1 && subtypeOfList xs1 ys1\n\
+                 )";
     FS.writeSync(fd, fstar_program_subtypeof_rest);
     FS.closeSync(fd);
 }

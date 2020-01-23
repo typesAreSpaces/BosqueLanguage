@@ -1,6 +1,7 @@
 module BosqueTypes
 
 open Sequence
+open List
 module Util=Util
 
 // Convention with UnionTerm: 
@@ -36,7 +37,7 @@ type bosqueType =
 // FIX: The following is incomplete
 | BKeyedType
 | BErrorType
-// User-defined types
+| BListType : bosqueType -> bosqueType// User-defined types
 | BnSMain__Bar2Type
 | BnSMain__Baz2Type
 | BnSMain__Bar3Type
@@ -56,6 +57,16 @@ let rec eqTypeSeq n x y = match x with
                     | SNil -> false
                     | SCons y1 m' ys1 -> (m = m') && x1 = y1 && eqTypeSeq m xs1 ys1
                     )
+val eqTypeList : list bosqueType → list bosqueType → Tot bool
+let rec eqTypeList x y = match x with
+| LNil → (match y with
+         | LNil → true
+         | _ → false
+         )
+| LCons x1 xs1 → (match y with
+                 | LNil → false
+                 | LCons y1 ys1 → x1 = y1 && eqTypeList xs1 ys1
+                 )
 
 (* Definition to encode the subtype relation on Bosque types 
    i.e.forall x y.subtypeOf x y <===> x :> y *) 
@@ -79,7 +90,7 @@ let rec subtypeOf x y = match x, y with
 | BTupleType b1 n1 seq1, BTupleType b2 n2 seq2 -> 
     if b1 then 
         if (n1 > n2) then false
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2) 
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2) 
     else 
         if b2 then false
         else
@@ -90,7 +101,7 @@ let rec subtypeOf x y = match x, y with
 | BRecordType b1 n1 _ seq1, BRecordType b2 n2 _ seq2 ->
     if b1 then
         if (n1 > n2) then false
-        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(take n2 n1 seq2)
+        else b1 && (n1 <= n2) && subtypeOfSeq n1 seq1(takeSequence n2 n1 seq2)
     else
         if b2 then false
         else
@@ -101,6 +112,7 @@ let rec subtypeOf x y = match x, y with
 // | BEnumType, ? -> ?
 // | BCustomType, ? -> ?
 // | BKeyedType, ? -> ?
+| BListType t1 , BListType t2 -> subtypeOf t1 t2
 // User-defined types
 // Reflexivity relation
 | BnSMain__Bar2Type, BnSMain__Bar2Type -> true
@@ -130,3 +142,13 @@ subtypeOfSeq n x y = match x with
                     | SNil -> false
                     | SCons y1 m' ys1 -> (m = m') && (subtypeOf x1 y1) && subtypeOfSeq m xs1 ys1  
                     )
+and
+subtypeOfList x y = match x with
+| LNil → (match y with
+         | LNil → true
+         | _ → false
+         )
+| LCons x1 xs1 → (match y with
+                 | LNil → false
+                 | LCons y1 ys1 → subtypeOf x1 y1 && subtypeOfList xs1 ys1
+                 )
