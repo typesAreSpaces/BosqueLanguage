@@ -51,6 +51,11 @@ getTypeSeq n x = match x with
 
 (* --------------------------------------------------------------- *)
 (* Casting / Type checkers *)
+val isNone : bosqueTerm → Tot bool
+let isNone x = match x with
+| BNone → true
+| _ → false
+
 val isBool : bosqueTerm -> Tot bool
 let isBool x = match x with 
 | BBool _ -> true
@@ -97,6 +102,11 @@ val isError : bosqueTerm -> Tot bool
 let isError x = match x with 
 | BError -> true
 | _ -> false 
+
+val isList : bosqueType → bosqueTerm → Tot bool
+let isList ty x = match x with
+| BList ty' _ → ty = ty'
+| _ → false
 (* --------------------------------------------------------------- *)
 
 (* ------------------------------------------------------------------------ *)
@@ -138,8 +148,12 @@ let rec op_eqTerm x y = match x, y with
 | BTypedString s1 ty1, BTypedString s2 ty2 → BBool (s1 = s2 && ty1 = ty2)
 | BGUID s1 n1, BGUID s2 n2 → BBool (s1 = s2 && n1 = n2)
 | BTuple n1 seq1, BTuple n2 seq2 → if (n1 ≠ n2) then BBool (false)
-                                    else op_eqTerm_Seq n1 seq1 seq2
-// FIX: Include case for BRecord
+                                   else op_eqTerm_Seq n1 seq1 seq2
+| BRecord n1 sseq1 seq1, BRecord n2 sseq2 seq2 → if (n1 ≠ n2) then BBool (false)
+                                                 else (match equalSequence n1 sseq1 sseq2 with
+                                                      | false → BBool false
+                                                      | _ →  op_eqTerm_Seq n1 seq1 seq2
+                                                      )
 | BList t1 xs1, BList t2 xs2 →  if (t1 ≠ t2) then BBool false else op_eqTerm_List xs1 xs2
 // | BError, BError -> BBool true
 | _, _ → BBool (false)
@@ -243,13 +257,13 @@ let op_less x y = match x, y with
 // --------------------------------------------------------------------------------------------------
 (* Special functions *)
 | BInt x1, BInt y1 -> BBool (x1 < y1) 
-val isNone : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
-let isNone x = match x with
+val isNoneBosque : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
+let isNoneBosque x = match x with
 | BNone -> BBool true
 | _ -> BBool false
 
-val isSome : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
-let isSome x = match x with
+val isSomeBosque : bosqueTerm -> Tot (x:bosqueTerm{isBool x})
+let isSomeBosque x = match x with
 | BNone -> BBool false
 | _ -> BBool true
 

@@ -216,7 +216,7 @@ entity Baz2 provides Bar2, Bar3 {
 
 entrypoint function main() : Int {
     var e = Baz2{ f=1, g=2, k=true };
-    var e2 = e->project<Bar2 & Bar3>();
+    // var e2 = e->project<Bar2 & Bar3>();
     return 0;
 }
 

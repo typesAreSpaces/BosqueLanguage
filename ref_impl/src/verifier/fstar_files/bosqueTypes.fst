@@ -23,7 +23,6 @@ type bosqueType =
 | BGUIDType
 // The bool indicates if the Tuple is open or not
 | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType
-// FIX: The following is wrong
 // The bool indicates if the Record is open or not
 | BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType
 // FIX: The following is incomplete

@@ -1,4 +1,4 @@
-module Trigger_example
+module Trigger_lib
 
 type list 'a : Type = 
 | LNil 
@@ -52,33 +52,3 @@ val filter_append : p : ('a -> bool) -> x : list 'a -> y : list 'a -> Lemma
 let rec filter_append p x y = match x with 
 | LNil -> ()
 | LCons hd tl ->  filter_append p tl y
-
-val positive_fun : x : list 'a -> Tot nat
-let positive_fun x = length x
-
-val another_positive_fun : x : list nat -> Tot nat
-let another_positive_fun x = length x - (length (filter (fun (x : nat) -> x = 0) x))
-
-val hmm : p : ('a -> bool) -> x : list 'a -> y : list 'a -> Lemma 
-  (requires True)
-  (ensures (length (filter p (append x y))) == (length (filter p x)) + (length (filter p y)))
-let hmm _ _ _ = ()
-
-assume type t
-
-assume val (+): t -> t -> t
-
-assume val plus_associative: x:t -> y:t -> z:t -> Lemma
-  (requires True)
-  (ensures  (x + y) + z == x + (y + z))
-  [SMTPat ((x + y) + z)]
-
-irreducible let trigger (x:t) (y:t) = True
-
-// assume val plus_comm : x:t -> y:t -> Lemma (requires True) (ensures x + y == y + x) [SMTPat (x + y)]
-
-val test: x:t -> y:t -> z:t -> Lemma
-  (requires forall (a:t) (b:t).{:pattern (trigger a b)} trigger a b /\ a + b == b + a)
-  (ensures  (x + y) + z == (z + y) + x)
-let test x y z = cut (trigger z y /\ trigger x (z + y))
-// let test x y z = cut (trigger z y); cut (trigger x (z + y))

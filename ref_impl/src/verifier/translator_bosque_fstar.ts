@@ -926,14 +926,14 @@ class TranslatorBosqueFStar {
             case MIROpTag.MIRIsTypeOfNone: {
                 const opIsTypeOfNone = op as MIRIsTypeOfNone;
                 return [this.MIRArgumentToTermExpr(opIsTypeOfNone.trgt, fkey, TranslatorBosqueFStar.boolType),
-                new FuncTerm("isNone",
+                new FuncTerm("isNoneBosque",
                     [this.MIRArgumentToTermExpr(opIsTypeOfNone.arg, fkey, undefined)],
                     TranslatorBosqueFStar.boolType, fkey)];
             }
             case MIROpTag.MIRIsTypeOfSome: {
                 const opIsTypeOfSome = op as MIRIsTypeOfSome;
                 return [this.MIRArgumentToTermExpr(opIsTypeOfSome.trgt, fkey, TranslatorBosqueFStar.boolType),
-                new FuncTerm("isSome",
+                new FuncTerm("isSomeBosque",
                     [this.MIRArgumentToTermExpr(opIsTypeOfSome.arg, fkey, undefined)],
                     TranslatorBosqueFStar.boolType, fkey)];
             }

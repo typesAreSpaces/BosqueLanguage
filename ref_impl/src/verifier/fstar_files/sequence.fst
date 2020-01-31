@@ -47,3 +47,12 @@ let rec takeSequence #a n m x = match x with
 | SCons hd m' tl -> 
   if (m = 0) then SNil 
   else SCons hd (m - 1) (takeSequence m' (m - 1) tl)
+
+val equalSequence : (#a:Type) -> n:nat -> sequence a n -> sequence a n -> Tot bool
+let rec equalSequence #a n x y = match x with
+| SNil -> (match y with
+  | SNil -> true
+  | _ -> false)
+| SCons hd1 m1 tl1 -> (match y with 
+  | SCons hd2 m2 tl2 -> (m1 = m2) && equalSequence m1 tl1 tl2
+  | _ -> false)

@@ -41,10 +41,24 @@ let rec zipList' #a #b x v1 v2 = match v1 with
   | LNil -> LNil
   | LCons b tl2 ->  LCons (a, b) (zipList' x tl1 tl2)
 
-
 val takeList : #a:Type ->  m:nat -> list a -> list a
 let rec takeList #a m x = match x with
 | LNil -> LNil
 | LCons hd tl -> 
   if (m = 0) then LNil 
   else LCons hd (takeList (m - 1) tl)
+
+val lengthList : list 'a -> Tot nat
+let rec lengthList x = match x with
+| LNil -> 0
+| LCons _ tl -> 1 + lengthList tl
+
+val appendList : list 'a -> list 'a -> list 'a
+let rec appendList x y = match x with
+| LNil -> y
+| LCons hd tl -> LCons hd (appendList tl y)
+
+val filterList : ('a -> bool) -> list 'a -> list 'a
+let rec filterList p x = match x with
+| LNil -> LNil
+| LCons hd tl -> if (p hd) then LCons (hd) (filterList p tl) else (filterList p tl)

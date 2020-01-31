@@ -22,8 +22,6 @@ let nSMain__main  =
   let _ = assert_norm(subtypeOf BIntType (getType __tmp_0_arg_0)) in
   let __tmp_0 = (BnSMain__Baz2 __tmp_0_arg_0 __tmp_0_arg_1 __tmp_0_arg_2) in
   let e = __tmp_0 in
-  let _MIRProjectFromTypeConcept = (BInt 0) in
-  let e2 = __tmp_6 in
   let __ir_ret__ = (BInt 0) in
   let _return_ = __ir_ret__ in
   _return_
