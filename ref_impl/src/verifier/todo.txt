@@ -1,0 +1,15 @@
+- Implement in Fstar the Bosque collection library
+- Axiomatize (currently establish relations between compositions between the function of the collection library), prove, and include an appropriate trigger for these lemmas.
+- Write these results in the paper
+
+
+Bosque Collection library:
+- List:
+  - size : list T -> integer
+  - exists list T -> (T -> bool) -> bool
+  - all : list T -> (T -> bool) -> bool
+  - filter : list T -> int ->
+- Set:
+- Map:
+
+I think is better to take a look to their actual implementation. And then reimplement these functions in Fstar.

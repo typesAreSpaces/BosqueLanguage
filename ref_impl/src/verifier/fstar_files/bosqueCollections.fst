@@ -1,5 +1,8 @@
 module BosqueCollections
 
+// Contains the axiomatization of 
+// the collections used in Bosque
+
 open List
 
 val lemma_length_append : x : list 'a -> y : list 'a -> Lemma
