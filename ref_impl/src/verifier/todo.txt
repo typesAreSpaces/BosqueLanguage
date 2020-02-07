@@ -1,15 +1,49 @@
-- Implement in Fstar the Bosque collection library
-- Axiomatize (currently establish relations between compositions between the function of the collection library), prove, and include an appropriate trigger for these lemmas.
-- Write these results in the paper
+TODO List:
 
+- Implement in Fstar the Bosque collection library
+  - List check
+  - Set 
+  - Map
+- Axiomatize (currently establish relations between compositions between the function of the collection library), prove, and include an appropriate trigger for these lemmas.
+- Write these results in the paper.
+
+Comment(s):
+	- Decided to implement the 'safe version' of each method directly (without the implementation of the unsafe one)
+	because Fstar complains a lot about unsafe functions (i.e. it cannot prove totality, some patterns are incomplete, etc)
+	- Update: Sometimes the unsafe method is necessary because it works as a helper function for the safe version.
+
+Question(s):
+	- What's the difference between _destructive_add and _unsafe_add?
+
+Progress
 
 Bosque Collection library:
+        Bosque                          Fstar Implementation    Comment
+
+Progress
 - List:
-  - size : list T -> integer
-  - exists list T -> (T -> bool) -> bool
-  - all : list T -> (T -> bool) -> bool
-  - filter : list T -> int ->
+check	_size                           lengthList
+//	_unsafe_at                      atList                  // Not implement for the above reason
+//	_unsafe_add                     LCons                   // Not implement for the above reason
+//	_unsafe_set                     setList                 // Not implement for the above reason
+pending _destructive_add                ??                      // Not sure what is the difference between this and _unsafe_add
+check	_exists                         existsList'             // Spotted a potential bug in the first branch of the if-then-else statement
+check	_all                            allList'                // Spotted a potential bug in the first branch of the if-then-else statement
+check	_filter                         filterList'             // Spotted a potential bug in the first branch of the if-then-else statement
+pending	_ofType<U>                      
+check	_map                            mapList'                // Spotted a potential bug in the first branch of the if-then-else statement
+check	empty                           emptyList
+check	at                              atList
+check	push                            pushList
+check	set                             setList
+check	exists                          existsList
+check	all                             allList
+check	filter                          filterList
+pending	ofType<U>                       
+check	map                             mapList
+check	sum                             sumList
+	
 - Set:
 - Map:
 
-I think is better to take a look to their actual implementation. And then reimplement these functions in Fstar.
+I think it's better to take a look to their actual implementation. And then reimplement these functions in Fstar.

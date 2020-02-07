@@ -1,3 +1,0 @@
-- Implement in Fstar the Bosque collection library
-- Axiomatize (currently establish relations between compositions between the function of the collection library), prove, and include an appropriate trigger for these lemmas.
-- Write these results in the paper
