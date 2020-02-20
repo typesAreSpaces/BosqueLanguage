@@ -22,7 +22,8 @@ import {
     MIRModifyWithFields,
     MIRAccessFromField,
     MIRProjectFromFields,
-    MIRConstructorPrimaryCollectionSingletons
+    MIRConstructorPrimaryCollectionSingletons,
+    MIRBinEq
 } from "../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
@@ -750,14 +751,10 @@ class TranslatorBosqueFStar {
             }
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
             // case MIROpTag.MIRInvokeKnownTarget: { // IMPLEMENT:
             //     TranslatorBosqueFStar.debugging("MIRInvokeKnownTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
             //     return [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.intType), new ConstTerm("0", TranslatorBosqueFStar.intType)];
             // }
-
-
 
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRInvokeVirtualTarget: { // IMPLEMENT:
@@ -765,8 +762,6 @@ class TranslatorBosqueFStar {
                 return [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
             }
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
             // case MIROpTag.MIRCallLambda: { // IMPLEMENT:
             //     TranslatorBosqueFStar.debugging("MIRCallLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -789,17 +784,15 @@ class TranslatorBosqueFStar {
                     TranslatorBosqueFStar.intType, fkey)];
             }
 
-
-
-
-            // ----------------------------------------------------------------------------------------------------------------------------------------------------
-            case MIROpTag.MIRBinEq: { // IMPLEMENT:
-                TranslatorBosqueFStar.debugging("MIRBinEq Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
-                return [new VarTerm("_MIRBinEq", TranslatorBosqueFStar.intType, fkey), new ConstTerm("0", TranslatorBosqueFStar.intType, fkey)];
+            case MIROpTag.MIRBinEq: {
+                const opBinEq = op as MIRBinEq;
+                const lhs = this.MIRArgumentToTermExpr(opBinEq.lhs, fkey, undefined);
+                const rhs = this.MIRArgumentToTermExpr(opBinEq.rhs, fkey, undefined);
+                return [
+                    this.MIRArgumentToTermExpr(opBinEq.trgt, fkey, TranslatorBosqueFStar.boolType),
+                    new FuncTerm("op_eqTerm", [lhs, rhs], TranslatorBosqueFStar.boolType, fkey)
+                ];
             }
-            // ----------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
             case MIROpTag.MIRBinCmp: { // DOUBLE CHECK regarding strings
                 // The predicate returned is of type Bool
