@@ -29,4 +29,6 @@ setImmediate(() => {
     const translator = new TranslatorBosqueFStar(masm, fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1), fstar_files_directory);
 
     translator.generateFStarCode(fkey);
+
+    
 });
