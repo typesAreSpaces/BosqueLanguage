@@ -2,6 +2,8 @@
 #define _GRAPH_FORMULAS
 
 #include <iostream>
+#include <vector>
+#include <list>
 #include <z3++.h>
 
 class GraphFormulas {
@@ -9,6 +11,7 @@ class GraphFormulas {
   z3::expr_vector formulas;
   public:
     GraphFormulas(const char *);
+    friend std::ostream & operator << (std::ostream &, const GraphFormulas &);
 };
 
 #endif

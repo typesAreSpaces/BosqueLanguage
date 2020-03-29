@@ -6,6 +6,7 @@ int main(){
   try { 
     GraphFormulas test("/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/verifier/cpp_files/smt_files/small_test.smt2");
     //GraphFormulas test("/home/jose/Documents/GithubProjects/BosqueLanguage/ref_impl/src/verifier/cpp_files/smt_files/test.smt2");
+    std::cout << test << std::endl;
   }
   catch(Z3_error_code e){
     std::cout << e << std::endl;

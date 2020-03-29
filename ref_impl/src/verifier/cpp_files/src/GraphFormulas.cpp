@@ -22,3 +22,6 @@ GraphFormulas::GraphFormulas(const char * smt_file) :
     }
   } 
 
+std::ostream & operator << (std::ostream & os, const GraphFormulas & gfs) {
+  return os;
+}  
