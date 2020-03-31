@@ -12,6 +12,7 @@
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
 import * as FS from "fs";
+import * as ChildProcess from "child_process"
 import {
     MIRBasicBlock, MIRJumpCond, MIROp, MIROpTag, MIRVarStore, MIRRegisterArgument, MIRReturnAssign, MIRPhi, MIRBinCmp, MIRArgument,
     MIRBinOp, MIRPrefixOp, MIRBody, MIRConstructorTuple, MIRConstructorRecord, MIRInvokeFixedFunction, MIRIsTypeOfNone, MIRLoadFieldDefaultValue,
@@ -501,7 +502,7 @@ class TranslatorBosqueFStar {
 
             case MIROpTag.MIRConstructorPrimaryCollectionSingletons: {
                 const opConstructorPrimaryCollectionsSingletons = op as MIRConstructorPrimaryCollectionSingletons;
-            
+
                 const current_tkey = opConstructorPrimaryCollectionsSingletons.tkey.slice(opConstructorPrimaryCollectionsSingletons.tkey.indexOf("=") + 1, -1);
                 const content_type = TranslatorBosqueFStar.stringVarToTypeExpr(current_tkey);
 
@@ -510,14 +511,14 @@ class TranslatorBosqueFStar {
                         , this.MIRArgumentToTermExpr(x, fkey, undefined)]) as [VarTerm, TermExpr][];
 
                 assignments.unshift([this.MIRArgumentToTermExpr(opConstructorPrimaryCollectionsSingletons.trgt, fkey, new ListType(content_type)),
-                    new ListTerm(assignments.map(x => x[0]), content_type, fkey)
+                new ListTerm(assignments.map(x => x[0]), content_type, fkey)
                 ]);
 
                 return assignments;
             }
 
 
-            
+
             // ----------------------------------------------------------------------------------------------------------------------------------------------------
             case MIROpTag.MIRConstructorPrimaryCollectionCopies: { // IMPLEMENT:
                 TranslatorBosqueFStar.debugging("ConstructorPrimaryCollectionCopies Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
@@ -1045,7 +1046,7 @@ class TranslatorBosqueFStar {
         }
     }
 
-    generateFStarCode(fkey: string) {
+    generateFStarCode(fkey: string, z3rlimit : number, max_fuel : number, max_ifuel : number) {
 
         const user_defined_types_map: Map<string, MIRConceptTypeDecl | MIREntityTypeDecl>
             = new Map([...TranslatorBosqueFStar.mapConceptDeclarations, ...TranslatorBosqueFStar.mapEntityDeclarations]);
@@ -1105,6 +1106,14 @@ class TranslatorBosqueFStar {
         // --------------------------------------------------------------------------------------------------
 
         FS.closeSync(fd);
+
+        const fstar_command = `fstar.exe ${this.fileName} --z3refresh --z3rlimit ${z3rlimit} --max_fuel ${max_fuel} --max_ifuel ${max_ifuel} --include fstar_files --log_queries`;
+        console.log("Using the following command");
+        console.log(fstar_command);
+
+        ChildProcess.execSync(fstar_command);
+        console.log(`mv queries-${this.fileName} fstar_files`);
+        ChildProcess.execSync(`mv queries-${this.fileName.replace("fst", "smt2")} fstar_files`);
     }
 }
 

@@ -28,7 +28,5 @@ setImmediate(() => {
     const fstarFileName = (sanitizeName(fkey) + "_" + fileName).replace("bsq", "fst");
     const translator = new TranslatorBosqueFStar(masm, fstarFileName.charAt(0).toUpperCase() + fstarFileName.slice(1), fstar_files_directory);
 
-    translator.generateFStarCode(fkey);
-
-    
+    translator.generateFStarCode(fkey, 20, 15, 5); 
 });
