@@ -1107,11 +1107,12 @@ class TranslatorBosqueFStar {
 
         FS.closeSync(fd);
 
-        const fstar_command = `fstar.exe ${this.fileName} --z3refresh --z3rlimit ${z3rlimit} --max_fuel ${max_fuel} --max_ifuel ${max_ifuel} --include fstar_files --log_queries`;
-        console.log("Using the following command");
-        console.log(fstar_command);
+        // We replace bin by src because fstar_files isn't loaded in the bin directory
+        const verifier_path = __dirname.replace("bin", "src");
+        const fstar_command = `fstar.exe ${this.fileName} --z3refresh --z3rlimit ${z3rlimit} --max_fuel ${max_fuel} --max_ifuel ${max_ifuel} --include ${verifier_path}/fstar_files --log_queries`;
+        console.log(`Using the following command: ${fstar_command}`);
         ChildProcess.execSync(fstar_command);
-        ChildProcess.execSync(`mv queries-${this.fileName.replace("fst", "smt2")} fstar_files`);
+        ChildProcess.execSync(`mv queries-${this.fileName.replace("fst", "smt2")} ${verifier_path}/fstar_files`);
     }
 }
 
