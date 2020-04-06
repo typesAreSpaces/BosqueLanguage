@@ -4,6 +4,7 @@ open Sequence
 open List
 open BosqueTypes
 open BosqueTerms
+open BosqueCollections
 open Util
 
 (* Type names *)

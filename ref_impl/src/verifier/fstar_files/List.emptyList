@@ -1,0 +1,93 @@
+; <Start encoding List.emptyList>
+
+(declare-fun List.emptyList (Term Term) Term)
+
+(declare-fun List.emptyList@tok () Term)
+;;;;;;;;;;;;;;;;Name-token correspondence
+;;; Fact-ids: Name List.emptyList; Namespace List
+(assert (! 
+;; def=list.fst(93,4-93,13); use=list.fst(93,4-93,13)
+(forall ((@x0 Term) (@x1 Term))
+ (! (= (ApplyTT (ApplyTT List.emptyList@tok
+@x0)
+@x1)
+(List.emptyList @x0
+@x1))
+ 
+
+:pattern ((ApplyTT (ApplyTT List.emptyList@tok
+@x0)
+@x1))
+:qid token_correspondence_List.emptyList))
+
+:named token_correspondence_List.emptyList))
+;;;;;;;;;;;;;;;;function token typing
+;;; Fact-ids: Name List.emptyList; Namespace List
+(assert (! 
+;; def=list.fst(93,4-93,13); use=list.fst(93,4-93,13)
+(forall ((@x0 Term))
+ (! (and (NoHoist @x0
+(HasType List.emptyList@tok
+Tm_arrow_4c76a14a038c484f30cb1bd485d60539))
+
+;; def=list.fst(93,4-93,13); use=list.fst(93,4-93,13)
+(forall ((@x1 Term) (@x2 Term))
+ (! (= (ApplyTT (ApplyTT List.emptyList@tok
+@x1)
+@x2)
+(List.emptyList @x1
+@x2))
+ 
+
+:pattern ((List.emptyList @x1
+@x2))
+:qid function_token_typing_List.emptyList.1))
+)
+ 
+
+:pattern ((ApplyTT @x0
+List.emptyList@tok))
+:qid function_token_typing_List.emptyList))
+
+:named function_token_typing_List.emptyList))
+;;;;;;;;;;;;;;;;free var typing
+;;; Fact-ids: Name List.emptyList; Namespace List
+(assert (! 
+;; def=list.fst(93,4-93,13); use=list.fst(93,4-93,13)
+(forall ((@x0 Term) (@x1 Term))
+ (! (implies (and (HasType @x0
+Tm_type)
+(HasType @x1
+(List.list @x0)))
+(HasType (List.emptyList @x0
+@x1)
+Prims.bool))
+ 
+
+:pattern ((List.emptyList @x0
+@x1))
+:qid typing_List.emptyList))
+
+:named typing_List.emptyList))
+;;;;;;;;;;;;;;;;Equation for List.emptyList
+;;; Fact-ids: Name List.emptyList; Namespace List
+(assert (! 
+;; def=list.fst(93,4-93,13); use=list.fst(93,4-93,13)
+(forall ((@x0 Term) (@x1 Term))
+ (! (= (List.emptyList @x0
+@x1)
+(Prims.op_Equality Prims.int
+(List.lengthList @x0
+@x1)
+(BoxInt 0)))
+ 
+
+:pattern ((List.emptyList @x0
+@x1))
+:qid equation_List.emptyList))
+
+:named equation_List.emptyList))
+
+; </end encoding List.emptyList>
+
+

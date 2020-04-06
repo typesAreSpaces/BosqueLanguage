@@ -1073,6 +1073,7 @@ class TranslatorBosqueFStar {
         FS.writeSync(fd, `open List\n`);
         FS.writeSync(fd, `open BosqueTypes\n`);
         FS.writeSync(fd, `open BosqueTerms\n`);
+        FS.writeSync(fd, `open BosqueCollections\n`);
         FS.writeSync(fd, `open Util\n`);
         FS.writeSync(fd, "\n");
         // --------------------------------------------------------
