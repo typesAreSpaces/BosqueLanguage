@@ -6,17 +6,17 @@
 import * as FS from "fs";
 import * as Path from "path";
 import chalk from "chalk";
-import { MIREmitter } from "./../compiler/mir_emitter";
-import { PackageConfig, MIRAssembly } from "./../compiler/mir_assembly";
+import { MIREmitter } from "../../compiler/mir_emitter";
+import { PackageConfig, MIRAssembly } from "../../compiler/mir_assembly";
 
 interface PathFile {
-    directory: string;
-    fileName: string;
+    file_directory: string;
+    file_name: string;
 }
 
 function bosqueToMASM(info: PathFile): MIRAssembly {
 
-    let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../"));
+  let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../../"));
     let files: { relativePath: string, contents: string }[] = [];
     try {
         // const coredir = Path.join(bosque_dir, "src/core/core.bsq");
@@ -27,7 +27,7 @@ function bosqueToMASM(info: PathFile): MIRAssembly {
         const collectionsdir = Path.join(bosque_dir, "src/core/direct/collections.bsq");
         const collectionsdata = FS.readFileSync(collectionsdir).toString();
 
-        const appdir = info.directory + info.fileName;
+        const appdir = info.file_directory + info.file_name;
         const appdata = FS.readFileSync(appdir).toString();
 
         files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];

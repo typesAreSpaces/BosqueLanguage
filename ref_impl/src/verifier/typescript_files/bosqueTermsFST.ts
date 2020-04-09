@@ -4,13 +4,13 @@
 //-------------------------------------------------------------------------------------------------------
 
 import * as FS from "fs";
-import { MIRConceptTypeDecl, MIREntityTypeDecl } from "../compiler/mir_assembly";
+import { MIRConceptTypeDecl, MIREntityTypeDecl } from "../../compiler/mir_assembly";
 import { sanitizeName } from "./util";
 
 function printBosqueTermsFST(fstar_files_directory: string, user_defined_types_map: Map<string, MIRConceptTypeDecl | MIREntityTypeDecl>) {
     // TODO: Keep working here
 
-    const fd = FS.openSync(fstar_files_directory + "bosqueTerms.fst", 'w');
+  const fd = FS.openSync(fstar_files_directory + "/bosqueTerms.fst", 'w');
 
     const program_initial = "module BosqueTerms\n\
 \n\

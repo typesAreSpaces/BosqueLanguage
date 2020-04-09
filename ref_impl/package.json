@@ -20,11 +20,9 @@
         "fs-extra": "~8.1.0"
     },
     "scripts": {
-        "build_old": "tsc -p tsconfig.json",
         "build": "tsc -p tsconfig.json && node ./build/resource_copy.js",
-        "test_old": "tsc -p tsconfig.json && node ./bin/test/test_runner.js",
         "test": "tsc -p tsconfig.json && node ./build/resource_copy.js && node ./bin/test/test_runner.js",
-        "build_verifier": "tsc -p tsconfig_verifier.json"
+        "verifier": "tsc -p tsconfig.json && node ./bin/verifier/typescript_files/run_verifier.js"
     },
     "files": [
         "bin/*"
