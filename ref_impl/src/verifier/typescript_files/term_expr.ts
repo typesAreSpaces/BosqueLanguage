@@ -7,23 +7,23 @@ import { TypeExpr, IntType, BoolType, NoneType, TypedStringType, TupleType, Reco
 import { toFStarSequence, toFStarList } from "./util";
 
 abstract class TermExpr {
-    readonly symbolName: string;
+    readonly symbol_name: string;
     readonly ty: TypeExpr;
     readonly fkey: string;
 
     // TODO: Add more reserved words from FStar
-    static readonly binOpToFStar: Map<string, string> = new Map<string, string>([
+    static readonly bin_op_to_fstar: Map<string, string> = new Map<string, string>([
         ["&&", "op_and"], ["||", "op_or"],
         ["*", "op_mult"], ["-", "op_sub"], ["+", "op_add"], ["%", "op_mod"], ["/", "op_div"],
         ["<=", "op_lessOrEq"], [">", "op_greater"], [">=", "op_greaterOrEq"], ["<", "op_less"],
         ["==", "op_eqTerm"], ["!=", "op_notEqTerm"]
     ]);
-    static readonly unaryOpToFStar: Map<string, string> = new Map<string, string>([
+    static readonly unary_op_to_fstar: Map<string, string> = new Map<string, string>([
         ["!", "op_not"],
         ["-", "op_neg"]
     ]);
-    constructor(symbolName: string, ty: TypeExpr, fkey: string) {
-        this.symbolName = symbolName;
+    constructor(symbol_name: string, ty: TypeExpr, fkey: string) {
+        this.symbol_name = symbol_name;
         this.ty = ty;
         this.fkey = fkey;
     }
@@ -31,59 +31,59 @@ abstract class TermExpr {
 }
 
 class VarTerm extends TermExpr {
-    constructor(symbolName: string, ty: TypeExpr, fkey: string) {
-        super(symbolName, ty, fkey);
+    constructor(symbol_name: string, ty: TypeExpr, fkey: string) {
+        super(symbol_name, ty, fkey);
     }
     toML() {
-        return this.symbolName;
+        return this.symbol_name;
     }
 }
 
 class ConstTerm extends TermExpr {
-    constructor(symbolName: string, ty: TypeExpr, fkey: string) {
+    constructor(symbol_name: string, ty: TypeExpr, fkey: string) {
         if (ty instanceof NoneType) {
             super("BNone", ty, fkey);
         }
         else if (ty instanceof BoolType) {
-            super("(BBool " + symbolName + ")", ty, fkey);
+            super("(BBool " + symbol_name + ")", ty, fkey);
         }
         else if (ty instanceof IntType) {
-            super("(BInt " + symbolName + ")", ty, fkey);
+            super("(BInt " + symbol_name + ")", ty, fkey);
         }
         else if (ty instanceof TypedStringType) {
-            super("(BTypedString " + symbolName + " " + ty.ty.id + ")", ty, fkey);
+            super("(BTypedString " + symbol_name + " " + ty.ty.id + ")", ty, fkey);
         }
         else {
-            super(symbolName, ty, fkey);
+            super(symbol_name, ty, fkey);
         }
     }
     toML() {
-        return this.symbolName;
+        return this.symbol_name;
     }
 }
 
 class FuncTerm extends TermExpr {
     readonly terms: TermExpr[];
-    constructor(symbolName: string, terms: TermExpr[], ty: TypeExpr, fkey: string) {
-        super(symbolName, ty, fkey);
+    constructor(symbol_name: string, terms: TermExpr[], ty: TypeExpr, fkey: string) {
+        super(symbol_name, ty, fkey);
         this.terms = terms;
     }
     toML() {
-        return "(" + this.symbolName
+        return "(" + this.symbol_name
             + " " + this.terms.map(x => x.toML()).join(" ")
             + ")";
     }
 }
 
 class TupleTerm extends TermExpr {
-    readonly termSequence: TermExpr[];
-    constructor(termSequence: TermExpr[], fkey: string) {
-        super("BTuple", new TupleType(false, termSequence.map(x => x.ty)), fkey);
-        this.termSequence = termSequence;
+    readonly term_sequence: TermExpr[];
+    constructor(term_sequence: TermExpr[], fkey: string) {
+        super("BTuple", new TupleType(false, term_sequence.map(x => x.ty)), fkey);
+        this.term_sequence = term_sequence;
     }
     toML() {
-        return "(BTuple " + this.termSequence.length + " "
-            + toFStarSequence(this.termSequence.map(x => x.toML()))
+        return "(BTuple " + this.term_sequence.length + " "
+            + toFStarSequence(this.term_sequence.map(x => x.toML()))
             + ")";
     }
 }
@@ -108,17 +108,17 @@ class TupleProjExpr extends TermExpr {
 }
 
 class RecordTerm extends TermExpr {
-    readonly stringSequence: string[];
-    readonly termSequence: TermExpr[];
-    constructor(stringSequence: string[], termSequence: TermExpr[], fkey: string) {
-        super("BRecord", new RecordType(false, stringSequence, termSequence.map(x => x.ty)), fkey);
-        this.stringSequence = stringSequence.map(x => "\"" + x + "\"");
-        this.termSequence = termSequence;
+    readonly string_sequence: string[];
+    readonly term_sequence: TermExpr[];
+    constructor(string_sequence: string[], term_sequence: TermExpr[], fkey: string) {
+        super("BRecord", new RecordType(false, string_sequence, term_sequence.map(x => x.ty)), fkey);
+        this.string_sequence = string_sequence.map(x => "\"" + x + "\"");
+        this.term_sequence = term_sequence;
     }
     toML() {
-        return "(BRecord " + this.termSequence.length + " "
-            + toFStarSequence(this.stringSequence) + " "
-            + toFStarSequence(this.termSequence.map(x => x.toML()))
+        return "(BRecord " + this.term_sequence.length + " "
+            + toFStarSequence(this.string_sequence) + " "
+            + toFStarSequence(this.term_sequence.map(x => x.toML()))
             + ")";
     }
 }
@@ -143,15 +143,15 @@ class RecordProjExpr extends TermExpr {
 }
 
 class ListTerm extends TermExpr {
-    readonly termList : TermExpr[];
+    readonly term_list : TermExpr[];
     readonly ty: TypeExpr;
-    constructor(termList: TermExpr[], ty: TypeExpr, fkey: string) {
+    constructor(term_list: TermExpr[], ty: TypeExpr, fkey: string) {
         super("BList", new ListType(ty), fkey);
-        this.termList = termList;
+        this.term_list = term_list;
         this.ty = ty;
     }
     toML(){
-        return `(BList ${this.ty.id} ${toFStarList(this.termList.map(x => x.toML()))})`;
+        return `(BList ${this.ty.id} ${toFStarList(this.term_list.map(x => x.toML()))})`;
     }
 
 }

@@ -7,74 +7,74 @@ import * as FS from "fs";
 import { sanitizeName, toFStarSequence } from "./util";
 
 abstract class TypeDecl {
-    readonly stringType: string;
-    constructor(stringType: string) {
-        this.stringType = stringType;
+    readonly string_type: string;
+    constructor(string_type: string) {
+        this.string_type = string_type;
     }
     abstract emit(fd: number): void;
 }
 
 class TypedStringTypeDecl extends TypeDecl {
-    constructor(stringType: string) {
-        super(stringType);
+    constructor(string_type: string) {
+        super(string_type);
     }
     emit(fd: number) {
         // Adding bTypedStringType at the beginning here is necessary
         // because TypedStringType.declared only keeps track of the elements
         // of the constructor type
-        FS.writeSync(fd, `let bTypedStringType_${this.stringType} = (BTypedStringType ${this.stringType})\n`);
+        FS.writeSync(fd, `let bTypedStringType_${this.string_type} = (BTypedStringType ${this.string_type})\n`);
     }
 }
 
 class TupleTypeDecl extends TypeDecl {
     readonly b: boolean;
-    readonly typeArray: TypeExpr[];
-    constructor(stringType: string, b: boolean, typeArray: TypeExpr[]) {
-        super(stringType);
+    readonly type_array: TypeExpr[];
+    constructor(string_type: string, b: boolean, type_array: TypeExpr[]) {
+        super(string_type);
         this.b = b;
-        this.typeArray = typeArray;
+        this.type_array = type_array;
     }
     emit(fd: number) {
         // Here the index contains the constructor information
         // Hence, the constructor information is not added  
-        FS.writeSync(fd, `let ${this.stringType} = BTupleType ${this.b} ${this.typeArray.length} ${TupleType.toFStarTuple(this.typeArray)}\n`);
+        FS.writeSync(fd, `let ${this.string_type} = BTupleType ${this.b} ${this.type_array.length} ${TupleType.toFStarTuple(this.type_array)}\n`);
     }
 }
 
 class RecordTypeDecl extends TypeDecl {
     readonly b: boolean;
     readonly field_names: string[];
-    readonly typeArray: TypeExpr[];
-    constructor(stringType: string, b: boolean, field_names: string[], typeArray: TypeExpr[]) {
-        super(stringType);
+    readonly type_array: TypeExpr[];
+    constructor(string_type: string, b: boolean, field_names: string[], type_array: TypeExpr[]) {
+        super(string_type);
         this.b = b;
         this.field_names = field_names;
-        this.typeArray = typeArray;
+        this.type_array = type_array;
     }
     emit(fd: number) {
-        FS.writeSync(fd, `let ${this.stringType} = BRecordType ${this.b} ${this.typeArray.length} ${RecordType.toFStarRecord(this.field_names, this.typeArray)}\n`);
+        FS.writeSync(fd, `let ${this.string_type} = BRecordType ${this.b} ${this.type_array.length} ${RecordType.toFStarRecord(this.field_names, this.type_array)}\n`);
     }
 }
 
 class UnionTypeDecl extends TypeDecl {
-    readonly typeArray: TypeExpr[];
-    constructor(stringType: string, typeArray: TypeExpr[]) {
-        super(stringType);
-        this.typeArray = typeArray;
+    readonly type_array: TypeExpr[];
+    constructor(string_type: string, type_array: TypeExpr[]) {
+        super(string_type);
+        this.type_array = type_array;
     }
     emit(fd: number) {
         // Here the index contains the constructor information
         // Hence, the constructor information is not added
-        FS.writeSync(fd, `let ${this.stringType} = ${UnionType.toFStarUnion(this.typeArray)}\n`);
+        FS.writeSync(fd, `let ${this.string_type} = ${UnionType.toFStarUnion(this.type_array)}\n`);
     }
 }
 
 class ListTypeDecl extends TypeDecl {
-    constructor(stringType: string) {
-        super(stringType);
+    constructor(string_type: string) {
+        super(string_type);
     }
     emit(fd: number) {
-        FS.writeSync(fd, `let bListType_${this.stringType} = (BListType ${this.stringType})\n`);
+        FS.writeSync(fd, `let bListType_${this.string_type} = (BListType ${this.string_type})\n`);
     }
 }
 
@@ -209,13 +209,13 @@ class TypedStringType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
-        const stringType = ty.id;
-        super("bTypedStringType_" + stringType);
+        const string_type = ty.id;
+        super("bTypedStringType_" + string_type);
         this.ty = ty;
         // --------------------------------------------------------------------------------
-        if (!TypedStringType.declared.has(stringType)) {
-            TypedStringType.declared.add(stringType);
-            TypeExpr.declarator.add(new TypedStringTypeDecl(stringType));
+        if (!TypedStringType.declared.has(string_type)) {
+            TypedStringType.declared.add(string_type);
+            TypeExpr.declarator.add(new TypedStringTypeDecl(string_type));
         }
         // --------------------------------------------------------------------------------
     }
@@ -235,17 +235,17 @@ class GUIDType extends TypeExpr {
 
 class TupleType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
-    readonly isOpen: boolean;
+    readonly is_open: boolean;
     readonly elements: TypeExpr[];
 
-    constructor(isOpen: boolean, elements: TypeExpr[]) {
-        super("bTupleType_" + elements.length + elements.map(x => x.id).join("_") + isOpen);
-        this.isOpen = isOpen;
+    constructor(is_open: boolean, elements: TypeExpr[]) {
+        super("bTupleType_" + elements.length + elements.map(x => x.id).join("_") + is_open);
+        this.is_open = is_open;
         this.elements = elements;
         // --------------------------------------------------------------------------------
         if (!TupleType.declared.has(this.id)) {
             TupleType.declared.add(this.id);
-            TypeExpr.declarator.add(new TupleTypeDecl(this.id, this.isOpen, this.elements));
+            TypeExpr.declarator.add(new TupleTypeDecl(this.id, this.is_open, this.elements));
         }
         // --------------------------------------------------------------------------------
     }
@@ -260,19 +260,19 @@ class TupleType extends TypeExpr {
 
 class RecordType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
-    readonly isOpen: boolean;
+    readonly is_open: boolean;
     readonly field_names: string[];
     readonly elements: TypeExpr[];
 
-    constructor(isOpen: boolean, field_names: string[], elements: TypeExpr[]) {
-        super("bRecordType_" + elements.length + elements.map((value, index) => field_names[index].slice(1, -1) + value.id).join("_") + isOpen);
-        this.isOpen = isOpen
+    constructor(is_open: boolean, field_names: string[], elements: TypeExpr[]) {
+        super("bRecordType_" + elements.length + elements.map((value, index) => field_names[index].slice(1, -1) + value.id).join("_") + is_open);
+        this.is_open = is_open
         this.field_names = field_names.map(x => "\"" + x + "\"");
         this.elements = elements;
         // --------------------------------------------------------------------------------
         if (!RecordType.declared.has(this.id)) {
             RecordType.declared.add(this.id);
-            TypeExpr.declarator.add(new RecordTypeDecl(this.id, this.isOpen, this.field_names, this.elements));
+            TypeExpr.declarator.add(new RecordTypeDecl(this.id, this.is_open, this.field_names, this.elements));
         }
         // --------------------------------------------------------------------------------
     }
@@ -362,13 +362,13 @@ class ListType extends TypeExpr {
     static declared: Set<string> = new Set<string>();
     readonly ty: TypeExpr;
     constructor(ty: TypeExpr) {
-        const stringType = ty.id;
-        super("bListType_" + stringType);
+        const string_type = ty.id;
+        super("bListType_" + string_type);
         this.ty = ty;
         // --------------------------------------------------------------------------------
-        if (!ListType.declared.has(stringType)) {
-            ListType.declared.add(stringType);
-            ListType.declarator.add(new ListTypeDecl(stringType));
+        if (!ListType.declared.has(string_type)) {
+            ListType.declared.add(string_type);
+            ListType.declarator.add(new ListTypeDecl(string_type));
         }
         // --------------------------------------------------------------------------------
     }

@@ -10,103 +10,105 @@ import { MIREmitter } from "../../compiler/mir_emitter";
 import { PackageConfig, MIRAssembly } from "../../compiler/mir_assembly";
 
 interface PathFile {
-    file_directory: string;
-    file_name: string;
+  file_directory: string;
+  file_name: string;
 }
 
 function bosqueToMASM(info: PathFile): MIRAssembly {
 
   let bosque_dir: string = Path.normalize(Path.join(__dirname, "./../../../"));
-    let files: { relativePath: string, contents: string }[] = [];
-    try {
-        // const coredir = Path.join(bosque_dir, "src/core/core.bsq");
-        const coredir = Path.join(bosque_dir, "src/core/direct/core.bsq");
-        const coredata = FS.readFileSync(coredir).toString();
+  let files: { relativePath: string, contents: string }[] = [];
+  try {
+    // const coredir = Path.join(bosque_dir, "src/core/core.bsq");
+    const coredir = Path.join(bosque_dir, "src/core/direct/core.bsq");
+    const coredata = FS.readFileSync(coredir).toString();
 
-        // const collectionsdir = Path.join(bosque_dir, "src/core/collections.bsq");
-        const collectionsdir = Path.join(bosque_dir, "src/core/direct/collections.bsq");
-        const collectionsdata = FS.readFileSync(collectionsdir).toString();
+    // const collectionsdir = Path.join(bosque_dir, "src/core/collections.bsq");
+    const collectionsdir = Path.join(bosque_dir, "src/core/direct/collections.bsq");
+    const collectionsdata = FS.readFileSync(collectionsdir).toString();
 
-      const appdir = info.file_directory + "/" + info.file_name;
-        const appdata = FS.readFileSync(appdir).toString();
+    const appdir = info.file_directory + "/" + info.file_name;
+    const appdata = FS.readFileSync(appdir).toString();
 
-        files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];
+    files = [{ relativePath: coredir, contents: coredata }, { relativePath: collectionsdir, contents: collectionsdata }, { relativePath: appdir, contents: appdata }];
+  }
+  catch (ex) {
+    process.stdout.write(chalk.red(`Read failed with exception -- ${ex}\n`));
+    throw new Error(`Read failed with exception -- ${ex}\n`);
+  }
+
+  const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), true, true, true, files);
+
+  if (errors.length !== 0) {
+    for (let i = 0; i < errors.length; ++i) {
+      process.stdout.write(chalk.red(`Parse error -- ${errors[i]}\n`));
     }
-    catch (ex) {
-        process.stdout.write(chalk.red(`Read failed with exception -- ${ex}\n`));
-        throw new Error(`Read failed with exception -- ${ex}\n`);
-    }
+    throw new Error("Too many Parsing errors!\n");
+  }
 
-    const { masm, errors } = MIREmitter.generateMASM(new PackageConfig(), true, true, true, files);
-
-    if (errors.length !== 0) {
-        for (let i = 0; i < errors.length; ++i) {
-            process.stdout.write(chalk.red(`Parse error -- ${errors[i]}\n`));
-        }
-        throw new Error("Too many Parsing errors!\n");
-    }
-
-    try {
-        return (masm as MIRAssembly);
-    }
-    catch (ex) {
-        process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
-        throw new Error(`fail with exception -- ${ex}\n`);
-    }
+  try {
+    return (masm as MIRAssembly);
+  }
+  catch (ex) {
+    process.stdout.write(chalk.red(`fail with exception -- ${ex}\n`));
+    throw new Error(`fail with exception -- ${ex}\n`);
+  }
 }
 
 function sanitizeName(name: string): string {
-    // TODO: Add more `replace operations' if the IR syntax (names)
-    // conflicts with FStar syntax
-    let result = name
-        .replace(new RegExp("#", 'g'), "_")
-        .replace(new RegExp("\\$", 'g'), "_")
-        .replace(new RegExp(":", 'g'), "_")
-    return result.charAt(0).toLowerCase() + result.slice(1);
+  // TODO: Add more `replace operations' if the IR syntax (names)
+  // conflicts with FStar syntax
+  let result = name
+    .replace(new RegExp("#", 'g'), "_")
+    .replace(new RegExp("\\$", 'g'), "_")
+    .replace(new RegExp(":", 'g'), "_")
+  // We lowercase the first character because variable/function
+  // declaration in fstar requires that
+  return result.charAt(0).toLowerCase() + result.slice(1);
 }
 
 function toFStarSequence(seq: string[]): string {
-    if (seq.length == 0) {
-        return "SNil";
-    }
-    else {
-        const tail = seq.slice(1);
-        return "(SCons " + seq[0] + " "
-            + (seq.length - 1) + " " + toFStarSequence(tail) + ")";
-    }
+  if (seq.length == 0) {
+    return "SNil";
+  }
+  else {
+    const tail = seq.slice(1);
+    return "(SCons " + seq[0] + " "
+      + (seq.length - 1) + " " + toFStarSequence(tail) + ")";
+  }
 }
 
 function toFStarList(seq: string[]): string {
-    if (seq.length == 0) {
-        return "LNil";
-    }
-    else {
-        const tail = seq.slice(1);
-        return "(LCons " + seq[0] + " " + toFStarList(tail) + ")";
-    }
+  if (seq.length == 0) {
+    return "LNil";
+  }
+  else {
+    const tail = seq.slice(1);
+    return "(LCons " + seq[0] + " " + toFStarList(tail) + ")";
+  }
 }
 
 function topoVisit(n: any, tordered: any[], neighbors: Map<any, Set<any>>) {
-    if (tordered.findIndex(element => element === n) !== -1) {
-        return;
-    }
+  if (tordered.findIndex(element => element === n) !== -1) {
+    return;
+  }
 
-    const n_neighbors = neighbors.get(n) as Set<any>;
-    n_neighbors.forEach(neighbor => topoVisit(neighbor, tordered, neighbors));
+  const n_neighbors = neighbors.get(n) as Set<any>;
+  n_neighbors.forEach(neighbor => topoVisit(neighbor, tordered, neighbors));
 
-    tordered.push(n);
+  tordered.push(n);
 }
 
 function topologicalOrder(neighbors: Map<any, Set<any>>): any[] {
-    let tordered: any[] = [];
+  let tordered: any[] = [];
 
-    neighbors.forEach((_, node) => topoVisit(node, tordered, neighbors));
+  neighbors.forEach((_, node) => topoVisit(node, tordered, neighbors));
 
-    return tordered.reverse();
+  return tordered.reverse();
 }
 
 export {
-    bosqueToMASM, PathFile,
-    sanitizeName, toFStarSequence, toFStarList,
-    topologicalOrder
+  bosqueToMASM, PathFile,
+  sanitizeName, toFStarSequence, toFStarList,
+  topologicalOrder
 };
