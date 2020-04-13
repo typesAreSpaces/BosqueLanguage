@@ -221,6 +221,7 @@ entrypoint function main() : Int {
     var m_i = 12;
     var m_i2 = 234;
     var e_ = m_i == m_i2;
+    var player2 = PlayerMark'x';
 
     return 0;
 }

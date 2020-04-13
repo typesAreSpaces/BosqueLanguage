@@ -1,49 +1,35 @@
-TODO List:
-
-- Implement in Fstar the Bosque collection library
-  - List check
-  - Set 
-  - Map
-- Axiomatize (currently establish relations between compositions between the function of the collection library), prove, and include an appropriate trigger for these lemmas.
-- Write these results in the paper.
-
-Comment(s):
-	- Decided to implement the 'safe version' of each method directly (without the implementation of the unsafe one)
-	because Fstar complains a lot about unsafe functions (i.e. it cannot prove totality, some patterns are incomplete, etc)
-	- Update: Sometimes the unsafe method is necessary because it works as a helper function for the safe version.
-
-Question(s):
-	- What's the difference between _destructive_add and _unsafe_add?
-
-Progress
-
-Bosque Collection library:
-        Bosque                          Fstar Implementation    Comment
-
-Progress
-- List:
-check	_size                           lengthList
-//	_unsafe_at                      atList                  // Not implement for the above reason
-//	_unsafe_add                     LCons                   // Not implement for the above reason
-//	_unsafe_set                     setList                 // Not implement for the above reason
-pending _destructive_add                ??                      // Not sure what is the difference between this and _unsafe_add
-check	_exists                         existsList'             // Spotted a potential bug in the first branch of the if-then-else statement
-check	_all                            allList'                // Spotted a potential bug in the first branch of the if-then-else statement
-check	_filter                         filterList'             // Spotted a potential bug in the first branch of the if-then-else statement
-pending	_ofType<U>                      
-check	_map                            mapList'                // Spotted a potential bug in the first branch of the if-then-else statement
-check	empty                           emptyList
-check	at                              atList
-check	push                            pushList
-check	set                             setList
-check	exists                          existsList
-check	all                             allList
-check	filter                          filterList
-pending	ofType<U>                       
-check	map                             mapList
-check	sum                             sumList
-	
-- Set:
-- Map:
-
-I think it's better to take a look to their actual implementation. And then reimplement these functions in Fstar.
+typescript_files/util.ts:59:  // TOUPDATE: Add more `replace operations' if the IR syntax (names)
+typescript_files/term_expr.ts:14:    // TOUPDATE: Add more reserved words from FStar
+typescript_files/translator_bosque_fstar.ts:6:// PRIORITIES:
+typescript_files/translator_bosque_fstar.ts:89:    // FIX: This is wrong, because these function should have
+typescript_files/translator_bosque_fstar.ts:188:  // TOUPDATE: Add more types as needed
+typescript_files/translator_bosque_fstar.ts:442:      case MIROpTag.MIRLoadFieldDefaultValue: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:465:      case MIROpTag.MIRAccessArgVariable: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:469:      case MIROpTag.MIRAccessLocalVariable: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:500:      case MIROpTag.MIRConstructorPrimaryCollectionEmpty: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:526:      case MIROpTag.MIRConstructorPrimaryCollectionCopies: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:530:      case MIROpTag.MIRConstructorPrimaryCollectionMixed: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:696:      case MIROpTag.MIRProjectFromTypeTuple: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:700:      case MIROpTag.MIRProjectFromTypeRecord: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:704:      case MIROpTag.MIRProjectFromTypeConcept: { // IMPLEMET:
+typescript_files/translator_bosque_fstar.ts:723:      case MIROpTag.MIRModifyWithIndecies: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:727:      case MIROpTag.MIRModifyWithProperties: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:731:      case MIROpTag.MIRModifyWithFields: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:744:      case MIROpTag.MIRStructuredExtendTuple: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:748:      case MIROpTag.MIRStructuredExtendRecord: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:752:      case MIROpTag.MIRStructuredExtendObject: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:770:        // case MIROpTag.MIRCallLambda: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:808:        // Q: Is still necessary to check if the type is either
+typescript_files/translator_bosque_fstar.ts:810:        // A: Yes, because that will tell which `operation code` should be used
+typescript_files/translator_bosque_fstar.ts:811:        // TODO: Implement the above
+typescript_files/translator_bosque_fstar.ts:825:      case MIROpTag.MIRRegAssign: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:829:      case MIROpTag.MIRTruthyConvert: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:855:      case MIROpTag.MIRAbort: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:860:      case MIROpTag.MIRDebug: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:941:      case MIROpTag.MIRIsTypeOf: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:945:        // PRIORITY:
+typescript_files/translator_bosque_fstar.ts:946:      case MIROpTag.MIRAccessConstantValue: { // IMPLEMENT:
+typescript_files/translator_bosque_fstar.ts:1136:    // TODO: Figure out how to include the following fields:
+typescript_files/bosqueTermsFST.ts:264:      // TODO: Include case for Strings\n\
+typescript_files/bosqueTypesFST.ts:10:// TODO: Include parameter to print extended types
+typescript_files/bosqueTypesFST.ts:44:  // FIX: The following are incomplete\n\

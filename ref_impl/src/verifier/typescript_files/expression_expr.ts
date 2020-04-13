@@ -47,7 +47,7 @@ class AssignmentExpr extends ExprExpr {
 
         const assertion_norm = this.tab_symbols.repeat(indentation_level)
           + "let _ = assert_norm(subtypeOf "
-          + arg.ty.id
+          + arg.ty.fstar_type_encoding
           + " (getType " + arg.toML() + ")) in\n";
 
         return assertion_norm
@@ -70,7 +70,7 @@ class AssignmentExpr extends ExprExpr {
 
         const assertion_norm = this.tab_symbols.repeat(indentation_level)
           + "let _ = assert_norm(subtypeOf "
-          + arg.ty.id
+          + arg.ty.fstar_type_encoding
           + " (getType " + arg.toML() + ")) in\n";
 
         return assertion_norm
@@ -91,7 +91,7 @@ class AssignmentExpr extends ExprExpr {
         if (!AssignmentExpr.assert_norm_flag.has(current_expr.fkey + current_expr.symbol_name)) {
           AssignmentExpr.assert_norm_flag.add(current_expr.fkey + current_expr.symbol_name);
 
-          const local_assertion_norm = "let _ = assert_norm(subtypeOf " + current_expr.ty.id
+          const local_assertion_norm = "let _ = assert_norm(subtypeOf " + current_expr.ty.fstar_type_encoding
             + " (getType " + current_expr.toML() + ")) in";
           return this.tab_symbols.repeat(indentation_level) + local_assertion_norm + "\n" + accum;
         }

@@ -56,7 +56,7 @@ function bosqueToMASM(info: PathFile): MIRAssembly {
 }
 
 function sanitizeName(name: string): string {
-  // TODO: Add more `replace operations' if the IR syntax (names)
+  // TOUPDATE: Add more `replace operations' if the IR syntax (names)
   // conflicts with FStar syntax
   let result = name
     .replace(new RegExp("#", 'g'), "_")

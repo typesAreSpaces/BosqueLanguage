@@ -40,16 +40,14 @@ function printBosqueTypesFST(fstar_files_directory: string, user_defined_types: 
     | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType\n\
   // The bool indicates if the Record is open or not\n\
     | BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType\n\
-  // FIX: The following is incomplete\n\
+  // -----------------------------------\
+  // FIX: The following are incomplete\n\
     | BFunctionType\n\
-  // FIX: The following is incomplete\n\
     | BObjectType\n\
-  // FIX: The following is incomplete\n\
     | BEnumType \n\
-  // FIX: The following is incomplete\n\
     | BCustomKeyType\n\
-  // FIX: The following is incomplete\n\
     | BKeyedType\n\
+  // -----------------------------------\
     | BErrorType\n\
     | BListType : bosqueType -> bosqueType";
   FS.writeSync(fd, fstar_program_core_decl);
@@ -145,7 +143,7 @@ FS.writeSync(fd, "// Provide relation\n");
 user_defined_types.forEach((value, index) => {
   let value_to_type : String;
   if (index.includes("NSCore")) 
-    value_to_type = TranslatorBosqueFStar.stringVarToTypeExpr(index).id;            
+    value_to_type = TranslatorBosqueFStar.stringVarToTypeExpr(index).fstar_type_encoding;            
   else 
     value_to_type = "B" + sanitizeName(index) + "Type";
 

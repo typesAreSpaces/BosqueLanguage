@@ -150,41 +150,42 @@ class TranslatorBosqueFStar {
     return new UnionType(set_of_types);
   }
 
-  static optionalRecordSugaring(nonOptionalProperties: string[], nonOptionalTypes: TypeExpr[], optionalProperties: string[], optionalTypes: TypeExpr[]): UnionType {
-    const set_of_types = new Set<TypeExpr>();
+  static optionalRecordSugaring(non_optional_properties: string[], non_optional_types: TypeExpr[], 
+    optional_properties: string[], optional_types: TypeExpr[]): UnionType {
+      const set_of_types = new Set<TypeExpr>();
 
-    const total = Math.pow(2, optionalProperties.length);
-    for (let i = 0; i < total; i++) {
+      const total = Math.pow(2, optional_properties.length);
+      for (let i = 0; i < total; i++) {
 
-      let temp_set_properties: string[] = [];
-      let temp_set_types: TypeExpr[] = [];
+        let temp_set_properties: string[] = [];
+        let temp_set_types: TypeExpr[] = [];
 
-      // Copy non_optionals
-      for (let i = 0; i < nonOptionalProperties.length; ++i) {
-        temp_set_properties.push(nonOptionalProperties[i]);
-        temp_set_types.push(nonOptionalTypes[i])
-      }
-
-      let num = i.toString(2);
-      while (num.length < optionalProperties.length) {
-        num = '0' + num;
-      }
-      for (let b = 0; b < num.length; b++) {
-        if (num[b] === '1') {
-          // Copy optionals
-          temp_set_properties.push(optionalProperties[b]);
-          temp_set_types.push(optionalTypes[b]);
+        // Copy non_optionals
+        for (let i = 0; i < non_optional_properties.length; ++i) {
+          temp_set_properties.push(non_optional_properties[i]);
+          temp_set_types.push(non_optional_types[i])
         }
+
+        let num = i.toString(2);
+        while (num.length < optional_properties.length) {
+          num = '0' + num;
+        }
+        for (let b = 0; b < num.length; b++) {
+          if (num[b] === '1') {
+            // Copy optionals
+            temp_set_properties.push(optional_properties[b]);
+            temp_set_types.push(optional_types[b]);
+          }
+        }
+        const entries_temp = temp_set_properties.map((value, index) => [value, temp_set_types[index]]) as [string, TypeExpr][];
+        entries_temp.sort((x, y) => x[0].localeCompare(y[0]))
+        set_of_types.add(new RecordType(false, entries_temp.map(x => x[0]), entries_temp.map(x => x[1])));
       }
-      const entries_temp = temp_set_properties.map((value, index) => [value, temp_set_types[index]]) as [string, TypeExpr][];
-      entries_temp.sort((x, y) => x[0].localeCompare(y[0]))
-      set_of_types.add(new RecordType(false, entries_temp.map(x => x[0]), entries_temp.map(x => x[1])));
+
+      return new UnionType(set_of_types);
     }
 
-    return new UnionType(set_of_types);
-  }
-
-  // TODO: Add more types as needed
+  // TOUPDATE: Add more types as needed
   // String[Type] means that the string is a type which 
   // description comes from a Type expression
   // stringVarToTypeExpr : String[Type] -> TypeExpr
@@ -454,7 +455,7 @@ class TranslatorBosqueFStar {
 
 
 
-        // case MIROpTag.AccessCapturedVariable: { // IMPLEMENT:
+        // case MIROpTag.AccessCapturedVariable: { 
         //     TranslatorBosqueFStar.debugging("AcessCapturedVariable Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     return [new VarTerm("_AccessCapturedVariable", TranslatorBosqueFStar.int_type), new ConstTerm("0", TranslatorBosqueFStar.int_type)];
         // }
@@ -549,7 +550,7 @@ class TranslatorBosqueFStar {
         return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(false, field_names, types_of_elements)),
           new RecordTerm(field_names, elements, fkey)];
       }
-        // case MIROpTag.ConstructorLambda: { // IMPLEMENT:
+        // case MIROpTag.ConstructorLambda: { 
         //     // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     // const opConstructorLambda = op as MIRConstructorLambda;
         //     // console.log(opConstructorLambda);
@@ -570,7 +571,7 @@ class TranslatorBosqueFStar {
             opCallNamespaceFunction.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)),
             resultType, fkey)];
       }
-        // case MIROpTag.CallStaticFunction: { // IMPLEMENT:
+        // case MIROpTag.CallStaticFunction: { 
         //     TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.int_type), new ConstTerm("0", TranslatorBosqueFStar.int_type)];
         // }
@@ -754,13 +755,13 @@ class TranslatorBosqueFStar {
       }
         // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        // case MIROpTag.MIRInvokeKnownTarget: { // IMPLEMENT:
+        // case MIROpTag.MIRInvokeKnownTarget: { 
         //     TranslatorBosqueFStar.debugging("MIRInvokeKnownTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     return [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.int_type), new ConstTerm("0", TranslatorBosqueFStar.int_type)];
         // }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------------------
-      case MIROpTag.MIRInvokeVirtualTarget: { // IMPLEMENT:
+      case MIROpTag.MIRInvokeVirtualTarget: {
         TranslatorBosqueFStar.debugging("MIRInvokeVirtualTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         return [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
       }

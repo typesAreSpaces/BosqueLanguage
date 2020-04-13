@@ -20,9 +20,9 @@ module BosqueTerms
 | BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz2: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm ->  bosqueTerm
+| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 | BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
 | BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
-| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 
   (* Definition of getType *)
   val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -41,9 +41,9 @@ module BosqueTerms
 | BnSMain__Bar3 _ -> BnSMain__Bar3Type
 | BnSMain__Bar2 _ -> BnSMain__Bar2Type
 | BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
+| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 | BnSMain__Musician _ _ -> BnSMain__MusicianType
 | BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
-| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 and
   getTypeSeq n x = match x with
     | SNil -> SNil
@@ -319,6 +319,10 @@ val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bo
 let projectBnSMain__Baz2_k x = match x with
 | BnSMain__Baz2 _ _ k -> k
 
+val projectBnSMain__PlayerMark_mark : x:bosqueTerm{BnSMain__PlayerMarkType = (getType x)} -> bosqueTerm
+let projectBnSMain__PlayerMark_mark x = match x with
+| BnSMain__PlayerMark mark -> mark
+
 val projectBnSMain__Musician_artist : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
 let projectBnSMain__Musician_artist x = match x with
 | BnSMain__Musician artist _ -> artist
@@ -341,8 +345,4 @@ let projectBnSMain__Artist_name x = match x with
 val projectBnSMain__Artist_player : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
 let projectBnSMain__Artist_player x = match x with
 | BnSMain__Artist _ _ _ _ player -> player
-
-val projectBnSMain__PlayerMark_mark : x:bosqueTerm{BnSMain__PlayerMarkType = (getType x)} -> bosqueTerm
-let projectBnSMain__PlayerMark_mark x = match x with
-| BnSMain__PlayerMark mark -> mark
 

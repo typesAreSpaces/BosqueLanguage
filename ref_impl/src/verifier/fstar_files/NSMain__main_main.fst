@@ -9,6 +9,7 @@ open Util
 
 (* Type names *)
 let bTypedStringType_BAnyType = (BTypedStringType BAnyType)
+let bTypedStringType_BnSMain__PlayerMarkType = (BTypedStringType BnSMain__PlayerMarkType)
 
 (* Constant Declarations *)
 
@@ -29,6 +30,8 @@ let nSMain__main  =
   let _ = assert_norm(subtypeOf BIntType (getType m_i)) in
   let __tmp_6 = (op_eqTerm m_i m_i2) in
   let e_ = __tmp_6 in
+  let __tmp_9 = (BTypedString "x" BnSMain__PlayerMarkType) in
+  let player2 = __tmp_9 in
   let __ir_ret__ = (BInt 0) in
   let _return_ = __ir_ret__ in
   _return_

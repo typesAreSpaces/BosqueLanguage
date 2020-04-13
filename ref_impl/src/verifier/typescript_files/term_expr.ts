@@ -11,7 +11,7 @@ abstract class TermExpr {
     readonly ty: TypeExpr;
     readonly fkey: string;
 
-    // TODO: Add more reserved words from FStar
+    // TOUPDATE: Add more reserved words from FStar
     static readonly bin_op_to_fstar: Map<string, string> = new Map<string, string>([
         ["&&", "op_and"], ["||", "op_or"],
         ["*", "op_mult"], ["-", "op_sub"], ["+", "op_add"], ["%", "op_mod"], ["/", "op_div"],
@@ -51,7 +51,7 @@ class ConstTerm extends TermExpr {
             super("(BInt " + symbol_name + ")", ty, fkey);
         }
         else if (ty instanceof TypedStringType) {
-            super("(BTypedString " + symbol_name + " " + ty.ty.id + ")", ty, fkey);
+            super("(BTypedString " + symbol_name + " " + ty.ty.fstar_type_encoding + ")", ty, fkey);
         }
         else {
             super(symbol_name, ty, fkey);
@@ -151,7 +151,7 @@ class ListTerm extends TermExpr {
         this.ty = ty;
     }
     toML(){
-        return `(BList ${this.ty.id} ${toFStarList(this.term_list.map(x => x.toML()))})`;
+        return `(BList ${this.ty.fstar_type_encoding} ${toFStarList(this.term_list.map(x => x.toML()))})`;
     }
 
 }
