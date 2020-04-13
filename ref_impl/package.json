@@ -22,7 +22,8 @@
     "scripts": {
         "build": "tsc -p tsconfig.json && node ./build/resource_copy.js",
         "test": "tsc -p tsconfig.json && node ./build/resource_copy.js && node ./bin/test/test_runner.js",
-        "verifier": "tsc -p tsconfig.json && node ./bin/verifier/typescript_files/run_verifier.js"
+        "verifier": "tsc -p tsconfig.json && node ./bin/verifier/typescript_files/run_verifier.js",
+        "todo": "grep -nr \"// [A-Z][A-Za-z]*:\" "
     },
     "files": [
         "bin/*"
