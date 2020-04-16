@@ -216,7 +216,12 @@ entity Baz2 provides Bar2, Bar3 {
 
 entrypoint function main() : Int {
     var e = Baz2{ f=1, g=2, k=true };
-    // var e2 = e->project<Bar2 & Bar3>();
+    // Currently the following construction doesn't work.
+    // Perhaps because line 1322 doesn't allow instances of 
+    // unions nor conjunctions. I see two possible solutions:
+    // 1) Extend IntersectionTypeSignature and UnionTypeSignature from NominalTypeSignature
+    // 2) Include the above types in line 1322 of ast/parser.ts 
+    // var e2 = e->project<Bar2 & Bar3>(); 
 
     var m_i = 12;
     var m_i2 = 234;

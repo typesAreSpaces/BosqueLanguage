@@ -40,14 +40,14 @@ function printBosqueTypesFST(fstar_files_directory: string, user_defined_types: 
     | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType\n\
   // The bool indicates if the Record is open or not\n\
     | BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType\n\
-  // -----------------------------------\
+  // -----------------------------------\n\
   // FIX: The following are incomplete\n\
     | BFunctionType\n\
     | BObjectType\n\
     | BEnumType \n\
     | BCustomKeyType\n\
     | BKeyedType\n\
-  // -----------------------------------\
+  // -----------------------------------\n\
     | BErrorType\n\
     | BListType : bosqueType -> bosqueType";
   FS.writeSync(fd, fstar_program_core_decl);

@@ -550,7 +550,7 @@ class TranslatorBosqueFStar {
         return [this.MIRArgumentToTermExpr(opConstructorRecord.trgt, fkey, new RecordType(false, field_names, types_of_elements)),
           new RecordTerm(field_names, elements, fkey)];
       }
-        // case MIROpTag.ConstructorLambda: { 
+        // case MIROpTag.ConstructorLambda: { // IMPLEMENT:
         //     // TranslatorBosqueFStar.debugging("ConstructorLambda Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     // const opConstructorLambda = op as MIRConstructorLambda;
         //     // console.log(opConstructorLambda);
@@ -571,7 +571,7 @@ class TranslatorBosqueFStar {
             opCallNamespaceFunction.args.map(x => this.MIRArgumentToTermExpr(x, fkey, undefined)),
             resultType, fkey)];
       }
-        // case MIROpTag.CallStaticFunction: { 
+        // case MIROpTag.CallStaticFunction: { // IMPLEMENT:
         //     TranslatorBosqueFStar.debugging("CallStaticFunction Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     return [new VarTerm("_CallStaticFunction", TranslatorBosqueFStar.int_type), new ConstTerm("0", TranslatorBosqueFStar.int_type)];
         // }
@@ -755,13 +755,13 @@ class TranslatorBosqueFStar {
       }
         // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-        // case MIROpTag.MIRInvokeKnownTarget: { 
+        // case MIROpTag.MIRInvokeKnownTarget: { // IMPLEMENT:
         //     TranslatorBosqueFStar.debugging("MIRInvokeKnownTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         //     return [new VarTerm("_MIRInvokeKnownTarget", TranslatorBosqueFStar.int_type), new ConstTerm("0", TranslatorBosqueFStar.int_type)];
         // }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------------------
-      case MIROpTag.MIRInvokeVirtualTarget: {
+      case MIROpTag.MIRInvokeVirtualTarget: { // IMPLEMENT:
         TranslatorBosqueFStar.debugging("MIRInvokeVirtualTarget Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
         return [new VarTerm("_MIRInvokeVirtualTarget", TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
       }

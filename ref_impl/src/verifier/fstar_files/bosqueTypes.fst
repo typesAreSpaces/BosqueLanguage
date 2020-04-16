@@ -25,16 +25,14 @@ module BosqueTypes
     | BTupleType : bool -> n:nat -> sequence bosqueType n -> bosqueType
   // The bool indicates if the Record is open or not
     | BRecordType : bool -> n:nat -> sequence string n -> sequence bosqueType n -> bosqueType
-  // FIX: The following is incomplete
+  // -----------------------------------
+  // FIX: The following are incomplete
     | BFunctionType
-  // FIX: The following is incomplete
     | BObjectType
-  // FIX: The following is incomplete
     | BEnumType 
-  // FIX: The following is incomplete
     | BCustomKeyType
-  // FIX: The following is incomplete
     | BKeyedType
+  // -----------------------------------
     | BErrorType
     | BListType : bosqueType -> bosqueType// User-defined types
 | BnSMain__Bar3Type
