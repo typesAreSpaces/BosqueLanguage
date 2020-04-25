@@ -1,0 +1,23 @@
+namespace NSMain;
+
+concept Foo {
+  field f : Int;
+}
+
+concept Bar {
+  field f: Int;
+}
+
+entity Baz provides Foo, Bar {
+  field g: Int;
+  field k: Bool;
+}
+
+entrypoint function main(): Int {
+    
+    var e = Baz { f=1, g=2, k=true };
+    var e2 = e->project<Foo & Bar>();
+    
+    return 0;
+}
+

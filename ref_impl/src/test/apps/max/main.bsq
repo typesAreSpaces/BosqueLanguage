@@ -212,6 +212,15 @@ concept Bar3 {
 entity Baz2 provides Bar2, Bar3 {
     field g: Int;
     field k: Bool;
+    const local_const : Int = 1;
+}
+
+function foo2(f: fn() -> Int): Int {
+    return f();
+}
+
+function foo(f: fn(_: Int, _: Int) -> Int, a: [Int, Int]): Int {
+    return f(...a);
 }
 
 entrypoint function main() : Int {
@@ -228,6 +237,11 @@ entrypoint function main() : Int {
     var e_ = m_i == m_i2;
     var player2 = PlayerMark'x';
 
+    // The following needs clarification
+    // How to process constants inside concepts/entities
+    var access_example = Baz2::local_const + 1;
+
+    var ir = foo(fn(x, y) => x + y, [1, 2]); //Types inferred
     return 0;
 }
 

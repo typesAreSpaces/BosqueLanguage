@@ -31,6 +31,9 @@ setImmediate(() => {
     .replace(new RegExp(":", 'g'), "_");
 
   const translator = new TranslatorBosqueFStar(masm, fstar_file_name);
+  //console.log(translator)
 
-  translator.generateFStarCode(fkey, 20, 15, 5); 
+  translator.generateFStarCode(fkey); 
+  //translator.runFStarCode(20, 15, 5);
+
 });

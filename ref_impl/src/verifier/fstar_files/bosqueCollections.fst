@@ -5,13 +5,47 @@ module BosqueCollections
 
 open BosqueTerms
 open List 
+// Signature
+assume val local_empty : list bosqueTerm -> Tot bool
+assume val local_size : list bosqueTerm -> Tot int
+assume val local_at: list bosqueTerm -> int -> Tot bosqueTerm
+assume val local_push: list bosqueTerm -> bosqueTerm -> Tot (list bosqueTerm)
+assume val local_set: list bosqueTerm -> bosqueTerm -> Tot (list bosqueTerm)
 
-// assume AxiomLengthAppend1 : 
+// Axioms
 assume AxiomEmpty1 : 
-forall (x : list bosqueTerm) . {:pattern (emptyList x)} (emptyList x) = (x = LNil)
+forall (x : list bosqueTerm) . 
+  {:pattern (local_empty x)} 
+  (local_empty x) = (x = LNil)
 
 assume AxiomEmpty2 : 
-forall (x : list bosqueTerm) . {:pattern (x = LNil)} (emptyList x) = (x = LNil)
+forall (x : list bosqueTerm) . 
+  {:pattern (x = LNil)} 
+  (local_empty x) = (x = LNil)
+
+assume AxiomSize1 : 
+forall (x : list bosqueTerm) . 
+  {:pattern (local_size x)} 
+  local_size x >= 0
+
+assume AxiomSize2 : 
+forall (x : list bosqueTerm) . 
+  {:pattern (local_size x)}
+  (x = LNil) = (local_size x = 0) 
+
+assume AxiomsSize3 : 
+forall (
+
+assume AxiomPush : // Check patterns here
+forall (la la' : list bosqueTerm) (x : bosqueTerm) . 
+  {:pattern (local_push la x) ; (local_size la')} 
+  (la' = local_push la x) ==> (local_size la' = local_size la + 1)
+
+// Tests
+let y = LCons (BInt 2) LNil
+let _ = assert_norm (not (local_empty y))
+let _ = assert_norm (not (y = LNil))
+let _ = assert_norm ( not ( local_size y = (- 5) ) )
 
 // forall (x y : list bosqueTerm) . {:pattern (appendList x y)} lengthList x + lengthList y = lengthList (appendList x y) 
 
@@ -33,6 +67,3 @@ forall (x : list bosqueTerm) . {:pattern (x = LNil)} (emptyList x) = (x = LNil)
 //   {:pattern (filterList (appendList x y))} 
 //   appendList (filterList x p) (filterList y p) == filterList (appendList x y) p 
 
-let x = LCons (BInt 2) LNil
-let _ = assert_norm (not (emptyList x))
-let _ = assert_norm (not (x = LNil))
