@@ -75,6 +75,7 @@ class TranslatorBosqueFStar {
   readonly fstar_files_directory: string;
 
   constructor(masm: MIRAssembly, file_name: string) {
+    console.log(masm);
     this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     this.func_declarations = masm.invokeDecls;
@@ -391,7 +392,8 @@ class TranslatorBosqueFStar {
 
   // MIRArgumentToTypeExpr : MIRArgument -> TypeExpr
   MIRArgumentToTypeExpr(arg: MIRArgument | string, fkey: string): TypeExpr {
-    if(typeof arg === "string"){
+    console.log(this.types_seen); // DEBUG
+    if(typeof arg === "string"){ 
       return (this.types_seen.get(fkey + arg) as TypeExpr);
     }
     // This branch handles variables
@@ -589,6 +591,7 @@ class TranslatorBosqueFStar {
         // }
       case MIROpTag.MIRAccessFromIndex: {
         const opAccessFromIndex = op as MIRAccessFromIndex;
+        console.log(op); // DEBUG
         const dimension = (this.MIRArgumentToTypeExpr(opAccessFromIndex.arg, fkey) as TupleType).elements.length;
 
         return [
@@ -656,7 +659,7 @@ class TranslatorBosqueFStar {
 
         const last_index_point = opAccessFromField.field.lastIndexOf(".");
         const field_name = opAccessFromField.field.substr(last_index_point + 1);
-        const type_src = (this.types_seen.get(sanitizeName(opAccessFromField.arg.nameID + fkey)) as ConstructorType);
+        const type_src = (this.types_seen.get(sanitizeName(fkey + opAccessFromField.arg.nameID)) as ConstructorType);
         const scope_name = sanitizeName(type_src.original_name);
 
         return [this.MIRArgumentToTermExpr(opAccessFromField.trgt, fkey, TranslatorBosqueFStar.stringVarToTypeExpr(opAccessFromField.resultAccessType)),
@@ -673,7 +676,7 @@ class TranslatorBosqueFStar {
           const index = x.indexOf(":") + 1;
           return x.substring(index);
         });
-        const type_src = (this.types_seen.get(sanitizeName(opProjectFromFields.arg.nameID + fkey)) as ConstructorType);
+        const type_src = (this.types_seen.get(sanitizeName(fkey + opProjectFromFields.arg.nameID)) as ConstructorType);
         const scope_name = sanitizeName(type_src.original_name);
 
         const properties = opProjectFromFields.fields.map((value, _) => {
@@ -717,7 +720,7 @@ class TranslatorBosqueFStar {
         const opProjectFromTypeConcept = op as MIRProjectFromTypeConcept;
         console.log(opProjectFromTypeConcept);
 
-        //console.log(this.types_seen.get(sanitizeName(opProjectFromTypeConcept.arg.nameID + fkey)));
+        //console.log(this.types_seen.get(sanitizeName(fkey + opProjectFromTypeConcept.arg.nameID)));
 
         return [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
 
@@ -895,10 +898,10 @@ class TranslatorBosqueFStar {
       }
       case MIROpTag.MIRPhi: { // DOUBLE CHECK
         const opPhi = op as MIRPhi;
-        const currentType = this.types_seen.get(sanitizeName(opPhi.trgt.nameID + fkey));
+        const currentType = this.types_seen.get(sanitizeName(fkey + opPhi.trgt.nameID));
         const typeFromSrc = this.MIRArgumentToTypeExpr(opPhi.src.get(comingFrom) as MIRRegisterArgument, fkey);
         if (currentType == undefined) {
-          this.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey), typeFromSrc);
+          this.types_seen.set(sanitizeName(fkey + opPhi.trgt.nameID), typeFromSrc);
         }
         else {
           if (!currentType.equalTo(typeFromSrc)) {
@@ -906,12 +909,12 @@ class TranslatorBosqueFStar {
               if (typeFromSrc instanceof UnionType) {
                 const previousElementsSet = new Set(Array.from(typeFromSrc.elements));
                 currentType.elements.forEach(x => previousElementsSet.add(x));
-                this.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                this.types_seen.set(sanitizeName(fkey + opPhi.trgt.nameID),
                   new UnionType(previousElementsSet));
               }
               else {
                 currentType.elements.add(typeFromSrc);
-                this.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                this.types_seen.set(sanitizeName(fkey + opPhi.trgt.nameID),
                   new UnionType(currentType.elements));
               }
             }
@@ -919,11 +922,11 @@ class TranslatorBosqueFStar {
               if (typeFromSrc instanceof UnionType) {
                 const previousElementsSet = new Set(Array.from(typeFromSrc.elements));
                 previousElementsSet.add(currentType);
-                this.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                this.types_seen.set(sanitizeName(fkey + opPhi.trgt.nameID),
                   new UnionType(previousElementsSet));
               }
               else {
-                this.types_seen.set(sanitizeName(opPhi.trgt.nameID + fkey),
+                this.types_seen.set(sanitizeName(fkey + opPhi.trgt.nameID),
                   new UnionType(new Set<TypeExpr>([typeFromSrc, currentType])));
               }
             }
@@ -1009,7 +1012,7 @@ class TranslatorBosqueFStar {
     }
     else {
       declarations.params.map(x =>
-        this.types_seen.set(sanitizeName(x.name + fkey), TranslatorBosqueFStar.stringVarToTypeExpr(x.type))
+        this.types_seen.set(sanitizeName(fkey + x.name), TranslatorBosqueFStar.stringVarToTypeExpr(x.type))
       );
 
       const return_type = TranslatorBosqueFStar.stringVarToTypeExpr(declarations.resultType);
