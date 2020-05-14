@@ -1,0 +1,276 @@
+//-------------------------------------------------------------------------------------------------------
+// Copyright (C) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+//-------------------------------------------------------------------------------------------------------
+
+//
+//This is a bosque test/benchmark for a simple max function.
+//Expected output is: 20
+//
+
+namespace NSMain;
+
+function max0(x: [Int, Int], y: Int): Int
+{
+    var z = [1, 2, 3];
+    var z_1 = z.0;
+    var z2 = [1, 2, 3];
+    var z2_1 = z2.1;
+
+    if(x.0 >= y){
+        return x.0;
+    }
+    else{
+        return y;
+    }
+}
+
+function identityUnion(x : Int | None | String | Bool) : Int | None | String | Bool {
+    return x;
+}
+
+function identityTupleNoneable(x : [Int, Bool?]) : [Int, Bool?] {
+    return x;
+}
+
+function optionalFunction(x: [?:Bool, ?:Int]): Bool {
+    return true;
+}
+
+function max(x: Int | None, y: Int): Int
+    ensures _return_ == x || _return_ == y;
+{
+    if (x == none) {
+	   return y;   
+    } 
+    else {
+        if(x >= y){
+            return x;
+        }
+        else{
+            return y;
+        }
+    }
+}
+
+function maxx(x: Bool | None, y : Int) : Int | None | Bool {
+    if (y > 0){
+        return x; 
+    }
+    else{
+        return y;
+    }
+}
+
+function max2(x: Int, y: Int): Int
+    ensures _return_ == x || _return_ == y;
+{
+    // Tuple constructor
+    var z = [x, y];
+    var z1 = z.0;
+
+    if(x >= y){
+        return x;
+    }
+    else{
+        return y;
+    }
+}
+
+function max3(x: [Int, Int]): Int
+{
+    if(x.0 >= x.1){
+        return x.0;
+    }
+    else{
+        return x.1;
+    }
+}
+
+function max4(x: {f: Int, g: Int}): Int
+{
+    var aa = [1, 2];
+    var y = {h = 1, i = 2};
+    var yH = y.h;
+            
+    if(x.f >= x.g){
+        return x.f;
+    }
+    else{
+        return x.g;
+    }
+}
+
+function max5(x : Int, y : Int) : Int
+{
+    var! internal_result : Int;
+    if(x >= y){
+        internal_result = x;
+    }
+    else{
+        internal_result = y;
+    }
+    return internal_result;
+}
+
+entity Artist provides Parsable {
+    field name: String;
+    field id: Int;
+    field lastName: String;
+    field isGood: Bool;
+    field player: PlayerMark;
+
+    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): Artist | None {
+        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
+    }
+}
+
+entity Musician provides Parsable {
+    field artist : Artist;
+    field instrument : String;
+
+    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): PlayerMark | None {
+        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
+    }
+}
+
+entity PlayerMark provides Parsable {
+    field mark: String;
+
+    override static tryParse(str: String): PlayerMark | None {
+        return (str == "x" || str == "o") ? PlayerMark{ mark=str } : none;
+    }
+}
+
+entrypoint function main2(): Int {
+
+    var string_test = "string_test";
+    
+    var chris = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
+    var chris_but_musician = Musician{artist = chris, instrument = "Guitar"};
+
+    var player1 = PlayerMark{mark="x"};
+    var player2 = PlayerMark'x';
+    var player3 = PlayerMark'hmm';
+ 
+    var artist1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
+    var artist2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
+    
+    var player_tuple = [player1, player2];
+
+    var n = none;
+    var xTuple = [10, 30];
+    var xTuple2 = [10, xTuple];
+    var xTuple3 = [10, [10, 3]];
+    var xTupleProj = xTuple2.1;
+    var xTupleProj2 = xTuple3.1;
+    var x_max_tuple = max3(xTupleProj);
+    var x_max_tuple2 = max3(xTupleProj2);
+
+    var proj_tuple = [[1, 2], [3, 4], 5].2;
+    var xTuple4 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, [1, 1], "hello", false, true];
+    var xTuple5 = xTuple4.[2, 0, 15, 2, 20];
+
+    var xRecord = {f = 1, g = 2};
+    //var xProjection = xRecord.f;
+    //var xRecord2 = {g = 10, f = 20};
+    //var xProjection2 = xRecord2.f;
+    
+    var y = 20;
+    var y2 = identityUnion(y);
+
+    var z = max(xTuple2.0, y);
+    var z_max_func_repeated = max(z, y);
+    
+    var z4 = maxx(false, 3);
+    
+    var zTuple = [xTuple2, y];
+    
+    var z5 = identityTupleNoneable([y, false]);
+
+    var a = optionalFunction([true]);
+    
+    return z_max_func_repeated;
+}
+
+function optionalRecordFunction(x: {f?:Bool, g?:Int, h: String}): Bool {
+    return true;
+}
+
+function selectF(x: Bool): Int {
+    return x ? 1 : 2;
+}
+
+concept Bar2 {
+    field f: Int;
+}
+
+concept Bar3 {
+    field f: Int;
+}
+
+entity Baz2 provides Bar2, Bar3 {
+    field g: Int;
+    field k: Bool;
+    field another_default : Int = max0([g, g], g);
+    field another_default : Int = max0([1, 2], 3);
+    field default_field: Bool = true;
+    const local_const : Int = 1;
+}
+
+function foo2(f: fn() -> Int): Int {
+    return f();
+}
+
+function foo(f: fn(_: Int, _: Int) -> Int, a: [Int, Int]): Int {
+    return f(...a);
+}
+
+entrypoint function main() : Int {
+    var e = Baz2{ f=1, g=2, k=true };
+    // Currently the following construction doesn't work.
+    // Perhaps because line 1322 doesn't allow instances of 
+    // unions nor conjunctions. I see two possible solutions:
+    // 1) Extend IntersectionTypeSignature and UnionTypeSignature from NominalTypeSignature
+    // 2) Include the above types in line 1322 of ast/parser.ts 
+    // var e2 = e->project<Bar2 & Bar3>(); 
+
+    /*var m_i = 12;*/
+    /*var m_i2 = 234;*/
+    /*var e_ = m_i == m_i2;*/
+    /*var player2 = PlayerMark'x';*/
+
+    // The following needs clarification
+    // How to process constants inside concepts/entities
+    /*var access_example = Baz2::local_const + 1;*/
+
+    var is_this_constant = 2;
+
+    /*var ir = foo(fn(x, y) => x + y, [1, 2]); //Types inferred*/
+    return 0;
+}
+
+entity Baz3 provides Baz2 {
+    field l: Bool;
+}
+
+entrypoint function main3(): Int {
+    var xRecord = {f = true, g = 2, h = "hello"};
+    var x_ProjectedRecord = xRecord.g;
+    var x = xRecord.{g, f};
+    // var y = optionalRecordFunction(xRecord);
+
+    var e = Baz2{ f=1, g=2, k=true };
+    var e2 = e.f;
+    var e3 = e.{f, k};
+
+    // var e4 = e->project<Bar2&Bar3>(); // Pending
+    // var e5 = e->update(g=5);
+
+    var m_list = List<Int>{1, 2, 3};
+    // var checking = m_list->filter(fn(id: Int): Bool => true);
+
+    // var f = selectF(true);
+
+    return e2;
+}

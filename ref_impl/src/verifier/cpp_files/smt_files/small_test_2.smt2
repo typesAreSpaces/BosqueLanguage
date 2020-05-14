@@ -1,3 +1,6 @@
+(set-option :smt.auto-config false) ; disable automatic self configuration
+(set-option :smt.mbqi false) ; disable model-based quantifier instantiation
+
 (declare-fun x () Int)
 (declare-fun f (Int) Int)
 (declare-fun g (Int) Int)

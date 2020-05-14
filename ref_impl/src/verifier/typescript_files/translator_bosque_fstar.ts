@@ -68,6 +68,8 @@ class TranslatorBosqueFStar {
   static entity_declarations: Map<string, MIREntityTypeDecl>;
   readonly constant_declarations: Map<string, MIRConstantDecl>;
 
+  readonly default_values : Map<string, MIRBody>;
+
   readonly is_fkey_declared: Set<string> = new Set<string>();
   readonly function_declarations = [] as FunctionDeclaration[];
 
@@ -75,7 +77,22 @@ class TranslatorBosqueFStar {
   readonly fstar_files_directory: string;
 
   constructor(masm: MIRAssembly, file_name: string) {
-    console.log(masm);
+    // Revelant information about masm
+    // masm.typeMap: Map containing all the types used in the programs to analyze
+    // masm.entityDecls: Map containing entities
+    // masm.conceptDecls: Map containing concepts
+    // masm.primitiveInvokeDecls: Map containing ?
+    // masm.invokeDecls: Map containing function declarations
+    // masm.fieldDecls: Map containing declaration about field (in concepts and entities as well)
+
+    this.default_values = new Map<StringTypeMangleNameWithFkey, MIRBody>();
+    masm.fieldDecls.forEach(x => {
+      if(x.value !== undefined){
+        console.log(x);
+        this.default_values.set(x.fname, x.value);
+      }
+    });
+
     this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
     this.func_declarations = masm.invokeDecls;
@@ -95,7 +112,6 @@ class TranslatorBosqueFStar {
       this.func_declarations.set(index, (this.func_declarations.get("NSMain::id") as MIRInvokeBodyDecl))
     });
     // ---------------------------------------------------------------------------------------------------------
-
     this.file_name = file_name;
     this.fstar_files_directory = Path.join(Path.normalize(Path.join(__dirname, "../")), "/fstar_files").replace("bin", "src");
   }
@@ -392,7 +408,6 @@ class TranslatorBosqueFStar {
 
   // MIRArgumentToTypeExpr : MIRArgument -> TypeExpr
   MIRArgumentToTypeExpr(arg: MIRArgument | string, fkey: string): TypeExpr {
-    console.log(this.types_seen); // DEBUG
     if(typeof arg === "string"){ 
       return (this.types_seen.get(fkey + arg) as TypeExpr);
     }
@@ -454,11 +469,15 @@ class TranslatorBosqueFStar {
         const opLoadFieldDefaultValue = op as MIRLoadFieldDefaultValue;
         console.log(opLoadFieldDefaultValue);
 
+        // KEEP: working here
+
         // return [this.MIRArgumentToTermExpr(opMIRLoadFieldDefaultValue.trgt, fkey, 
         //     this.MIRArgumentToTypeExpr(opReturnAssign.src, fkey)),
         // this.MIRArgumentToTermExpr(opReturnAssign.src, fkey, undefined)];
 
-        TranslatorBosqueFStar.debugging("LoadFieldDefaultValue Not implemented yet", TranslatorBosqueFStar.DEBUGGING);
+        //return [this.MIRArgumentToTermExpr(opLoadFieldDefaultValue.trgt,fkey, this.MIRArgumentToTypeExpr(sanitizeName(opLoadFieldDefaultValue.fkey), "")), 
+        //this.MIRArgumentToTermExpr(opLoadFieldDefaultValue.fkey, "", undefined)]
+
         return [new VarTerm("_LoadFieldDefaultValue", TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
       }
       // ---------------------------------------------------------------------------------------------------
@@ -591,7 +610,6 @@ class TranslatorBosqueFStar {
         // }
       case MIROpTag.MIRAccessFromIndex: {
         const opAccessFromIndex = op as MIRAccessFromIndex;
-        console.log(op); // DEBUG
         const dimension = (this.MIRArgumentToTypeExpr(opAccessFromIndex.arg, fkey) as TupleType).elements.length;
 
         return [
@@ -724,7 +742,7 @@ class TranslatorBosqueFStar {
 
         return [new VarTerm("_MIRProjectFromTypeConcept", TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
 
-        // return [this.MIRArgumentToTermExpr(opProjectFromTypeConcept.trgt, fkey, ), // KEEP WORKING HERE
+        // return [this.MIRArgumentToTermExpr(opProjectFromTypeConcept.trgt, fkey, ), 
         //     TranslatorBosqueFStar.int_type, fkey), new ConstTerm("0", TranslatorBosqueFStar.int_type, fkey)];
       }
       // ---------------------------------------------------------------------------------------------------
@@ -1079,18 +1097,15 @@ class TranslatorBosqueFStar {
     printBosqueTermsFST(this.fstar_files_directory, user_defined_types_map);
     // ---------------------------------------------------------------------
 
+    // The following stores the types of constant declarations
+    // in types_seen
     this.constant_declarations.forEach(const_decl => {
 
       if(const_decl.value.vtypes instanceof Map){
         const local_vtypes = const_decl.value.vtypes as Map<string, string>;
         this.types_seen.set(sanitizeName(const_decl.cname), TranslatorBosqueFStar.stringVarToTypeExpr(local_vtypes.get("_return_") as string));
       }
-
-      //const string_entry = const_decl.value.vtypes.get("_return_")
-      //if(typeof string_entry === "string"){ 
-      //}
-    } 
-    )
+    })
 
     const fd = FS.openSync(this.fstar_files_directory + "/" + this.file_name, 'w');
     this.collectExpr(fkey);
@@ -1114,6 +1129,9 @@ class TranslatorBosqueFStar {
     FS.writeSync(fd, "\n");
     // ------------------------------------
     // --------------------------------------------------------------------------------------------------
+    
+    // The following emits declaration of constant
+    // in FStar
     FS.writeSync(fd, "(* Constant Declarations *)\n");
     this.constant_declarations.forEach(constant_decl => {
       // Constant declaration generally have only two blocks: entry and exit
