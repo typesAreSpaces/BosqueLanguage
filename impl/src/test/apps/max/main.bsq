@@ -40,17 +40,12 @@ function optionalFunction(x: [?:Bool, ?:Int]): Bool {
 function max(x: Int, y: Int): Int
     ensures $return == x || $return == y;
 {
-    if (x == none) {
-	   return y;   
-    } 
-    else {
-        if(x >= y){
-            return x;
-        }
-        else{
-            return y;
-        }
-    }
+  if(x >= y){
+    return x;
+  }
+  else{
+    return y;
+  }
 }
 
 function maxx(x: Bool | None, y : Int) : Int | None | Bool {
@@ -101,17 +96,14 @@ function max4(x: {f: Int, g: Int}): Int
     }
 }
 
-function max5(x : Int, y : Int) : Int
-{
-    var! internal_result : Int;
-    if(x >= y){
-        internal_result = x;
+entity PlayerMark provides Parsable {
+    field mark: String;
+
+    override static tryParse(str: String): PlayerMark | None {
+        return (str == "x" || str == "o") ? PlayerMark@{ mark=str } : none;
     }
-    else{
-        internal_result = y;
-    }
-    return internal_result;
 }
+
 
 entity Artist provides Parsable {
     field name: String;
@@ -120,8 +112,8 @@ entity Artist provides Parsable {
     field isGood: Bool;
     field player: PlayerMark;
 
-    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): Artist | None {
-        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
+    override static tryParse(name : String, iq : Int, lastName : String, isGood : Bool, player: PlayerMark): Artist | None {
+        return (name == "Peter" || name == "Chris") ? PlayerMark@{ name=name, id=id, lastName=lastName, isGood=isGood, player=player} : none;
     }
 }
 
@@ -129,16 +121,8 @@ entity Musician provides Parsable {
     field artist : Artist;
     field instrument : String;
 
-    override static tryParse(_name: String, _iq: Int, _lastName: String, _isGood: Bool, _player: PlayerMark): PlayerMark | None {
-        return (_name == "Peter" || _name == "Chris") ? PlayerMark{ name=_name, id=_id, lastName=_lastName, isGood=_isGood, _player=player} : none;
-    }
-}
-
-entity PlayerMark provides Parsable {
-    field mark: String;
-
-    override static tryParse(str: String): PlayerMark | None {
-        return (str == "x" || str == "o") ? PlayerMark{ mark=str } : none;
+    override static tryParse(name: String, iq: Int, lastName: String, isGood: Bool, player: PlayerMark): PlayerMark | None {
+        return (name == "Peter" || name == "Chris") ? PlayerMark@{ name=name, id=id, lastName=lastName, isGood=isGood, player=player} : none;
     }
 }
 
@@ -146,15 +130,15 @@ entrypoint function main2(): Int {
 
     var string_test = "string_test";
     
-    var chris = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark{mark="o"}};
-    var chris_but_musician = Musician{artist = chris, instrument = "Guitar"};
+    var chris = Artist@{id=100, name="Chris", lastName="Cornell", isGood=true, player=PlayerMark@{mark="o"}};
+    var chris_but_musician = Musician@{artist = chris, instrument = "Guitar"};
 
-    var player1 = PlayerMark{mark="x"};
+    var player1 = PlayerMark@{mark="x"};
     var player2 = PlayerMark'x';
     var player3 = PlayerMark'hmm';
  
-    var artist1 = Artist{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
-    var artist2 = Artist{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
+    var artist1 = Artist@{name="Peter", id=100, lastName="Pan", isGood=true, player=player1};
+    var artist2 = Artist@{id=100, name="Chris", lastName="Cornell", isGood=true, player=player1};
     
     var player_tuple = [player1, player2];
 
@@ -224,7 +208,7 @@ function foo(f: fn(_: Int, _: Int) -> Int, a: [Int, Int]): Int {
 }
 
 entrypoint function main() : Int {
-    var e = Baz2{ f=1, g=2, k=true };
+    var e = Baz2@{ f=1, g=2, k=true };
     // Currently the following construction doesn't work.
     // Perhaps because line 1322 doesn't allow instances of 
     // unions nor conjunctions. I see two possible solutions:
@@ -255,22 +239,23 @@ entrypoint function main3(): Int {
     var x = xRecord.{g, f};
     // var y = optionalRecordFunction(xRecord);
 
-    var e = Baz2{ f=1, g=2, k=true };
+    var e = Baz2@{ f=1, g=2, k=true };
     var e2 = e.f;
     var e3 = e.{f, k};
 
     // var e4 = e->project<Bar2&Bar3>(); // Pending
     // var e5 = e->update(g=5);
 
-    var m_list = List<Int>{1, 2, 3};
+    var m_list = List<Int>@{1, 2, 3};
     // var checking = m_list->filter(fn(id: Int): Bool => true);
 
     // var f = selectF(true);
+    return 0;
 }
 
 entrypoint function main4(): Int {
     let x = 10;
     let y = 20;
 
-    return e2;
+    return max(x,y);
 }

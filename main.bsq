@@ -1,23 +1,19 @@
 namespace NSMain;
 
-concept Foo {
-  field f : Int;
-}
-
-concept Bar {
-  field f: Int;
-}
-
-entity Baz provides Foo, Bar {
-  field g: Int;
-  field k: Bool;
+function max (x : Int, y : Int) : Int
+  // ensures $return == x || $return == y;
+{
+  if(x >= y){
+    return x;
+  }
+  else{
+    return y;
+  }
 }
 
 entrypoint function main(): Int {
-    
-    var e = Baz { f=1, g=2, k=true };
-    var e2 = e->project<Foo & Bar>();
-    
-    return 0;
+  let x = 10;
+  let y = 20;
+  return max(x, y);
 }
 
