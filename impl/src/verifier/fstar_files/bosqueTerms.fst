@@ -19,10 +19,10 @@ module BosqueTerms
 // User-defined terms
 | BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
-| BnSMain__Baz2: another_default: bosqueTerm -> default_field: bosqueTerm -> f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm ->  bosqueTerm
+| BnSMain__Baz2: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm ->  bosqueTerm
+| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 | BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
 | BnSMain__Artist: id: bosqueTerm -> isGood: bosqueTerm -> lastName: bosqueTerm -> name: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
-| BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 
   (* Definition of getType *)
   val getTypeSeq : n:nat -> (x: sequence bosqueTerm n) -> Tot (sequence bosqueType n) (decreases x)
@@ -40,10 +40,10 @@ module BosqueTerms
 // User-defined terms
 | BnSMain__Bar3 _ -> BnSMain__Bar3Type
 | BnSMain__Bar2 _ -> BnSMain__Bar2Type
-| BnSMain__Baz2 _ _ _ _ _ -> BnSMain__Baz2Type
+| BnSMain__Baz2 _ _ _ -> BnSMain__Baz2Type
+| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 | BnSMain__Musician _ _ -> BnSMain__MusicianType
 | BnSMain__Artist _ _ _ _ _ -> BnSMain__ArtistType
-| BnSMain__PlayerMark _ -> BnSMain__PlayerMarkType
 and
   getTypeSeq n x = match x with
     | SNil -> SNil
@@ -309,21 +309,19 @@ val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bo
 let projectBnSMain__Bar2_f x = match x with
 | BnSMain__Bar2 f -> f
 
-val projectBnSMain__Baz2_another_default : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_another_default x = match x with
-| BnSMain__Baz2 another_default _ _ _ _ -> another_default
-val projectBnSMain__Baz2_default_field : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_default_field x = match x with
-| BnSMain__Baz2 _ default_field _ _ _ -> default_field
 val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_f x = match x with
-| BnSMain__Baz2 _ _ f _ _ -> f
+| BnSMain__Baz2 f _ _ -> f
 val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_g x = match x with
-| BnSMain__Baz2 _ _ _ g _ -> g
+| BnSMain__Baz2 _ g _ -> g
 val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_k x = match x with
-| BnSMain__Baz2 _ _ _ _ k -> k
+| BnSMain__Baz2 _ _ k -> k
+
+val projectBnSMain__PlayerMark_mark : x:bosqueTerm{BnSMain__PlayerMarkType = (getType x)} -> bosqueTerm
+let projectBnSMain__PlayerMark_mark x = match x with
+| BnSMain__PlayerMark mark -> mark
 
 val projectBnSMain__Musician_artist : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
 let projectBnSMain__Musician_artist x = match x with
@@ -347,8 +345,4 @@ let projectBnSMain__Artist_name x = match x with
 val projectBnSMain__Artist_player : x:bosqueTerm{BnSMain__ArtistType = (getType x)} -> bosqueTerm
 let projectBnSMain__Artist_player x = match x with
 | BnSMain__Artist _ _ _ _ player -> player
-
-val projectBnSMain__PlayerMark_mark : x:bosqueTerm{BnSMain__PlayerMarkType = (getType x)} -> bosqueTerm
-let projectBnSMain__PlayerMark_mark x = match x with
-| BnSMain__PlayerMark mark -> mark
 

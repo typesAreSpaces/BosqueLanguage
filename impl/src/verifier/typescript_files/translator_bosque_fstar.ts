@@ -42,18 +42,18 @@ type StringTypeMangleNameWithFkey = string;
 
 class TranslatorBosqueFStar {
 
-  static readonly any_type = new AnyType();
-  static readonly some_type = new SomeType();
-  static readonly truthy_type = new TruthyType();
-  static readonly none_type = new NoneType();
+  static readonly any_type      = new AnyType();
+  static readonly some_type     = new SomeType();
+  static readonly truthy_type   = new TruthyType();
+  static readonly none_type     = new NoneType();
   static readonly parsable_type = new ParsableType();
-  static readonly bool_type = new BoolType();
-  static readonly int_type = new IntType();
-  static readonly guid_type = new GUIDType();
-  static readonly object_type = new ObjectType();
-  static readonly string_type = new TypedStringType(TranslatorBosqueFStar.any_type);
-  static readonly skip_command = new VarTerm("_skip", TranslatorBosqueFStar.bool_type, "_global");
-  static readonly DEBUGGING = true;
+  static readonly bool_type     = new BoolType();
+  static readonly int_type      = new IntType();
+  static readonly guid_type     = new GUIDType();
+  static readonly object_type   = new ObjectType();
+  static readonly string_type   = new TypedStringType(TranslatorBosqueFStar.any_type);
+  static readonly skip_command  = new VarTerm("_skip", TranslatorBosqueFStar.bool_type, "_global");
+  static readonly DEBUGGING     = true;
 
   static fresh_count = 0;
 
@@ -1030,6 +1030,8 @@ class TranslatorBosqueFStar {
       // map_blocks.forEach(x => console.log(x.jsonify()));
 
       const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
+        // KEEP WORKING HERE
+        console.log(block);
         const current_flow = flow.get(block.label) as FlowLink;
         console.assert(block.ops.length > 0);
 
@@ -1037,6 +1039,7 @@ class TranslatorBosqueFStar {
           case 0: {
             const last_op = block.ops[block.ops.length - 1] as MIRVarStore;
             console.assert(last_op != undefined);
+            console.log(last_op);
             const reg_name = sanitizeName(last_op.name.nameID);
             const continuation = () => new ReturnExpr(new VarTerm(reg_name, return_type, fkey));
             return this.opsToExpr(block.ops, comingFrom, fkey, continuation);

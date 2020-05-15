@@ -28,7 +28,6 @@ function bosqueToMASM(files: string[], core: string) : MIRAssembly | undefined {
     }
 
     for (let i = 0; i < files.length; ++i) {
-      process.stdout.write(`Wait a minute... Stop everything... ${files[i]}\n`);
       const file = { relativePath: files[i], contents: FS.readFileSync(files[i]).toString() };
       code.push(file);
     }
