@@ -11,6 +11,7 @@
 // MIRIsTypeOfSome Not implemented yet
 // ConstructorPrimaryCollectionSingletons Not implemented yet
 
+const assert = require('assert').strict;
 import * as FS from "fs";
 import * as ChildProcess from "child_process"
 import * as Path from "path"
@@ -62,12 +63,12 @@ class TranslatorBosqueFStar {
   // types_seen : String[MangledNamewithFkey] -> TypeExpr
   readonly types_seen: Map<StringTypeMangleNameWithFkey, TypeExpr>;
 
-  readonly func_declarations: Map<string, MIRInvokeBodyDecl>;
   static concept_declarations: Map<string, MIRConceptTypeDecl>;
   static entity_declarations: Map<string, MIREntityTypeDecl>;
   readonly constant_declarations: Map<string, MIRConstantDecl>;
+  readonly invoke_declarations: Map<string, MIRInvokeBodyDecl>;
 
-  readonly default_values : Map<string, MIRBody>;
+  //readonly default_values : Map<string, MIRBody>; // FIX: Define default_values properly
 
   readonly is_fkey_declared: Set<string> = new Set<string>();
   readonly function_declarations = [] as FunctionDeclaration[];
@@ -84,21 +85,22 @@ class TranslatorBosqueFStar {
     // masm.invokeDecls: Map containing function declarations
     // masm.fieldDecls: Map containing declaration about field (in concepts and entities as well)
 
-    this.default_values = new Map<StringTypeMangleNameWithFkey, MIRBody>();
-    masm.fieldDecls.forEach(x => {
-      if(x.value !== undefined){
-        console.log(x);
+    // KEEP: working here. Define default_values propertly.
+    //this.default_values = new Map<StringTypeMangleNameWithFkey, MIRBody>();
+    //masm.fieldDecls.forEach(x => {
+      //if(x.value !== undefined){
+        ////console.log(x);
+        //// KEEP: working here
         //this.default_values.set(x.fname, x.value);
-      }
-    });
+      //}
+    //});
 
     this.types_seen = new Map<StringTypeMangleNameWithFkey, TypeExpr>();
 
-    this.func_declarations = masm.invokeDecls;
     TranslatorBosqueFStar.concept_declarations = masm.conceptDecls;
-
-    TranslatorBosqueFStar.entity_declarations = masm.entityDecls;
-    this.constant_declarations = masm.constantDecls;
+    TranslatorBosqueFStar.entity_declarations  = masm.entityDecls;
+    this.constant_declarations                 = masm.constantDecls;
+    this.invoke_declarations                     = masm.invokeDecls;
 
     // ---------------------------------------------------------------------------------------------------------
     // masm.primitiveInvokeDecls contains all the functions
@@ -108,7 +110,7 @@ class TranslatorBosqueFStar {
     // its actual FStar implementation. It's useful because
     // momentarily these functions have 'valid definitions'.
     masm.primitiveInvokeDecls.forEach((_, index) => {
-      this.func_declarations.set(index, (this.func_declarations.get("NSMain::id") as MIRInvokeBodyDecl))
+      this.invoke_declarations.set(index, (this.invoke_declarations.get("NSMain::id") as MIRInvokeBodyDecl))
     });
     // ---------------------------------------------------------------------------------------------------------
     this.file_name = file_name;
@@ -596,7 +598,7 @@ class TranslatorBosqueFStar {
         // the stack_expressions stack
 
         this.collectExpr(currentFunctionKey);
-        const resultType = TranslatorBosqueFStar.stringVarToTypeExpr((this.func_declarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
+        const resultType = TranslatorBosqueFStar.stringVarToTypeExpr((this.invoke_declarations.get(currentFunctionKey) as MIRInvokeBodyDecl).resultType);
 
         return [this.MIRArgumentToTermExpr(opCallNamespaceFunction.trgt, fkey, resultType),
           new FuncTerm(sanitizeName(currentFunctionKey),
@@ -1004,8 +1006,9 @@ class TranslatorBosqueFStar {
   }
 
   collectExpr(fkey: string) {
-    const declarations = (this.func_declarations.get(fkey) as MIRInvokeBodyDecl);
+    const declarations = (this.invoke_declarations.get(fkey) as MIRInvokeBodyDecl);
     const map_blocks = (declarations.body as MIRBody).body;
+
     // ---------------------------------------------------------
     // Checking vtypes -----------------------------------------
     // const valueTypes = (declarations.body as MIRBody).vtypes;
@@ -1017,45 +1020,47 @@ class TranslatorBosqueFStar {
       throw new Error("The program with fkey " + fkey + " is just a string");
     }
     else {
+
       declarations.params.map(x =>
-        this.types_seen.set(sanitizeName(fkey + x.name), TranslatorBosqueFStar.stringVarToTypeExpr(x.type))
+        this.types_seen.set(
+          sanitizeName(fkey + x.name), 
+          TranslatorBosqueFStar.stringVarToTypeExpr(x.type)
+        )
       );
 
       const return_type = TranslatorBosqueFStar.stringVarToTypeExpr(declarations.resultType);
       const flow = computeBlockLinks(map_blocks);
 
-      // console.log("More detailed Blocks:---------------------------------------------------------");
-      // map_blocks.forEach(x => console.log(x));
-      // console.log("More detailed++ Blocks:-------------------------------------------------------");
-      // map_blocks.forEach(x => console.log(x.jsonify()));
-
       const traverse = (block: MIRBasicBlock, comingFrom: string): ExprExpr => {
-        // KEEP WORKING HERE
-        console.log(block);
         const current_flow = flow.get(block.label) as FlowLink;
-        console.assert(block.ops.length > 0);
 
         switch (current_flow.succs.size) {
           case 0: {
-            const last_op = block.ops[block.ops.length - 1] as MIRVarStore;
-            console.assert(last_op != undefined);
-            console.log(last_op);
-            const reg_name = sanitizeName(last_op.name.nameID);
+            const reg_name = sanitizeName("$$return");
             const continuation = () => new ReturnExpr(new VarTerm(reg_name, return_type, fkey));
             return this.opsToExpr(block.ops, comingFrom, fkey, continuation);
           }
           case 1: {
             const successor_label = current_flow.succs.values().next().value;
-            const continuation = () => traverse((map_blocks as Map<string, MIRBasicBlock>).get(successor_label) as MIRBasicBlock, block.label);
+            const continuation = () => traverse(
+              map_blocks.get(successor_label) as MIRBasicBlock, 
+              block.label
+            );
             return this.opsToExpr(block.ops.slice(0, -1), comingFrom, fkey, continuation);
           }
           case 2: {
             const jump_cond_op = block.ops[block.ops.length - 1] as MIRJumpCond;
             const reg_name = sanitizeName(jump_cond_op.arg.nameID);
             const condition = new VarTerm(reg_name, TranslatorBosqueFStar.bool_type, fkey);
-            const branch_true = traverse(map_blocks.get(jump_cond_op.trueblock) as MIRBasicBlock, block.label);
-            const branch_false = traverse(map_blocks.get(jump_cond_op.falseblock) as MIRBasicBlock, block.label);
-            const continuation = () => new ConditionalExpr(condition, branch_true, branch_false);
+            const true_branch = traverse(
+              map_blocks.get(jump_cond_op.trueblock) as MIRBasicBlock, 
+              block.label
+            );
+            const false_branch = traverse(
+              map_blocks.get(jump_cond_op.falseblock) as MIRBasicBlock, 
+              block.label
+            );
+            const continuation = () => new ConditionalExpr(condition, true_branch, false_branch);
             return this.opsToExpr(block.ops.slice(0, -1), comingFrom, fkey, continuation);
           }
           default: {
@@ -1063,11 +1068,11 @@ class TranslatorBosqueFStar {
           }
         }
       }
-
       if (!this.is_fkey_declared.has(fkey)) {
         this.is_fkey_declared.add(fkey);
+        const entry_block = map_blocks.get("entry") as MIRBasicBlock;
         this.function_declarations.push(
-          new FunctionDeclaration(declarations, traverse(map_blocks.get("entry") as MIRBasicBlock, "entry"))
+          new FunctionDeclaration(declarations, traverse(entry_block, "entry"))
         );
       }
     }
@@ -1090,13 +1095,20 @@ class TranslatorBosqueFStar {
 
     //// The following stores the types of constant declarations
     //// in types_seen
-    //this.constant_declarations.forEach(const_decl => {
+    this.constant_declarations.forEach(const_decl => {
 
-      //if(const_decl.value.vtypes instanceof Map){
-        //const local_vtypes = const_decl.value.vtypes as Map<string, string>;
-        //this.types_seen.set(sanitizeName(const_decl.cname), TranslatorBosqueFStar.stringVarToTypeExpr(local_vtypes.get("_return_") as string));
-      //}
-    //})
+      const body_decl = this.invoke_declarations.get(const_decl.value);
+      if(body_decl instanceof MIRInvokeBodyDecl){
+        const local_vtypes = body_decl.body.vtypes;
+        if(local_vtypes instanceof Map){
+          this.types_seen.set(
+            sanitizeName(const_decl.cname), 
+            TranslatorBosqueFStar.stringVarToTypeExpr(local_vtypes.get("$$return") as string)
+          );
+        }
+      }
+
+    })
 
     const fd = FS.openSync(this.fstar_files_directory + "/" + this.file_name, 'w');
     this.collectExpr(fkey);
@@ -1125,18 +1137,22 @@ class TranslatorBosqueFStar {
     // in FStar
     FS.writeSync(fd, "(* Constant Declarations *)\n");
     this.constant_declarations.forEach(constant_decl => {
-      //// Constant declaration generally have only two blocks: entry and exit
-      //// We just `declare` the entry block
-      //constant_decl.value.body.forEach(basicBlock => {
-        //if (basicBlock.label == "entry") {
-          //const return_type = TranslatorBosqueFStar.stringVarToTypeExpr(constant_decl.declaredType);
-          //const continuation = () => new ReturnExpr(new VarTerm("__ir_ret__", return_type, fkey));
-          //this.types_seen.set(sanitizeName(constant_decl.cname), return_type);
-          //FS.writeSync(fd,
-            //`let ${sanitizeName(constant_decl.cname)} =\
-                         //\n${this.opsToExpr(basicBlock.ops, "entry", "", continuation).toML(1, 0)}\n`);
-        //}
-      //});
+      // Constant declaration generally have only two blocks: entry and exit
+      // We just `declare` the entry block
+      const body_decl = this.invoke_declarations.get(constant_decl.value);
+      if(body_decl instanceof MIRInvokeBodyDecl){
+        body_decl.body.body.forEach(basic_block => {
+          if (basic_block.label == "entry") {
+            assert(basic_block.ops[0] instanceof MIRReturnAssign);
+            const return_type = TranslatorBosqueFStar.stringVarToTypeExpr(constant_decl.declaredType);
+            const continuation = () => new ReturnExpr(new VarTerm("___ir_ret__", return_type, fkey));
+            this.types_seen.set(sanitizeName(constant_decl.cname), return_type);
+            FS.writeSync(fd,
+              `let ${sanitizeName(constant_decl.cname)} =\
+                         \n${this.opsToExpr(basic_block.ops, "entry", "", continuation).toML(1, 0)}\n`);
+          }
+        });
+      }
     });
     FS.writeSync(fd, "\n");
     // --------------------------------------------------------------------------------------------------

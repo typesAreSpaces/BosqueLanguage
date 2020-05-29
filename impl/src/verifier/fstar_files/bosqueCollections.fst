@@ -2,6 +2,7 @@ module BosqueCollections
 
 // Contains an axiomatization of 
 // the Bosque collection library
+// FIX: This module is not complete
 
 open BosqueTerms
 open List 
@@ -33,8 +34,8 @@ forall (x : list bosqueTerm) .
   {:pattern (local_size x)}
   (x = LNil) = (local_size x = 0) 
 
-assume AxiomsSize3 : 
-forall (
+// assume AxiomsSize3 : 
+// forall (
 
 assume AxiomPush : // Check patterns here
 forall (la la' : list bosqueTerm) (x : bosqueTerm) . 
