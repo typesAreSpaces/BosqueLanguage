@@ -9,6 +9,8 @@ namespace NSMain;
 // with the ordering of the field in the
 // MIRConstructorPrimary
 
+// --------------------------------------------
+
 /*concept Foo {*/
   /*field f: Int;*/
 /*}*/
@@ -46,6 +48,8 @@ entity Baz {
   field zexample_default : Int = 567;
   const local_const : Int = 1;
 }
+
+// --------------------------------------------
 
 entrypoint function main() : Int {
   var e = Baz@{ f=12, g=34, k=true };
