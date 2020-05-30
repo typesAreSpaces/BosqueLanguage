@@ -58,6 +58,7 @@ function sanitizeName(name: string): string {
     .replace(new RegExp("#", 'g'), "_")
     .replace(new RegExp("\\$", 'g'), "_")
     .replace(new RegExp(":", 'g'), "_")
+    .replace(new RegExp("\\.", 'g'), "_")
   // We lowercase the first character because variable/function
   // declaration in fstar requires that
   return result.charAt(0).toLowerCase() + result.slice(1);

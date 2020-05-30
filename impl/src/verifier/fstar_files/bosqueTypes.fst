@@ -35,12 +35,7 @@ module BosqueTypes
   // -----------------------------------
     | BErrorType
     | BListType : bosqueType -> bosqueType// User-defined types
-| BnSMain__Bar3Type
-| BnSMain__Bar2Type
-| BnSMain__Baz2Type
-| BnSMain__MusicianType
-| BnSMain__PlayerMarkType
-| BnSMain__ArtistType
+| BnSMain__BazType
 
 (* Definition of equality relation on Bosque types *)
   val eqTypeSeq : n:nat -> sequence bosqueType n -> sequence bosqueType n -> Tot bool 
@@ -112,24 +107,9 @@ else false
   | BListType t1 , BListType t2 -> subtypeOf t1 t2
 // User-defined types
 // Reflexivity relation
-| BnSMain__Bar3Type, BnSMain__Bar3Type -> true
-| BnSMain__Bar2Type, BnSMain__Bar2Type -> true
-| BnSMain__Baz2Type, BnSMain__Baz2Type -> true
-| BnSMain__MusicianType, BnSMain__MusicianType -> true
-| BnSMain__PlayerMarkType, BnSMain__PlayerMarkType -> true
-| BnSMain__ArtistType, BnSMain__ArtistType -> true
+| BnSMain__BazType, BnSMain__BazType -> true
 // Provide relation
-| BnSMain__Bar3Type, BnSMain__Baz2Type -> true
-| BObjectType, BnSMain__Bar3Type -> true
-| BObjectType, BnSMain__Bar2Type -> true
-| BObjectType, BnSMain__Baz2Type -> true
-| BObjectType, BnSMain__MusicianType -> true
-| BObjectType, BnSMain__PlayerMarkType -> true
-| BObjectType, BnSMain__ArtistType -> true
-| BnSMain__Bar2Type, BnSMain__Baz2Type -> true
-| BParsableType, BnSMain__MusicianType -> true
-| BParsableType, BnSMain__PlayerMarkType -> true
-| BParsableType, BnSMain__ArtistType -> true
+| BObjectType, BnSMain__BazType -> true
 | _, _ -> false
 and 
 subtypeOfSeq n x y = match x with

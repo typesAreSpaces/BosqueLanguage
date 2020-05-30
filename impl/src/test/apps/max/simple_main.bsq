@@ -1,0 +1,54 @@
+//-------------------------------------------------------------------------------------------------------
+// Copyright (C) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+//-------------------------------------------------------------------------------------------------------
+
+namespace NSMain;
+
+// It seems that inheretance messes up 
+// with the ordering of the field in the
+// MIRConstructorPrimary
+
+/*concept Foo {*/
+  /*field f: Int;*/
+/*}*/
+
+/*entity Baz provides Foo {*/
+  /*field g: Int;*/
+  /*field k: Bool;*/
+  /*field zexample_default : Int = 567;*/
+  /*const local_const : Int = 1;*/
+/*}*/
+
+// --------------------------------------------
+
+/*concept Foo {*/
+  /*field f: Int;*/
+/*}*/
+
+/*concept Bar {*/
+  /*field f: Int;*/
+/*}*/
+
+/*entity Baz provides Foo, Bar {*/
+  /*field g: Int;*/
+  /*field k: Bool;*/
+  /*field zexample_default : Int = 567;*/
+  /*const local_const : Int = 1;*/
+/*}*/
+
+// --------------------------------------------
+
+entity Baz {
+  field f: Int;
+  field g: Int;
+  field k: Bool;
+  field zexample_default : Int = 567;
+  const local_const : Int = 1;
+}
+
+entrypoint function main() : Int {
+  var e = Baz@{ f=12, g=34, k=true };
+  var access_example = Baz::local_const + 1;
+  return access_example;
+}

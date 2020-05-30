@@ -196,6 +196,7 @@ concept Bar3 {
 entity Baz2 provides Bar2, Bar3 {
     field g: Int;
     field k: Bool;
+    field zexample_default : Int = 567;
     const local_const : Int = 1;
 }
 
@@ -208,7 +209,7 @@ function foo(f: fn(_: Int, _: Int) -> Int, a: [Int, Int]): Int {
 }
 
 entrypoint function main() : Int {
-    /*var e = Baz2@{ f=1, g=2, k=true };*/
+    var e = Baz2@{ f=12, g=34, k=true };
     // Currently the following construction doesn't work.
     // Perhaps because line 1322 doesn't allow instances of 
     // unions nor conjunctions. I see two possible solutions:
