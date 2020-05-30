@@ -35,6 +35,7 @@ module BosqueTypes
   // -----------------------------------
     | BErrorType
     | BListType : bosqueType -> bosqueType// User-defined types
+| BnSMain__FooType
 | BnSMain__BazType
 
 (* Definition of equality relation on Bosque types *)
@@ -107,8 +108,11 @@ else false
   | BListType t1 , BListType t2 -> subtypeOf t1 t2
 // User-defined types
 // Reflexivity relation
+| BnSMain__FooType, BnSMain__FooType -> true
 | BnSMain__BazType, BnSMain__BazType -> true
 // Provide relation
+| BnSMain__FooType, BnSMain__BazType -> true
+| BObjectType, BnSMain__FooType -> true
 | BObjectType, BnSMain__BazType -> true
 | _, _ -> false
 and 

@@ -509,6 +509,8 @@ class TranslatorBosqueFStar {
         const current_tkey = opConstructorPrimary.tkey
         const current_entity_decl = TranslatorBosqueFStar.entity_declarations.get(current_tkey) as MIREntityTypeDecl;
         // To check/study the bug/enable the following console.logs
+        //console.log("----opConstructorPrimary");
+        //console.log(opConstructorPrimary);
         //console.log("----current_entity_decl");
         //console.log(current_entity_decl);
         //current_entity_decl.fields.map(x => { console.log(x.sourceLocation); } );
@@ -1122,11 +1124,6 @@ class TranslatorBosqueFStar {
       // since we filter those @ line 99
       if(default_decl.value !== undefined){
         const body_decl = this.invoke_declarations.get(default_decl.value);
-        // KEEP: working here
-        console.log("Wait");
-        console.log(default_decl);
-        console.log(body_decl);
-        console.log("Wait2");
         if(body_decl instanceof MIRInvokeBodyDecl){
           const local_vtypes = body_decl.body.vtypes;
           local_vtypes;

@@ -17,6 +17,7 @@ module BosqueTerms
     | BError : bosqueTerm
     | BList : bosqueType -> list bosqueTerm -> bosqueTerm
 // User-defined terms
+| BnSMain__Foo: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Baz: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm -> zexample_default: bosqueTerm ->  bosqueTerm
 
   (* Definition of getType *)
@@ -33,6 +34,7 @@ module BosqueTerms
     | BError -> BErrorType
     | BList content_type _ -> BListType content_type
 // User-defined terms
+| BnSMain__Foo _ -> BnSMain__FooType
 | BnSMain__Baz _ _ _ _ -> BnSMain__BazType
 and
   getTypeSeq n x = match x with
@@ -291,6 +293,10 @@ and
         | _ -> BError
 
 // User-defined Projectors
+val projectBnSMain__Foo_f : x:bosqueTerm{BnSMain__FooType = (getType x)} -> bosqueTerm
+let projectBnSMain__Foo_f x = match x with
+| BnSMain__Foo f -> f
+
 val projectBnSMain__Baz_f : x:bosqueTerm{BnSMain__BazType = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz_f x = match x with
 | BnSMain__Baz f _ _ _ -> f
