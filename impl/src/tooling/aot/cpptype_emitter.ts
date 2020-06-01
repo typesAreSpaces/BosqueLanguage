@@ -20,6 +20,7 @@ class CPPTypeEmitter {
     readonly bigIntType: MIRType;
     readonly float64Type: MIRType;
     readonly stringType: MIRType;
+    readonly regexType: MIRType;
 
     readonly keyType: MIRType;
     readonly validatorType: MIRType;
@@ -48,6 +49,7 @@ class CPPTypeEmitter {
         this.bigIntType = assembly.typeMap.get("NSCore::BigInt") as MIRType;
         this.float64Type = assembly.typeMap.get("NSCore::Float64") as MIRType;
         this.stringType = assembly.typeMap.get("NSCore::String") as MIRType;
+        this.regexType = assembly.typeMap.get("NSCore::Regex") as MIRType;
 
         this.keyType = assembly.typeMap.get("NSCore::KeyType") as MIRType;
         this.validatorType = assembly.typeMap.get("NSCore::Validator") as MIRType;
@@ -253,7 +255,7 @@ class CPPTypeEmitter {
             return new NoneRepr();
         }
         else if (this.typecheckIsName_Option(tt, /^NSCore::Bool$/)) {
-            return new StructRepr(true, "bool", "*", "MIRNominalTypeEnum_Bool", "MIRNominalTypeEnum_Category_Empty");
+            return new StructRepr(true, "BSQBool", "*", "MIRNominalTypeEnum_Bool", "MIRNominalTypeEnum_Category_Empty");
         }
         else if (this.typecheckIsName_Option(tt, /^NSCore::Int$/)) {
             return new StructRepr(true, "int64_t", "*", "MIRNominalTypeEnum_Int", "MIRNominalTypeEnum_Category_Empty");
@@ -280,15 +282,15 @@ class CPPTypeEmitter {
             return new RefRepr(true, "BSQCryptoHash", "BSQCryptoHash*", "MIRNominalTypeEnum_Category_CryptoHash");
         }
         else if (this.typecheckEntityAndProvidesName_Option(tt, this.enumtype)) {
-            return new StructRepr(true, "BSQEnum", "Boxed_BSQEnum", `MIRNominalTypeEnum_${this.mangleStringForCpp(tt.trkey)}`, "MIRNominalTypeEnum_Category_Enum");
+            return new StructRepr(true, "BSQEnum", "Boxed_BSQEnum", `MIRNominalTypeEnum::${this.mangleStringForCpp(tt.trkey)}`, "MIRNominalTypeEnum_Category_Enum");
         }
         else if (this.typecheckEntityAndProvidesName_Option(tt, this.idkeytype)) {
             const iddecl = this.assembly.entityDecls.get(tt.trkey) as MIREntityTypeDecl;
-            if(iddecl.fields.length === 1) {
-                return new StructRepr(true, "BSQIdKeySimple", "Boxed_BSQIdKeySimple", `MIRNominalTypeEnum_${this.mangleStringForCpp(tt.trkey)}`, "MIRNominalTypeEnum_Category_IdKeySimple");
+            if(iddecl.attributes.includes("identifier_simple")) {
+                return new StructRepr(true, "BSQIdKeySimple", "Boxed_BSQIdKeySimple", `MIRNominalTypeEnum::${this.mangleStringForCpp(tt.trkey)}`, "MIRNominalTypeEnum_Category_IdKeySimple");
             }
             else {
-                return new RefRepr(true, "BSQIdKeyCompound", "BSQIdKeyCompound*", "MIRNominalTypeEnum_Category_IdKeyCompound");
+                return new StructRepr(true, "BSQIdKeyCompound", "Boxed_BSQIdKeyCompound", `MIRNominalTypeEnum::${this.mangleStringForCpp(tt.trkey)}`, "MIRNominalTypeEnum_Category_IdKeyCompound");
             }
         }
         else {
@@ -308,7 +310,7 @@ class CPPTypeEmitter {
                 return new StructRepr(false, "BSQISOTime", "Boxed_BSQISOTime", "MIRNominalTypeEnum_ISOTime", "MIRNominalTypeEnum_Category_ISOTime");
             }
             else if (this.typecheckIsName_Option(tt, /^NSCore::Regex$/)) {
-                return new RefRepr(false, "BSQRegex", "BSQRegex*", "MIRNominalTypeEnum_Category_Regex");
+                return new StructRepr(false, "BSQRegex", "Boxed_BSQRegex", "MIRNominalTypeEnum_Regex", "MIRNominalTypeEnum_Category_Regex", );
             }
             else if (tt instanceof MIRTupleType) {
                 return new StructRepr(false, "BSQTuple", "BSQTuple", "MIRNominalTypeEnum_Tuple", "MIRNominalTypeEnum_Category_Tuple");
@@ -423,18 +425,23 @@ class CPPTypeEmitter {
             assert(!(trinto instanceof NoneRepr) && !(trinto instanceof StructRepr) && !(trinto instanceof RefRepr), "Should not be possible");
 
             let cc = "[INVALID]";
-            if (trfrom.base === "bool") {
+            if (trfrom.base === "BSQBool") {
                 cc = `BSQ_ENCODE_VALUE_BOOL(${exp})`;
             }
             else if (trfrom.base === "int64_t") {
                 cc = `BSQ_ENCODE_VALUE_TAGGED_INT(${exp})`;
+            }
+            else if (trfrom.base === "BSQEnum" || trfrom.base === "BSQIdKeySimple" || trfrom.base === "BSQIdKeyCompound") {
+                const scope = this.mangleStringForCpp("$scope$");
+                const ops = this.getFunctorsForType(from);
+                cc = `BSQ_NEW_ADD_SCOPE(${scope}, ${trfrom.boxed}, ${trfrom.nominaltype}, ${ops.inc}{}(${exp}))`;
             }
             else {
                 const scope = this.mangleStringForCpp("$scope$");
                 const ops = this.getFunctorsForType(from);
                 cc = `BSQ_NEW_ADD_SCOPE(${scope}, ${trfrom.boxed}, ${ops.inc}{}(${exp}))`;
             }
-
+                
             if (trinto instanceof KeyValueRepr) {
                 return `((KeyValue)${cc})`;
             }
@@ -457,7 +464,7 @@ class CPPTypeEmitter {
                 return `BSQ_VALUE_NONE`;
             }
             else if (trinto instanceof StructRepr) {
-                if (trinto.base === "bool") {
+                if (trinto.base === "BSQBool") {
                     return `BSQ_GET_VALUE_BOOL(${exp})`;
                 }
                 else if (trinto.base === "int64_t") {
@@ -465,7 +472,7 @@ class CPPTypeEmitter {
                 }
                 else {
                     if(trinto.base === "BSQTuple" || trinto.base === "BSQRecord") {
-                        return `*${exp}`
+                        return `*(BSQ_GET_VALUE_PTR(${exp}, ${trinto.base}))`;
                     }
                     else {
                         return `BSQ_GET_VALUE_PTR(${exp}, ${trinto.boxed})->bval`;
@@ -484,7 +491,7 @@ class CPPTypeEmitter {
                 return `BSQ_VALUE_NONE`;
             }
             else if (trinto instanceof StructRepr) {
-                if (trinto.base === "bool") {
+                if (trinto.base === "BSQBool") {
                     return `BSQ_GET_VALUE_BOOL(${exp})`;
                 }
                 else if (trinto.base === "int64_t") {
@@ -492,7 +499,7 @@ class CPPTypeEmitter {
                 }
                 else {
                     if(trinto.base === "BSQTuple" || trinto.base === "BSQRecord") {
-                        return `*${exp}`
+                        return `*(BSQ_GET_VALUE_PTR(${exp}, ${trinto.base}))`;
                     }
                     else {
                         return `BSQ_GET_VALUE_PTR(${exp}, ${trinto.boxed})->bval`;
@@ -608,7 +615,7 @@ class CPPTypeEmitter {
     buildIncOpForType(tt: MIRType, arg: string): string {
         const rcinfo = this.getRefCountableStatus(tt);
         if (rcinfo === "no") {
-            return arg;
+            return "";
         }
         else {
             const tr = this.getCPPReprFor(tt);
@@ -621,7 +628,7 @@ class CPPTypeEmitter {
                 return `INC_REF_CHECK(${tr.base}, ${arg})`;
             }
             else {
-                return `RCIncFunctor_${tr.base}{}(${arg})`
+                return `RCIncFunctor_${tr.base}{}(${arg})`;
             }
         }
     }
@@ -629,21 +636,21 @@ class CPPTypeEmitter {
     buildReturnOpForType(tt: MIRType, arg: string, scope: string): string {
         const rcinfo = this.getRefCountableStatus(tt);
         if (rcinfo === "no") {
-            return ";";
+            return "";
         }
         else {
             const tr = this.getCPPReprFor(tt);
             if (rcinfo === "ephemeral") {
-                return `(${arg}).processForCallReturn(${scope});`;
+                return `(${arg}).processForCallReturn(${scope})`;
             }
             else if (rcinfo === "direct") {
-                return `${scope}.callReturnDirect(${arg});`;
+                return `${scope}.callReturnDirect(${arg})`;
             }
             else if (rcinfo === "checked") {
-                return `${scope}.processReturnChecked(${arg});`;
+                return `${scope}.processReturnChecked(${arg})`;
             }
             else {
-                return `RCReturnFunctor_${tr.base}{}(${arg}, ${scope});`
+                return `RCReturnFunctor_${tr.base}{}(${arg}, ${scope})`;
             }
         }
     }
@@ -814,7 +821,7 @@ class CPPTypeEmitter {
         const crepr = this.getCPPReprFor(typet);
 
         const cops = this.getFunctorsForType(typet);
-        const bc = `BSQSet<${crepr.std}, ${cops.dec}, ${cops.display}, ${cops.eq}, ${cops.less}>`;
+        const bc = `BSQSet<${crepr.std}, ${cops.dec}, ${cops.display}, ${cops.less}, ${cops.eq}>`;
         const decl = `class ${declrepr.base} : public ${bc}\n`
         + "{\n"
         + "public:\n"
@@ -838,7 +845,7 @@ class CPPTypeEmitter {
         const kops = this.getFunctorsForType(typek);
         const vops = this.getFunctorsForType(typev);
 
-        const bc = `BSQMap<${krepr.std}, ${kops.dec}, ${kops.display}, ${kops.eq}, ${kops.less}, ${vrepr.std}, ${vops.dec}, ${vops.display}>`;
+        const bc = `BSQMap<${krepr.std}, ${kops.dec}, ${kops.display}, ${kops.less}, ${kops.eq}, ${vrepr.std}, ${vops.dec}, ${vops.display}>`;
         const decl = `class ${declrepr.base} : public ${bc}\n`
         + "{\n"
         + "public:\n"
@@ -920,35 +927,11 @@ class CPPTypeEmitter {
                     };
             }
             else {
-                const copy_constructor_initializer = entity.fields.map((fd) => {
-                    return `${this.mangleStringForCpp(fd.fkey)}(src.${this.mangleStringForCpp(fd.fkey)})`;
-                });
-                const copy_cons = `${this.mangleStringForCpp(entity.tkey)}(const ${this.mangleStringForCpp(entity.tkey)}& src) ${copy_constructor_initializer.length !== 0 ? ":" : ""} ${copy_constructor_initializer.join(", ")} { ; }`;
-
-                const move_constructor_initializer = entity.fields.map((fd) => {
-                    return `${this.mangleStringForCpp(fd.fkey)}(std::move(src.${this.mangleStringForCpp(fd.fkey)}))`;
-                });
-                const move_cons = `${this.mangleStringForCpp(entity.tkey)}(${this.mangleStringForCpp(entity.tkey)}&& src) ${move_constructor_initializer.length !== 0 ? ":" : ""} ${move_constructor_initializer.join(", ")} { ; }`;
-
-                const copy_assign_ops = entity.fields.map((fd) => {
-                    return `this->${this.mangleStringForCpp(fd.fkey)} = src.${this.mangleStringForCpp(fd.fkey)};`;
-                });
-                const copy_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(const ${this.mangleStringForCpp(entity.tkey)}& src)`
-                + `{\n`
-                + `  if (this == &src) return *this;\n\n  `
-                + copy_assign_ops.join("\n  ")
-                + `return *this;\n`
-                + `}\n`;
-
-                const move_assign_ops = entity.fields.map((fd) => {
-                    return `this->${this.mangleStringForCpp(fd.fkey)} = std::move(src.${this.mangleStringForCpp(fd.fkey)});`;
-                });
-                const move_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(${this.mangleStringForCpp(entity.tkey)}&& src)`
-                + `{\n`
-                + `  if (this == &src) return *this;\n\n  `
-                +  move_assign_ops.join("\n  ")
-                + `return *this;\n`
-                + `}\n`;
+                const copy_cons = `${this.mangleStringForCpp(entity.tkey)}(const ${this.mangleStringForCpp(entity.tkey)}& src) = default;`;
+                const move_cons = `${this.mangleStringForCpp(entity.tkey)}(${this.mangleStringForCpp(entity.tkey)}&& src) = default;`;
+                
+                const copy_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(const ${this.mangleStringForCpp(entity.tkey)}& src) = default;`;
+                const move_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(${this.mangleStringForCpp(entity.tkey)}&& src) = default;`;
 
                 const incop_ops = entity.fields.map((fd) => {
                     return this.buildIncOpForType(this.getMIRType(fd.declaredType), `tt.${this.mangleStringForCpp(fd.fkey)}`) + ";";
@@ -984,9 +967,9 @@ class CPPTypeEmitter {
                 + `  }\n`
                 + `};\n`;
 
-                const displayop = `struct RCDisplayFunctor_${this.mangleStringForCpp(entity.tkey)}`
+                const displayop = `struct DisplayFunctor_${this.mangleStringForCpp(entity.tkey)}`
                 + `{\n`
-                + `  std::string operator()(${this.mangleStringForCpp(entity.tkey)}& tt) const\n` 
+                + `  std::string operator()(const ${this.mangleStringForCpp(entity.tkey)}& tt) const\n` 
                 + `  {\n` 
                 + `    return tt.display();`
                 + `  }\n`
@@ -1055,11 +1038,17 @@ class CPPTypeEmitter {
             constructor_initializer.push(`entry_${i}(e${i})`);
         }
 
+        const copy_cons = `${this.mangleStringForCpp(tt.trkey)}(const ${this.mangleStringForCpp(tt.trkey)}& src) = default;`;
+        const move_cons = `${this.mangleStringForCpp(tt.trkey)}(${this.mangleStringForCpp(tt.trkey)}&& src) = default;`;
+
+        const copy_assign = `${this.mangleStringForCpp(tt.trkey)}& operator=(const ${this.mangleStringForCpp(tt.trkey)}& src) = default;`;
+        const move_assign = `${this.mangleStringForCpp(tt.trkey)}& operator=(${this.mangleStringForCpp(tt.trkey)}&& src) = default;`;
+
         const fjoins = displayvals.map((dv) => `diagnostic_format(${dv})`).join(" + std::string(\", \") + ");
         const display = "std::string display() const\n"
             + "    {\n"
             + `        BSQRefScope ${this.mangleStringForCpp("$scope$")};\n`
-            + `        return std::string("(|) ") + ${fjoins} + std::string(" |)");\n`
+            + `        return std::string("(| ") + ${fjoins} + std::string(" |)");\n`
             + "    }";
 
         const processForCallReturn = "void processForCallReturn(BSQRefScope& scope)\n"
@@ -1073,6 +1062,10 @@ class CPPTypeEmitter {
             + `    ${fields.join("\n    ")}\n\n`
             + `    ${this.mangleStringForCpp(tt.trkey)}() { ; }\n\n`
             + `    ${this.mangleStringForCpp(tt.trkey)}(${constructor_args.join(", ")}) : ${constructor_initializer.join(", ")} { ; }\n\n`
+            + `    ${copy_cons}\n`
+            + `    ${move_cons}\n`
+            + `    ${copy_assign}\n`
+            + `    ${move_assign}\n`
             + `    ${display}\n\n`
             + `    ${processForCallReturn}\n`
             + "};"

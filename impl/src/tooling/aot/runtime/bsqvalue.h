@@ -10,6 +10,10 @@
 ////
 //Value ops
 
+typedef uint8_t BSQBool;
+#define BSQTRUE 1
+#define BSQFALSE 0
+
 #define MIN_BSQ_INT -9007199254740991
 #define MAX_BSQ_INT 9007199254740991
 
@@ -22,18 +26,18 @@
 #define BSQ_IS_VALUE_TAGGED_INT(V) ((((uintptr_t)(V)) & 0x4) == 0x4)
 #define BSQ_IS_VALUE_PTR(V) ((((uintptr_t)(V)) & 0x7) == 0)
 
-#define BSQ_GET_VALUE_BOOL(V) (((uintptr_t)(V)) & 0x1)
+#define BSQ_GET_VALUE_BOOL(V) ((BSQBool)(((uintptr_t)(V)) & 0x1))
 #define BSQ_GET_VALUE_TAGGED_INT(V) (int64_t)(((int64_t)(V)) >> 0x3)
 #define BSQ_GET_VALUE_PTR(V, T) (reinterpret_cast<T*>(V))
 
 #define BSQ_ENCODE_VALUE_BOOL(B) ((void*)(((uintptr_t)(B)) | 0x2))
 #define BSQ_ENCODE_VALUE_TAGGED_INT(I) ((void*)((((uint64_t) I) << 0x3) | 0x4))
 
-#define BSQ_GET_VALUE_TRUTHY(V) (((uintptr_t)(V)) & 0x1)
+#define BSQ_GET_VALUE_TRUTHY(V) ((BSQBool)(((uintptr_t)(V)) & 0x1))
 
 #define BSQ_VALUE_NONE nullptr
-#define BSQ_VALUE_TRUE BSQ_ENCODE_VALUE_BOOL(true)
-#define BSQ_VALUE_FALSE BSQ_ENCODE_VALUE_BOOL(false)
+#define BSQ_VALUE_TRUE BSQ_ENCODE_VALUE_BOOL(BSQTRUE)
+#define BSQ_VALUE_FALSE BSQ_ENCODE_VALUE_BOOL(BSQFALSE)
 
 ////
 //Reference counting ops
@@ -213,18 +217,27 @@ class BSQRefScope
 {
 private:
     std::vector<BSQRef*> opts;
+    bool nodec;
 
 public:
-    BSQRefScope() : opts()
+    BSQRefScope() : opts(), nodec(false)
+    {
+        ;
+    }
+
+    BSQRefScope(bool nodec) : opts(), nodec(nodec)
     {
         ;
     }
 
     ~BSQRefScope()
     {
-        for(uint16_t i = 0; i < this->opts.size(); ++i)
+        if (!nodec)
         {
-           this->opts[i]->decrement();
+            for (uint16_t i = 0; i < this->opts.size(); ++i)
+            {
+                this->opts[i]->decrement();
+            }
         }
     }
 
@@ -305,29 +318,29 @@ struct DisplayFunctor_NoneValue
     std::string operator()(NoneValue n) const { return "none"; }
 };
 
-struct RCIncFunctor_bool
+struct RCIncFunctor_BSQBool
 {
-    inline bool operator()(bool b) const { return b; }
+    inline BSQBool operator()(bool b) const { return b; }
 };
-struct RCDecFunctor_bool
+struct RCDecFunctor_BSQBool
 {
-    inline void operator()(bool b) const { ; }
+    inline void operator()(BSQBool b) const { ; }
 };
-struct RCReturnFunctor_bool
+struct RCReturnFunctor_BSQBool
 {
-    inline void operator()(bool b, BSQRefScope& scope) const { ; }
+    inline void operator()(BSQBool b, BSQRefScope& scope) const { ; }
 };
-struct EqualFunctor_bool
+struct EqualFunctor_BSQBool
 {
-    inline bool operator()(bool l, bool r) const { return l == r; }
+    inline bool operator()(BSQBool l, BSQBool r) const { return l == r; }
 };
-struct LessFunctor_bool
+struct LessFunctor_BSQBool
 {
-    inline bool operator()(bool l, bool r) const { return (!l) & r; }
+    inline bool operator()(BSQBool l, BSQBool r) const { return (!l) & r; }
 };
-struct DisplayFunctor_bool
+struct DisplayFunctor_BSQBool
 {
-    std::string operator()(bool b) const { return b ? "true" : "false"; }
+    std::string operator()(BSQBool b) const { return b ? "true" : "false"; }
 };
 
 struct RCIncFunctor_int64_t
@@ -598,21 +611,40 @@ struct DisplayFunctor_BSQISOTime
 };
 typedef BSQBoxed<BSQISOTime, RCDecFunctor_BSQISOTime> Boxed_BSQISOTime;
 
-class BSQRegex : public BSQRef
+class BSQRegex
 {
 public:
-    const std::string re;
+    const std::regex* re;
 
-    BSQRegex(const std::string& re) : BSQRef(MIRNominalTypeEnum_Regex), re(re) { ; }
-    virtual ~BSQRegex() = default;
+    BSQRegex() { ; }
+    BSQRegex(std::regex* re) : re(re) { ; }
+
+    BSQRegex(const BSQRegex& src) = default;
+    BSQRegex(BSQRegex&& src) = default;
+
+    BSQRegex& operator=(const BSQRegex& src) = default;
+    BSQRegex& operator=(BSQRegex&& src) = default;
+};
+struct RCIncFunctor_BSQRegex
+{
+    inline BSQRegex operator()(BSQRegex re) const { return re; }
+};
+struct RCDecFunctor_BSQRegex
+{
+    inline void operator()(BSQRegex re) const { ; }
+};
+struct RCReturnFunctor_BSQRegex
+{
+    inline void operator()(BSQRegex& re, BSQRefScope& scope) const { ; }
 };
 struct DisplayFunctor_BSQRegex
 {
-    std::string operator()(const BSQRegex* r) const 
+    std::string operator()(const BSQRegex& r) const 
     { 
-        return std::string{"/"} + r->re + std::string{"/"};
+        return std::string{"[REGEX]"};
     }
 };
+typedef BSQBoxed<BSQRegex, RCDecFunctor_BSQRegex> Boxed_BSQRegex;
 
 class BSQTuple : public BSQRef
 {
@@ -815,12 +847,11 @@ public:
     template <DATA_KIND_FLAG flag>
     static BSQRecord createFromUpdate(const BSQRecord* src, std::map<MIRPropertyEnum, Value>&& values)
     {
-        std::map<MIRPropertyEnum, Value> entries(move(values));
         auto fv = flag;
 
         for(auto iter = src->entries.begin(); iter != src->entries.end(); ++iter) {
             auto pos = values.lower_bound(iter->first);
-            if(pos != src->entries.cend() && pos->first != iter->first)
+            if(pos == values.cend() || pos->first != iter->first)
             {
                 values.emplace_hint(pos, *iter);
             }

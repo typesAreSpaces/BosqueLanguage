@@ -23,13 +23,13 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
     hidden static s_oftype<T where KeyType, U>(m: Map<K, V>): Map<T, U> # map_oftype
     hidden static s_cast<T where KeyType, U>(m: Map<K, V>): Map<T, U> # map_cast
 
-    hidden static s_project(m: Map<K, V>, ds: Set<K>, missingok: Bool): Map<K, V> # map_project
+    hidden static s_projectall(m: Map<K, V>, dl: List<K>): Map<K, V> # map_projectall
+    hidden static s_excludeall(m: Map<K, V>, ds: List<K>): Map<K, V> # map_excludeall
+
+    hidden static s_project(m: Map<K, V>, ds: Set<K>): Map<K, V> # map_project
     hidden static s_exclude(m: Map<K, V>, ds: Set<K>): Map<K, V> # map_exclude
 
     recursive? hidden static s_remap(m: Map<K, V>, f: recursive? fn(_: K, _: V) -> U): Map<K, U> # map_remap
-
-    hidden static s_projectall(m: Map<K, V>, dl: List<K>): Map<K, V> # map_projectall
-    hidden static s_excludeall(m: Map<K, V>, ds: Set<K>): Map<K, V> # map_excludeall
 
     hidden static s_union(m: Map<K, V>, om: Map<K, V>): Map<K, V> # map_union
     hidden static s_unionall(dl: List<Map<K, V>>): Map<K, V> # map_unionall
@@ -37,27 +37,27 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
     hidden static s_merge(m: Map<K, V>, om: Map<K, V>): Map<K, V> # map_merge
     hidden static s_mergeall(dl: List<Map<K, V>>): Map<K, V> # map_mergeall
 
-    override method size(): Int {
+    method size(): Int {
         return Map<K, V>::s_size(this);
     }
 
-    override method empty(): Bool {
+    method empty(): Bool {
         return Map<K, V>::s_size(this) == 0;
     }
 
-    override method keys(): List<K> {
+    method keys(): List<K> {
         return Map<K, V>::s_key_list(this);
     }
 
-    override method keySet(): Set<K> {
+    method keySet(): Set<K> {
         return Map<K, V>::s_key_set(this);
     }
 
-    override method values(): List<K> {
+    method values(): List<V> {
         return Map<K, V>::s_values(this);
     }
 
-    override method entries(): List<MapEntry<K, V>> {
+    method entries(): List<MapEntry<K, V>> {
         return Map<K, V>::s_entries(this);
     }
 
@@ -65,15 +65,15 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
         abort;
     }
 
-    override method has(key: K): Bool {
-        return Map<K, V>::s_has_key(this, k);
+    method has(key: K): Bool {
+        return Map<K, V>::s_has_key(this, key);
     }
 
-    override method hasAll(...kl: List<K>): Bool {
+    method hasAll(...kl: List<K>): Bool {
         return Map<K, V>::s_has_all(this, kl);
     }
 
-    override method domainIncludes(s: Set<K>): Bool {
+    method domainSubsetOf(s: Set<K>): Bool {
         if(Set<K>::s_size(s) > Map<K, V>::s_size(this)) {
             return false;
         }
@@ -82,14 +82,18 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
         }
     }
 
-    override method get(key: K): V 
-        requires release Map<K, V>::s_has_key(this, k);
+    method get(key: K): V 
+        requires release Map<K, V>::s_has_key(this, key);
     {
-        return Map<K, V>::s_at_val(this, k);
+        return Map<K, V>::s_at_val(this, key);
     }
 
-    override method tryGet(k: K): V? {
+    method tryGet(k: K): V? {
         return Map<K, V>::s_has_key(this, k) ? Map<K, V>::s_at_val(this, k) : none;
+    }
+
+    method defaultGet(k: K, default: V): V {
+        return Map<K, V>::s_has_key(this, k) ? Map<K, V>::s_at_val(this, k) : default;
     }
 
     recursive? method submap(p: recursive? fn(_: K, _: V) -> Bool): Map<K, V> {
@@ -97,23 +101,11 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
     }
 
     method ofType<T where KeyType, U>(): Map<T, U> {
-        return Map<K, V>::s_oftype<U>(this);
+        return Map<K, V>::s_oftype<T, U>(this);
     }
 
     method cast<T where KeyType, U>(): Map<T, U> {
-        return Map<K, V>::s_cast<U>(this);
-    }
-
-    method project(ds: Set<K>, missingok?: Bool): Map<K, V> {
-        return Map<K, V>::s_project(this, ds, Truthy::truth(missingok));
-    }
-
-    method exclude(ds: Set<K>): Map<K, V> {
-        return Map<K, V>::s_exclude(this, ds);
-    }
-
-    recursive? method remap<U>(f: recursive? fn(_: K, _: V) -> U): Map<K, U> {
-        return Map<K, V>::s_remap<U>[recursive?](this, f);
+        return Map<K, V>::s_cast<T, U>(this);
     }
 
     method projectAll(...kl: List<K>): Map<K, V> {
@@ -122,6 +114,38 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
 
     method excludeAll(...kl: List<K>): Map<K, V> {
         return Map<K, V>::s_excludeall(this, kl);
+    }
+
+    method projectSet(ds: Set<K>): Map<K, V> {
+        return Map<K, V>::s_project(this, ds);
+    }
+
+    method excludeSet(ds: Set<K>): Map<K, V> {
+        return Map<K, V>::s_exclude(this, ds);
+    }
+
+    recursive? method remap<U>(f: recursive? fn(_: K, _: V) -> U): Map<K, U> {
+        return Map<K, V>::s_remap<U>[recursive?](this, f);
+    }
+
+    method {when V KeyType} composeWith(m: Map<V, U>): Map<K, U> {
+        return Map<K, V>::s_composewith(this, m);
+    }
+
+    method {when V KeyType} tryComposeWith(m: Map<V, U>): Map<K, U?> {
+        return Map<K, V>::s_trycomposewith(this, m);
+    }
+
+    method {when V KeyType} defaultComposeWith(m: Map<V, U>, default: U): Map<K, U> {
+        return Map<K, V>::s_defaultcomposewith(this, m, default);
+    }
+
+    method {when V KeyType} injectiveInvert(): Map<V, K> {
+        return Map<K, V>::s_invertinj(this, m);
+    }
+
+    method {when V KeyType} relationalInvert(): Map<V, List<K>> {
+        return Map<K, V>::s_invertrel(this, m);
     }
 
     method union(m: Map<K, V>): Map<K, V> {
@@ -136,7 +160,7 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
             return List<T>::s_unsafe_get(ml, 0);
         }
         else {
-            return Set<T>::s_unionall(ml);
+            return Map<K, V>::s_unionall(ml);
         }
     }
 
@@ -152,33 +176,33 @@ entity Map<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>>, POD
             return List<T>::s_unsafe_get(ml, 0);
         }
         else {
-            return Set<T>::s_mergeall(ml);
+            return Map<K, V>::s_mergeall(ml);
         }
     }
 }
 
 entity DynamicMap<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V>> {
-    override method size(): Int {
+    method size(): Int {
         abort;
     }
 
-    override method empty(): Bool  {
+    method empty(): Bool  {
         abort;
     }
 
-    override method keys(): List<K>  {
+    method keys(): List<K>  {
         abort;
     }
 
-    override method keySet(): Set<K>  {
+    method keySet(): Set<K>  {
         abort;
     }
 
-    override method values(): List<K>  {
+    method values(): List<V>  {
         abort;
     }
 
-    override method entries(): List<MapEntry<K, V>>  {
+    method entries(): List<MapEntry<K, V>>  {
         abort;
     }
 
@@ -186,23 +210,23 @@ entity DynamicMap<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V
         abort;
     }
 
-    override method has(key: K): Bool {
+    method has(key: K): Bool {
         abort;
     }
 
-    override method hasAll(...ks: List<K>): Bool {
+    method hasAll(...ks: List<K>): Bool {
         abort;
     }
 
-    override method domainIncludes(s: Set<K>): Bool {
+    method domainSubsetOf(s: Set<K>): Bool {
         abort;
     }
 
-    override method get(key: K): V {
+    method get(key: K): V {
         abort;
     }
 
-    override method tryGet(k: K): V? {
+    method tryGet(k: K): V? {
         abort;
     }
 
@@ -250,23 +274,23 @@ entity DynamicMap<K where KeyType, V> provides Object, Expandoable<MapEntry<K, V
         abort;
     }
 
-    method project(ds: Set<K>, missingok?: Bool): DynamicMap<K, V> {
-        abort;
-    }
-
-    method exclude(ds: Set<K>): Map<K, V> {
-        abort;
-    }
-
-    recursive? method remap<U>(f: recursive? fn(_: K, _: V) -> U): DynamicMap<K, U> {
-        abort;
-    }
-
     method projectAll(...kl: List<K>): DynamicMap<K, V> {
         abort;
     }
 
     method excludeAll(...kl: List<K>): DynamicMap<K, V> {
+        abort;
+    }
+
+    method projectSet(ds: Set<K>): DynamicMap<K, V> {
+        abort;
+    }
+
+    method excludeSet(ds: Set<K>): Map<K, V> {
+        abort;
+    }
+
+    recursive? method remap<U>(f: recursive? fn(_: K, _: V) -> U): DynamicMap<K, U> {
         abort;
     }
 

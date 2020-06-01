@@ -34,7 +34,6 @@ const KeywordStrings = [
     "enum",
     "entity",
     "ensures",
-    "err",
     "false",
     "field",
     "fn",
@@ -46,7 +45,6 @@ const KeywordStrings = [
     "method",
     "namespace",
     "none",
-    "ok",
     "or",
     "private",
     "provides",
@@ -112,7 +110,6 @@ const SymbolStrings = [
     ">=",
     "-",
     "->",
-    "?->",
     "*",
     "/"
 ].sort((a, b) => { return (a.length !== b.length) ? (b.length - a.length) : a.localeCompare(b); });
@@ -165,7 +162,10 @@ const RightScanParens = ["]", ")", "}", "|)", "|}"];
 
 const AttributeStrings = ["struct", "hidden", "private", "factory", "virtual", "abstract", "override", "entrypoint", "recursive", "recursive?"];
 
+const SpecialFunctionNames = ["ok", "err"];
 const SpecialInvokeNames = ["update", "merge", "project", "tryProject"];
+
+const UnsafeFieldNames = ["is", "as", "tryAs", "defaultAs", "isNone", "isSome", "update", "merge", "project", "tryProject", "tryParse"]
 
 const TokenStrings = {
     Clear: "[CLEAR]",
@@ -320,18 +320,10 @@ class Lexer {
             return false;
         }
 
-        if (m.groups) {
-            const groups = m.groups;
-            if (groups.multiline !== undefined) {
-                for (const char of groups.multiline) {
-                    if (char === "\n") {
-                        this.m_cline++;
-                    }
-                }
-            }
-            if (groups.multilineEndChar !== undefined && groups.multilineEndChar !== "/")
-            {
-                this.recordLexToken(this.m_cpos, TokenStrings.Error);
+        for (let i = 0; i < m[0].length; ++i) {
+            if (m[0][i] === "\n") {
+                this.m_cline++;
+                this.m_linestart = this.m_cpos + i + 1;
             }
         }
 
@@ -1043,7 +1035,15 @@ class Parser {
             entries = this.parseListOf<[string, TypeSignature, boolean]>("{", "}", ",", () => {
                 this.ensureToken(TokenStrings.Identifier);
 
+                //
+                //TODO: We also need to check this on objects that field and method names are distinct.
+                //      Type checker will also need to make sure that property/field accesses & updates are really to properties or fields.
+                //
                 const name = this.consumeTokenAndGetValue();
+                if(UnsafeFieldNames.includes(name)) {
+                    this.raiseError(this.getCurrentLine(), `Property name "${name}" is ambigious with the methods that Record may provide`);
+                }
+
                 const isopt = this.testAndConsumeTokenIf("?");
                 this.ensureAndConsumeToken(":");
                 const rtype = this.parseTypeSignature();
@@ -1243,8 +1243,7 @@ class Parser {
                 }
                 else {
                     const ptype = this.parseTypeSignature();
-                    this.ensureToken(TokenStrings.TypedString);
-                    const pstr = this.consumeTokenAndGetValue();
+                    const pstr = this.testToken(TokenStrings.TypedString) ? this.consumeTokenAndGetValue() : "";
 
                     pargs.push([ptype, pstr]);
                 }
@@ -1346,15 +1345,6 @@ class Parser {
             this.m_penv.assembly.addLiteralRegex(restr);
             return new LiteralRegexExpression(sinfo, restr);
         }
-        else if(tk === "err" || tk === "ok") {
-            this.consumeToken();
-
-            this.ensureAndConsumeToken("(");
-            const arg = this.parseExpression();
-            this.ensureAndConsumeToken(")");
-            
-            return new ResultExpression(sinfo, this.m_penv.getCurrentFunctionScope().getReturnType(), tk, arg);
-        }
         else if (tk === TokenStrings.Identifier) {
             const istr = this.consumeTokenAndGetValue();
 
@@ -1379,11 +1369,20 @@ class Parser {
                 }
             }
             else {
-                const targs = this.testToken("<") ? this.parseTemplateArguments() : new TemplateArguments([]);
-                const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
-                const args = this.parseArguments("(", ")");
+                if(SpecialFunctionNames.includes(istr)) {
+                    this.ensureAndConsumeToken("(");
+                    const arg = this.parseExpression();
+                    this.ensureAndConsumeToken(")");
+                    
+                    return new ResultExpression(sinfo, this.m_penv.getCurrentFunctionScope().getReturnType(), istr, arg);
+                }
+                else {
+                    const targs = this.testToken("<") ? this.parseTemplateArguments() : new TemplateArguments([]);
+                    const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
+                    const args = this.parseArguments("(", ")");
 
-                return new CallNamespaceFunctionExpression(sinfo, ns, istr, targs, pragmas, args);
+                    return new CallNamespaceFunctionExpression(sinfo, ns, istr, targs, pragmas, args);
+                }
             }
         }
         else if (tk === "fn" || this.testFollows("recursive", "fn")) {
@@ -1569,11 +1568,6 @@ class Parser {
 
                     ops.push(new PostfixProjectFromIndecies(sinfo, isElvis, false, indecies));
                 }
-                else if (this.testToken(TokenStrings.Identifier)) {
-                    const name = this.consumeTokenAndGetValue();
-
-                    ops.push(new PostfixAccessFromName(sinfo, isElvis, name));
-                }
                 else if (this.testToken("{")) {
                     const names = this.parseListOf<string>("{", "}", ",", () => {
                         this.ensureToken(TokenStrings.Identifier);
@@ -1586,7 +1580,7 @@ class Parser {
 
                     ops.push(new PostfixProjectFromNames(sinfo, isElvis, false, names));
                 }
-                else {
+                else if(this.testToken("(|")) {
                     this.ensureToken("(|");
 
                     if (this.testFollows("(|", TokenStrings.Int)) {
@@ -1614,29 +1608,33 @@ class Parser {
                         ops.push(new PostfixProjectFromNames(sinfo, isElvis, true, names));
                     }
                 }
-            }
-            else if (tk === "->" || tk === "?->") {
-                const isElvis = this.testToken("?->");
-                this.consumeToken();
-
-                let specificResolve: TypeSignature | undefined = undefined;
-                if (this.testToken(TokenStrings.Namespace) || this.testToken(TokenStrings.Type) || this.testToken(TokenStrings.Template)) {
-                    specificResolve = this.parseTypeSignature();
-                    this.ensureAndConsumeToken("::");
-                }
-
-                this.ensureToken(TokenStrings.Identifier);
-                const name = this.consumeTokenAndGetValue();
-
-                if (SpecialInvokeNames.includes(name)) {
-                    ops.push(this.handleSpecialCaseMethods(sinfo, isElvis, specificResolve, name));
-                }
                 else {
-                    const terms = this.testToken("<") ? this.parseTemplateArguments() : new TemplateArguments([]);
-                    const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
-                    const args = this.parseArguments("(", ")");
+                    let specificResolve: TypeSignature | undefined = undefined;
+                    if (this.testToken(TokenStrings.Namespace) || this.testToken(TokenStrings.Type) || this.testToken(TokenStrings.Template)) {
+                        specificResolve = this.parseTypeSignature();
+                        this.ensureAndConsumeToken("::");
+                    }
+    
+                    this.ensureToken(TokenStrings.Identifier);
+                    const name = this.consumeTokenAndGetValue();
+    
+                    if (SpecialInvokeNames.includes(name)) {
+                        ops.push(this.handleSpecialCaseMethods(sinfo, isElvis, specificResolve, name));
+                    }
+                    else if (!(this.testToken("<") || this.testToken("[") || this.testToken("("))) {
+                        if(specificResolve !== undefined) {
+                            this.raiseError(this.getCurrentLine(), "Encountered named access but given type resolver (only valid on method calls)");
+                        }
 
-                    ops.push(new PostfixInvoke(sinfo, isElvis, specificResolve, name, terms, pragmas, args));
+                        ops.push(new PostfixAccessFromName(sinfo, isElvis, name));
+                    }
+                    else {
+                        const terms = this.testToken("<") ? this.parseTemplateArguments() : new TemplateArguments([]);
+                        const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
+                        const args = this.parseArguments("(", ")");
+    
+                        ops.push(new PostfixInvoke(sinfo, isElvis, specificResolve, name, terms, pragmas, args));
+                    }
                 }
             }
             else {
@@ -1794,11 +1792,11 @@ class Parser {
         }
     }
 
-    private parseMapEntryConstructorExpression(): Expression {
+    private parseMapEntryConstructorExpression(disallowMapEntry?: boolean): Expression {
         const sinfo = this.getCurrentSrcInfo();
         const exp = this.parseOrExpression();
 
-        if (this.testAndConsumeTokenIf("=>")) {
+        if (!(disallowMapEntry) && this.testAndConsumeTokenIf("=>")) {
             return new MapEntryConstructorExpression(sinfo, exp, this.parseMapEntryConstructorExpression());
         }
         else {
@@ -1806,14 +1804,14 @@ class Parser {
         }
     }
 
-    private parseSelectExpression(): Expression {
+    private parseSelectExpression(disallowMapEntry?: boolean): Expression {
         const sinfo = this.getCurrentSrcInfo();
-        const texp = this.parseMapEntryConstructorExpression();
+        const texp = this.parseMapEntryConstructorExpression(disallowMapEntry);
 
         if (this.testAndConsumeTokenIf("?")) {
-            const exp1 = this.parseMapEntryConstructorExpression();
+            const exp1 = this.parseMapEntryConstructorExpression(disallowMapEntry);
             this.ensureAndConsumeToken(":");
-            const exp2 = this.parseSelectExpression();
+            const exp2 = this.parseSelectExpression(disallowMapEntry);
 
             return new SelectExpression(sinfo, texp, exp1, exp2);
         }
@@ -2203,10 +2201,6 @@ class Parser {
                     return new VariableDeclarationStatement(sinfo, vars[0].name, isConst, vars[0].vtype, sexp); 
                 }
                 else {
-                    if (exp !== undefined && exp.length !== vars.length) {
-                        this.raiseError(line, "Mismatch between variables declared and values provided");
-                    }
-
                     return new VariablePackDeclarationStatement(sinfo, isConst, vars, exp);
                 }
             }
@@ -2271,10 +2265,6 @@ class Parser {
                 return new VariableAssignmentStatement(sinfo, vars[0], exps[0]); 
             }
             else {
-                if (exps.length !== 1 || exps.length !== vars.length) {
-                    this.raiseError(line, "Mismatch between variables declared and values provided");
-                }
-
                 return new VariablePackAssignmentStatement(sinfo, vars, exps);
             }
         }
@@ -2492,7 +2482,7 @@ class Parser {
 
         let whencheck = undefined;
         if (this.testAndConsumeTokenIf("when")) {
-            whencheck = this.parseExpression();
+            whencheck = this.parseSelectExpression(true);
         }
 
         if (istypematch) {
@@ -2582,11 +2572,9 @@ class Parser {
 
     private parseDeclPragmas(): [TypeSignature, string][] {
         let pragmas: [TypeSignature, string][] = [];
-        while (this.testToken("pragma")) {
+        while (this.testAndConsumeTokenIf("pragma")) {
             const ts = this.parseTypeSignature();
-
-            this.ensureToken(TokenStrings.TypedString);
-            const sl = this.consumeTokenAndGetValue();
+            const sl = this.testToken(TokenStrings.TypedString) ? this.consumeTokenAndGetValue() : "";
 
             pragmas.push([ts, sl]);
         }
@@ -3116,6 +3104,12 @@ class Parser {
         const simpleITypeResult = itype;
 
         this.ensureAndConsumeToken("=");
+
+        //
+        //TODO: Parse this explicitly to preserve the order of "properties" and enforce no optional
+        //      This is needed to keep the order of params in the constructor stable (and developer friendly)
+        //      Will be a breaking change though!
+        //
         const idval = this.parseTypeSignature();
         this.ensureAndConsumeToken(";");
 
@@ -3137,9 +3131,13 @@ class Parser {
             }
 
             const consparams = components.map((cmp) => new FunctionParameter(cmp.cname, cmp.ctype, false, false));
-            const body = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_from");
+            const body = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_from_composite");
             const createdecl = new InvokeDecl(sinfo, this.m_penv.getCurrentFile(), [], "no", [], [], undefined, consparams, undefined, undefined, simpleITypeResult, [], [], false, new Set<string>(), body);
             const create = new StaticFunctionDecl(sinfo, this.m_penv.getCurrentFile(), [], "create", createdecl);
+
+            const gkbody = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_getkey_composite");
+            const gkdecl = new InvokeDecl(sinfo, this.m_penv.getCurrentFile(), [], "no", [], [], undefined, [], undefined, undefined, idval, [], [], false, new Set<string>(), gkbody);
+            const gk = new StaticFunctionDecl(sinfo, this.m_penv.getCurrentFile(), [], "key", gkdecl);
 
             let provides = [[new NominalTypeSignature("NSCore", "IdKey"), undefined]] as [TypeSignature, TypeConditionRestriction | undefined][];
 
@@ -3148,29 +3146,33 @@ class Parser {
                     
             const invariants: InvariantDecl[] = [];
             const staticMembers = new Map<string, StaticMemberDecl>();
-            const staticFunctions = new Map<string, StaticFunctionDecl>().set("create", create);
+            const staticFunctions = new Map<string, StaticFunctionDecl>().set("create", create).set("key", gk);
             const memberFields = new Map<string, MemberFieldDecl>();
             const memberMethods = new Map<string, MemberMethodDecl>();
 
-            currentDecl.objects.set(iname, new EntityTypeDecl(sinfo, this.m_penv.getCurrentFile(), pragmas, attributes, currentDecl.ns, iname, [], provides, invariants, staticMembers, staticFunctions, memberFields, memberMethods));
+            currentDecl.objects.set(iname, new EntityTypeDecl(sinfo, this.m_penv.getCurrentFile(), pragmas, ["identifier_composite", ...attributes], currentDecl.ns, iname, [], provides, invariants, staticMembers, staticFunctions, memberFields, memberMethods));
             this.m_penv.assembly.addObjectDecl(currentDecl.ns + "::" + iname, currentDecl.objects.get(iname) as EntityTypeDecl);
         }
         else {
             const param = new FunctionParameter("value", idval, false, false);
-            const body = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_from");
+            const body = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_from_simple");
             const createdecl = new InvokeDecl(sinfo, this.m_penv.getCurrentFile(), [], "no", [], [], undefined, [param], undefined, undefined, simpleITypeResult, [], [], false, new Set<string>(), body);
             const create = new StaticFunctionDecl(sinfo, this.m_penv.getCurrentFile(), [], "create", createdecl);
+
+            const gkbody = new BodyImplementation(`${this.m_penv.getCurrentFile()}::${sinfo.pos}`, this.m_penv.getCurrentFile(), "idkey_getkey_simple");
+            const gkdecl = new InvokeDecl(sinfo, this.m_penv.getCurrentFile(), [], "no", [], [], undefined, [], undefined, undefined, idval, [], [], false, new Set<string>(), gkbody);
+            const gk = new StaticFunctionDecl(sinfo, this.m_penv.getCurrentFile(), [], "key", gkdecl);
 
             let provides = [[new NominalTypeSignature("NSCore", "IdKey"), undefined]] as [TypeSignature, TypeConditionRestriction | undefined][];
             provides.push([new NominalTypeSignature("NSCore", "APIType"), new TypeConditionRestriction([new TemplateTypeRestriction(idval, new NominalTypeSignature("NSCore", "APIType"))])]);
 
             const invariants: InvariantDecl[] = [];
             const staticMembers = new Map<string, StaticMemberDecl>();
-            const staticFunctions = new Map<string, StaticFunctionDecl>().set("create", create);
+            const staticFunctions = new Map<string, StaticFunctionDecl>().set("create", create).set("key", gk);
             const memberFields = new Map<string, MemberFieldDecl>();
             const memberMethods = new Map<string, MemberMethodDecl>();
 
-            currentDecl.objects.set(iname, new EntityTypeDecl(sinfo, this.m_penv.getCurrentFile(), pragmas, attributes, currentDecl.ns, iname, [], provides, invariants, staticMembers, staticFunctions, memberFields, memberMethods));
+            currentDecl.objects.set(iname, new EntityTypeDecl(sinfo, this.m_penv.getCurrentFile(), pragmas, ["identifier_simple", ...attributes], currentDecl.ns, iname, [], provides, invariants, staticMembers, staticFunctions, memberFields, memberMethods));
             this.m_penv.assembly.addObjectDecl(currentDecl.ns + "::" + iname, currentDecl.objects.get(iname) as EntityTypeDecl);
         }
     }

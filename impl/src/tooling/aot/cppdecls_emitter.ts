@@ -12,6 +12,9 @@ type CPPCode = {
     STATIC_STRING_DECLARE: string,
     STATIC_STRING_CREATE: string,
 
+    STATIC_REGEX_DECLARE: string,
+    STATIC_REGEX_CREATE: string,
+
     STATIC_INT_DECLARE: string,
     STATIC_INT_CREATE: string,
     
@@ -162,7 +165,17 @@ class CPPEmitter {
         .sort((a, b) => a[0]
         .localeCompare(b[0])).map((ce) => ce[1])
         .forEach((cdecl) => {
-            const enumv = `${typeemitter.mangleStringForCpp(cdecl.tkey)} = BUILD_MIR_NOMINAL_TYPE(MIRNominalTypeEnum_Category_Empty, ${concepttypeinfo.length + nominaltypeinfo.length + 1})`;
+            let enumv = "[INVALID]"; 
+            if(cdecl.tkey === "NSCore::Tuple") {
+                enumv = `${typeemitter.mangleStringForCpp(cdecl.tkey)} = BUILD_MIR_NOMINAL_TYPE(MIRNominalTypeEnum_Category_Tuple, ${concepttypeinfo.length + nominaltypeinfo.length + 1})`;
+            }
+            else if(cdecl.tkey === "NSCore::Record") {
+                enumv = `${typeemitter.mangleStringForCpp(cdecl.tkey)} = BUILD_MIR_NOMINAL_TYPE(MIRNominalTypeEnum_Category_Record, ${concepttypeinfo.length + nominaltypeinfo.length + 1})`;
+            }
+            else {
+                enumv = `${typeemitter.mangleStringForCpp(cdecl.tkey)} = BUILD_MIR_NOMINAL_TYPE(MIRNominalTypeEnum_Category_Empty, ${concepttypeinfo.length + nominaltypeinfo.length + 1})`;
+            }
+
             const displayv = `"${cdecl.tkey}"`;
             concepttypeinfo.push({ enum: enumv, display: displayv, datakind: "-1" });
         });
@@ -237,6 +250,13 @@ class CPPEmitter {
         bodyemitter.allConstStrings.forEach((v, k) => {
             conststring_declare.push(`static BSQString ${v};`);
             conststring_create.push(`BSQString Runtime::${v}(${k}, 1);`);
+        });
+
+        let constregex_declare: string[] = [];
+        let constregex_create: string[] = [];
+        bodyemitter.allConstRegexes.forEach((v, k) => {
+            conststring_declare.push(`static std::regex ${v};`);
+            conststring_create.push(`std::regex Runtime::${v}(${k});`);
         });
 
         let constint_declare: string[] = [];
@@ -333,6 +353,9 @@ class CPPEmitter {
             STATIC_STRING_DECLARE: conststring_declare.sort().join("\n  "),
             STATIC_STRING_CREATE: conststring_create.sort().join("\n  "),
         
+            STATIC_REGEX_DECLARE: constregex_declare.sort().join("\n  "),
+            STATIC_REGEX_CREATE: constregex_create.sort().join("\n  "),
+
             STATIC_INT_DECLARE: constint_declare.sort().join("\n  "),
             STATIC_INT_CREATE: constint_create.sort().join("\n  "),
             

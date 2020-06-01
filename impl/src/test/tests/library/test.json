@@ -1,365 +1,797 @@
 [
     {
-        "src": "list.bsq",
+        "src": "maptests.bsq",
         "tests": [
             {
                 "kind": "compile"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lsize",
-                "expected": "3"
+                "entrypoint": "sizeAndEmpty",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lvals",
-                "expected": "2"
+                "entrypoint": "hasop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lpush",
-                "expected": "4"
+                "entrypoint": "keylistop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lset",
-                "expected": "5"
+                "entrypoint": "keysetop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "restCallSimpleArgsList",
-                "expected": "2"
+                "entrypoint": "valuesop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lfilter",
-                "expected": "2"
+                "entrypoint": "entriesop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lmap",
-                "expected": "6"
+                "entrypoint": "hasallop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lallyes",
-                "expected": "true"
+                "entrypoint": "domainsubsetofop",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "lallno",
-                "expected": "false"
+                "entrypoint": "gettests",
+                "expected": "0"
             },
             {
                 "kind": "aot",
-                "entrypoint": "loftype",
-                "expected": "4"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "lsum",
-                "expected": "4"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lsize",
-                "expected": "3"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lvals",
-                "expected": "2"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lpush",
-                "expected": "4"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lset",
-                "expected": "5"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "restCallSimpleArgsList",
-                "expected": "2"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lfilter",
-                "expected": "2"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lmap",
-                "expected": "6"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lallyes",
-                "expected": "true"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lallno",
-                "expected": "false"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "loftype",
-                "expected": "4"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "lsum",
-                "expected": "4"
-            },
-            {
-                "kind": "symtest",
-                "entrypoint": "latbounds",
-                "error": true
-            },
-            {
-                "kind": "symtest",
-                "entrypoint": "lpushok"
-            }
-        ]
-    },
-    {
-        "src": "set.bsq",
-        "tests": [
-            {
-                "kind": "compile"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "empty",
-                "expected": "4"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "restCallSimpleArgsSet",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "restCallOverlapArgsSet",
-                "expected": "1"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "hasCyes",
-                "expected": "true"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "hasCno",
-                "expected": "false"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "insertCyes",
-                "expected": "4"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "insertCno",
-                "expected": "3"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "removeCyes",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "removeCno",
-                "expected": "3"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "empty",
-                "expected": "4"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "restCallSimpleArgsSet",
-                "expected": "2"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "restCallOverlapArgsSet",
-                "expected": "1"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "hasCyes",
-                "expected": "true"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "hasCno",
-                "expected": "false"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "insertCyes",
-                "expected": "4"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "insertCno",
-                "expected": "3"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "removeCyes",
-                "expected": "2"
-            },
-            {
-                "kind": "symexec",
-                "entrypoint": "removeCno",
-                "expected": "3"
-            },
-            {
-                "kind": "symtest",
-                "entrypoint": "puzzle",
-                "error": true
-            }
-        ]
-    },
-    {
-        "src": "map.bsq",
-        "tests": [
-            {
-                "kind": "compile"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "empty",
-                "expected": "4"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "dupkey",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "restCallSimpleArgsMap",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "restCallOverlapArgsMap",
-                "expected": "1"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "hasCyes",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "hasCno",
-                "expected": "-1"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "insertCyes",
-                "expected": "4"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "insertCno",
-                "expected": "3"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "removeCyes",
-                "expected": "2"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "removeCno",
-                "expected": "3"
-            },
-            {
-                "kind": "aot",
-                "entrypoint": "getFail",
-                "args": ["11"],
+                "entrypoint": "geterr1",
                 "expected": null
             },
             {
                 "kind": "aot",
-                "entrypoint": "tox",
-                "expected": "true"
+                "entrypoint": "geterr2",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "submapop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "oftypeop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "castop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "projectops",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "excludeops",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "casterr",
+                "expected": null
             },
             {
                 "kind": "symexec",
-                "entrypoint": "empty",
-                "expected": "4"
+                "entrypoint": "sizeAndEmpty",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "dupkey",
-                "expected": "2"
+                "entrypoint": "hasop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "restCallSimpleArgsMap",
-                "expected": "2"
+                "entrypoint": "keylistop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "restCallOverlapArgsMap",
-                "expected": "1"
+                "entrypoint": "keysetop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "hasCyes",
-                "expected": "2"
+                "entrypoint": "valuesop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "hasCno",
-                "expected": "(- 1)"
+                "entrypoint": "entriesop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "insertCyes",
-                "expected": "4"
+                "entrypoint": "hasallop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "insertCno",
-                "expected": "3"
+                "entrypoint": "domainsubsetofop",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "removeCyes",
-                "expected": "2"
+                "entrypoint": "gettests",
+                "expected": "0"
             },
             {
                 "kind": "symexec",
-                "entrypoint": "removeCno",
-                "expected": "3"
+                "entrypoint": "geterr1",
+                "expected": null
             },
             {
                 "kind": "symexec",
-                "entrypoint": "tox",
-                "expected": "true"
+                "entrypoint": "geterr2",
+                "expected": null
             },
             {
-                "kind": "symtest",
-                "entrypoint": "getFail",
-                "error": true
+                "kind": "symexec",
+                "entrypoint": "submapop",
+                "expected": "0"
             },
             {
-                "kind": "symtest",
-                "entrypoint": "puzzle",
-                "error": true
+                "kind": "symexec",
+                "entrypoint": "oftypeop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "castop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "casterr",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "projectops",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "excludeops",
+                "expected": "0"
+            }
+        ]
+    },
+    {
+        "src": "listtests.bsq",
+        "tests": [
+            {
+                "kind": "compile"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sizeAndEmpty",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "frontBackGet",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "frontError",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "backError",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "getError",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "toSet",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "single",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "singleError",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "xof",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "countp",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "contcount",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "minmax",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "minerror",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "maxerror",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sumop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findnotop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findoperror",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findlastoperror",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexopalts",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexerr1",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexerr2",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexerr3",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexerr4",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnotop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnotopalts",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnoterr1",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnoterr2",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnoterr3",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "findindexnoterr4",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "filterop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "filternotop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "oftypeop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "castop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "casterr",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sliceop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sliceerr1",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sliceerr2",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sliceerr3",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "removefirstop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "removefirsterr",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "removelastop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "removelasterr",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "takewhileop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "uniqueop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "reverseop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "mapop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "mapindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "discardwhileop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "takeuntilop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "discarduntilop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "projectop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "projecterr",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "tryprojectop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "defaultprojectop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "zipindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "joinop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "joingroupop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "partitionop",
+                "expected": "0"
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "sort",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sizeAndEmpty",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "frontBackGet",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "frontError",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "backError",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "getError",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "toSet",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "single",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "singleError",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "xof",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "countp",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "contcount",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "minmax",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "minerror",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "maxerror",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sumop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findnotop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findoperror",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findlastoperror",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexopalts",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexerr1",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexerr2",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexerr3",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexerr4",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnotop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnotopalts",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnoterr1",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnoterr2",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnoterr3",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "findindexnoterr4",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "filterop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "filternotop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "oftypeop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "castop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "casterr",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sliceop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sliceerr1",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sliceerr2",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sliceerr3",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "removefirstop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "removefirsterr",
+                "expected": null
+            },
+            {
+                "kind": "aot",
+                "entrypoint": "removelastop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "removelasterr",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "takewhileop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "discardwhileop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "takeuntilop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "discarduntilop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "uniqueop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "reverseop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "mapop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "mapindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "projectop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "projecterr",
+                "expected": null
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "tryprojectop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "defaultprojectop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "zipindexop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "joinop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "joingroupop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "partitionop",
+                "expected": "0"
+            },
+            {
+                "kind": "symexec",
+                "entrypoint": "sort",
+                "expected": "0"
             }
         ]
     }

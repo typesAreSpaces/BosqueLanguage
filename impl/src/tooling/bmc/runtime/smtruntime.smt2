@@ -21,16 +21,18 @@
       (bsq_logicaltime 0)
       (bsq_cryptohash 0)
       (bsq_enum 0)
-      (bsq_idkey 0)
+      (bsq_idkeysimple 0)
+      (bsq_idkeycompound 0)
       (BKeyValue 0)
     ) (
-    ( (bsq_safestring@cons (bsq_safestring_type String) (bsq_safestring_value String)) )
-    ( (bsq_stringof@cons (bsq_stringof_type String) (bsq_stringof_value String)) )
+    ( (bsq_safestring@cons (bsq_safestring_type Int) (bsq_safestring_value String)) )
+    ( (bsq_stringof@cons (bsq_stringof_type Int) (bsq_stringof_value String)) )
     ( (bsq_uuid@cons (bsq_uuid_value String)) )
     ( (bsq_logicaltime@cons (bsq_logicaltime_value Int)) )
     ( (bsq_cryptohash@cons (bsq_cryptohash_value String)) )
-    ( (bsq_enum@cons (bsq_enum_type String) (bsq_enum_value Int)) )
-    ( (bsq_idkey@cons (bsq_idkey_type String) (bsq_idkey_value (Array Int BKeyValue))) )
+    ( (bsq_enum@cons (bsq_enum_type Int) (bsq_enum_value Int)) )
+    ( (bsq_idkeysimple@cons (bsq_idkeysimple_type Int) (bsq_idkeysimple_value BKeyValue)) )
+    ( (bsq_idkeycompound@cons (bsq_idkeycompound_type Int) (bsq_idkeycompound_value (Array Int BKeyValue))) )
     (
       (bsqkey_none) 
       (bsqkey_bool (bsqkey_bool_value Bool))
@@ -43,7 +45,8 @@
       (bsqkey_logicaltime (bsqkey_logicaltime_value bsq_logicaltime))
       (bsqkey_cryptohash (bsqkey_cryptohash_value bsq_cryptohash))
       (bsqkey_enum (bsqkey_enum_value bsq_enum))
-      (bsqkey_idkey (bsqkey_idkey_value bsq_idkey))
+      (bsqkey_idkeysimple (bsqkey_idkeysimple_value bsq_idkeysimple))
+      (bsqkey_idkeycompound (bsqkey_idkeycompound_value bsq_idkeycompound))
     )
 ))
 
@@ -59,11 +62,11 @@
     (bsq_object 0)
     (BTerm 0)
     ) (
-    ( (bsq_buffer@cons (bsq_buffer_type String) (bsq_buffer_contents String)) )
-    ( (bsq_bufferof@cons (bsq_bufferof_type String) (bsq_bufferof_contents String)) )
+    ( (bsq_buffer@cons (bsq_buffer_type Int) (bsq_buffer_contents String)) )
+    ( (bsq_bufferof@cons (bsq_bufferof_type Int) (bsq_bufferof_contents String)) )
     ( (bsq_bytebuffer@cons (bsq_bytebuffer_contents (Seq Int))) )
     ( (bsq_isotime@cons (bsq_isotime_value Int)) )
-    ( (bsq_regex@cons (bsq_regex_value String)) )
+    ( (bsq_regex@cons (bsq_regex_value Int)) )
     ( (bsq_tuple@cons (bsq_tuple_concepts StructuralSpecialTypeInfo) (bsq_tuple_entries (Array Int BTerm)))  )
     ( (bsq_record@cons (bsq_record_concepts StructuralSpecialTypeInfo) (bsq_record_entries (Array String BTerm))) )
     ;;NOMINAL_CONSTRUCTORS;;
@@ -82,31 +85,33 @@
       (bsqterm_regex (bsqterm_regex_value bsq_regex))
       (bsqterm_tuple (bsqterm_tuple_value bsq_tuple))
       (bsqterm_record (bsqterm_record_value bsq_record))
-      (bsqterm_object (bsqterm_object_type String) (bsqterm_object_value bsq_object))
+      (bsqterm_object (bsqterm_object_type Int) (bsqterm_object_value bsq_object))
     )
 ))
 
-(declare-fun nominalDataKinds (String) StructuralSpecialTypeInfo)
-;;NOMINAL_TYPE_TO_DATA_KIND_ASSERTS;;
+;;NOMINAL_TYPE_KIND_DECLS;;
 
-(declare-const MIRNominalTypeEnum_None String)
-(declare-const MIRNominalTypeEnum_Bool String)
-(declare-const MIRNominalTypeEnum_Int String)
-(declare-const MIRNominalTypeEnum_BigInt String)
-(declare-const MIRNominalTypeEnum_Float64 String)
-(declare-const MIRNominalTypeEnum_String String)
-(declare-const MIRNominalTypeEnum_UUID String)
-(declare-const MIRNominalTypeEnum_LogicalTime String)
-(declare-const MIRNominalTypeEnum_CryptoHash String)
-(declare-const MIRNominalTypeEnum_ByteBuffer String)
-(declare-const MIRNominalTypeEnum_ISOTime String)
-(declare-const MIRNominalTypeEnum_Tuple String)
-(declare-const MIRNominalTypeEnum_Record String)
-(declare-const MIRNominalTypeEnum_Regex String)
+(declare-const MIRNominalTypeEnum_None Int)
+(declare-const MIRNominalTypeEnum_Bool Int)
+(declare-const MIRNominalTypeEnum_Int Int)
+(declare-const MIRNominalTypeEnum_BigInt Int)
+(declare-const MIRNominalTypeEnum_Float64 Int)
+(declare-const MIRNominalTypeEnum_String Int)
+(declare-const MIRNominalTypeEnum_UUID Int)
+(declare-const MIRNominalTypeEnum_LogicalTime Int)
+(declare-const MIRNominalTypeEnum_CryptoHash Int)
+(declare-const MIRNominalTypeEnum_ByteBuffer Int)
+(declare-const MIRNominalTypeEnum_ISOTime Int)
+(declare-const MIRNominalTypeEnum_Tuple Int)
+(declare-const MIRNominalTypeEnum_Record Int)
+(declare-const MIRNominalTypeEnum_Regex Int)
 
 ;;SPECIAL_NAME_BLOCK_ASSERTS;;
 
-(define-fun bsqkey_get_nominal_type ((keyv BKeyValue)) String
+(declare-fun nominalDataKinds (Int) StructuralSpecialTypeInfo)
+;;NOMINAL_TYPE_TO_DATA_KIND_ASSERTS;;
+
+(define-fun bsqkey_get_nominal_type ((keyv BKeyValue)) Int
   (ite (= keyv bsqkey_none) MIRNominalTypeEnum_None
     (ite (is-bsqkey_bool keyv) MIRNominalTypeEnum_Bool
       (ite (is-bsqkey_int keyv) MIRNominalTypeEnum_Int
@@ -118,7 +123,9 @@
                   (ite (is-bsqkey_logicaltime keyv) MIRNominalTypeEnum_LogicalTime
                     (ite (is-bsqkey_cryptohash keyv) MIRNominalTypeEnum_CryptoHash
                       (ite (is-bsqkey_enum keyv) (bsq_enum_type (bsqkey_enum_value keyv))
-                        (bsq_idkey_type (bsqkey_idkey_value keyv))
+                        (ite (is-bsqkey_idkeysimple keyv) (bsq_idkeysimple_type (bsqkey_idkeysimple_value keyv))
+                          (bsq_idkeycompound_type (bsqkey_idkeycompound_value keyv))
+                        )
                       )
                     )
                   )
@@ -132,7 +139,7 @@
   )
 )
 
-(define-fun bsqterm_get_nominal_type ((term BTerm)) String
+(define-fun bsqterm_get_nominal_type ((term BTerm)) Int
   (ite (is-bsqterm_float64 term) MIRNominalTypeEnum_Float64
     (ite (is-bsqterm_key term) (bsqkey_get_nominal_type (bsqterm_key_value term))
       (ite (is-bsqterm_buffer term) (bsq_buffer_type (bsqterm_buffer_value term))
@@ -157,7 +164,7 @@
 (define-fun bsqkeyless_basetypes ((k1 BKeyValue) (k2 BKeyValue)) Bool
   (let ((k1t (bsqkey_get_nominal_type k1)) (k2t (bsqkey_get_nominal_type k2)))
     (ite (not (= k1t k2t))
-      (str.< k1t k2t)
+      (< k1t k2t)
       (ite (and (= k1 bsqkey_none) (= k2 bsqkey_none)) false
         (ite (and (is-bsqkey_bool k1) (is-bsqkey_bool k2)) (and (not (bsqkey_bool_value k1)) (bsqkey_bool_value k2))
           (ite (and (is-bsqkey_int k1) (is-bsqkey_int k2)) (< (bsqkey_int_value k1) (bsqkey_int_value k2))
@@ -183,7 +190,14 @@
   )
 )
 
-(define-fun bsqkeyless_identity ((idtype String) (k1 bsq_idkey) (k2 bsq_idkey)) Bool
+(define-fun bsqkeyless_identitysimple ((idtype Int) (k1 bsq_idkeysimple) (k2 bsq_idkeysimple)) Bool
+;;
+;;TODO -- need to gas bound and generate this (and bsqkeyless programatically)
+;;
+false
+)
+
+(define-fun bsqkeyless_identitycompound ((idtype Int) (k1 bsq_idkeycompound) (k2 bsq_idkeycompound)) Bool
 ;;
 ;;TODO -- need to gas bound and generate this (and bsqkeyless programatically)
 ;;
@@ -193,10 +207,13 @@ false
 (define-fun bsqkeyless ((k1 BKeyValue) (k2 BKeyValue)) Bool
   (let ((k1t (bsqkey_get_nominal_type k1)) (k2t (bsqkey_get_nominal_type k2)))
     (ite (not (= k1t k2t))
-      (str.< k1t k2t)
-      (ite (and (is-bsqkey_idkey k1) (is-bsqkey_idkey k2))
-        (bsqkeyless_identity k1t (bsqkey_idkey_value k1) (bsqkey_idkey_value k2))
-        (bsqkeyless_basetypes k1 k2)
+      (< k1t k2t)
+      (ite (and (is-bsqkey_idkeycompound k1) (is-bsqkey_idkeycompound k2))
+        (bsqkeyless_identitycompound k1t (bsqkey_idkeycompound_value k1) (bsqkey_idkeycompound_value k2))
+        (ite (and (is-bsqkey_idkeysimple k1) (is-bsqkey_idkeysimple k2))
+          (bsqkeyless_identitysimple k1t (bsqkey_idkeysimple_value k1) (bsqkey_idkeysimple_value k2))
+          (bsqkeyless_basetypes k1 k2)
+        )
       )
     )
   )
@@ -257,8 +274,10 @@ false
     ;;RESULTS;;
 ))
 
-(declare-const mirconceptsubtypearray_empty (Array String Bool))
-(assert (= mirconceptsubtypearray_empty ((as const (Array String Bool)) false)))
+(declare-const mirconceptsubtypearray_empty (Array Int Bool))
+(assert (= mirconceptsubtypearray_empty ((as const (Array Int Bool)) false)))
+
+;;REGEX_DECLS;;
 
 ;;CONCEPT_SUBTYPE_RELATION_DECLARE;;
 

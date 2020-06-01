@@ -36,7 +36,7 @@ An overarching theme of the Bosque project is increasing the ability of automate
 
 ## News
 
-**May 2020:** We will be running a Bosque Webinar with Live Q&A on May 14th (registration is [here](https://note.microsoft.com/MSR-Webinar-Programming-Languages-Bosque-Registration-Live.html)). An on demand recording will be available as well for those that cannot make the live event. 
+**May 2020:** We will be running a Bosque Webinar with Live Q&A on May 27th (registration is [here](https://note.microsoft.com/MSR-Webinar-Programming-Languages-Bosque-Registration-Live.html)). An on demand recording will be available as well for those that cannot make the live event. 
 
 ## Documentation
 
@@ -68,7 +68,7 @@ add2(y=2, 5)   //7
 
 ```none
 function allPositive(...args: List<Int>): Bool {
-    return args->allOf(fn(x) => x >= 0);
+    return args.allOf(fn(x) => x >= 0);
 }
 
 allPositive(1, 3, 4) //true
@@ -135,12 +135,12 @@ entity NamedGreeting provides WithName, Greeting {
     }
 }
 
-GenericGreeting@{}->sayHello()         //"hello world"
-GenericGreeting::instance->sayHello()  //"hello world"
+GenericGreeting@{}.sayHello()         //"hello world"
+GenericGreeting::instance.sayHello()  //"hello world"
 
-NamedGreeting@{}->sayHello()           //type error no value provided for "name" field
-NamedGreeting@{name=""}->sayHello()    //invariant error
-NamedGreeting@{name="bob"}->sayHello() //"hello bob"
+NamedGreeting@{}.sayHello()           //type error no value provided for "name" field
+NamedGreeting@{name=""}.sayHello()    //invariant error
+NamedGreeting@{name="bob"}.sayHello() //"hello bob"
 ```
 
 **Validated and Typed Strings:**
@@ -149,7 +149,7 @@ typedef Letter = /\w/;
 typedef Digit = /\d/;
 
 function fss(s1: SafeString<Digit>): Bool {
-    return s1->string() == "3";
+    return s1.string() == "3";
 }
 
 Digit::accepts("a"); //false
@@ -290,7 +290,7 @@ function checkIntBounds(arg: Int?): Bool {
 }
 
 entrypoint function processOp(op: String, arg1: Int, arg2: Int?): Int 
-    requires release NSMain::ops->has(op);
+    requires release NSMain::ops.has(op);
     requires release checkIntBounds(arg1) && checkIntBounds(arg2);
     //requires release (op == "add" || op == "sub") ==> arg2 != none;
 {
@@ -371,7 +371,7 @@ In order to build the language the following are needed:
 - 64 bit Operating System
 - The LTS version of [node.js](https://nodejs.org/en/download/) ( According to your OS )
 - Typescript (install with: `npm i typescript -g`)
-- A C++ compiler -- by default `clang` on Windows and `g++` on Linux/Mac
+- A C++ compiler -- by default `clang` on Windows/Linux/Mac
 
 ### Build & Test
 
