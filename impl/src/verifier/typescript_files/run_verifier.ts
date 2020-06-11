@@ -10,7 +10,8 @@ import { TranslatorBosqueFStar } from "./translator_bosque_fstar";
 setImmediate(() => {
 
   const file_directory = Path.normalize(Path.join(__dirname, "./../../../src/test/apps/max"));
-  const file_name = "simple_main.bsq";
+  //const file_name = "simple_main.bsq";
+  const file_name = "main.bsq";
   const fkey = "NSMain::main";
 
   const masm = bosqueToMASM([`${file_directory}/${file_name}`], "cpp"); 

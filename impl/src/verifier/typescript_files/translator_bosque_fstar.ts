@@ -603,6 +603,8 @@ class TranslatorBosqueFStar {
       case MIROpTag.MIRInvokeFixedFunction: {
         const opCallNamespaceFunction = op as MIRInvokeFixedFunction;
         const currentFunctionKey = opCallNamespaceFunction.mkey;
+        console.log("hey");
+        console.log(currentFunctionKey);
         // The following line will keep pushing to 
         // the stack_expressions stack
 
