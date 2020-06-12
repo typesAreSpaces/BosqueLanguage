@@ -8,7 +8,7 @@
 
 class GraphFormulas {
   z3::context ctx;
-  z3::expr_vector formulas;
+  z3::expr_vector assertions;
   public:
     GraphFormulas(const char *);
     friend std::ostream & operator << (std::ostream &, const GraphFormulas &);

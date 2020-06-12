@@ -26,4 +26,3 @@ run: $(PROJECT)
 .PHONY: clean
 clean: 
 	rm -rf $(ODIR)/* $(PROJECT)
-

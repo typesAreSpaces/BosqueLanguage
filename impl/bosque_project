@@ -1,0 +1,115 @@
+let SessionLoad = 1
+let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+let v:this_session=expand("<sfile>:p")
+silent only
+cd ~/Documents/GithubProjects/BosqueLanguage/impl
+if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
+  let s:wipebuf = bufnr('%')
+endif
+set shortmess=aoO
+badd +29 src/verifier/typescript_files/run_verifier.ts
+badd +615 src/verifier/typescript_files/translator_bosque_fstar.ts
+badd +1 src/test/apps/max/main.bsq
+badd +56 src/test/apps/max/simple_main.bsq
+badd +117 src/test/tests/expression/callargs.bsq
+badd +634 src/compiler/mir_ops.ts
+badd +73 src/compiler/mir_ssa.ts
+badd +67 src/compiler/mir_vartype.ts
+badd +168 src/compiler/mir_emitter.ts
+badd +5 src/verifier/typescript_files/util.ts
+argglobal
+%argdel
+edit src/test/apps/max/main.bsq
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd _ | wincmd |
+split
+1wincmd k
+wincmd w
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe '1resize ' . ((&lines * 26 + 30) / 60)
+exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
+exe '2resize ' . ((&lines * 31 + 30) / 60)
+exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
+exe 'vert 3resize ' . ((&columns * 157 + 157) / 315)
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 14 - ((13 * winheight(0) + 13) / 26)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+14
+normal! 0
+wincmd w
+argglobal
+if bufexists("src/verifier/typescript_files/run_verifier.ts") | buffer src/verifier/typescript_files/run_verifier.ts | else | edit src/verifier/typescript_files/run_verifier.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 11 - ((10 * winheight(0) + 15) / 31)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+11
+normal! 0
+wincmd w
+argglobal
+if bufexists("src/verifier/typescript_files/translator_bosque_fstar.ts") | buffer src/verifier/typescript_files/translator_bosque_fstar.ts | else | edit src/verifier/typescript_files/translator_bosque_fstar.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 935 - ((28 * winheight(0) + 29) / 58)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+935
+normal! 07|
+wincmd w
+exe '1resize ' . ((&lines * 26 + 30) / 60)
+exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
+exe '2resize ' . ((&lines * 31 + 30) / 60)
+exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
+exe 'vert 3resize ' . ((&columns * 157 + 157) / 315)
+tabnext 1
+if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+  silent exe 'bwipe ' . s:wipebuf
+endif
+unlet! s:wipebuf
+set winheight=1 winwidth=20 winminheight=1 winminwidth=1 shortmess=filnxtToOFIc
+let s:sx = expand("<sfile>:p:r")."x.vim"
+if file_readable(s:sx)
+  exe "source " . fnameescape(s:sx)
+endif
+let &so = s:so_save | let &siso = s:siso_save
+doautoall SessionLoadPost
+unlet SessionLoad
+" vim: set ft=vim :

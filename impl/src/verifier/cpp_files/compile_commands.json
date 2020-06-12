@@ -1,0 +1,34 @@
+[
+ {
+  "directory": "/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/verifier/cpp_files",
+  "arguments": [
+   "g++",
+   "-g",
+   "-c",
+   "-o",
+   "obj/GraphFormulas.o",
+   "-I./src",
+   "-I./include",
+   "-std=c++11",
+   "-Wall",
+   "src/GraphFormulas.cpp"
+  ],
+  "file": "src/GraphFormulas.cpp"
+ },
+ {
+  "directory": "/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/verifier/cpp_files",
+  "arguments": [
+   "g++",
+   "-g",
+   "-c",
+   "-o",
+   "obj/main.o",
+   "-I./src",
+   "-I./include",
+   "-std=c++11",
+   "-Wall",
+   "src/main.cpp"
+  ],
+  "file": "src/main.cpp"
+ }
+]
