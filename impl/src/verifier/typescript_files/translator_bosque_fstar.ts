@@ -25,7 +25,7 @@ import {
   MIRAccessFromField,
   MIRProjectFromFields,
   MIRConstructorPrimaryCollectionSingletons,
-  MIRBinEq, MIRAccessArgVariable, MIRAccessConstantValue
+  MIRBinEq, MIRAccessConstantValue
 } from "../../compiler/mir_ops";
 import { computeBlockLinks, FlowLink } from "../../compiler/mir_info";
 import { ExprExpr, ReturnExpr, AssignmentExpr, ConditionalExpr } from "./expression_expr";
