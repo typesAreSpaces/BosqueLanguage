@@ -217,27 +217,24 @@ class BSQRefScope
 {
 private:
     std::vector<BSQRef*> opts;
-    bool nodec;
+    bool passdirect;
 
 public:
-    BSQRefScope() : opts(), nodec(false)
+    BSQRefScope() : opts(), passdirect(false)
     {
         ;
     }
 
-    BSQRefScope(bool nodec) : opts(), nodec(nodec)
+    BSQRefScope(bool passdirect) : opts(), passdirect(passdirect)
     {
         ;
     }
 
     ~BSQRefScope()
     {
-        if (!nodec)
+        for (uint16_t i = 0; i < this->opts.size(); ++i)
         {
-            for (uint16_t i = 0; i < this->opts.size(); ++i)
-            {
-                this->opts[i]->decrement();
-            }
+            this->opts[i]->decrement();
         }
     }
 
@@ -264,7 +261,10 @@ public:
     inline void callReturnDirect(BSQRef* ptr)
     {
         ptr->increment();
-        this->opts.push_back(ptr);
+        if (!passdirect)
+        {
+            this->opts.push_back(ptr);
+        }
     }
 
     inline void processReturnChecked(Value v)
@@ -273,7 +273,10 @@ public:
         {
             BSQRef* ptr = BSQ_GET_VALUE_PTR(v, BSQRef);
             ptr->increment();
-            this->opts.push_back(ptr);
+            if (!passdirect)
+            {
+                this->opts.push_back(ptr);
+            }
         }
     }
 };
@@ -402,9 +405,10 @@ DATA_KIND_FLAG getDataKindFlag(Value v);
 
 std::string diagnostic_format(Value v);
 
+template <typename T>
 struct RCIncFunctor_BSQRef
 {
-    inline BSQRef* operator()(BSQRef* r) const { return INC_REF_DIRECT(BSQRef, r); }
+    inline T* operator()(BSQRef* r) const { return INC_REF_DIRECT(T, r); }
 };
 struct RCDecFunctor_BSQRef
 {

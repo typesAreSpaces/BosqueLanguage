@@ -88,7 +88,7 @@ public:
         std::for_each(m->entries.begin(), m->entries.end(), [p, &entries](MEntry<K, V>& v) {
             if(p(v.key, v.value))
             {
-                entries.push_back(MEntry<K, V>{K_RCIncF{}(v.key), V_RCIncF{}(v.value)});
+                entries.emplace_back(MEntry<K, V>{K_RCIncF{}(v.key), V_RCIncF{}(v.value)});
             }
         });
 
@@ -102,7 +102,7 @@ public:
         std::for_each(m->entries.begin(), m->entries.end(), [tck, tcv, cc, &entries](MEntry<K, V>& v) {
             if(tck(v.key) && tcv(v.value))
             {
-                entries.push_back(cc(v.key, v.value));
+                entries.emplace_back(cc(v.key, v.value));
             }
         });
 
@@ -116,7 +116,7 @@ public:
         std::for_each(m->entries.begin(), m->entries.end(), [tck, tcv, cc, &entries](MEntry<K, V>& v) {
             BSQ_ASSERT(tck(v.key) && tcv(v.value), "abort -- invalid element in cast in Map<K, V>::cast");
 
-            entries.push_back(cc(v.key, v.value));
+            entries.emplace_back(cc(v.key, v.value));
         });
 
         return BSQ_NEW_NO_RC(RMType, ntype, move(entries));
@@ -131,7 +131,7 @@ public:
             V vv;
             if(m->tryGetValue(k, &vv))
             {
-                entries.push_back(MEntry<K, V>{K_RCIncF{}(k), V_RCIncF{}(vv)});
+                entries.emplace_back(MEntry<K, V>{K_RCIncF{}(k), V_RCIncF{}(vv)});
             }
         });
 
@@ -149,7 +149,7 @@ public:
             bool has = es.find(e.key) != es.end();
             if(!has)
             {
-                entries.push_back(MEntry<K, V>{K_RCIncF{}(e.key), V_RCIncF{}(e.value)});
+                entries.emplace_back(MEntry<K, V>{K_RCIncF{}(e.key), V_RCIncF{}(e.value)});
             }
         });
 
@@ -165,7 +165,7 @@ public:
             V vv;
             if(m->tryGetValue(k, &vv))
             {
-                entries.push_back(MEntry<K, V>{K_RCIncF{}(k), V_RCIncF{}(vv)});
+                entries.emplace_back(MEntry<K, V>{K_RCIncF{}(k), V_RCIncF{}(vv)});
             }
         });
 
@@ -182,24 +182,125 @@ public:
             bool has = ds->has(e.key);
             if(!has)
             {
-                entries.push_back(MEntry<K, V>{K_RCIncF{}(e.key), V_RCIncF{}(e.value)});
+                entries.emplace_back(MEntry<K, V>{K_RCIncF{}(e.key), V_RCIncF{}(e.value)});
             }
         });
 
         return BSQ_NEW_NO_RC(Ty, m->nominalType, move(entries));
     }
 
-    template <typename K_RCIncF, typename U, typename U_RCDecF, typename U_DisplayF, MIRNominalTypeEnum ntype, typename LambdaF>
-    static BSQMap<K, K_RCDecF, K_DisplayF, K_CMP, K_EQ, U, U_RCDecF, U_DisplayF>* map_remap(Ty* m)
+    template <typename MapT, typename U, MIRNominalTypeEnum ntype, typename K_RCInc, typename LambdaF>
+    static MapT* map_remap(Ty* m, LambdaF f)
     {
-        std::vector<MEntry<K, V>> entries;
+        std::vector<MEntry<K, U>> entries;
         entries.reserve(m->entries.size());
 
-        std::transform(m->entries.begin(), m->entries.end(), std::back_inserter(entries), [](MEntry<K, V>& v) -> MEntry<K, V> {
-            return MEntry<K, U>{K_RCIncF{}(v.key), LambdaF{}(v.key, v.value)};
+        std::transform(m->entries.begin(), m->entries.end(), std::back_inserter(entries), [f](MEntry<K, V>& v) -> MEntry<K, U> {
+            return MEntry<K, U>{K_RCInc{}(v.key), f(v.key, v.value)};
         });
 
-        return BSQ_NEW_NO_RC((BSQMap<K, K_RCDecF, K_DisplayF, K_CMP, K_EQ, U, U_RCDecF, U_DisplayF>), ntype, move(entries));
+        return BSQ_NEW_NO_RC(MapT, ntype, move(entries));
+    }
+
+    template <typename MapT, typename U, typename U_RCInc, MIRNominalTypeEnum ntype, typename K_RCInc, typename MapU>
+    static MapT* map_compose(Ty* m1, MapU* m2)
+    {
+        std::vector<MEntry<K, U>> entries;
+        entries.reserve(m1->entries.size());
+
+        std::transform(m1->entries.begin(), m1->entries.end(), std::back_inserter(entries), [m2](MEntry<K, V>& v) -> MEntry<K, U> {
+            U uu;
+            bool ok = m2->tryGetValue(v.value, &uu);
+            BSQ_ASSERT(ok, "abort -- missing Key for Map<K, V>::compose");
+
+            return MEntry<K, U>{K_RCInc{}(v.key), U_RCInc{}(uu)};
+        });
+
+        return BSQ_NEW_NO_RC(MapT, ntype, move(entries));
+    }
+
+    template <typename MapT, typename U, typename MU, MIRNominalTypeEnum ntype, typename K_RCInc, typename MapU, typename UConvF>
+    static MapT* map_trycompose(Ty* m1, MapU* m2, MU unone, UConvF uc)
+    {
+        std::vector<MEntry<K, MU>> entries;
+        
+        std::transform(m1->entries.begin(), m1->entries.end(), std::back_inserter(entries), [m2, uc, unone](MEntry<K, V>& v) -> MEntry<K, MU> {
+            U uu;
+            if(m2->tryGetValue(v.value, &uu))
+            {
+                return MEntry<K, MU>{K_RCInc{}(v.key), uc(uu)};
+            }
+            else
+            {
+                return MEntry<K, MU>{K_RCInc{}(v.key), unone};
+            }
+        });
+
+        return BSQ_NEW_NO_RC(MapT, ntype, move(entries));
+    }
+
+    template <typename MapT, typename U, typename U_RCInc, MIRNominalTypeEnum ntype, typename K_RCInc, typename MapU>
+    static MapT* map_defaultcompose(Ty* m1, MapU* m2, U dflt)
+    {
+        std::vector<MEntry<K, U>> entries;
+        entries.reserve(m1->entries.size());
+
+        std::transform(m1->entries.begin(), m1->entries.end(), std::back_inserter(entries), [m2, dflt](MEntry<K, V>& v) -> MEntry<K, U> {
+            U uu;
+            if(m2->tryGetValue(v.value, &uu))
+            {
+                return MEntry<K, U>{K_RCInc{}(v.key), U_RCInc{}(uu)};
+            }
+            else
+            {
+                return MEntry<K, U>{K_RCInc{}(v.key), U_RCInc{}(dflt)};
+            }
+        });
+
+        return BSQ_NEW_NO_RC(MapT, ntype, move(entries));
+    }
+
+    template <typename MapT, MIRNominalTypeEnum ntype, typename K_RCInc, typename V_RCInc, typename V_CMP, typename V_EQ>
+    static MapT* map_injinvert(Ty* m)
+    {
+        std::vector<MEntry<V, K>> entries;
+        entries.reserve(m->entries.size());
+
+        std::transform(m->entries.begin(), m->entries.end(), std::back_inserter(entries), [](MEntry<K, V>& v) -> MEntry<V, K> {
+            return MEntry<V, K>{V_RCInc{}(v.value), K_RCInc{}(v.key)};
+        });
+
+        std::stable_sort(entries.begin(), entries.end(), MEntryCMP<V, K, V_CMP>{});
+        auto dup = std::adjacent_find(entries.begin(), entries.end(), MEntryEQ<V, K, V_EQ>{});
+        BSQ_ASSERT(dup == entries.end(), "abort -- cannot injectively invert map with duplicate values");
+
+        return BSQ_NEW_NO_RC(MapT, ntype, move(entries));
+    }
+
+    template <typename ListT, MIRNominalTypeEnum lntype, typename MapT, MIRNominalTypeEnum mntype, typename K_RCInc, typename V_RCInc, typename V_CMP>
+    static MapT* map_relinvert(Ty* m)
+    {
+        std::map<V, std::vector<K>, V_CMP> partitions;
+        std::for_each(m->entries.begin(), m->entries.end(), [&partitions](MEntry<K, V>& entry) {
+            auto pp = partitions.find(entry.value);
+
+            if(pp != partitions.end())
+            {
+                pp->second.emplace_back(K_RCInc{}(entry.key));
+            }
+            else 
+            {
+                partitions.emplace(V_RCInc{}(entry.value), std::vector<K>{K_RCInc{}(entry.key)});
+            }
+        });
+
+        std::vector<MEntry<V, ListT*>> mentries;
+        std::transform(partitions.begin(), partitions.end(), std::back_inserter(mentries), [](std::pair<V, std::vector<K>>&& me) -> MEntry<V, ListT*> {
+            auto le = BSQ_NEW_NO_RC(ListT, lntype, std::move(me.second));
+            return MEntry<V, ListT*>{me.first, INC_REF_DIRECT(ListT, le)};
+        });
+
+        return BSQ_NEW_NO_RC(MapT, mntype, move(mentries));
     }
 
     template <typename K_RCIncF, typename V_RCIncF>
@@ -207,19 +308,19 @@ public:
     {
         std::map<K, V, K_CMP> rm;
 
-        std::transform(m->entries.begin(), m->entries.end(), std::inserter(rm, rm.end()), [](MEntry<K, V>& e) -> std::pair<K, V> {
+        std::transform(m->entries.begin(), m->entries.end(), std::inserter(rm, rm.begin()), [](const MEntry<K, V>& e) -> std::pair<K, V> {
             return std::make_pair(e.key, e.value);
         });
 
-        std::for_each(om->entries.begin(), om->entries.end(), [&rm](MEntry<K, V>& e) -> std::pair<K, V> {
+        std::for_each(om->entries.begin(), om->entries.end(), [&rm](const MEntry<K, V>& e) {
             BSQ_ASSERT(rm.find(e.key) == rm.end(), "abort -- cannot have duplicate keys in Map<K, V>::union");
 
-            rm.insert(e.key, e.value);
+            rm.insert(std::make_pair(e.key, e.value));
         });
 
         std::vector<MEntry<K, V>> entries;
-        std::transform(rm->entries.begin(), rm->entries.end(), std::back_inserter(entries), [](std::pair<K, V>& e) -> MEntry<K, V> {
-            return MEntry<K, V>(K_RCIncF{}(e.key), V_RCIncF{}(e.value));
+        std::transform(rm.begin(), rm.end(), std::back_inserter(entries), [](const std::pair<K, V>& e) -> MEntry<K, V> {
+            return MEntry<K, V>{K_RCIncF{}(e.first), V_RCIncF{}(e.second)};
         });
 
         return BSQ_NEW_NO_RC(Ty, m->nominalType, move(entries));
@@ -231,21 +332,17 @@ public:
         std::map<K, V, K_CMP> rm;
         std::vector<Ty*>& maps = dl->entries;
 
-        std::transform(maps.begin()->entries.begin(), maps.begin()->entries.end(), std::inserter(rm, rm.end()), [](MEntry<K, V>& e) -> std::pair<K, V> {
-            return std::make_pair(e.key, e.value);
-        });
-
-        std::for_each(maps.begin() + 1, maps.end(), [&rm](Ty* om) {
-            std::for_each(om->entries.begin(), om->entries.end(), [&rm](MEntry<K, V>& e) {
+        std::for_each(maps.begin(), maps.end(), [&rm](Ty* om) {
+            std::for_each(om->entries.begin(), om->entries.end(), [&rm](const MEntry<K, V>& e) {
                 BSQ_ASSERT(rm.find(e.key) == rm.end(), "abort -- cannot have duplicate keys in Map<K, V>::unionAll");
 
-                rm.insert(e.key, e.value);
+                rm.insert(std::make_pair(e.key, e.value));
             });
         });
 
         std::vector<MEntry<K, V>> entries;
-        std::transform(rm->entries.begin(), rm->entries.end(), std::back_inserter(entries), [](std::pair<K, V>& e) -> MEntry<K, V> {
-            return MEntry<K, V>(K_RCIncF{}(e.key), V_RCIncF{}(e.value));
+        std::transform(rm.begin(), rm.end(), std::back_inserter(entries), [](const std::pair<K, V>& e) -> MEntry<K, V> {
+            return MEntry<K, V>{K_RCIncF{}(e.first), V_RCIncF{}(e.second)};
         });
 
         return BSQ_NEW_NO_RC(Ty, ntype, move(entries));
@@ -256,17 +353,17 @@ public:
     {
         std::map<K, V, K_CMP> rm;
 
-        std::transform(m->entries.begin(), m->entries.end(), std::inserter(rm, rm.end()), [](MEntry<K, V>& e) -> std::pair<K, V> {
+        std::transform(m->entries.begin(), m->entries.end(), std::inserter(rm, rm.begin()), [](const MEntry<K, V>& e) -> std::pair<K, V> {
             return std::make_pair(e.key, e.value);
         });
 
-        std::for_each(om->entries.begin(), om->entries.end(), [&rm](MEntry<K, V>& e) -> std::pair<K, V> {
-            rm.insert(e.key, e.value);
+        std::for_each(om->entries.begin(), om->entries.end(), [&rm](const MEntry<K, V>& e) {
+            rm[e.key] = e.value;
         });
 
         std::vector<MEntry<K, V>> entries;
-        std::transform(rm->entries.begin(), rm->entries.end(), std::back_inserter(entries), [](std::pair<K, V>& e) -> MEntry<K, V> {
-            return MEntry<K, V>(K_RCIncF{}(e.key), V_RCIncF{}(e.value));
+        std::transform(rm.begin(), rm.end(), std::back_inserter(entries), [](const std::pair<K, V>& e) -> MEntry<K, V> {
+            return MEntry<K, V>{K_RCIncF{}(e.first), V_RCIncF{}(e.second)};
         });
 
         return BSQ_NEW_NO_RC(Ty, m->nominalType, move(entries));
@@ -278,19 +375,15 @@ public:
         std::map<K, V, K_CMP> rm;
         std::vector<Ty*>& maps = dl->entries;
 
-        std::transform(maps.begin()->entries.begin(), maps.begin()->entries.end(), std::inserter(rm, rm.begin()), [](MEntry<K, V>& e) -> std::pair<K, V> {
-            return std::make_pair(e.key, e.value);
-        });
-
-        std::for_each(maps.begin() + 1, maps.end(), [&rm](Ty* om) {
-            std::for_each(om->entries.begin(), om->entries.end(), [&rm](MEntry<K, V>& e) {
-                rm.insert(e.key, e.value);
+        std::for_each(maps.begin(), maps.end(), [&rm](Ty* om) {
+            std::for_each(om->entries.begin(), om->entries.end(), [&rm](const MEntry<K, V>& e) {
+                rm[e.key] = e.value;
             });
         });
 
         std::vector<MEntry<K, V>> entries;
-        std::transform(rm->entries.begin(), rm->entries.end(), std::back_inserter(entries), [](std::pair<K, V>& e) -> MEntry<K, V> {
-            return MEntry<K, V>(K_RCIncF{}(e.key), V_RCIncF{}(e.value));
+        std::transform(rm.begin(), rm.end(), std::back_inserter(entries), [](const std::pair<K, V>& e) -> MEntry<K, V> {
+            return MEntry<K, V>{K_RCIncF{}(e.first), V_RCIncF{}(e.second)};
         });
 
         return BSQ_NEW_NO_RC(Ty, ntype, move(entries));

@@ -333,7 +333,7 @@ class Lexer {
 
     private static readonly _s_intRe = /(0|[1-9][0-9]*)/y;
     private static readonly _s_bigintRe = /(0|[1-9][0-9]*)n/y;
-    private static readonly _s_floatRe = /[0-9]+\.[0-9]+f/y;
+    private static readonly _s_floatRe = /([0-9]+(\.[0-9]+)?|\.[0-9]+)([eE][-+]?[0-9]+)?f/y;
     private tryLexNumber(): boolean {
         Lexer._s_floatRe.lastIndex = this.m_cpos;
         const mf = Lexer._s_floatRe.exec(this.m_input);
@@ -828,7 +828,7 @@ class Parser {
 
             const bodyid = `${srcFile}::${sinfo.pos}`;
             try {
-                this.m_penv.pushFunctionScope(new FunctionScope(argNames, resultInfo));
+                this.m_penv.pushFunctionScope(new FunctionScope(argNames, resultInfo, ispcode));
                 body = this.parseBody(bodyid, srcFile, fparams.map((p) => p.name));
                 captured = this.m_penv.getCurrentFunctionScope().getCaptureVars();
                 this.m_penv.popFunctionScope();
@@ -1346,10 +1346,15 @@ class Parser {
             return new LiteralRegexExpression(sinfo, restr);
         }
         else if (tk === TokenStrings.Identifier) {
-            const istr = this.consumeTokenAndGetValue();
+            let istr = this.consumeTokenAndGetValue();
 
             const ns = this.m_penv.tryResolveNamespace(undefined, istr);
             if (ns === undefined) {
+                //In lambda/pcode bodies we want to bind "this" to the enclosing this *NOT* the accidental "this" any internal method invocations
+                if(this.m_penv.getCurrentFunctionScope().isPCodeEnv() && istr === "this") {
+                    istr = "$$this_captured";
+                }
+
                 //Ignore special postcondition $return variable but everything else should be processed
                 if (istr !== "$return") {
                     this.m_penv.getCurrentFunctionScope().useLocalVar(istr);
@@ -1629,11 +1634,32 @@ class Parser {
                         ops.push(new PostfixAccessFromName(sinfo, isElvis, name));
                     }
                     else {
-                        const terms = this.testToken("<") ? this.parseTemplateArguments() : new TemplateArguments([]);
-                        const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
-                        const args = this.parseArguments("(", ")");
-    
-                        ops.push(new PostfixInvoke(sinfo, isElvis, specificResolve, name, terms, pragmas, args));
+                        //ugly ambiguity with < -- the follows should be a NS, Type, or T token
+                        //
+                        //TODO: in theory it could also be a "(" and we need to do a tryParseType thing
+                        //
+                        if(this.testToken("<")) {
+                            if (this.testFollows("<", TokenStrings.Namespace) || this.testFollows("<", TokenStrings.Type) || this.testFollows("<", TokenStrings.Template)) {
+                                const terms = this.parseTemplateArguments();
+                                const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
+                                const args = this.parseArguments("(", ")");
+
+                                ops.push(new PostfixInvoke(sinfo, isElvis, specificResolve, name, terms, pragmas, args));
+                            }
+                            else {
+                                if(specificResolve !== undefined) {
+                                    this.raiseError(this.getCurrentLine(), "Encountered named access but given type resolver (only valid on method calls)");
+                                }
+        
+                                ops.push(new PostfixAccessFromName(sinfo, isElvis, name));
+                            }
+                        }
+                        else {
+                            const pragmas = this.testToken("[") ? this.parsePragmaArguments() : new PragmaArguments("no", []);
+                            const args = this.parseArguments("(", ")");
+
+                            ops.push(new PostfixInvoke(sinfo, isElvis, specificResolve, name, new TemplateArguments([]), pragmas, args));
+                        }
                     }
                 }
             }
@@ -1918,7 +1944,7 @@ class Parser {
 
         let entries: MatchEntry<Expression>[] = [];
         this.ensureAndConsumeToken("{");
-        while (this.testToken("type") || this.testToken("case")) {
+        while (this.testToken("type") || this.testToken("case") || (this.testToken(TokenStrings.Identifier) && this.peekTokenData() === "_")) {
             if (this.testToken("type")) {
                 entries.push(this.parseMatchEntry<Expression>(sinfo, true, () => this.parseExpression()));
             }
@@ -2494,7 +2520,10 @@ class Parser {
     }
 
     private parseMatchEntry<T>(sinfo: SourceInfo, istypematch: boolean, actionp: () => T): MatchEntry<T> {
-        this.consumeToken();
+        if(!this.testToken(TokenStrings.Identifier)) {
+            this.consumeToken();
+        }
+
         const guard = this.parseMatchGuard(sinfo, istypematch);
         this.ensureAndConsumeToken("=>");
         const action = actionp();
@@ -2513,7 +2542,7 @@ class Parser {
 
         let entries: MatchEntry<BlockStatement>[] = [];
         this.ensureAndConsumeToken("{");
-        while (this.testToken("type") || this.testToken("case")) {
+        while (this.testToken("type") || this.testToken("case") || (this.testToken(TokenStrings.Identifier) && this.peekTokenData() === "_")) {
             if (this.testToken("type")) {
                 entries.push(this.parseMatchEntry<BlockStatement>(sinfo, true, () => this.parseBlockStatement()));
             }
@@ -2649,7 +2678,7 @@ class Parser {
     private parsePreAndPostConditions(sinfo: SourceInfo, argnames: Set<string>, rtype: TypeSignature): [PreConditionDecl[], PostConditionDecl[]] {
         let preconds: PreConditionDecl[] = [];
         try {
-            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(argnames), rtype));
+            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(argnames), rtype, false));
             while (this.testToken("requires") || this.testToken("validate")) {
                 const isvalidate = this.testToken("validate");
                 this.consumeToken();
@@ -2680,7 +2709,7 @@ class Parser {
 
         let postconds: PostConditionDecl[] = [];
         try {
-            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(argnames).add("$return"), rtype));
+            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(argnames).add("$return"), rtype, false));
             while (this.testToken("ensures")) {
                 this.consumeToken();
 
@@ -2890,15 +2919,11 @@ class Parser {
 
     private parseInvariantsInto(invs: InvariantDecl[]) {
         try {
-            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(["this"]), new NominalTypeSignature("NSCore", "Bool")));
-            while (this.testToken("invariant") || this.testToken("check")) {
-                const ischeck = this.testAndConsumeTokenIf("check");
+            this.m_penv.pushFunctionScope(new FunctionScope(new Set<string>(["this"]), new NominalTypeSignature("NSCore", "Bool"), false));
+            while (this.testToken("invariant")) {
                 this.consumeToken();
 
-                let level: BuildLevel = ischeck ? "release" : "debug";
-                if (!ischeck) {
-                    level = this.parseBuildInfo(level);
-                }
+                let level: BuildLevel = this.parseBuildInfo("debug");
 
                 const sinfo = this.getCurrentSrcInfo();
                 const exp = this.parseExpression();
@@ -2913,14 +2938,15 @@ class Parser {
     }
 
     private parseOOPMembersCommon(thisType: TypeSignature, invariants: InvariantDecl[], staticMembers: Map<string, StaticMemberDecl>, staticFunctions: Map<string, StaticFunctionDecl>, memberFields: Map<string, MemberFieldDecl>, memberMethods: Map<string, MemberMethodDecl>) {
-        this.parseInvariantsInto(invariants);
-
         let allMemberNames = new Set<string>();
         while (!this.testToken("}")) {
             const pragmas = this.parseDeclPragmas();
             const attributes = this.parseAttributes();
 
-            if (this.testToken("const")) {
+            if (this.testToken("invariant")) {
+                this.parseInvariantsInto(invariants);
+            }
+            else if (this.testToken("const")) {
                 this.parseConstMember(staticMembers, allMemberNames, attributes, pragmas);
             }
             else if (this.testToken("static")) {

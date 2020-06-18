@@ -22,7 +22,6 @@ The Bosque language derives from a combination of [TypeScript](https://www.types
   - [0.13 Atomic Constructors and Factories](#0.13-Atomic-Constructors-and-Factories)
   - [0.14 Synthesis Blocks](#0.14-Synthesis-Blocks)
   - [0.15 API Types](#0.15-API-Types)
-  - [0.16 Checks and Invariants](#0.16-Checks-and-Invariants)
 - [1 Type System](#1-Type-System)
   - [1.1 Nominal Types](#1.1-Nominal-Types)
   - [1.2 Structural Types](#1.2-Structural-Types)
@@ -331,13 +330,13 @@ function foo(val?: {tag: Int, value?: String}): String {
 A fundamental concept in a programming language is the iteration construct and a critical question is should this construct be provided as high-level functors, such as filter/map/reduce, or do programmers benefit from the flexibility available with iterative, while or for, looping constructs. To answer this question in a definitive manner the authors of [Mining Semantic Loop Idioms](https://www.microsoft.com/en-us/research/uploads/prod/2018/10/LoopIdioms.pdf) engaged in a study of all the loops "idioms" found in real-world code. The categorization and coverage results showed that almost every loop a developer would want to write falls into a small number of idiomatic patterns which correspond to higher level concepts developers are using in the code, e.g., filter, find, group, map, etc. With this result in mind the Bosque language trades structured loops for a set of high-level iterative processing constructs ([3 Collections](#3-Collections)).
 
 ```none
-let v: List<Int?> = List<Int?>{1, 2, none, 4};
+let v: List<Int?> = List<Int?>@{1, 2, none, 4};
 
-//Chained - List<Int>{1, 4, 16}
-v.filter(fn(x) => x != none).map<Int>(fn(x) => x*x)
+let dd = v.ofType<Int>().map<Int>(fn(x) => x*x);
+_debug(dd); //List<Int>@{1, 4, 16}
 ```
 
-Eliminating the boilerplate of writing the same loops repeatedly eliminates whole classes of errors including, e.g. bounds computations, and makes the intent clear with a descriptively named functor instead of relying on a shared set of mutually known loop patterns. Critically, for enabling automated program validation and optimization, eliminating loops also eliminates the need for computing loop-invariants. Instead, and with a careful design of the collection libraries, it is possible to write precise transformers for each functor. In this case the computation of _strongest-postconditions_ or _weakest-preconditions_ avoids the complexity of generating a loop invariant and instead becomes a simple and deterministic case of formula pushing!
+Eliminating the boilerplate of writing the same loops repeatedly eliminates whole classes of errors including, e.g. bounds computations, and makes the intent clear with a descriptively named functor instead of relying on a shared set of mutually known loop patterns. Critically, for enabling automated program validation and optimization, eliminating loops also eliminates the need for computing loop-invariants. Instead, and with a careful design of the collection libraries, it is possible to write precise transformers for each functor. In this case the computation of _strongest-postconditions_ or _weakest-preconditions_ avoids the complexity of generating a loop invariant and instead becomes a deterministic case of formula pushing!
 
 ## <a name="0.9-Recursion"></a>0.9 Recursion
 
@@ -347,7 +346,7 @@ Thus, Bosque is designed to encourage limited uses of recursion, increase the cl
 
 ## <a name="0.10-Determinacy"></a>0.10 Determinacy
 
-When the behavior of a code block is under-specified the result is code that is harder to reason about and more prone to errors. As a key goal of the Bosque language is to eliminate sources of unneeded complexity that lead to confusion and errors we naturally want to eliminate these under-specified behaviors. Thus, Bosque does not have any _undefined_ behavior such as allowing uninitialized variable reads and eliminates all _under defined_ behavior as well including sorting stability and all associative collections (sets and maps) have a fixed and stable enumeration order.
+When the behavior of a code block is under-specified the result is code that is harder to reason about and more prone to errors. As a key goal of the Bosque language is to eliminate sources of unneeded complexity that lead to confusion and errors we naturally want to eliminate these under-specified behaviors. Thus, Bosque does not have any _undefined_ behavior such as allowing uninitialized variable reads and eliminates all _under defined_ behavior as well including sorting stability and all associative collections (sets and maps) have a fixed and stable enumeration order based on the order of the underlying key values.
 
 As a result of these design choices there is always a single _unique_ and _canonical_ result for any Bosque program. This means that developers will never see intermittent production failures or flaky unit-tests!
 
@@ -361,25 +360,43 @@ In light of these issues the Bosque language does not allow user visible _refere
 
 ```
 identifier UserId = Int;
-composite identifier OwnedResourceId = {owner: UserId, name: String};
-guid identifier GlobalResourceId;
+enum GlobalEnum {
+    local,
+    network
+}
 
 entity Resource {
-    field id: OwnedResourceId | GlobalResourceId;
+    field access: UserId | GlobalEnum;
     field data: String;
 }
 
-function checkAccessForUser(user: UserId, ...resources: List<Resource>): Bool {
-    return resources.all(fn(r) => 
-        switch(r.id) {
-            type DurableOrchestrationContext => true
-            type OwnedResourceId => r.id.owner = user
+function checkAccessForUser(user: UserId, resources: List<Resource>): Bool {
+    return resources.allOf(fn(r) => {
+            let access = r.access;
+            return switch(access) {
+                type GlobalEnum => access == GlobalEnum::local
+                type UserId => access == user
+                _ => false
+            };
         }
     );
 }
 
-checkAccessForUser(UserId.create(5), {owner: UserId.create(5), "file1"}) //true
-checkAccessForUser(UserId.create(5), {owner: UserId.create(5), "file1"}, {owner: UserId.create(2), "file2"}) //false
+let user5 = UserId::create(5);
+let user2 = UserId::create(2);
+    
+let resources1 = List<Resource>@{ 
+        Resource@{user5, "file1"},
+        Resource@{GlobalEnum::local, "file2"}
+    };
+
+let resources2 = List<Resource>@{ 
+        Resource@{user5, "file1"},
+        Resource@{user2, "file2"}
+    };
+
+_debug(checkAccessForUser(user5, resources1)); //true
+_debug(checkAccessForUser(user5, resources2)); //false
 ```
 
 The composite key type allows a developer to create a distinct type to represent a composite equality comparable value that provides the notion of equality e.g. identity, primary key, equivalence, etc. that makes sense for their domain. The language also allows types to define a key field that will be used for equality/order by the associative containers in the language ([3 Collections](#3-Collections)).
@@ -399,15 +416,15 @@ entity Foo {
         requires release this.x > 1;   //precondition enabled in release as well as debug
         ensures $return > 0;           //postcondition
     {
-        check this.x - y > 0;   //sanity check - enabled on optimized builds
-        assert this.x + y != y; //diagnostic assert - only for test/debug
+        check this.x - y >= 0;      //sanity check - enabled on optimized builds
+        assert this.x + y > this.x; //diagnostic assert - only for test/debug
 
-        return this.x - y + 1;
+        return this.x - (y + 1);
     }
 }
 ```
 
-The special references `$x` in the invariant and `$return` in the ensures check are instances of *implicit binder* variables in Bosque. These variables serve a number of useful roles. In the case of `$return` the variable provides a way to refer to the implicit return value. Similarly for any input reference parameter `p`, which may be rebound in the body, the variable `$p` can be used to refer to the original value. In the case of the invariant the variable `$x` refers to the value of the field `x` in the about to be created object, i.e., we check the invariants on the fields *before* construction. This choice ensures that at no point in time (or code) an object will be visible/accessible that violates its invariants.
+The special references `$x` in the invariant and `$return` in the ensures check are instances of *implicit binder* variables in Bosque. These variables serve a number of useful roles. In the case of `$return` the variable provides a way to refer to the implicit return value. Similarly for any reference parameter `p`, which may be rebound in the body, the variable `$p` can be used to refer to the original value. In the case of the invariant the variable `$x` refers to the value of the field `x` in the about to be created object, i.e., we check the invariants on the fields *before* construction. This choice ensures that at no point in time (or code) an object will be visible/accessible that violates its invariants.
 
 ## <a name="0.13-Atomic-Constructors-and-Factories"></a>0.13 Atomic Constructors and Factories
 
@@ -419,7 +436,7 @@ However, it is sometimes useful to encapsulate initialization logic and, to acco
 concept Bar {
     field f: Int;
 
-    factory default(): {f: Int} {
+    factory static default(): {f: Int} {
         return {f=1};
     }
 }
@@ -428,16 +445,16 @@ entity Baz provides Bar {
     field g: Int;
     field h: Bool = true;
 
-    factory identity(i: Int): {f: Int, g: Int} {
+    factory static identity(i: Int): {f: Int, g: Int} {
         return {f=i, g=i};
     }
 }
 
-let x = Baz{f=1, g=2};
-let y = Baz{f=1, g=2, h=false};
+let x = Baz@{1, 2};
+let y = Baz@{1, 2, h=false};
 
-let p = Baz@identity(1); //equivalent to Baz{...Baz::identity(1)}
-let q = Baz{...Bar::default(), g=2};
+let p = Baz@identity(1); //equivalent to Baz@{...Baz::identity(1)}
+let q = Baz@{...Bar::default(), g=2};
 ```
 
 In this code the two `Baz` entities are allocated via the atomic initialization constructor. In the first case the omitted `h` field is set to the provided default value of `true`. The `identity` factory defines `f` and `g` values for the entity via the returned record. When invoked with the constructor syntax
@@ -467,11 +484,6 @@ Using these types it is possible to define a high quality interface that is:
 3. Can be checked for common semantic version changes
 4. Can be effectively fuzzed using structure aware fuzzers
 5. Can be effectively checked using symbolic analysis techniques
-
-## <a name="0.16-Checks-and-Invariants"></a>0.16 Checks and Invariants
-
-API types are designed to support the definition of high-quality external interfaces into Bosque applications. Good types for APIs are easy to understand without looking at the source code of an application, can easily be validated for changes to an applications semantic version, and also are precise descriptions of what the value of the argument should be. Thus API types include:
-
 
 # <a name="1-Type-System"></a>1 Type System
 

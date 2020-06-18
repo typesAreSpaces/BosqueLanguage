@@ -20,6 +20,7 @@ import chalk from "chalk";
 
 const scratchroot = Path.normalize(Path.join(__dirname, "../../scratch/"));
 const binroot = Path.normalize(Path.join(__dirname, "../../"));
+const ext = process.platform == "win32" ? "exe" : "";
 
 function generateMASM(files: string[], blevel: "debug" | "test" | "release", corelibpath: string): MIRAssembly {
     let bosque_dir: string = Path.normalize(Path.join(__dirname, "../../"));
@@ -58,11 +59,15 @@ function generateMASM(files: string[], blevel: "debug" | "test" | "release", cor
 program
     .option("-e --entrypoint [entrypoint]", "Entrypoint of the exe", "NSMain::main")
     .option("-o --outfile [outfile]", "Optional name of the output exe", (process.platform === "win32") ? "a.exe" : "a.out")
-    .option("-c --compiler [compiler]", "Compiler to use", (process.platform === "win32") ? "\"C:\\Program Files\\LLVM\\bin\\clang.exe\"" : "clang++")
+    .option("-c --compiler [compiler]", "Compiler to use", (process.platform === "win32") ? "clang.exe" : "clang++")
     .option("-l --level [level]", "Build level version", "debug")
     .option("-f --flags <flags>", "Custom compiler flags", "")
 
     program.parse(process.argv);
+
+if (process.platform == "win32" && !program.outfile.endsWith(`.${ext}`)){
+    program.outfile += `.${ext}`;
+}
 
 if (program.args.length === 0) {
     process.stdout.write(chalk.red("Error -- Please specify at least one source file as an argument\n"));
@@ -166,7 +171,6 @@ setImmediate(() => {
             FS.writeFileSync(outfile, contents);
         });
 
-        process.stdout.write(`Compiling C++ code with ${program.compiler} into exe file "${chalk.bold(program.outfile)}"...\n`);
         let buildOpts = "";
         if(program.level === "debug") {
             buildOpts = " -g -DBDEBUG";
@@ -182,7 +186,10 @@ setImmediate(() => {
             buildOpts += ` ${program.flags}`;
         }
 
-        execSync(`${program.compiler}${buildOpts} -std=c++17 -o ${program.outfile} ${cpppath}/*.cpp`);
+        const buildstring = `${program.compiler} ${buildOpts} -std=c++17`;
+        process.stdout.write(`Compiling C++ code with ${buildstring} into exe file "${chalk.bold(program.outfile)}"...\n`);
+        
+        execSync(`${program.compiler} ${buildOpts} -std=c++17 -o ${program.outfile} ${cpppath}/*.cpp`);
     }
     catch (ex) {
         process.stderr.write(chalk.red(`Error -- ${ex}\n`));

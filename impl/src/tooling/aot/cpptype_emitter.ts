@@ -431,7 +431,7 @@ class CPPTypeEmitter {
             else if (trfrom.base === "int64_t") {
                 cc = `BSQ_ENCODE_VALUE_TAGGED_INT(${exp})`;
             }
-            else if (trfrom.base === "BSQEnum" || trfrom.base === "BSQIdKeySimple" || trfrom.base === "BSQIdKeyCompound") {
+            else if (trfrom.base === "double" || trfrom.base === "BSQEnum" || trfrom.base === "BSQIdKeySimple" || trfrom.base === "BSQIdKeyCompound") {
                 const scope = this.mangleStringForCpp("$scope$");
                 const ops = this.getFunctorsForType(from);
                 cc = `BSQ_NEW_ADD_SCOPE(${scope}, ${trfrom.boxed}, ${trfrom.nominaltype}, ${ops.inc}{}(${exp}))`;
@@ -601,7 +601,15 @@ class CPPTypeEmitter {
                 return "ephemeral";
             }
             else if (tr instanceof StructRepr) {
-                return "ops";
+                if(!this.assembly.entityDecls.has(tt.trkey)) {
+                    return "ops";
+                }
+                else {
+                    const sfields = (this.assembly.entityDecls.get(tt.trkey) as MIREntityTypeDecl).fields;
+                    const allnorc = sfields.every((fd) => this.getRefCountableStatus(this.getMIRType(fd.declaredType)) === "no");
+
+                    return allnorc ? "no" : "ops";
+                }
             }
             else if (tr instanceof RefRepr) {
                 return "direct";
@@ -688,7 +696,7 @@ class CPPTypeEmitter {
                 return { inc: `RCIncFunctor_${tr.base}`, dec: `RCDecFunctor_${tr.base}`, ret: `RCReturnFunctor_${tr.base}`, eq: `EqualFunctor_${tr.base}`, less: `LessFunctor_${tr.base}`, display: `DisplayFunctor_${tr.base}` };
             }
             else {
-                return { inc: "RCIncFunctor_BSQRef", dec: "RCDecFunctor_BSQRef", ret: "[INVALID_RET]", eq: "[INVALID_EQ]", less: "[INVALID_LESS]", display: "DisplayFunctor_BSQRef" };
+                return { inc: `RCIncFunctor_BSQRef<${tr.base}>`, dec: "RCDecFunctor_BSQRef", ret: "[INVALID_RET]", eq: "[INVALID_EQ]", less: "[INVALID_LESS]", display: "DisplayFunctor_BSQRef" };
             }
         }
         else {
@@ -857,7 +865,7 @@ class CPPTypeEmitter {
         return { isref: true, fwddecl: `class ${declrepr.base};`, fulldecl: decl };
     }
 
-    generateCPPEntity(entity: MIREntityTypeDecl): { isref: boolean, fwddecl: string, fulldecl: string } | { isref: boolean, fwddecl: string, fulldecl: string, boxeddecl: string, ops: string[] } | undefined {
+    generateCPPEntity(entity: MIREntityTypeDecl): { isref: boolean, fwddecl: string, fulldecl: string, displayimpl?: string } | { isref: boolean, fwddecl: string, fulldecl: string, boxeddecl: string, ops: string[], displayimpl?: string } | undefined {
         const tt = this.getMIRType(entity.tkey);
 
         if(this.isSpecialReprEntity(tt)) {
@@ -894,7 +902,8 @@ class CPPTypeEmitter {
 
             const faccess = entity.fields.map((f) => this.coerce(`this->${this.mangleStringForCpp(f.fkey)}`, this.getMIRType(f.declaredType), this.anyType));
             const fjoins = faccess.length !== 0 ? faccess.map((fa) => `diagnostic_format(${fa})`).join(" + std::string(\", \") + ") : "\" \"";
-            const display = "std::string display() const\n"
+            const display = "std::string display() const;"
+            const displayimpl = `std::string ${this.mangleStringForCpp(entity.tkey)}::display() const\n`
                 + "    {\n"
                 + `        BSQRefScope ${this.mangleStringForCpp("$scope$")};\n`
                 + `        return std::string("${entity.tkey}{ ") + ${fjoins} + std::string(" }");\n`
@@ -923,7 +932,8 @@ class CPPTypeEmitter {
                         + `    virtual ~${this.mangleStringForCpp(entity.tkey)}() { ; }\n\n`
                         + `    virtual void destroy() { ${destructor_list.join(" ")} }\n\n`
                         + `    ${display}\n`
-                        + "};"
+                        + "};",
+                    displayimpl: displayimpl
                     };
             }
             else {
@@ -933,9 +943,12 @@ class CPPTypeEmitter {
                 const copy_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(const ${this.mangleStringForCpp(entity.tkey)}& src) = default;`;
                 const move_assign = `${this.mangleStringForCpp(entity.tkey)}& operator=(${this.mangleStringForCpp(entity.tkey)}&& src) = default;`;
 
-                const incop_ops = entity.fields.map((fd) => {
-                    return this.buildIncOpForType(this.getMIRType(fd.declaredType), `tt.${this.mangleStringForCpp(fd.fkey)}`) + ";";
-                });
+                const incop_ops = entity.fields
+                    .filter((fd) => this.getRefCountableStatus(this.getMIRType(fd.declaredType)) !== "no")
+                    .map((fd) => {
+                        return this.buildIncOpForType(this.getMIRType(fd.declaredType), `tt.${this.mangleStringForCpp(fd.fkey)}`) + ";";
+                    });
+
                 const incop = `struct RCIncFunctor_${this.mangleStringForCpp(entity.tkey)}`
                 + `{\n`
                 + `  inline ${this.mangleStringForCpp(entity.tkey)} operator()(${this.mangleStringForCpp(entity.tkey)} tt) const\n` 
@@ -994,14 +1007,15 @@ class CPPTypeEmitter {
                         + "{\n"
                         + "public:\n"
                         + `    Boxed_${this.mangleStringForCpp(entity.tkey)}(const ${this.mangleStringForCpp(entity.tkey)}& bval) : BSQBoxedObject(MIRNominalTypeEnum::${this.mangleStringForCpp(entity.tkey)}, bval) { ; }\n`
-                        + `    std::string display() const {return this->bval.display(); }\n\n`
+                        + `    std::string display() const;\n\n`
                         + "};",
                     ops: [
                         incop,
                         decop,
                         returnop,
                         displayop
-                    ]
+                    ],
+                    displayimpl: displayimpl + "\n" + `std::string Boxed_${this.mangleStringForCpp(entity.tkey)}::display() const {return this->bval.display(); }`
                     };
             }
         }
