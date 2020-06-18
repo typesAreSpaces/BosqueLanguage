@@ -55,6 +55,7 @@ function sanitizeName(name: string): string {
   // TOUPDATE: Add more `replace operations' if the IR syntax (names)
   // conflicts with FStar syntax
   let result = name
+    .replace(/\+/g, "_")
     .replace(/#/g,  "_")
     .replace(/:/g,  "_")
     .replace(/-/g,  "_")

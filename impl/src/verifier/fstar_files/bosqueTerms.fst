@@ -19,7 +19,7 @@ module BosqueTerms
 // User-defined terms
 | BnSMain__Bar3: f: bosqueTerm ->  bosqueTerm
 | BnSMain__Bar2: f: bosqueTerm ->  bosqueTerm
-| BnSMain__Baz2: g: bosqueTerm -> k: bosqueTerm -> zexample_default: bosqueTerm -> f: bosqueTerm ->  bosqueTerm
+| BnSMain__Baz2: f: bosqueTerm -> g: bosqueTerm -> k: bosqueTerm -> zexample_default: bosqueTerm ->  bosqueTerm
 | BnSMain__Musician: artist: bosqueTerm -> instrument: bosqueTerm ->  bosqueTerm
 | BnSMain__PlayerMark: mark: bosqueTerm ->  bosqueTerm
 | BnSMain__Artist: name: bosqueTerm -> id: bosqueTerm -> lastName: bosqueTerm -> isGood: bosqueTerm -> player: bosqueTerm ->  bosqueTerm
@@ -309,18 +309,18 @@ val projectBnSMain__Bar2_f : x:bosqueTerm{BnSMain__Bar2Type = (getType x)} -> bo
 let projectBnSMain__Bar2_f x = match x with
 | BnSMain__Bar2 f -> f
 
-val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_g x = match x with
-| BnSMain__Baz2 g _ _ _ -> g
-val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_k x = match x with
-| BnSMain__Baz2 _ k _ _ -> k
-val projectBnSMain__Baz2_zexample_default : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
-let projectBnSMain__Baz2_zexample_default x = match x with
-| BnSMain__Baz2 _ _ zexample_default _ -> zexample_default
 val projectBnSMain__Baz2_f : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
 let projectBnSMain__Baz2_f x = match x with
-| BnSMain__Baz2 _ _ _ f -> f
+| BnSMain__Baz2 f _ _ _ -> f
+val projectBnSMain__Baz2_g : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_g x = match x with
+| BnSMain__Baz2 _ g _ _ -> g
+val projectBnSMain__Baz2_k : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_k x = match x with
+| BnSMain__Baz2 _ _ k _ -> k
+val projectBnSMain__Baz2_zexample_default : x:bosqueTerm{BnSMain__Baz2Type = (getType x)} -> bosqueTerm
+let projectBnSMain__Baz2_zexample_default x = match x with
+| BnSMain__Baz2 _ _ _ zexample_default -> zexample_default
 
 val projectBnSMain__Musician_artist : x:bosqueTerm{BnSMain__MusicianType = (getType x)} -> bosqueTerm
 let projectBnSMain__Musician_artist x = match x with
