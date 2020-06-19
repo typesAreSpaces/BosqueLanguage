@@ -598,7 +598,6 @@ false
 (assert (= @smtres@ nsmain__mainI58I))
 
 (assert (not (and (is-result_error@Int @smtres@) (is-result_bmc (result_error_code@Int @smtres@)))))
-;(assert (not (is-result_bmc (result_error_code@Int @smtres@))))
 (assert (is-result_error@Int @smtres@))
 
 (check-sat)

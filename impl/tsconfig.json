@@ -16,6 +16,7 @@
         "./src/compiler/*.ts",
         "./src/test/*.ts",
         "./src/verifier/typescript_files/*.ts",
+        "./src/optimizer/*.ts",
         "./src/tooling/*.ts",
         "./src/tooling/aot/*.ts",
         "./src/tooling/bmc/*.ts",

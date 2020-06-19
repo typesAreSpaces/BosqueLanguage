@@ -24,6 +24,7 @@
         "build": "tsc -p tsconfig.json && node ./build/resource_copy.js",
         "test": "tsc -p tsconfig.json && node ./build/resource_copy.js && node ./bin/test/test_runner.js",
         "verifier": "tsc -p tsconfig.json && node ./bin/verifier/typescript_files/run_verifier.js",
+        "optimizer": "tsc -p tsconfig.json && node ./bin/optimizer/run_optimizer.js",
         "todo": "grep -nr \"// [A-Z][A-Za-z]*:\" > todo.txt ",
         "toimplement": "npm run-script todo | grep \"ts.*IMPLEMENT\"",
         "make-exe": "npm run build && node ./scripts/make-exe.js && npm --force link"

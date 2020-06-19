@@ -1,0 +1,348 @@
+
+> bosque-reference-implementation@0.5.0-rc-1 optimizer /home/jose/Documents/GithubProjects/BosqueLanguage/impl
+> tsc -p tsconfig.json && node ./bin/optimizer/run_optimizer.js
+
+Reading app code...
+Compiling assembly...
+--Key: NSOptimizerTest::main
+Printing body elements
+----entry
+----Ops
+[
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 447, span: 3 },
+  trgt: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  resultType: 'NSCore::Int',
+  mkey: 'NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%17%0]',
+  args: [ MIRConstantInt { nameID: '=int=2', value: '2' } ]
+}
+MIRVarLifetimeStart {
+  tag: 'MIRVarLifetimeStart',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 432, span: 3 },
+  name: 'not_used',
+  rtype: 'NSCore::Int'
+}
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 432, span: 3 },
+  src: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  name: MIRVariable { nameID: 'not_used', lname: 'not_used' }
+}
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 18, column: 0, pos: 484, span: 4 },
+  trgt: MIRTempRegister { nameID: '_#tmp_3', regID: 3 },
+  resultType: 'NSCore::Int',
+  mkey: 'NSOptimizerTest::what',
+  args: []
+}
+MIRVarLifetimeStart {
+  tag: 'MIRVarLifetimeStart',
+  sinfo: SourceInfo { line: 18, column: 0, pos: 473, span: 3 },
+  name: 'hmm1',
+  rtype: 'NSCore::Int'
+}
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 18, column: 0, pos: 473, span: 3 },
+  src: MIRTempRegister { nameID: '_#tmp_3', regID: 3 },
+  name: MIRVariable { nameID: 'hmm1', lname: 'hmm1' }
+}
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 19, column: 0, pos: 505, span: 4 },
+  trgt: MIRTempRegister { nameID: '_#tmp_4', regID: 4 },
+  resultType: 'NSCore::Int',
+  mkey: 'NSOptimizerTest::what',
+  args: []
+}
+MIRVarLifetimeStart {
+  tag: 'MIRVarLifetimeStart',
+  sinfo: SourceInfo { line: 19, column: 0, pos: 494, span: 3 },
+  name: 'hmm2',
+  rtype: 'NSCore::Int'
+}
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 19, column: 0, pos: 494, span: 3 },
+  src: MIRTempRegister { nameID: '_#tmp_4', regID: 4 },
+  name: MIRVariable { nameID: 'hmm2', lname: 'hmm2' }
+}
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 523, span: 3 },
+  trgt: MIRTempRegister { nameID: '_#tmp_5', regID: 5 },
+  resultType: 'NSCore::Int',
+  mkey: 'NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%21%0]',
+  args: [ MIRConstantInt { nameID: '=int=1', value: '1' } ]
+}
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 516, span: 6 },
+  src: MIRTempRegister { nameID: '_#tmp_5', regID: 5 },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 516, span: 6 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 15, column: 0, pos: 427, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 15, column: 0, pos: 427, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry_#tmp_0 = NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%17%0]::(2)v-begin not_usednot_used = _#tmp_0_#tmp_3 = NSOptimizerTest::what::()v-begin hmm1hmm1 = _#tmp_3_#tmp_4 = NSOptimizerTest::what::()v-begin hmm2hmm2 = _#tmp_4_#tmp_5 = NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%21%0]::(1)$__ir_ret__ = _#tmp_5jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+--Key: NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%21%0]
+Printing body elements
+----entry
+----Ops
+[
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 385, span: 1 },
+  trgt: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  resultType: 'NSCore::Int',
+  mkey: 'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+21##529',
+  args: [ MIRVariable { nameID: 'x', lname: 'x' } ]
+}
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 378, span: 6 },
+  src: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 378, span: 6 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 11, column: 0, pos: 374, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 11, column: 0, pos: 374, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry_#tmp_0 = fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+21##529::(x)$__ir_ret__ = _#tmp_0jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+--Key: NSOptimizerTest::what
+Printing body elements
+----entry
+----Ops
+[
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 8, column: 0, pos: 309, span: 6 },
+  src: MIRConstantInt { nameID: '=int=1', value: '1' },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 8, column: 0, pos: 309, span: 6 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 7, column: 0, pos: 305, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 7, column: 0, pos: 305, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry$__ir_ret__ = 1jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+--Key: NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%17%0]
+Printing body elements
+----entry
+----Ops
+[
+MIRInvokeFixedFunction {
+  tag: 'MIRInvokeFixedFunction',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 385, span: 1 },
+  trgt: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  resultType: 'NSCore::Int',
+  mkey: 'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+17##453',
+  args: [ MIRVariable { nameID: 'x', lname: 'x' } ]
+}
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 378, span: 6 },
+  src: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 12, column: 0, pos: 378, span: 6 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 11, column: 0, pos: 374, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 11, column: 0, pos: 374, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry_#tmp_0 = fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+17##453::(x)$__ir_ret__ = _#tmp_0jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+--Key: fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+21##529
+Printing body elements
+----entry
+----Ops
+[
+MIRBinOp {
+  tag: 'MIRBinOp',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 536, span: 1 },
+  trgt: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  lhsInferType: 'NSCore::Int',
+  lhs: MIRVariable { nameID: 'x', lname: 'x' },
+  op: '+',
+  rhsInferType: 'NSCore::Int',
+  rhs: MIRConstantInt { nameID: '=int=1', value: '1' }
+}
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 536, span: 1 },
+  src: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 536, span: 1 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 536, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 21, column: 0, pos: 536, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry_#tmp_0 = x+1$__ir_ret__ = _#tmp_0jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+--Key: fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+17##453
+Printing body elements
+----entry
+----Ops
+[
+MIRBinOp {
+  tag: 'MIRBinOp',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 460, span: 1 },
+  trgt: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  lhsInferType: 'NSCore::Int',
+  lhs: MIRVariable { nameID: 'x', lname: 'x' },
+  op: '+',
+  rhsInferType: 'NSCore::Int',
+  rhs: MIRConstantInt { nameID: '=int=1', value: '1' }
+}
+MIRReturnAssign {
+  tag: 'MIRReturnAssign',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 460, span: 1 },
+  src: MIRTempRegister { nameID: '_#tmp_0', regID: 0 },
+  name: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 460, span: 1 },
+  trgtblock: 'returnassign'
+}
+]
+----returnassign
+----Ops
+[
+MIRVarStore {
+  tag: 'MIRVarStore',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 460, span: 1 },
+  src: MIRVariable { nameID: '$__ir_ret__', lname: '$__ir_ret__' },
+  name: MIRVariable { nameID: '$$return', lname: '$$return' }
+}
+MIRJump {
+  tag: 'MIRJump',
+  sinfo: SourceInfo { line: 17, column: 0, pos: 460, span: 1 },
+  trgtblock: 'exit'
+}
+]
+----exit
+----Ops
+[
+]
+Hmm: entry_#tmp_0 = x+1$__ir_ret__ = _#tmp_0jump returnassign
+Hmm: returnassign$$return = $__ir_ret__jump exit
+Hmm: exit
+Map(1) {
+  'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+17##453' => 'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+21##529'
+}
+Done!
