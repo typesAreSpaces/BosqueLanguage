@@ -1,0 +1,52 @@
+MIROp : MIROpTag, SourceInfo x 
+- MIRValueOp : MIRTempRegister x
+-- MIRLoadConst : MIRConstantArgument 
+-- MIRLoadConstSafeString : string, MIRNominalTypeKey, MIRResolvedTypeKey
+-- MIRLoadConstYpedString : string MIRNominalTypeKey, MIRResolvedTypeKey, MIRInvokeKey | undefined, errtype : MIRResolvedTypeKey | undefined
+-- MIRAccessConstantValue : MIRConstantKey
+-- MIRLoadFieldDefaultValue : MIRFieldKey
+-- MIRAccessArgVariable : MIRVariable
+-- MIRAccessLocalVariable : MIRVariable
+-- MIRInvokeInvariantCheckDirect : MIRInvokeKey, MIRNominalTypeKey, MIRArgument
+-- MIRInvokeInvariantCheckVirtualTarget : MIRResolvedTypeKey, MIRArgument
+-- MIRConstructorPrimary : MIRNominalTypeKey, MIRArgument[]
+-- MIRConstructorPrimaryCollectionEmpty : MIRNominalTypeKey
+-- MIRConstructorPrimaryCollectionSingletons : MIRNominalTypeKey, MIRArgument[]
+-- MIRConstructorPrimaryCollectionCopies : MIRNominalTypeKey, MIRArgument[]
+-- MIRConstructorPrimaryCollectionMixed : MIRNomialTypeKey, [boolean, MIRArgument][]
+-- MIRConstructorTuple : MIRResolvedTypeKey, MIRArgument[]
+-- MIRConstructorRecord : MIRResolvedTypeKey, [string, MIRArgument][]
+-- MIRConstructorEphemeralValueList : MIRResolvedTypeKey, MIRArgument[]
+-- MIRAccessFromIndex : MIRResolvedTypeKey, MIRArgument, MIRResolvedTypeKey, number
+-- MIRProjectFromIndecies : MIRResolt
+(.. in total there 43 classes that extend MIRValueOp)
+- MIRFlowOp : x
+-- MIRRegAssign
+-- MIRTruthyConvert
+-- MIRVarStore
+-- MIRPackSlice
+-- MIRPackExtend
+-- MIRReturnAssign
+-- MIRAbort
+-- MIRDebug
+-- MIRPhi
+- MIRJumOp : x
+-- MIRJump
+-- MIRVarLifetimeStart
+-- MIRVarLifetimeEnd
+-- MIRJumpCond
+-- MIRJumpNone
+
+MIRArgument x
+- MIRRegisterArgument x
+-- MIRTempRegister x
+-- MIRVariable x
+- MIRConstantArgument x
+-- MIRConstantNone x
+-- MIRConstantTrue x
+-- MIRConstantFalse x
+-- MIRConstantInt x
+-- MIRConstantBigInt x
+-- MIRConstantFloat64 x
+-- MIRConstantString x
+-- MIRConstantRegex x
