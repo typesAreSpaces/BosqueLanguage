@@ -8,7 +8,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +95 run_optimizer.ts
-badd +339 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts
+badd +1 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts
 badd +15 ~/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq
 badd +16 ~/Documents/GithubProjects/BosqueLanguage/impl/src/verifier/typescript_files/util.ts
 badd +158 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_assembly.ts
@@ -42,17 +42,17 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 41 + 43) / 86)
+exe '1resize ' . ((&lines * 8 + 39) / 78)
 exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
-exe '2resize ' . ((&lines * 41 + 43) / 86)
+exe '2resize ' . ((&lines * 8 + 39) / 78)
 exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
-exe '3resize ' . ((&lines * 42 + 43) / 86)
+exe '3resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 3resize ' . ((&columns * 78 + 157) / 315)
-exe '4resize ' . ((&lines * 42 + 43) / 86)
+exe '4resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 4resize ' . ((&columns * 78 + 157) / 315)
-exe '5resize ' . ((&lines * 42 + 43) / 86)
+exe '5resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 5resize ' . ((&columns * 78 + 157) / 315)
-exe '6resize ' . ((&lines * 42 + 43) / 86)
+exe '6resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 6resize ' . ((&columns * 78 + 157) / 315)
 argglobal
 setlocal fdm=manual
@@ -64,7 +64,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 147 - ((3 * winheight(0) + 20) / 41)
+let s:l = 147 - ((0 * winheight(0) + 4) / 8)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -82,7 +82,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 32 - ((19 * winheight(0) + 20) / 41)
+let s:l = 32 - ((0 * winheight(0) + 4) / 8)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -100,7 +100,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 109 - ((38 * winheight(0) + 21) / 42)
+let s:l = 109 - ((1 * winheight(0) + 33) / 67)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -118,7 +118,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 85 - ((14 * winheight(0) + 21) / 42)
+let s:l = 85 - ((1 * winheight(0) + 33) / 67)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -136,12 +136,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 594 - ((1 * winheight(0) + 21) / 42)
+let s:l = 637 - ((32 * winheight(0) + 33) / 67)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-594
-normal! 03|
+637
+normal! 058|
 wincmd w
 argglobal
 if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
@@ -154,7 +154,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 40 - ((13 * winheight(0) + 21) / 42)
+let s:l = 40 - ((1 * winheight(0) + 33) / 67)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -162,17 +162,17 @@ normal! zt
 normal! 0
 wincmd w
 5wincmd w
-exe '1resize ' . ((&lines * 41 + 43) / 86)
+exe '1resize ' . ((&lines * 8 + 39) / 78)
 exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
-exe '2resize ' . ((&lines * 41 + 43) / 86)
+exe '2resize ' . ((&lines * 8 + 39) / 78)
 exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
-exe '3resize ' . ((&lines * 42 + 43) / 86)
+exe '3resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 3resize ' . ((&columns * 78 + 157) / 315)
-exe '4resize ' . ((&lines * 42 + 43) / 86)
+exe '4resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 4resize ' . ((&columns * 78 + 157) / 315)
-exe '5resize ' . ((&lines * 42 + 43) / 86)
+exe '5resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 5resize ' . ((&columns * 78 + 157) / 315)
-exe '6resize ' . ((&lines * 42 + 43) / 86)
+exe '6resize ' . ((&lines * 67 + 39) / 78)
 exe 'vert 6resize ' . ((&columns * 78 + 157) / 315)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
