@@ -12,6 +12,11 @@ badd +1 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts
 badd +15 ~/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq
 badd +16 ~/Documents/GithubProjects/BosqueLanguage/impl/src/verifier/typescript_files/util.ts
 badd +158 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_assembly.ts
+badd +59 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_cleanup.ts
+badd +49 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_vartype.ts
+badd +65 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ssa.ts
+badd +863 ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_emitter.ts
+badd +273 ~/Documents/GithubProjects/BosqueLanguage/impl/src/ast/assembly.ts
 argglobal
 %argdel
 $argadd run_optimizer.ts
@@ -42,17 +47,17 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 8 + 39) / 78)
+exe '1resize ' . ((&lines * 9 + 34) / 69)
 exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
-exe '2resize ' . ((&lines * 8 + 39) / 78)
+exe '2resize ' . ((&lines * 9 + 34) / 69)
 exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
-exe '3resize ' . ((&lines * 67 + 39) / 78)
+exe '3resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 3resize ' . ((&columns * 78 + 157) / 315)
-exe '4resize ' . ((&lines * 67 + 39) / 78)
+exe '4resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 4resize ' . ((&columns * 78 + 157) / 315)
-exe '5resize ' . ((&lines * 67 + 39) / 78)
+exe '5resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 5resize ' . ((&columns * 78 + 157) / 315)
-exe '6resize ' . ((&lines * 67 + 39) / 78)
+exe '6resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 6resize ' . ((&columns * 78 + 157) / 315)
 argglobal
 setlocal fdm=manual
@@ -64,11 +69,11 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 147 - ((0 * winheight(0) + 4) / 8)
+let s:l = 151 - ((0 * winheight(0) + 4) / 9)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-147
+151
 normal! 0
 wincmd w
 argglobal
@@ -82,12 +87,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 32 - ((0 * winheight(0) + 4) / 8)
+let s:l = 16 - ((0 * winheight(0) + 4) / 9)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-32
-normal! 041|
+16
+normal! 0
 wincmd w
 argglobal
 if bufexists("run_optimizer.ts") | buffer run_optimizer.ts | else | edit run_optimizer.ts | endif
@@ -100,79 +105,79 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 109 - ((1 * winheight(0) + 33) / 67)
+let s:l = 102 - ((47 * winheight(0) + 28) / 57)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-109
-normal! 03|
-wincmd w
-argglobal
-if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 85 - ((1 * winheight(0) + 33) / 67)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-85
-normal! 03|
-wincmd w
-argglobal
-if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 637 - ((32 * winheight(0) + 33) / 67)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-637
-normal! 058|
-wincmd w
-argglobal
-if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 40 - ((1 * winheight(0) + 33) / 67)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-40
+102
 normal! 0
 wincmd w
-5wincmd w
-exe '1resize ' . ((&lines * 8 + 39) / 78)
+argglobal
+if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 573 - ((0 * winheight(0) + 28) / 57)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+573
+normal! 03|
+wincmd w
+argglobal
+if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1844 - ((37 * winheight(0) + 28) / 57)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1844
+normal! 0
+wincmd w
+argglobal
+if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/compiler/mir_ops.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1876 - ((23 * winheight(0) + 28) / 57)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1876
+normal! 024|
+wincmd w
+6wincmd w
+exe '1resize ' . ((&lines * 9 + 34) / 69)
 exe 'vert 1resize ' . ((&columns * 157 + 157) / 315)
-exe '2resize ' . ((&lines * 8 + 39) / 78)
+exe '2resize ' . ((&lines * 9 + 34) / 69)
 exe 'vert 2resize ' . ((&columns * 157 + 157) / 315)
-exe '3resize ' . ((&lines * 67 + 39) / 78)
+exe '3resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 3resize ' . ((&columns * 78 + 157) / 315)
-exe '4resize ' . ((&lines * 67 + 39) / 78)
+exe '4resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 4resize ' . ((&columns * 78 + 157) / 315)
-exe '5resize ' . ((&lines * 67 + 39) / 78)
+exe '5resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 5resize ' . ((&columns * 78 + 157) / 315)
-exe '6resize ' . ((&lines * 67 + 39) / 78)
+exe '6resize ' . ((&lines * 57 + 34) / 69)
 exe 'vert 6resize ' . ((&columns * 78 + 157) / 315)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

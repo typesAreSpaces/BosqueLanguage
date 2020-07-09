@@ -81,7 +81,7 @@ abstract class MIRArgument {
   normalize(ctx : NormalizationContext) : object {
     const ctx_query = ctx.get(this.nameID);
     const entry : number = ctx_query == undefined ? ctx.size : ctx_query;
-    ctx.set(this.nameID, ctx.size);
+    ctx.set(this.nameID, entry);
     return { nameID : entry };
   }
 }
@@ -116,7 +116,7 @@ class MIRTempRegister extends MIRRegisterArgument {
   }
 
   normalize(ctx : NormalizationContext) : object {
-    return { ...super.normalize(ctx) };
+    return { ...super.normalize(ctx), regID: this.regID };
   }
 }
 
@@ -139,7 +139,7 @@ class MIRVariable extends MIRRegisterArgument {
   normalize(ctx : NormalizationContext) : object {
     const ctx_query = ctx.get(this.lname);
     const entry : number = ctx_query == undefined ? ctx.size : ctx_query;
-    ctx.set(this.lname, ctx.size);
+    ctx.set(this.lname, entry);
     return { ...super.normalize(ctx) , lname : entry };
   }
 }
@@ -633,8 +633,10 @@ class MIRLoadConstSafeString extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return { ...super.normalize(ctx), ivalue : this.ivalue };
+    return { ...super.normalize(ctx), 
+      ivalue : this.ivalue, tkey : this.tkey,
+      tskey : this.tskey
+    };
   }
 }
 
@@ -669,8 +671,12 @@ class MIRLoadConstTypedString extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      tskey : this.tskey,
+      errtype : this.errtype
+    };
   }
 }
 
@@ -697,8 +703,10 @@ class MIRAccessConstantValue extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      ckey : this.ckey
+    };
   }
 }
 
@@ -725,8 +733,10 @@ class MIRLoadFieldDefaultValue extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      fkey : this.fkey
+    };
   }
 }
 
@@ -753,8 +763,10 @@ class MIRAccessArgVariable extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      name : this.name.normalize(ctx)
+    };
   }
 }
 
@@ -781,8 +793,10 @@ class MIRAccessLocalVariable extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      name : this.name.normalize(ctx)
+    };
   }
 }
 
@@ -813,8 +827,11 @@ class MIRInvokeInvariantCheckDirect extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      rcvr : this.rcvr.normalize(ctx)
+    };
   }
 }
 
@@ -843,8 +860,11 @@ class MIRInvokeInvariantCheckVirtualTarget extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      infertype : this.infertype,
+      rcvr : this.rcvr.normalize(ctx)
+    };
   }
 }
 
@@ -873,8 +893,11 @@ class MIRConstructorPrimary extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -901,8 +924,10 @@ class MIRConstructorPrimaryCollectionEmpty extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey
+    };
   }
 }
 
@@ -931,8 +956,11 @@ class MIRConstructorPrimaryCollectionSingletons extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -961,8 +989,11 @@ class MIRConstructorPrimaryCollectionCopies extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -991,8 +1022,11 @@ class MIRConstructorPrimaryCollectionMixed extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      tkey : this.tkey,
+      args : this.args.map(x => [x[0], x[1].normalize(ctx)])
+    };
   }
 }
 
@@ -1021,8 +1055,11 @@ class MIRConstructorTuple extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultTupleType : this.resultTupleType,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -1051,8 +1088,11 @@ class MIRConstructorRecord extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultRecordType : this.resultRecordType,
+      args : this.args.map(x => [x[0], x[1].normalize(ctx)])
+    };
   }
 }
 
@@ -1081,8 +1121,11 @@ class MIRConstructorEphemeralValueList extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultEphemeralListType : this.resultEphemeralListType,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -1115,8 +1158,12 @@ class MIRAccessFromIndex extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      idx : this.idx
+    };
   }
 }
 
@@ -1148,8 +1195,13 @@ class MIRProjectFromIndecies extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      indecies : this.indecies
+    };
   }
 }
 
@@ -1182,8 +1234,13 @@ class MIRAccessFromProperty extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultAccessType : this.resultAccessType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      property : this.property
+    };
   }
 }
 
@@ -1216,8 +1273,13 @@ class MIRProjectFromProperties extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      properties : this.properties
+    };
   }
 }
 
@@ -1250,8 +1312,13 @@ class MIRAccessFromField extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultAccessType : this.resultAccessType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      field : this.field
+    };
   }
 }
 
@@ -1284,8 +1351,13 @@ class MIRProjectFromFields extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      fields : this.fields
+    };
   }
 }
 
@@ -1320,8 +1392,14 @@ class MIRProjectFromTypeTuple extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      istry : this.istry,
+      argInferType : this.argInferType,
+      ptype : this.ptype
+    };
   }
 }
 
@@ -1356,8 +1434,14 @@ class MIRProjectFromTypeRecord extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      istry : this.istry,
+      argInferType : this.argInferType,
+      ptype : this.ptype
+    };
   }
 }
 
@@ -1394,8 +1478,15 @@ class MIRProjectFromTypeNominal extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultProjectType : this.resultProjectType,
+      arg : this.arg.normalize(ctx),
+      istry : this.istry,
+      argInferType : this.argInferType,
+      ptype : this.ptype,
+      cfields : this.cfields
+    };
   }
 }
 
@@ -1428,8 +1519,13 @@ class MIRModifyWithIndecies extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultTupleType : this.resultTupleType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      updates : this.updates.map(x => [x[0], x[1].normalize(ctx)])
+    };
   }
 }
 
@@ -1462,8 +1558,13 @@ class MIRModifyWithProperties extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultRecordType : this.resultRecordType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      updates : this.updates.map(x => [x[0], x[1].normalize(ctx)])
+    };
   }
 }
 
@@ -1496,8 +1597,13 @@ class MIRModifyWithFields extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultNominalType : this.resultNominalType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      updates : this.updates.map(x => [x[0], x[1].normalize(ctx)])
+    };
   }
 }
 
@@ -1532,8 +1638,14 @@ class MIRStructuredExtendTuple extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultTupleType: this.resultTupleType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      update : this.update.normalize(ctx),
+      updateInferType : this.updateInferType
+    };
   }
 }
 
@@ -1568,8 +1680,14 @@ class MIRStructuredExtendRecord extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultRecordType : this.resultRecordType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      update : this.update.normalize(ctx),
+      updateInferType : this.updateInferType
+    };
   }
 }
 
@@ -1606,8 +1724,13 @@ class MIRStructuredExtendObject extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultNominalType : this.resultNominalType,
+      arg : this.arg.normalize(ctx),
+      argInferType : this.argInferType,
+      fieldsResolves : this.fieldResolves
+    };
   }
 }
 
@@ -1640,8 +1763,13 @@ class MIRLoadFromEpehmeralList extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx),
+      resultType : this.resultType,
+      argInferType : this.argInferType,
+      idx : this.idx
+    };
   }
 }
 
@@ -1672,8 +1800,11 @@ class MIRInvokeFixedFunction extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultType : this.resultType,
+      args : this.args.map(x => x.normalize(ctx))
+    };
   }
 }
 
@@ -1706,8 +1837,11 @@ class MIRInvokeVirtualFunction extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      resultType : this.resultType,
+
+    };
   }
 }
 
@@ -1738,8 +1872,12 @@ class MIRPrefixOp extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      op : this.op,
+      arg : this.arg.normalize(ctx),
+      infertype : this.infertype
+    };
   }
 }
 
@@ -1774,8 +1912,14 @@ class MIRBinOp extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      lhsInferType : this.lhsInferType,
+      lhs : this.lhs.normalize(ctx),
+      op : this.op,
+      rhsInferType : this.rhsInferType,
+      rhs : this.rhs.normalize(ctx)
+    };
   }
 }
 
@@ -1812,8 +1956,15 @@ class MIRBinEq extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      lhsInferType : this.lhsInferType,
+      lhs : this.lhs.normalize(ctx),
+      op : this.op,
+      rhsInferType : this.rhsInferType,
+      rhs : this.rhs.normalize(ctx),
+      relaxed : this.relaxed
+    };
   }
 }
 
@@ -1848,8 +1999,14 @@ class MIRBinLess extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      lhsInferType : this.lhsInferType,
+      lhs : this.lhs.normalize(ctx),
+      rhsInferType : this.rhsInferType,
+      rhs : this.rhs.normalize(ctx),
+      relaxed : this.relaxed
+    };
   }
 }
 
@@ -1884,8 +2041,14 @@ class MIRBinCmp extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      lhsInferType : this.lhsInferType,
+      lhs : this.lhs.normalize(ctx),
+      op : this.op,
+      rhs : this.rhs.normalize(ctx),
+      rhsInferType : this.rhsInferType
+    };
   }
 }
 
@@ -1912,8 +2075,10 @@ class MIRIsTypeOfNone extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx)
+    };
   }
 }
 
@@ -1940,8 +2105,10 @@ class MIRIsTypeOfSome extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx)
+    };
   }
 }
 
@@ -1972,8 +2139,12 @@ class MIRIsTypeOf extends MIRValueOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      argInferType : this.argInferType,
+      arg : this.arg.normalize(ctx),
+      oftype : this.oftype
+    };
   }
 }
 
@@ -2003,8 +2174,11 @@ class MIRRegAssign extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      src : this.src.normalize(ctx),
+      trgt : this.trgt.normalize(ctx)
+    };
   }
 }
 
@@ -2034,8 +2208,11 @@ class MIRTruthyConvert extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      src : this.src.normalize(ctx),
+      trgt : this.trgt.normalize(ctx)
+    };
   }
 }
 
@@ -2065,8 +2242,11 @@ class MIRVarStore extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      src : this.src.normalize(ctx),
+      name : this.name.normalize(ctx)
+    };
   }
 }
 
@@ -2098,8 +2278,12 @@ class MIRPackSlice extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      src : this.src.normalize(ctx),
+      sltype : this.sltype,
+      trgt : this.trgt.normalize(ctx)
+    };
   }
 }
 
@@ -2133,8 +2317,13 @@ class MIRPackExtend extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      basepack : this.basepack.normalize(ctx),
+      ext : this.ext.map(x => x.normalize(ctx)),
+      sltype : this.sltype,
+      trgt : this.trgt.normalize(ctx)
+    };
   }
 }
 
@@ -2164,8 +2353,11 @@ class MIRReturnAssign extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      src : this.src.normalize(ctx),
+      name : this.name.normalize(ctx)
+    };
   }
 }
 
@@ -2193,8 +2385,10 @@ class MIRAbort extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      info : this.info
+    };
   }
 }
 
@@ -2227,8 +2421,10 @@ class MIRDebug extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      value : (this.value == undefined ? undefined : this.value.normalize(ctx))
+    };
   }
 }
 
@@ -2256,8 +2452,10 @@ class MIRJump extends MIRJumpOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      trgtblock : this.trgtblock
+    };
   }
 }
 
@@ -2287,8 +2485,11 @@ class MIRVarLifetimeStart extends MIRJumpOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      name : this.name,
+      rtype : this.rtype
+    };
   }
 }
 
@@ -2316,8 +2517,10 @@ class MIRVarLifetimeEnd extends MIRJumpOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      name : this.name
+    };
   }
 }
 
@@ -2349,8 +2552,12 @@ class MIRJumpCond extends MIRJumpOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx),
+      trueblock : this.trueblock,
+      falseblock : this.falseblock
+    };
   }
 }
 
@@ -2382,8 +2589,12 @@ class MIRJumpNone extends MIRJumpOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      arg : this.arg.normalize(ctx),
+      noneblock : this.noneblock,
+      someblock : this.someblock
+    };
   }
 }
 
@@ -2425,8 +2636,10 @@ class MIRPhi extends MIRFlowOp {
   }
 
   normalize(ctx : NormalizationContext){
-    // TODO: implementation
-    return {};
+    return {
+      ...super.normalize(ctx),
+      trgt : this.trgt.normalize(ctx)
+    };
   }
 }
 
@@ -2555,5 +2768,5 @@ export {
   MIRJump, MIRJumpCond, MIRJumpNone,
   MIRPhi,
   MIRVarLifetimeStart, MIRVarLifetimeEnd,
-  MIRBasicBlock, MIRBody
+  MIRBasicBlock, MIRBody, NormalizationContext
 };
