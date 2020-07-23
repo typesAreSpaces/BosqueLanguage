@@ -4,6 +4,15 @@ namespace NSOptimizerTest;
 
 /*The body definition can be either an _expression_ or a _statement block_.*/
 
+global nsconst1: Int = 3;
+global nsconst2: Int = 7;
+
+entity SE {
+    const sconst1: Int = 3;
+    const sconst2: Int = 7;
+    field a_field : Int;
+}
+
 function what() : Int {
   return 1;
 }
@@ -15,8 +24,8 @@ function foo(f : fn(_ : Int) -> Int, x : Int) : Int {
 entrypoint function main() : Int {
 
   var not_used = foo(fn(x) => x + 1, 2);
-  var hmm1 = what();
-  var hmm2 = what();
+  var hmm1 = what() + SE::sconst1;
+  var hmm2 = what() +  NSOptimizerTest::nsconst2;
 
   return foo(fn(x) => x + 1, 1);
 }

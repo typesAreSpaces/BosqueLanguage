@@ -129,10 +129,11 @@ setImmediate(() => {
   const masm = bosqueToMASM([`${file_directory}/${file_name}`], "cpp"); 
 
   if(masm !== undefined){
-    console.log(new MASMOptimizer(masm).functionDeclsToRemove());
+    const to_remove = new MASMOptimizer(masm).functionDeclsToRemove();
+    console.log(to_remove);
     //console.log(new MASMOptimizer(masm).functionDeclsToRemove2());
-
-    console.log(masm);
+    masm.simplify(to_remove);
+    //console.log(masm.invokeDecls);
 
     process.stdout.write(`Done!\n`);
     process.exit(0);

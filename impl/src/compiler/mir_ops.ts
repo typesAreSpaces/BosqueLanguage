@@ -538,6 +538,10 @@ abstract class MIROp {
   normalize(ctx : NormalizationContext) : object {
     return { tag: this.tag };
   }
+
+  simplify(to_remove : Map<MIRInvokeKey, MIRInvokeKey>) : MIROp {
+    return this;
+  }
 }
 
 abstract class MIRValueOp extends MIROp {
@@ -1775,7 +1779,7 @@ class MIRLoadFromEpehmeralList extends MIRValueOp {
 
 class MIRInvokeFixedFunction extends MIRValueOp {
   resultType: MIRResolvedTypeKey;
-  readonly mkey: MIRInvokeKey;
+  mkey: MIRInvokeKey;
   args: MIRArgument[]; //this is args[0] for methods
 
   constructor(sinfo: SourceInfo, resultType: MIRResolvedTypeKey, mkey: MIRInvokeKey, args: MIRArgument[], trgt: MIRTempRegister) {
@@ -1805,6 +1809,13 @@ class MIRInvokeFixedFunction extends MIRValueOp {
       resultType : this.resultType,
       args : this.args.map(x => x.normalize(ctx))
     };
+  }
+
+  simplify(to_remove : Map<MIRInvokeKey, MIRInvokeKey>) : MIROp {
+    const entry = to_remove.get(this.mkey);
+    if(entry != undefined)
+      this.mkey = entry;
+    return this;
   }
 }
 
@@ -1842,6 +1853,11 @@ class MIRInvokeVirtualFunction extends MIRValueOp {
       resultType : this.resultType,
 
     };
+  }
+
+  simplify(to_remove : Map<MIRInvokeKey, MIRInvokeKey>) : MIROp {
+    // TODO: needs proper implementation
+    return this;
   }
 }
 
@@ -2668,6 +2684,11 @@ class MIRBasicBlock {
 
   static jparse(jobj: any): MIRBasicBlock {
     return new MIRBasicBlock(jobj.label, jobj.ops.map((op: any) => MIROp.jparse(op)));
+  }
+
+  simplify(to_remove : Map<MIRInvokeKey, MIRInvokeKey>) : MIRBasicBlock {
+    this.ops = this.ops.map(x => x.simplify(to_remove));
+    return this;
   }
 }
 
