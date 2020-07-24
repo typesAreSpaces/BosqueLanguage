@@ -6,6 +6,7 @@
 import * as Path from "path";
 import { bosqueToMASM } from "./util"
 import { TranslatorBosqueFStar } from "./translator_bosque_fstar";
+import { MASMOptimizer  } from "../../optimizer/masm_optimizer"
 
 setImmediate(() => {
 
@@ -16,7 +17,6 @@ setImmediate(() => {
 
   const masm = bosqueToMASM([`${file_directory}/${file_name}`], "cpp"); 
 
-
   const fstar_file_name = (fkey + "_" + file_name)
     .replace(new RegExp("#", 'g'), "_")
     .replace(new RegExp("\\$", 'g'), "_")
@@ -24,6 +24,16 @@ setImmediate(() => {
     .replace("bsq", "fst");
 
   if(masm !== undefined){
+
+    const to_remove = new MASMOptimizer(masm).functionDeclsToRemove();
+    masm.invokeDecls.forEach((value, key) => {
+      console.log("----New entry");
+      console.log(key);
+      console.log(value);
+      console.log(value.body)});
+    console.log("------ To remove");
+    console.log(to_remove);
+    masm.simplify(to_remove);
 
     const translator = new TranslatorBosqueFStar(masm, fstar_file_name);
 

@@ -1,0 +1,161 @@
+
+> bosque-reference-implementation@0.5.0-rc-1 optimizer /home/jose/Documents/GithubProjects/BosqueLanguage/impl
+> tsc -p tsconfig.json && node ./bin/optimizer/run_optimizer.js
+
+Reading app code...
+Compiling assembly...
+--START
+NSOptimizerTest::nsconst2@@cons
+NSOptimizerTest::main
+[]
+[]
+--END
+--START
+NSOptimizerTest::SE::sconst1@@cons
+NSOptimizerTest::main
+[]
+[]
+--END
+--START
+NSOptimizerTest::SE::sconst1@@cons
+NSOptimizerTest::nsconst2@@cons
+[]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+NSOptimizerTest::main
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+NSOptimizerTest::nsconst2@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+NSOptimizerTest::SE::sconst1@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::what
+NSOptimizerTest::main
+[]
+[]
+--END
+--START
+NSOptimizerTest::what
+NSOptimizerTest::nsconst2@@cons
+[]
+[]
+--END
+--START
+NSOptimizerTest::what
+NSOptimizerTest::SE::sconst1@@cons
+[]
+[]
+--END
+--START
+NSOptimizerTest::what
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+[]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%26%0]
+NSOptimizerTest::main
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%26%0]
+NSOptimizerTest::nsconst2@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%26%0]
+NSOptimizerTest::SE::sconst1@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%26%0]
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+NSOptimizerTest::main
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+NSOptimizerTest::nsconst2@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+NSOptimizerTest::SE::sconst1@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+NSOptimizerTest::what
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+NSOptimizerTest::main
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+NSOptimizerTest::nsconst2@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+NSOptimizerTest::SE::sconst1@@cons
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+NSOptimizerTest::what
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[]
+--END
+--START
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602
+fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+[ MIRFunctionParameter { name: 'x', type: 'NSCore::Int' } ]
+--END
+Map(2) {
+  'NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%26%0]' => 'NSOptimizerTest::foo[/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq%30%0]',
+  'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+26##602' => 'fn--/home/jose/Documents/GithubProjects/BosqueLanguage/impl/src/test/tests/optimizer/simple_test.bsq+30##721'
+}
+Done!
