@@ -1,7 +1,0 @@
-MIRKeyGenerator::
--computePCodeKeyInfo
--- generateFunctionKey
--- generateStaticKey
--- generateMethodKey
-- generatePCodeKey
-i.e. MIRInvokeKey is the `problematic` type, for the moment
