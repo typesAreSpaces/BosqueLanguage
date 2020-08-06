@@ -42,8 +42,7 @@ class MASMOptimizer {
     return true;
   }
 
-  functionDeclsToRemove() 
-    : Map<MIRInvokeKey, MIRInvokeKey> {
+  functionDeclsToRemove() : Map<MIRInvokeKey, MIRInvokeKey> {
 
       const repr_funcs = new Set<MIRInvokeKey>();
       const to_remove  = new Map<MIRInvokeKey, MIRInvokeKey>();
@@ -54,20 +53,19 @@ class MASMOptimizer {
           // The following cannot be undefined, by construction
           const previous_invoke_decl = this.masm.invokeDecls.get(repr_func) as MIRInvokeBodyDecl;
           assert(previous_invoke_decl instanceof MIRInvokeBodyDecl);
-          console.log("--START");
-          console.log(function_name);
-          console.log(repr_func);
-          console.log(newest_invoke_decl.params);
-          console.log(previous_invoke_decl.params);
-          console.log("--END");
+          //console.log("--START");
+          //console.log(function_name);
+          //console.log(repr_func);
+          //console.log("--END");
           if(this.areEqualMapMIRBasicBlock(newest_invoke_decl.body.body, previous_invoke_decl.body.body) 
-          // Be care with the comparision, these are Object in javascript i.e. comparision takes into consider some pointer logic
-          //&& newest_invoke_decl.key == previous_invoke_decl.key
-          //&& newest_invoke_decl.attributes == previous_invoke_decl.attributes
-          //&& newest_invoke_decl.recursive == previous_invoke_decl.recursive
-          //&& newest_invoke_decl.pragmas == previous_invoke_decl.pragmas
-          //&& newest_invoke_decl.params == previous_invoke_decl.params
-          //&& newest_invoke_decl.resultType == previous_invoke_decl.resultType
+          // Be careful with the comparision, these are Object in javascript i.e. comparision takes into consider some pointer logic
+          //&& isEqual(newest_invoke_decl.enclosingDecl, previous_invoke_decl.enclosingDecl) // Dont include this one!
+          //&& isEqual(newest_invoke_decl.key, previous_invoke_decl.key) // Dont include this one!
+          //&& isEqual(newest_invoke_decl.attributes , previous_invoke_decl.attributes)
+          && isEqual(newest_invoke_decl.recursive , previous_invoke_decl.recursive)
+          //&& isEqual(newest_invoke_decl.pragmas , previous_invoke_decl.pragmas)
+          && isEqual(newest_invoke_decl.params.map(x => x.type) , previous_invoke_decl.params.map(x => x.type))
+          && isEqual(newest_invoke_decl.resultType , previous_invoke_decl.resultType)
           ){
             to_remove.set(function_name, repr_func);
             found = true;
@@ -101,8 +99,7 @@ class MASMOptimizer {
     return true;
   }
 
-  functionDeclsToRemove2() 
-    : Map<MIRInvokeKey, MIRInvokeKey> {
+  functionDeclsToRemove2() : Map<MIRInvokeKey, MIRInvokeKey> {
       const repr_funcs = new Set<MIRInvokeKey>();
       const to_remove  = new Map<MIRInvokeKey, MIRInvokeKey>();
 

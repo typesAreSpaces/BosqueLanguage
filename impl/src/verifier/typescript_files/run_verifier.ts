@@ -26,13 +26,14 @@ setImmediate(() => {
   if(masm !== undefined){
 
     const to_remove = new MASMOptimizer(masm).functionDeclsToRemove();
-    masm.invokeDecls.forEach((value, key) => {
-      console.log("----New entry");
-      console.log(key);
-      console.log(value);
-      console.log(value.body)});
-    console.log("------ To remove");
-    console.log(to_remove);
+    //masm.invokeDecls.forEach((value, key) => {
+      //console.log("----New entry");
+      //console.log(key);
+      //console.log(value);
+      //console.log(value.body)
+    //});
+    //console.log("------ To remove");
+    //console.log(to_remove);
     masm.simplify(to_remove);
 
     const translator = new TranslatorBosqueFStar(masm, fstar_file_name);
