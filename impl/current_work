@@ -1,0 +1,108 @@
+let SessionLoad = 1
+let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+let v:this_session=expand("<sfile>:p")
+silent only
+cd ~/Documents/GithubProjects/BosqueLanguage/impl
+if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
+  let s:wipebuf = bufnr('%')
+endif
+set shortmess=aoO
+badd +1999 src/tooling/bmc/smtbody_emitter.ts
+badd +108 src/runtimes/symtest/symtest.ts
+badd +570 src/compiler/mir_assembly.ts
+badd +20 src/core/verify/list.bsq
+badd +136 src/core/verify/core.bsq
+badd +1 ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts
+badd +308 ~/Documents/GithubProjects/BosqueLanguage/impl/node_modules/@types/node/child_process.d.ts
+badd +53 ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts
+argglobal
+%argdel
+edit src/compiler/mir_assembly.ts
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+2wincmd h
+wincmd w
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 129 + 156) / 313)
+exe 'vert 2resize ' . ((&columns * 79 + 156) / 313)
+exe 'vert 3resize ' . ((&columns * 103 + 156) / 313)
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 187 - ((35 * winheight(0) + 41) / 83)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+187
+normal! 012|
+wincmd w
+argglobal
+if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 21 - ((20 * winheight(0) + 41) / 83)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+21
+normal! 0
+wincmd w
+argglobal
+if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 41 - ((5 * winheight(0) + 41) / 83)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+41
+normal! 018|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 129 + 156) / 313)
+exe 'vert 2resize ' . ((&columns * 79 + 156) / 313)
+exe 'vert 3resize ' . ((&columns * 103 + 156) / 313)
+tabnext 1
+if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+  silent exe 'bwipe ' . s:wipebuf
+endif
+unlet! s:wipebuf
+set winheight=1 winwidth=20 winminheight=1 winminwidth=1 shortmess=filnxtToOFIc
+let s:sx = expand("<sfile>:p:r")."x.vim"
+if file_readable(s:sx)
+  exe "source " . fnameescape(s:sx)
+endif
+let &so = s:so_save | let &siso = s:siso_save
+doautoall SessionLoadPost
+unlet SessionLoad
+" vim: set ft=vim :

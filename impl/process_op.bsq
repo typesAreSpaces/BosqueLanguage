@@ -1,0 +1,40 @@
+namespace NSMain;
+
+global ops: Set<String> = Set<String>@{
+    "negate",
+    "add",
+    "sub"
+};
+
+function checkIntBounds(arg: Int?): Bool {
+    //our calculator is for small numbers -- maybe use BigInt later
+    return arg == none || ((-100 <= arg) && (arg <= 100)); 
+}
+
+entrypoint function processOp(op: String, arg1: Int, arg2: Int?): Int 
+    requires release NSMain::ops.has(op);
+    requires release checkIntBounds(arg1) && checkIntBounds(arg2);
+    //requires release (op == "add" || op == "sub") ==> arg2 != none;
+{
+    if(op == "negate") {
+        return -arg1;
+    }
+    else {
+        assert(arg2 != none);
+
+        if(op == "add") {
+            return arg1 + arg2;
+        }
+        else {
+            return arg1 - arg2;
+        }
+    }
+}
+
+entrypoint function main() : Int {
+  var a = "negate";
+  var l = List<Int>@{101, 1};
+  // var b = processOp(a, 101, 2);
+  var b = processOp(a, 100, 2);
+  return 0;
+}
