@@ -7,14 +7,18 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +1999 src/tooling/bmc/smtbody_emitter.ts
-badd +108 src/runtimes/symtest/symtest.ts
-badd +570 src/compiler/mir_assembly.ts
+badd +1 src/tooling/bmc/smtbody_emitter.ts
+badd +1 src/runtimes/symtest/symtest.ts
+badd +198 src/compiler/mir_assembly.ts
 badd +20 src/core/verify/list.bsq
 badd +136 src/core/verify/core.bsq
-badd +1 ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts
-badd +308 ~/Documents/GithubProjects/BosqueLanguage/impl/node_modules/@types/node/child_process.d.ts
-badd +53 ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts
+badd +1 src/tooling/bmc/smttype_emitter.ts
+badd +308 node_modules/@types/node/child_process.d.ts
+badd +53 src/tooling/bmc/smtdecls_emitter.ts
+badd +1 bin/tooling/bmc/smt_exp.js
+badd +47 src/tooling/bmc/smt_exp.ts
+badd +8 src/core/cpp/core.bsq
+badd +0 src/core/cpp/list.bsq
 argglobal
 %argdel
 edit src/compiler/mir_assembly.ts
@@ -23,7 +27,13 @@ wincmd _ | wincmd |
 vsplit
 wincmd _ | wincmd |
 vsplit
-2wincmd h
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+4wincmd h
+wincmd w
+wincmd w
 wincmd w
 wincmd w
 set nosplitbelow
@@ -33,9 +43,11 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 129 + 156) / 313)
-exe 'vert 2resize ' . ((&columns * 79 + 156) / 313)
-exe 'vert 3resize ' . ((&columns * 103 + 156) / 313)
+exe 'vert 1resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 2resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 3resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 4resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 5resize ' . ((&columns * 61 + 156) / 313)
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -46,15 +58,15 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 187 - ((35 * winheight(0) + 41) / 83)
+let s:l = 199 - ((10 * winheight(0) + 41) / 83)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-187
+199
 normal! 012|
 wincmd w
 argglobal
-if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smttype_emitter.ts | endif
+if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -64,7 +76,43 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 21 - ((20 * winheight(0) + 41) / 83)
+let s:l = 2005 - ((15 * winheight(0) + 41) / 83)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+2005
+normal! 049|
+wincmd w
+argglobal
+if bufexists("src/core/cpp/list.bsq") | buffer src/core/cpp/list.bsq | else | edit src/core/cpp/list.bsq | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 18 - ((17 * winheight(0) + 41) / 83)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+18
+normal! 088|
+wincmd w
+argglobal
+if bufexists("src/tooling/bmc/smttype_emitter.ts") | buffer src/tooling/bmc/smttype_emitter.ts | else | edit src/tooling/bmc/smttype_emitter.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 21 - ((16 * winheight(0) + 41) / 83)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -72,7 +120,7 @@ normal! zt
 normal! 0
 wincmd w
 argglobal
-if bufexists("~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts") | buffer ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts | else | edit ~/Documents/GithubProjects/BosqueLanguage/impl/src/tooling/bmc/smtdecls_emitter.ts | endif
+if bufexists("src/tooling/bmc/smtdecls_emitter.ts") | buffer src/tooling/bmc/smtdecls_emitter.ts | else | edit src/tooling/bmc/smtdecls_emitter.ts | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -89,9 +137,11 @@ normal! zt
 41
 normal! 018|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 129 + 156) / 313)
-exe 'vert 2resize ' . ((&columns * 79 + 156) / 313)
-exe 'vert 3resize ' . ((&columns * 103 + 156) / 313)
+exe 'vert 1resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 2resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 3resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 4resize ' . ((&columns * 62 + 156) / 313)
+exe 'vert 5resize ' . ((&columns * 61 + 156) / 313)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

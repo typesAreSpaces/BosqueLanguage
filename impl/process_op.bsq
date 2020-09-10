@@ -34,7 +34,9 @@ entrypoint function processOp(op: String, arg1: Int, arg2: Int?): Int
 entrypoint function main() : Int {
   var a = "negate";
   var l = List<Int>@{101, 1};
-  // var b = processOp(a, 101, 2);
+  check l.allOf(fn(x) => x > 0);
+  /*check l.allOf(fn(x) => x > 1);*/
+  /*var b = processOp(a, 101, 2);*/
   var b = processOp(a, 100, 2);
   return 0;
 }
