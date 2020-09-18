@@ -2000,6 +2000,15 @@ class SMTBodyEmitter {
     const enclkey = (idecl.enclosingDecl || "[NA]") as MIRNominalTypeKey
 
     switch (idecl.implkey) {
+      case "list_concat": {
+        break;
+      }
+      case "list_fill": {
+        break;
+      }
+      case "list_toset": {
+        break;
+      }
       case "list_all": {
         const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const lsize = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
@@ -2053,6 +2062,237 @@ class SMTBodyEmitter {
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+        break;
+      }
+      case "list_count": {
+        break;
+      }
+      case "list_countnot": {
+        break;
+      }
+      case "list_indexof": {
+        break;
+      }
+      case "list_indexoflast": {
+        break;
+      }
+      case "list_indexofnot": {
+        break;
+      }
+      case "list_indexoflastnot": {
+        break;
+      }
+      case "list_count_keytype": {
+        break;
+      }
+      case "list_indexof_keytype": {
+        break;
+      }
+      case "list_indexoflast_keytype": {
+        break;
+      }
+      case "list_min": {
+        break;
+      }
+      case "list_max": {
+        break;
+      }
+      case "list_sum": {
+        break;
+      }
+      case "list_filter": {
+        break;
+      }
+      case "list_filternot": {
+        break;
+      }
+      case "list_oftype": {
+        break;
+      }
+      case "list_cast": {
+        break;
+      }
+      case "list_slice": {
+        break;
+      }
+      case "list_takewhile": {
+        break;
+      }
+      case "list_discardwhile": {
+        break;
+      }
+      case "list_takeuntil": {
+        break;
+      }
+      case "list_discarduntil": {
+        break;
+      }
+      case "list_unique": {
+        break;
+      }
+      case "list_reverse": {
+        break;
+      }
+      case "list_map": {
+        break;
+      }
+      case "list_mapindex": {
+        break;
+      }
+      case "list_project": {
+        break;
+      }
+      case "list_tryproject": {
+        break;
+      }
+      case "list_defaultproject": {
+        break;
+      }
+      case "list_zipindex": {
+        break;
+      }
+      case "list_join": {
+        break;
+      }
+      case "list_joingroup": {
+        break;
+      }
+      case "list_append": {
+        break;
+      }
+      case "list_partition": {
+        break;
+      }
+      case "list_sort": {
+        break;
+      }
+      case "list_toindexmap": {
+        break;
+      }
+      case "list_transformindexmap": {
+        break;
+      }
+      case "list_transformmap": {
+        break;
+      }
+      case "list_zip": {
+        break;
+      }
+      case "list_unzip": {
+        break;
+      }
+      case "list_range": {
+        break;
+      }
+      case "set_entry_list": {
+        break;
+      }
+      case "set_hasall": {
+        break;
+      }
+      case "set_subsetof": {
+        break;
+      }
+      case "set_equal": {
+        break;
+      }
+      case "set_disjoint": {
+        break;
+      }
+      case "set_subset": {
+        break;
+      }
+      case "set_oftype": {
+        break;
+      }
+      case "set_cast": {
+        break;
+      }
+      case "set_union": {
+        break;
+      }
+      case "set_intersect": {
+        break;
+      }
+      case "set_difference": {
+        break;
+      }
+      case "set_symmetricdifference": {
+        break;
+      }
+      case "set_unionall": {
+        break;
+      }
+      case "set_intersectall": {
+        break;
+      }
+      case "map_key_list": {
+        break;
+      }
+      case "map_key_set": {
+        break;
+      }
+      case "map_values": {
+        break;
+      }
+      case "map_entries": {
+        break;
+      }
+      case "map_has_all": {
+        break;
+      }
+      case "map_domainincludes": {
+        break;
+      }
+      case "map_submap": {
+        break;
+      }
+      case "map_oftype": {
+        break;
+      }
+      case "map_cast": {
+        break;
+      }
+      case "map_projectall": {
+        break;
+      }
+      case "map_excludeall": {
+        break;
+      }
+      case "map_project": {
+        break;
+      }
+      case "map_exclude": {
+        break;
+      }
+      case "map_remap": {
+        break;
+      }
+      case "map_composewith": {
+        break;
+      }
+      case "map_trycomposewith": {
+        break;
+      }
+      case "map_defaultcomposewith": {
+        break;
+      }
+      case "map_invertinj": {
+        break;
+      }
+      case "map_invertrel": {
+        break;
+      }
+      case "map_union": {
+        break;
+      }
+      case "map_unionall": {
+        break;
+      }
+      case "map_merge": {
+        break;
+      }
+      case "map_mergeall": {
         break;
       }
       default: {
