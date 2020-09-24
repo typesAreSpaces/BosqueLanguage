@@ -1,9 +1,11 @@
 namespace NSMain;
 
 entrypoint function main() : Int {
-  var l = List<Int>@{101, 1};
-  check l.allOf(fn(x) => x > 0);
-  check l.size() > 0;
+  var l1 = List<Int>@{1, 2, 3};
+  var l2 = List<Int>@{1, 2, 3};
+  var l3 = List<Int>::concat(l1, l2);
+  check l1.allOf(fn(x) => x > 0);
+  /*check l.size() > 0;*/
   /*check l.allOf(fn(x) => x > 1);*/
   return 0;
 }

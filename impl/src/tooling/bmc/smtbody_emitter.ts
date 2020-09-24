@@ -2003,12 +2003,39 @@ class SMTBodyEmitter {
 
     switch (idecl.implkey) {
       case "list_concat": {
+        // TODO: keep working here
+        const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l1size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l1");
+        const l2size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l2");
+        const l3size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l3");
+        //const larr = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(`(assert (forall ((l1 ${ltype}) (l2 ${ltype}) (l3 ${ltype}))  (=> (= l3 (${fname} l1 l2)) 
+(= ${l3size.emit()} (+ ${l1size.emit()} ${l2size.emit()})))  ))`);
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_fill": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_toset": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_all": {
@@ -2069,234 +2096,696 @@ class SMTBodyEmitter {
         break;
       }
       case "list_count": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_countnot": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexof": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexoflast": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexofnot": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexoflastnot": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_count_keytype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexof_keytype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_indexoflast_keytype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_min": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_max": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_sum": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_filter": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_filternot": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_oftype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_cast": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_slice": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_takewhile": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_discardwhile": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_takeuntil": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_discarduntil": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_unique": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_reverse": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_map": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_mapindex": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_project": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_tryproject": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_defaultproject": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_zipindex": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_join": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_joingroup": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_append": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_partition": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_sort": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_toindexmap": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_transformindexmap": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_transformmap": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_zip": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_unzip": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "list_range": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_entry_list": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_hasall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_subsetof": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_equal": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_disjoint": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_subset": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_oftype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_cast": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_union": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_intersect": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_difference": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_symmetricdifference": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_unionall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "set_intersectall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_key_list": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_key_set": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_values": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_entries": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_has_all": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_domainincludes": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_submap": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_oftype": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_cast": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_projectall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_excludeall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_project": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_exclude": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_remap": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_composewith": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_trycomposewith": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_defaultcomposewith": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_invertinj": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_invertrel": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_union": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_unionall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_merge": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       case "map_mergeall": {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        }
         break;
       }
       default: {
