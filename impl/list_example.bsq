@@ -3,6 +3,7 @@ namespace NSMain;
 entrypoint function main() : Int {
   var l = List<Int>@{101, 1};
   check l.allOf(fn(x) => x > 0);
+  check l.size() > 0;
   /*check l.allOf(fn(x) => x > 1);*/
   return 0;
 }

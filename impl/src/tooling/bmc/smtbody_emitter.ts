@@ -1999,6 +1999,8 @@ class SMTBodyEmitter {
   generateBuiltinAxioms(fname: string, idecl: MIRInvokePrimitiveDecl, params: string[]) {
     const enclkey = (idecl.enclosingDecl || "[NA]") as MIRNominalTypeKey
 
+    process.stdout.write(`[DEBUG MODE] Processing ${idecl.implkey}\n`);
+
     switch (idecl.implkey) {
       case "list_concat": {
         break;
@@ -2015,12 +2017,14 @@ class SMTBodyEmitter {
         const larr = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          process.stdout.write(`[basic]\n`);
           this.insertAxioms(
             `(assert (forall ((l ${ltype})) (=> (= ${lsize.emit()} 0) (${fname} l))))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
           const lambda = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, `(select ${larr.emit()} i)`)
+          process.stdout.write(`[standard]\n`);
           this.insertAxioms(
             `(assert (forall ((l ${ltype}) (i Int)) (=> (${fname} l) ${lambda})))`
           );

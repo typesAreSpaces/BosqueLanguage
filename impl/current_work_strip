@@ -7,14 +7,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +1999 src/tooling/bmc/smtbody_emitter.ts
-badd +47 src/tooling/bmc/smtdecls_emitter.ts
+badd +1964 src/tooling/bmc/smtbody_emitter.ts
+badd +45 src/tooling/bmc/smtdecls_emitter.ts
 badd +716 src/tooling/bmc/smttype_emitter.ts
-badd +1 src/runtimes/symtest/symtest.ts
-badd +0 src/compiler/mir_assembly.ts
+badd +93 src/runtimes/symtest/symtest.ts
+badd +1 src/compiler/mir_assembly.ts
+badd +3 bin/core/verify/list.bsq
+badd +0 src/core/verify/list.bsq
 argglobal
 %argdel
-edit src/runtimes/symtest/symtest.ts
+edit src/tooling/bmc/smtdecls_emitter.ts
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
@@ -22,9 +24,13 @@ wincmd _ | wincmd |
 vsplit
 wincmd _ | wincmd |
 vsplit
+3wincmd h
 wincmd _ | wincmd |
-vsplit
-4wincmd h
+split
+wincmd _ | wincmd |
+split
+2wincmd k
+wincmd w
 wincmd w
 wincmd w
 wincmd w
@@ -36,11 +42,15 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 2resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 3resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 4resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 5resize ' . ((&columns * 61 + 156) / 313)
+exe '1resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 1resize ' . ((&columns * 85 + 171) / 342)
+exe '2resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 2resize ' . ((&columns * 85 + 171) / 342)
+exe '3resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 3resize ' . ((&columns * 85 + 171) / 342)
+exe 'vert 4resize ' . ((&columns * 85 + 171) / 342)
+exe 'vert 5resize ' . ((&columns * 125 + 171) / 342)
+exe 'vert 6resize ' . ((&columns * 44 + 171) / 342)
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -51,30 +61,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 93 - ((0 * winheight(0) + 8) / 16)
+let s:l = 45 - ((2 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-93
-normal! 027|
-wincmd w
-argglobal
-if bufexists("src/tooling/bmc/smtdecls_emitter.ts") | buffer src/tooling/bmc/smtdecls_emitter.ts | else | edit src/tooling/bmc/smtdecls_emitter.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 43 - ((1 * winheight(0) + 8) / 16)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-43
-normal! 053|
+45
+normal! 0
 wincmd w
 argglobal
 if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
@@ -87,12 +79,30 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1875 - ((9 * winheight(0) + 8) / 16)
+let s:l = 1961 - ((0 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1875
-normal! 05|
+1961
+normal! 016|
+wincmd w
+argglobal
+if bufexists("src/core/verify/list.bsq") | buffer src/core/verify/list.bsq | else | edit src/core/verify/list.bsq | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 11 - ((10 * winheight(0) + 10) / 21)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+11
+normal! 041|
 wincmd w
 argglobal
 if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
@@ -105,12 +115,30 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 2018 - ((0 * winheight(0) + 8) / 16)
+let s:l = 2021 - ((44 * winheight(0) + 32) / 65)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2018
-normal! 09|
+2021
+normal! 028|
+wincmd w
+argglobal
+if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1993 - ((30 * winheight(0) + 32) / 65)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1993
+normal! 03|
 wincmd w
 argglobal
 if bufexists("src/compiler/mir_assembly.ts") | buffer src/compiler/mir_assembly.ts | else | edit src/compiler/mir_assembly.ts | endif
@@ -123,19 +151,23 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 187 - ((10 * winheight(0) + 8) / 16)
+let s:l = 190 - ((29 * winheight(0) + 32) / 65)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-187
-normal! 08|
+190
+normal! 016|
 wincmd w
-4wincmd w
-exe 'vert 1resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 2resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 3resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 4resize ' . ((&columns * 62 + 156) / 313)
-exe 'vert 5resize ' . ((&columns * 61 + 156) / 313)
+5wincmd w
+exe '1resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 1resize ' . ((&columns * 85 + 171) / 342)
+exe '2resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 2resize ' . ((&columns * 85 + 171) / 342)
+exe '3resize ' . ((&lines * 21 + 33) / 67)
+exe 'vert 3resize ' . ((&columns * 85 + 171) / 342)
+exe 'vert 4resize ' . ((&columns * 85 + 171) / 342)
+exe 'vert 5resize ' . ((&columns * 125 + 171) / 342)
+exe 'vert 6resize ' . ((&columns * 44 + 171) / 342)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

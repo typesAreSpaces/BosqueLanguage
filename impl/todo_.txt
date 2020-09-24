@@ -1,0 +1,7 @@
+list_size
+list_unsafe_get
+set_size
+set_has_key
+map_size
+map_has_key
+map_at_val
