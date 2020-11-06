@@ -1,11 +1,29 @@
 namespace NSMain;
 
 entrypoint function main() : Int {
-  var l1 = List<Int>@{1, 2, 3};
-  var l2 = List<Int>@{1, 2, 3};
-  var l3 = List<Int>::concat(l1, l2);
-  check l1.allOf(fn(x) => x > 0);
-  /*check l.size() > 0;*/
-  /*check l.allOf(fn(x) => x > 1);*/
+
+  /*var filled_list = List<Int>@{1, 1, 1, 1, 1, 1, 1, 1, 1, 1};*/
+  var filled_list = List<Int>::fill(10, 1);
+  /*var filled_list_bool = List<Bool>::fill(10, true);*/
+  /*issue*/
+  /*check filled_list.noneOf(fn(x) => x == 2);*/
+  /*check filled_list.size() == 10;*/
+  check filled_list.anyOf(fn(x) => x == 1);
+  /*check filled_list.allOf(fn(x) => x == 1);*/
+  /*check filled_list.noneOf(fn(x) => x == 3);*/
+
+  /*var my_list = List<Int>@{1, 2, 3};*/
+  /*check my_list.anyOf(fn(x) => x > 4);*/
+  /*check my_list.allOf(fn(x) => x > 1);*/
+  /*check my_list.noneOf(fn(x) => x > 10);*/
+
+  /*var another_list = List<Int>@{1, 2, 3};*/
+  /*check my_list.size() == another_list.size();*/
+
+  /*var empty_list_haha = List<Int>@{};*/
+  /*check empty_list_haha.noneOf(fn(x) => x > 0);*/
+
+  /*var concat_list = List<Int>::concat(my_list, another_list);*/
+
   return 0;
 }

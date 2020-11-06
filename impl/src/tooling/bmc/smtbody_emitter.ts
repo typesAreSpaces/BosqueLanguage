@@ -2002,17 +2002,19 @@ class SMTBodyEmitter {
     process.stdout.write(`[DEBUG MODE] Processing ${idecl.implkey}\n`);
 
     switch (idecl.implkey) {
-      case "list_concat": {
-        // TODO: keep working here
-        const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+      case "list_concat": { // TODO: keep working later on this one
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l1size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l1");
         const l2size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l2");
         const l3size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l3");
-        //const larr = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+        //const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-          this.insertAxioms(`(assert (forall ((l1 ${ltype}) (l2 ${ltype}) (l3 ${ltype}))  (=> (= l3 (${fname} l1 l2)) 
-(= ${l3size.emit()} (+ ${l1size.emit()} ${l2size.emit()})))  ))`);
+          this.insertAxioms(`
+          (assert (forall ((l1 ${l_type}) (l2 ${l_type}) (l3 ${l_type})) 
+           (=> (= l3 (${fname} l1 l2))
+           (= ${l3size.emit()} (+ ${l1size.emit()} ${l2size.emit()}))
+          )))`);
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
@@ -2021,15 +2023,32 @@ class SMTBodyEmitter {
         break;
       }
       case "list_fill": {
+        const l_type = this.typegen.getSMTTypeFor(
+          this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_fill_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, 
+          "size", `(${fname} k val)`);
+        const l_fill_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, 
+          "entries", `(${fname} k val)`);
+
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type}) (k Int) (val Int)) 
+               (= ${l_fill_size.emit()} k)
+             ))`
+          );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+          this.insertAxioms(
+            `(assert (forall ((k Int) (val Int) (i Int))
+              (implies (and (<= 0 i) (< i k)) (= (select ${l_fill_entries.emit()} i) 1))
+            ))`);
         }
         break;
       }
-      case "list_toset": {
+      case "list_toset": { // TODO: ask Mark about this one
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
@@ -2039,21 +2058,30 @@ class SMTBodyEmitter {
         break;
       }
       case "list_all": {
-        const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
-        const lsize = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
-        const larr = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)){
           process.stdout.write(`[basic]\n`);
           this.insertAxioms(
-            `(assert (forall ((l ${ltype})) (=> (= ${lsize.emit()} 0) (${fname} l))))`
+            `(assert (forall ((l ${l_type})) 
+              (=> 
+               (= ${l_size.emit()} 0)
+               (${fname} l)
+             )))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-          const lambda = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, `(select ${larr.emit()} i)`)
+          const all_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+            `(select ${l_entries.emit()} i)`)
           process.stdout.write(`[standard]\n`);
           this.insertAxioms(
-            `(assert (forall ((l ${ltype}) (i Int)) (=> (${fname} l) ${lambda})))`
+            `(assert (forall ((l ${l_type})) 
+              (iff 
+               (${fname} l) 
+               (forall ((i Int)) (=> (and (<= 0 i) (< i ${l_size.emit()})) ${all_predicate}))
+             )))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
@@ -2061,19 +2089,24 @@ class SMTBodyEmitter {
         break;
       }
       case "list_none": {
-        const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
-        const lsize = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
-        const larr = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
           this.insertAxioms(
-            `(assert (forall ((l ${ltype})) (=> (= ${lsize.emit()} 0) (${fname} l))))`
+            `(assert (forall ((l ${l_type})) (=> (= ${l_size.emit()} 0) (${fname} l))))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-          const lambda = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, `(select ${larr.emit()} i)`)
+          const none_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+            `(select ${l_entries.emit()} i)`)
           this.insertAxioms(
-            `(assert (forall ((l ${ltype}) (i Int)) (=> (${fname} l) (not ${lambda}))))`
+            `(assert (forall ((l ${l_type}))
+              (iff 
+               (${fname} l) 
+               (forall ((i Int)) (=> (and (<= 0 i) (< i ${l_size.emit()})) (not ${none_predicate})))
+             )))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
@@ -2081,21 +2114,46 @@ class SMTBodyEmitter {
         break;
       }
       case "list_any": {
-        const ltype = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
-        const lsize = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
           this.insertAxioms(
-            `(assert (forall ((l ${ltype})) (=> (= ${lsize.emit()} 0) (not (${fname} l)))))`
+            `(assert (forall ((l ${l_type})) (=> (= ${l_size.emit()} 0) (not (${fname} l)))))`
           );
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          const any_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+            `(select ${l_entries.emit()} i)`)
+          //const any_predicate0 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+          //`(select ${l_entries.emit()} 0)`)
+
+          //const any_predicate1 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+          //`(select ${l_entries.emit()} 1)`)
+          //const any_predicate2 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+          //`(select ${l_entries.emit()} 2)`)
+          //const any_predicate3 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
+          //`(select ${l_entries.emit()} 3)`)
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type})) 
+              (iff 
+               (${fname} l) 
+               (exists ((i Int)) ${any_predicate})
+             )))`
+          );
+          //(exists ((i Int)) ${any_predicate})
+          //${any_predicate0}  
+          //(exists ((i Int)) (and (= i 0) ${any_predicate}))
+          //(or ${any_predicate1} ${any_predicate2} ${any_predicate3})
+          //(exists ((i Int)) ${any_predicate})
+          //(exists ((i Int)) ${any_predicate})
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
         break;
       }
-      case "list_count": {
+      case "list_count": { // TODO: ask Mark about this one
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {

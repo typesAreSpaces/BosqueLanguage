@@ -1,0 +1,9 @@
+namespace NSMain;
+
+entrypoint function main() : Int {
+
+  var filled_list = List<Int>::fill(10, 1);
+  check filled_list.anyOf(fn(x) => x == 1);
+  /*check filled_list.anyOf(fn(x) => x == 0);*/
+  return 0;
+}
