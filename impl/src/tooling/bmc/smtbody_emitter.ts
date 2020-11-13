@@ -2002,7 +2002,7 @@ class SMTBodyEmitter {
     process.stdout.write(`[DEBUG MODE] Processing ${idecl.implkey}\n`);
 
     switch (idecl.implkey) {
-      case "list_concat": { // TODO: keep working later on this one
+      case "list_concat": { // TODO: work later on this one
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l1size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l1");
         const l2size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l2");
@@ -2016,13 +2016,16 @@ class SMTBodyEmitter {
            (= ${l3size.emit()} (+ ${l1size.emit()} ${l2size.emit()}))
           )))`);
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_fill": {
+      case "list_fill": { // TODO: double proper instantiation of list_fill function
         const l_type = this.typegen.getSMTTypeFor(
           this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_fill_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, 
@@ -2037,6 +2040,7 @@ class SMTBodyEmitter {
              ))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
 
@@ -2046,18 +2050,22 @@ class SMTBodyEmitter {
               (implies (and (<= 0 i) (< i k)) (= (select ${l_fill_entries.emit()} i) 1))
             ))`);
         }
+
         break;
       }
       case "list_toset": { // TODO: ask Mark about this one
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_all": {
+      case "list_all": { // Done
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2072,10 +2080,10 @@ class SMTBodyEmitter {
              )))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-          const all_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
-            `(select ${l_entries.emit()} i)`)
-          process.stdout.write(`[standard]\n`);
+          const all_predicate = this.createLambdaForPred(
+            idecl.pcodes.get("p") as MIRPCode, `(select ${l_entries.emit()} i)`);
           this.insertAxioms(
             `(assert (forall ((l ${l_type})) 
               (iff 
@@ -2084,11 +2092,13 @@ class SMTBodyEmitter {
              )))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_none": {
+      case "list_none": { // Done
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2098,6 +2108,7 @@ class SMTBodyEmitter {
             `(assert (forall ((l ${l_type})) (=> (= ${l_size.emit()} 0) (${fname} l))))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
           const none_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
             `(select ${l_entries.emit()} i)`)
@@ -2109,11 +2120,13 @@ class SMTBodyEmitter {
              )))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_any": {
+      case "list_any": { // Done
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2123,18 +2136,11 @@ class SMTBodyEmitter {
             `(assert (forall ((l ${l_type})) (=> (= ${l_size.emit()} 0) (not (${fname} l)))))`
           );
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
           const any_predicate = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
             `(select ${l_entries.emit()} i)`)
-          //const any_predicate0 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
-          //`(select ${l_entries.emit()} 0)`)
 
-          //const any_predicate1 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
-          //`(select ${l_entries.emit()} 1)`)
-          //const any_predicate2 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
-          //`(select ${l_entries.emit()} 2)`)
-          //const any_predicate3 = this.createLambdaForPred(idecl.pcodes.get("p") as MIRPCode, 
-          //`(select ${l_entries.emit()} 3)`)
           this.insertAxioms(
             `(assert (forall ((l ${l_type})) 
               (iff 
@@ -2142,709 +2148,199 @@ class SMTBodyEmitter {
                (exists ((i Int)) ${any_predicate})
              )))`
           );
-          //(exists ((i Int)) ${any_predicate})
-          //${any_predicate0}  
-          //(exists ((i Int)) (and (= i 0) ${any_predicate}))
-          //(or ${any_predicate1} ${any_predicate2} ${any_predicate3})
-          //(exists ((i Int)) ${any_predicate})
-          //(exists ((i Int)) ${any_predicate})
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
       case "list_count": { // TODO: ask Mark about this one
+
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_countnot": {
+      case "list_countnot": { // TODO: ask Mark about this one
+
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_indexof": {
+      case "list_indexof": { // TODO: ask Mark about this one
+
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
+
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
         }
+
         break;
       }
-      case "list_indexoflast": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_indexofnot": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_indexoflastnot": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_count_keytype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_indexof_keytype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_indexoflast_keytype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
-      }
-      case "list_min": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_indexoflast": { // TODO:
       }
-      case "list_max": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_indexofnot": { // TODO:
       }
-      case "list_sum": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_indexoflastnot": { // TODO:
       }
-      case "list_filter": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_count_keytype": { // TODO:
       }
-      case "list_filternot": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_indexof_keytype": { // TODO:
       }
-      case "list_oftype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_indexoflast_keytype": { // TODO:
       }
-      case "list_cast": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_min": { // TODO:
       }
-      case "list_slice": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_max": { // TODO:
       }
-      case "list_takewhile": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_sum": { // TODO:
       }
-      case "list_discardwhile": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_filter": { // TODO:
       }
-      case "list_takeuntil": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_filternot": { // TODO:
       }
-      case "list_discarduntil": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_oftype": { // TODO:
       }
-      case "list_unique": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_cast": { // TODO:
       }
-      case "list_reverse": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_slice": { // TODO:
       }
-      case "list_map": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_takewhile": { // TODO:
       }
-      case "list_mapindex": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_discardwhile": { // TODO:
       }
-      case "list_project": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_takeuntil": { // TODO:
       }
-      case "list_tryproject": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_discarduntil": { // TODO:
       }
-      case "list_defaultproject": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_unique": { // TODO:
       }
-      case "list_zipindex": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_reverse": { // TODO:
       }
-      case "list_join": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_map": { // TODO:
       }
-      case "list_joingroup": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_mapindex": { // TODO:
       }
-      case "list_append": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_project": { // TODO:
       }
-      case "list_partition": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_tryproject": { // TODO:
       }
-      case "list_sort": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_defaultproject": { // TODO:
       }
-      case "list_toindexmap": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_zipindex": { // TODO:
       }
-      case "list_transformindexmap": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_join": { // TODO:
       }
-      case "list_transformmap": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_joingroup": { // TODO:
       }
-      case "list_zip": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_append": { // TODO:
       }
-      case "list_unzip": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_partition": { // TODO:
       }
-      case "list_range": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_sort": { // TODO:
       }
-      case "set_entry_list": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_toindexmap": { // TODO:
       }
-      case "set_hasall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_transformindexmap": { // TODO:
       }
-      case "set_subsetof": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_transformmap": { // TODO:
       }
-      case "set_equal": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_zip": { // TODO:
       }
-      case "set_disjoint": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_unzip": { // TODO:
       }
-      case "set_subset": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "list_range": { // TODO:
       }
-      case "set_oftype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_entry_list": { // TODO:
+      } 
+      case "set_hasall": { // TODO:
       }
-      case "set_cast": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_subsetof": { // TODO:
       }
-      case "set_union": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_equal": { // TODO:
       }
-      case "set_intersect": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_disjoint": { // TODO:
       }
-      case "set_difference": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_subset": { // TODO:
       }
-      case "set_symmetricdifference": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_oftype": { // TODO:
       }
-      case "set_unionall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_cast": { // TODO:
       }
-      case "set_intersectall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_union": { // TODO:
       }
-      case "map_key_list": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_intersect": { // TODO:
       }
-      case "map_key_set": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_difference": { // TODO:
       }
-      case "map_values": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_symmetricdifference": { // TODO:
       }
-      case "map_entries": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_unionall": { // TODO:
       }
-      case "map_has_all": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "set_intersectall": { // TODO:
       }
-      case "map_domainincludes": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_key_list": { // TODO:
       }
-      case "map_submap": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_key_set": { // TODO:
       }
-      case "map_oftype": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_values": { // TODO:
       }
-      case "map_cast": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_entries": { // TODO:
       }
-      case "map_projectall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_has_all": { // TODO:
       }
-      case "map_excludeall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_domainincludes": { // TODO:
       }
-      case "map_project": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_submap": { // TODO:
       }
-      case "map_exclude": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_oftype": { // TODO:
       }
-      case "map_remap": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_cast": { // TODO:
       }
-      case "map_composewith": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_projectall": { // TODO:
       }
-      case "map_trycomposewith": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_excludeall": { // TODO:
       }
-      case "map_defaultcomposewith": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_project": { // TODO:
       }
-      case "map_invertinj": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_exclude": { // TODO:
       }
-      case "map_invertrel": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_remap": { // TODO:
       }
-      case "map_union": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_composewith": { // TODO:
       }
-      case "map_unionall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_trycomposewith": { // TODO:
       }
-      case "map_merge": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_defaultcomposewith": { // TODO:
       }
-      case "map_mergeall": {
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-        break;
+      case "map_invertinj": { // TODO:
+      }
+      case "map_invertrel": { // TODO:
+      }
+      case "map_union": { // TODO:
+      }
+      case "map_unionall": { // TODO:
+      }
+      case "map_merge": { // TODO:
+      }
+      case "map_mergeall": { // TODO:
       }
       default: {
         assert(false, `Need to implement -- ${idecl.iname}`);
