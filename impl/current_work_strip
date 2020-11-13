@@ -7,18 +7,19 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +1 src/tooling/bmc/smtbody_emitter.ts
+badd +2082 src/tooling/bmc/smtbody_emitter.ts
 badd +1 src/runtimes/symtest/symtest.ts
 badd +1 src/compiler/mir_assembly.ts
 badd +20 src/core/verify/list.bsq
 badd +136 src/core/verify/core.bsq
-badd +1 src/tooling/bmc/smttype_emitter.ts
+badd +183 src/tooling/bmc/smttype_emitter.ts
 badd +308 node_modules/@types/node/child_process.d.ts
 badd +41 src/tooling/bmc/smtdecls_emitter.ts
 badd +1 bin/tooling/bmc/smt_exp.js
 badd +47 src/tooling/bmc/smt_exp.ts
 badd +8 src/core/cpp/core.bsq
 badd +18 src/core/cpp/list.bsq
+badd +9 level_verification.ts
 argglobal
 %argdel
 edit src/compiler/mir_assembly.ts
@@ -29,6 +30,10 @@ wincmd _ | wincmd |
 vsplit
 2wincmd h
 wincmd w
+wincmd _ | wincmd |
+split
+1wincmd k
+wincmd w
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -38,8 +43,11 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
+exe '2resize ' . ((&lines * 42 + 28) / 56)
 exe 'vert 2resize ' . ((&columns * 95 + 144) / 289)
-exe 'vert 3resize ' . ((&columns * 96 + 144) / 289)
+exe '3resize ' . ((&lines * 11 + 28) / 56)
+exe 'vert 3resize ' . ((&columns * 95 + 144) / 289)
+exe 'vert 4resize ' . ((&columns * 96 + 144) / 289)
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -50,7 +58,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 200 - ((6 * winheight(0) + 22) / 44)
+let s:l = 200 - ((7 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -68,12 +76,30 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1997 - ((1 * winheight(0) + 22) / 44)
+let s:l = 2319 - ((7 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1997
-normal! 03|
+2319
+normal! 037|
+wincmd w
+argglobal
+if bufexists("level_verification.ts") | buffer level_verification.ts | else | edit level_verification.ts | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1 - ((0 * winheight(0) + 5) / 11)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1
+normal! 0
 wincmd w
 argglobal
 if bufexists("src/tooling/bmc/smttype_emitter.ts") | buffer src/tooling/bmc/smttype_emitter.ts | else | edit src/tooling/bmc/smttype_emitter.ts | endif
@@ -86,17 +112,20 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 22 - ((9 * winheight(0) + 22) / 44)
+let s:l = 183 - ((21 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-22
+183
 normal! 0
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
+exe '2resize ' . ((&lines * 42 + 28) / 56)
 exe 'vert 2resize ' . ((&columns * 95 + 144) / 289)
-exe 'vert 3resize ' . ((&columns * 96 + 144) / 289)
+exe '3resize ' . ((&lines * 11 + 28) / 56)
+exe 'vert 3resize ' . ((&columns * 95 + 144) / 289)
+exe 'vert 4resize ' . ((&columns * 96 + 144) / 289)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
