@@ -3,10 +3,10 @@
 ;; Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 ;;-------------------------------------------------------------------------------------------------------
 
-(set-option :smt.auto-config false) ; disable automatic self configuration
-(set-option :smt.mbqi false) ; disable model-based quantifier instantiation
+;(set-option :smt.auto-config false) ; disable automatic self configuration
+;(set-option :smt.mbqi false) ; disable model-based quantifier instantiation
 
-(set-option :timeout 10000)
+;(set-option :timeout 10000)
 
 (declare-datatypes (
       (StructuralSpecialTypeInfo 0)
