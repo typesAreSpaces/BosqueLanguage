@@ -1,3 +1,5 @@
+namespace NSMain;
+
 entrypoint function main() : Int {
 
   var my_list = List<Int>::fill(10, 1);
