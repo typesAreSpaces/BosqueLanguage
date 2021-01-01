@@ -1,0 +1,9 @@
+entrypoint function main() : Int {
+
+  var my_list = List<Int>@{1, 2, 3};
+  var another_list = List<Int>@{1, 2, 3};
+
+  check my_list.size() == another_list.size();
+
+  return 0;
+}

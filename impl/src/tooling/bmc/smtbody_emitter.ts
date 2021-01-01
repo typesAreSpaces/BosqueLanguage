@@ -2004,6 +2004,9 @@ class SMTBodyEmitter {
     const enclkey = (idecl.enclosingDecl || "[NA]") as MIRNominalTypeKey
 
     process.stdout.write(`[DEBUG MODE] Processing ${idecl.implkey}\n`);
+    // WARNING: careful with higher-order functions
+    // check Error handling for each function application
+    // involving function arguments!
 
     switch (idecl.implkey) {
       case "list_concat": { // TODO: work later on this one
@@ -2029,7 +2032,8 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_fill": { // TODO: double proper instantiation of list_fill function
+        
+      case "list_fill": { // TODO: double check proper instantiation of list_fill function
         const l_type = this.typegen.getSMTTypeFor(
           this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_fill_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, 
@@ -2051,7 +2055,9 @@ class SMTBodyEmitter {
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
           this.insertAxioms(
             `(assert (forall ((k Int) (val Int) (i Int))
-              (implies (and (<= 0 i) (< i k)) (= (select ${l_fill_entries.emit()} i) val))
+              (=>
+              (and (<= 0 i) (< i k)) 
+              (= (select ${l_fill_entries.emit()} i) val))
             ))`);
         }
 
@@ -2158,24 +2164,61 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_count": { // TODO: working on this one
+      case "list_count": { 
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
 
-        console.log("------------------------fname");
-        console.log(fname);
-        console.log("------------------------idecl");
-        console.log(idecl);
-        console.log("------------------------params");
-        console.log(params);
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type}))
+              (=> (= ${l_size.emit()} 0) (= (${fname} l) 0))
+             ))`
+          );
+        }
 
-        // *********************************************
-        // Example of how to add an auxiliar declaration
-        const extra_pdecls = idecl.params.map(p => 
-          this.typegen.getSMTTypeFor(this.typegen.getMIRType(p.type)))
-            .concat(["Int", "Int"]);
-        this.addDeclaration(`extra_${fname}`, 
-          extra_pdecls, 
-          this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.resultType)));
-        // *********************************************
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type}))
+           (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          ))`
+          );
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+
+          // *********************************************
+          // Example of how to add an auxiliar declaration
+          const extra_pdecls = idecl.params.map(p => 
+            this.typegen.getSMTTypeFor(this.typegen.getMIRType(p.type)))
+              .concat(["Int"]);
+          this.addDeclaration(`rec_${fname}`, 
+            extra_pdecls, 
+            this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.resultType)));
+          // *********************************************
+
+          const count_predicate_0 = this.createLambdaForPred(
+            idecl.pcodes.get("p") as MIRPCode, `(select ${l_entries.emit()} 0)`);
+          const count_predicate_i = this.createLambdaForPred(
+            idecl.pcodes.get("p") as MIRPCode, `(select ${l_entries.emit()} i)`);
+
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type}))
+            (= (rec_${fname} l 0) (ite ${count_predicate_0} 1 0))
+            ))
+            `,
+            `(assert (forall ((l ${l_type}) (i Int))
+             (=> (and (< 0 i) (< i ${l_size.emit()})) (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite ${count_predicate_i} 1 0))))
+             ))`,
+            `(assert (forall ((l ${l_type}))
+             (= (${fname} l) (rec_${fname} l ${l_size.emit()}))
+             ))`
+          );
+        }
+
+        break;
+      }
+      case "list_countnot": { // TODO: ask Mark about this one
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
@@ -2190,21 +2233,36 @@ class SMTBodyEmitter {
         }
 
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          this.insertAxioms(
+            `(assert (forall ((l ${l_type}))
+           (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          ))`
+          );
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+          // *********************************************
+          // Example of how to add an auxiliar declaration
+          const extra_pdecls = idecl.params.map(p => 
+            this.typegen.getSMTTypeFor(this.typegen.getMIRType(p.type)))
+              .concat(["Int"]);
+          this.addDeclaration(`rec_${fname}`, 
+            extra_pdecls, 
+            this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.resultType)));
+          // *********************************************
+
           const count_predicate_0 = this.createLambdaForPred(
             idecl.pcodes.get("p") as MIRPCode, `(select ${l_entries.emit()} 0)`);
           const count_predicate_i = this.createLambdaForPred(
             idecl.pcodes.get("p") as MIRPCode, `(select ${l_entries.emit()} i)`);
 
-
-
-
           this.insertAxioms(
             `(assert (forall ((l ${l_type}))
-            (= (rec_${fname} l 0) (ite ${count_predicate_0} 1 0))
+            (= (rec_${fname} l 0) (ite (not ${count_predicate_0}) 1 0))
             ))
             `,
             `(assert (forall ((l ${l_type}) (i Int))
-             (=> (and (< 0 i) (< i ${l_size.emit()})) (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite ${count_predicate_i} 1 0))))
+             (=> (and (< 0 i) (< i ${l_size.emit()})) (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite (not ${count_predicate_i}) 1 0))))
              ))`,
             `(assert (forall ((l ${l_type}))
              (= (${fname} l) (rec_${fname} l ${l_size.emit()}))
@@ -2213,195 +2271,480 @@ class SMTBodyEmitter {
 
         }
 
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-
-        break;
-      }
-      case "list_countnot": { // TODO: ask Mark about this one
-
-        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
-        }
-
-        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
-        }
-
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
-        }
-
         break;
       }
       case "list_indexof": { // TODO: ask Mark about this one
 
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}))
+          (or 
+          (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (= (${fname} l) (- 1))
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          const indexof_predicate_fix = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} l))`);
+
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          ${indexof_predicate_fix}
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+          const indexof_predicate_another = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} i))`);
+
+          // This encodes that indexof is the first index
+          // satisfying such property p
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (=> (and (<= 0 i) (< i ${l_size.emit()})) ${indexof_predicate_another}) 
+          (<= (${fname} l) i)
+          )
+          ))
+          `);
+        }
+
+        break;
+      }
+      case "list_indexoflast": { // TODO: ask Mark about this one
+
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}))
+          (or 
+          (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (= (${fname} l) (- 1))
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          const indexof_predicate_fix = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} l))`);
+
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          ${indexof_predicate_fix}
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+          const indexof_predicate_another = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} i))`);
+
+          // This encodes that indexof is the last index
+          // satisfying such property p
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (=> (and (<= 0 i) (< i ${l_size.emit()})) ${indexof_predicate_another}) 
+          (<= i (${fname} l))
+          )
+          ))
+          `);
+        }
+
+        break;
+
+      }
+      case "list_indexofnot": {  
+
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}))
+          (or 
+          (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (= (${fname} l) (- 1))
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+
+          const indexof_predicate_fix = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} l))`);
+
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (not ${indexof_predicate_fix})
+          )
+          ))
+          `);
+
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+          const indexof_predicate_another = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} i))`);
+
+          // This encodes that indexof is the first index
+          // not satisfying such property p
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (=> (and (<= 0 i) (< i ${l_size.emit()})) (not ${indexof_predicate_another})) 
+          (<= i (${fname} l))
+          )
+          ))
+          `);
+
+        }
+
+        break;
+
+      }
+      case "list_indexoflastnot": { 
+
+        const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}))
+          (or 
+          (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (= (${fname} l) (- 1))
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+          const indexof_predicate_fix = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} l))`);
+
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (and (<= 0 (${fname} l)) (< (${fname} l) ${l_size.emit()}))
+          (not ${indexof_predicate_fix})
+          )
+          ))
+          `);
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+          const indexof_predicate_another = this
+            .createLambdaForPred(idecl.pcodes.get("p") as MIRPCode,
+              `(select ${l_entries.emit()} (${fname} i))`);
+
+          // This encodes that indexof is the last index
+          // not satisfying such property p
+          this.insertAxioms(`
+          (assert (forall ((l ${l_type}) (i Int))
+          (=> (=> (and (<= 0 i) (< i ${l_size.emit()})) (not ${indexof_predicate_another})) 
+          (<= i (${fname} l))
+          )
+          ))
+          `);
+        }
+
+        break;
+
+      }
+      case "list_count_keytype": { // TODO:
+        //const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
+        //const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
+        //const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
+
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
 
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
 
-        if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
         }
 
         break;
+
       }
-      case "list_indexoflast": { // TODO:
+      case "list_indexof_keytype": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
       }
-    case "list_indexofnot": { // TODO:
-    }
-    case "list_indexoflastnot": { // TODO:
-    }
-    case "list_count_keytype": { // TODO:
-    }
-    case "list_indexof_keytype": { // TODO:
-    }
-    case "list_indexoflast_keytype": { // TODO:
-    }
-    case "list_min": { // TODO:
-    }
-    case "list_max": { // TODO:
-    }
-    case "list_sum": { // TODO:
-    }
-    case "list_filter": { // TODO:
-    }
-    case "list_filternot": { // TODO:
-    }
-    case "list_oftype": { // TODO:
-    }
-    case "list_cast": { // TODO:
-    }
-    case "list_slice": { // TODO:
-    }
-    case "list_takewhile": { // TODO:
-    }
-    case "list_discardwhile": { // TODO:
-    }
-    case "list_takeuntil": { // TODO:
-    }
-    case "list_discarduntil": { // TODO:
-    }
-    case "list_unique": { // TODO:
-    }
-    case "list_reverse": { // TODO:
-    }
-    case "list_map": { // TODO:
-    }
-    case "list_mapindex": { // TODO:
-    }
-    case "list_project": { // TODO:
-    }
-    case "list_tryproject": { // TODO:
-    }
-    case "list_defaultproject": { // TODO:
-    }
-    case "list_zipindex": { // TODO:
-    }
-    case "list_join": { // TODO:
-    }
-    case "list_joingroup": { // TODO:
-    }
+      case "list_indexoflast_keytype": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_min": { // TODO:
+
+        console.log("Checking idecl of list_min");
+        console.log(idecl);
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_max": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_sum": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_filter": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_filternot": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_oftype": { // TODO:
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
+        }
+
+        if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
+        }
+
+        break;
+
+      }
+      case "list_cast": { // TODO:
+      }
+      case "list_slice": { // TODO:
+      }
+      case "list_takewhile": { // TODO:
+      }
+      case "list_discardwhile": { // TODO:
+      }
+      case "list_takeuntil": { // TODO:
+      }
+      case "list_discarduntil": { // TODO:
+      }
+      case "list_unique": { // TODO:
+      }
+      case "list_reverse": { // TODO:
+      }
+      case "list_map": { // TODO:
+      }
+      case "list_mapindex": { // TODO:
+      }
+      case "list_project": { // TODO:
+      }
+      case "list_tryproject": { // TODO:
+      }
+      case "list_defaultproject": { // TODO:
+      }
+      case "list_zipindex": { // TODO:
+      }
+      case "list_join": { // TODO:
+      }
+      case "list_joingroup": { // TODO:
+      }
       case "list_append": { // TODO:
       }
-case "list_partition": { // TODO:
-}
-case "list_sort": { // TODO:
-}
-case "list_toindexmap": { // TODO:
-}
-case "list_transformindexmap": { // TODO:
-}
-case "list_transformmap": { // TODO:
-}
-case "list_zip": { // TODO:
-}
-case "list_unzip": { // TODO:
-}
-case "list_range": { // TODO:
-}
-case "set_entry_list": { // TODO:
-} 
-case "set_hasall": { // TODO:
-}
-case "set_subsetof": { // TODO:
-}
-case "set_equal": { // TODO:
-}
-case "set_disjoint": { // TODO:
-}
-case "set_subset": { // TODO:
-}
-case "set_oftype": { // TODO:
-}
-case "set_cast": { // TODO:
-}
-case "set_union": { // TODO:
-}
-case "set_intersect": { // TODO:
-}
-case "set_difference": { // TODO:
-}
-case "set_symmetricdifference": { // TODO:
-}
-case "set_unionall": { // TODO:
-}
-case "set_intersectall": { // TODO:
-}
-case "map_key_list": { // TODO:
-}
-case "map_key_set": { // TODO:
-}
-case "map_values": { // TODO:
-}
-case "map_entries": { // TODO:
-}
-case "map_has_all": { // TODO:
-}
-case "map_domainincludes": { // TODO:
-}
-case "map_submap": { // TODO:
-}
-case "map_oftype": { // TODO:
-}
-case "map_cast": { // TODO:
-}
-case "map_projectall": { // TODO:
-}
-case "map_excludeall": { // TODO:
-}
-case "map_project": { // TODO:
-}
-case "map_exclude": { // TODO:
-}
-case "map_remap": { // TODO:
-}
-case "map_composewith": { // TODO:
-}
-case "map_trycomposewith": { // TODO:
-}
-case "map_defaultcomposewith": { // TODO:
-}
-case "map_invertinj": { // TODO:
-}
-case "map_invertrel": { // TODO:
-}
-case "map_union": { // TODO:
-}
-case "map_unionall": { // TODO:
-}
-case "map_merge": { // TODO:
-}
-case "map_mergeall": { // TODO:
-}
-default: {
-  assert(false, `Need to implement -- ${idecl.iname}`);
-  break;
-}
-    }
-    }
+      case "list_partition": { // TODO:
+      }
+      case "list_sort": { // TODO:
+      }
+      case "list_toindexmap": { // TODO:
+      }
+      case "list_transformindexmap": { // TODO:
+      }
+      case "list_transformmap": { // TODO:
+      }
+      case "list_zip": { // TODO:
+      }
+      case "list_unzip": { // TODO:
+      }
+      case "list_range": { // TODO:
+      }
 
-    insertAxioms(...axioms: string[]) {
-      axioms.forEach((ax) => this.uninterpAxioms.add(ax));
+
+      case "set_entry_list": { // TODO:
+      } 
+      case "set_hasall": { // TODO:
+      }
+      case "set_subsetof": { // TODO:
+      }
+      case "set_equal": { // TODO:
+      }
+      case "set_disjoint": { // TODO:
+      }
+      case "set_subset": { // TODO:
+      }
+      case "set_oftype": { // TODO:
+      }
+      case "set_cast": { // TODO:
+      }
+      case "set_union": { // TODO:
+      }
+      case "set_intersect": { // TODO:
+      }
+      case "set_difference": { // TODO:
+      }
+      case "set_symmetricdifference": { // TODO:
+      }
+      case "set_unionall": { // TODO:
+      }
+      case "set_intersectall": { // TODO:
+      }
+
+
+      case "map_key_list": { // TODO:
+      }
+      case "map_key_set": { // TODO:
+      }
+      case "map_values": { // TODO:
+      }
+      case "map_entries": { // TODO:
+      }
+      case "map_has_all": { // TODO:
+      }
+      case "map_domainincludes": { // TODO:
+      }
+      case "map_submap": { // TODO:
+      }
+      case "map_oftype": { // TODO:
+      }
+      case "map_cast": { // TODO:
+      }
+      case "map_projectall": { // TODO:
+      }
+      case "map_excludeall": { // TODO:
+      }
+      case "map_project": { // TODO:
+      }
+      case "map_exclude": { // TODO:
+      }
+      case "map_remap": { // TODO:
+      }
+      case "map_composewith": { // TODO:
+      }
+      case "map_trycomposewith": { // TODO:
+      }
+      case "map_defaultcomposewith": { // TODO:
+      }
+      case "map_invertinj": { // TODO:
+      }
+      case "map_invertrel": { // TODO:
+      }
+      case "map_union": { // TODO:
+      }
+      case "map_unionall": { // TODO:
+      }
+      case "map_merge": { // TODO:
+      }
+      case "map_mergeall": { // TODO:
+      }
+      default: {
+        assert(false, `Need to implement -- ${idecl.iname}`);
+        break;
+      }
     }
+  }
+
+insertAxioms(...axioms: string[]) {
+  axioms.forEach((ax) => this.uninterpAxioms.add(ax));
+}
   }
 
 const UninterpFunctions: string =

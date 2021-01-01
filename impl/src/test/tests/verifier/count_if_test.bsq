@@ -1,0 +1,13 @@
+namespace NSMain;
+
+entrypoint function main() : Int {
+
+  var my_list = List<Int>::fill(10, 1);
+  var my_empty_list = List<Int>@{};
+  var i = my_list.countIf(fn(x) => x == 0);
+  var j = my_empty_list.countIf(fn(x) => x == 0);
+
+  check 0 == i;
+
+  return 0;
+}

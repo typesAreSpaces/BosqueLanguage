@@ -1,0 +1,14 @@
+namespace NSMain;
+
+entrypoint function main() : Int {
+
+  var my_list = List<Int>@{1, 2, 3};
+  check my_list.anyOf(fn(x) => x > 4);
+  check my_list.allOf(fn(x) => x > 1);
+  check my_list.noneOf(fn(x) => x > 10);
+
+  var my_empty_list = List<Int>@{};
+  check my_empty_list.noneOf(fn(x) => x > 0);
+
+  return 0;
+}

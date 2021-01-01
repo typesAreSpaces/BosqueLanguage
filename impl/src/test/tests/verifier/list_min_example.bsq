@@ -1,0 +1,8 @@
+namespace NSMain;
+
+entrypoint function main() : Int {
+  var my_list = List<Int>@{1, 2, 3, 4};
+  var min_my_list = my_list.min();
+  check min_my_list == 1;
+  return 0;
+}
