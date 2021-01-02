@@ -4,12 +4,12 @@ entrypoint function main() : Int {
 
   var my_list = List<Int>::fill(10, 1);
   /*issue*/
-  /*var my_list_bool = List<Bool>::fill(10, true);*/
-  check my_list.noneOf(fn(x) => x == 2);
-  check my_list.size() == 10;
-  check my_list.anyOf(fn(x) => x == 1);
-  check my_list.allOf(fn(x) => x == 1);
-  check my_list.noneOf(fn(x) => x == 3);
+  var my_list_bool = List<Bool>::fill(10, true);
+  /*check my_list.noneOf(fn(x) => x == 2);*/
+  /*check my_list.size() == 10;*/
+  /*check my_list.anyOf(fn(x) => x == 1);*/
+  /*check my_list.allOf(fn(x) => x == 1);*/
+  /*check my_list.noneOf(fn(x) => x == 3);*/
 
   return 0;
 }
