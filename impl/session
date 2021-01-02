@@ -40,9 +40,9 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 125 + 188) / 376)
-exe 'vert 2resize ' . ((&columns * 125 + 188) / 376)
-exe 'vert 3resize ' . ((&columns * 124 + 188) / 376)
+exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
+exe 'vert 2resize ' . ((&columns * 96 + 144) / 289)
+exe 'vert 3resize ' . ((&columns * 95 + 144) / 289)
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -53,7 +53,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 200 - ((0 * winheight(0) + 47) / 95)
+let s:l = 200 - ((0 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -71,12 +71,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 2729 - ((94 * winheight(0) + 47) / 95)
+let s:l = 2176 - ((0 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2729
-normal! 014|
+2176
+normal! 031|
 wincmd w
 argglobal
 if bufexists("src/core/verify/list.bsq") | buffer src/core/verify/list.bsq | else | edit src/core/verify/list.bsq | endif
@@ -89,7 +89,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 22 - ((21 * winheight(0) + 47) / 95)
+let s:l = 22 - ((8 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -97,9 +97,9 @@ normal! zt
 normal! 053|
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 125 + 188) / 376)
-exe 'vert 2resize ' . ((&columns * 125 + 188) / 376)
-exe 'vert 3resize ' . ((&columns * 124 + 188) / 376)
+exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
+exe 'vert 2resize ' . ((&columns * 96 + 144) / 289)
+exe 'vert 3resize ' . ((&columns * 95 + 144) / 289)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
