@@ -1,6 +1,0 @@
-(declare-sort Term)
-(declare-sort nat)
-(declare-sort int)
-(declare-fun HasType (Term nat))
-(assert (forall ((x Term))
-	(! (iff (HasType x nat)))))
