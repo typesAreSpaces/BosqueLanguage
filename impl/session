@@ -7,7 +7,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +2429 src/tooling/bmc/smtbody_emitter.ts
+badd +2808 src/tooling/bmc/smtbody_emitter.ts
 badd +98 src/runtimes/symtest/symtest.ts
 badd +1 src/compiler/mir_assembly.ts
 badd +149 src/core/verify/list.bsq
@@ -32,16 +32,6 @@ wincmd _ | wincmd |
 vsplit
 2wincmd h
 wincmd w
-wincmd _ | wincmd |
-split
-wincmd _ | wincmd |
-split
-wincmd _ | wincmd |
-split
-3wincmd k
-wincmd w
-wincmd w
-wincmd w
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -50,16 +40,9 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
-exe '2resize ' . ((&lines * 3 + 28) / 56)
-exe 'vert 2resize ' . ((&columns * 105 + 144) / 289)
-exe '3resize ' . ((&lines * 43 + 28) / 56)
-exe 'vert 3resize ' . ((&columns * 105 + 144) / 289)
-exe '4resize ' . ((&lines * 4 + 28) / 56)
-exe 'vert 4resize ' . ((&columns * 105 + 144) / 289)
-exe '5resize ' . ((&lines * 1 + 28) / 56)
-exe 'vert 5resize ' . ((&columns * 105 + 144) / 289)
-exe 'vert 6resize ' . ((&columns * 86 + 144) / 289)
+exe 'vert 1resize ' . ((&columns * 125 + 188) / 376)
+exe 'vert 2resize ' . ((&columns * 125 + 188) / 376)
+exe 'vert 3resize ' . ((&columns * 124 + 188) / 376)
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -70,7 +53,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 200 - ((0 * winheight(0) + 27) / 54)
+let s:l = 200 - ((0 * winheight(0) + 47) / 95)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -78,17 +61,6 @@ normal! zt
 normal! 03|
 wincmd w
 argglobal
-enew
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-wincmd w
-argglobal
 if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
 setlocal fdm=manual
 setlocal fde=0
@@ -99,48 +71,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 2036 - ((4 * winheight(0) + 21) / 43)
+let s:l = 2729 - ((94 * winheight(0) + 47) / 95)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2036
-normal! 0
-wincmd w
-argglobal
-if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 2492 - ((2 * winheight(0) + 2) / 4)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-2492
-normal! 010|
-wincmd w
-argglobal
-if bufexists("src/tooling/bmc/smtbody_emitter.ts") | buffer src/tooling/bmc/smtbody_emitter.ts | else | edit src/tooling/bmc/smtbody_emitter.ts | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 2535 - ((0 * winheight(0) + 0) / 1)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-2535
-normal! 027|
+2729
+normal! 014|
 wincmd w
 argglobal
 if bufexists("src/core/verify/list.bsq") | buffer src/core/verify/list.bsq | else | edit src/core/verify/list.bsq | endif
@@ -153,24 +89,17 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 22 - ((21 * winheight(0) + 27) / 54)
+let s:l = 22 - ((21 * winheight(0) + 47) / 95)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 22
 normal! 053|
 wincmd w
-3wincmd w
-exe 'vert 1resize ' . ((&columns * 96 + 144) / 289)
-exe '2resize ' . ((&lines * 3 + 28) / 56)
-exe 'vert 2resize ' . ((&columns * 105 + 144) / 289)
-exe '3resize ' . ((&lines * 43 + 28) / 56)
-exe 'vert 3resize ' . ((&columns * 105 + 144) / 289)
-exe '4resize ' . ((&lines * 4 + 28) / 56)
-exe 'vert 4resize ' . ((&columns * 105 + 144) / 289)
-exe '5resize ' . ((&lines * 1 + 28) / 56)
-exe 'vert 5resize ' . ((&columns * 105 + 144) / 289)
-exe 'vert 6resize ' . ((&columns * 86 + 144) / 289)
+2wincmd w
+exe 'vert 1resize ' . ((&columns * 125 + 188) / 376)
+exe 'vert 2resize ' . ((&columns * 125 + 188) / 376)
+exe 'vert 3resize ' . ((&columns * 124 + 188) / 376)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

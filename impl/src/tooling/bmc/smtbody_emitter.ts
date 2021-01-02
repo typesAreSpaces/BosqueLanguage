@@ -2009,7 +2009,7 @@ class SMTBodyEmitter {
     // involving function arguments!
 
     switch (idecl.implkey) {
-      case "list_concat": { // TODO: work later on this one
+      case "list_concat": { // [Pending]
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l1size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l1");
         const l2size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l2");
@@ -2033,7 +2033,7 @@ class SMTBodyEmitter {
         break;
       }
 
-      case "list_fill": {
+      case "list_fill": { // [Done]
         const l_type = this.typegen.getSMTTypeFor(
           this.typegen.getMIRType(idecl.enclosingDecl as string));
         const value_type = this.typegen.getSMTTypeFor(
@@ -2064,9 +2064,11 @@ class SMTBodyEmitter {
               (= (select ${l_fill_entries.emit()} i) val))
             ))`);
         }
+
         break;
       }
-      case "list_toset": { // TODO: ask Mark about this one
+
+      case "list_toset": { // [Pending]
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
         }
 
@@ -2078,7 +2080,8 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_all": { // Done
+
+      case "list_all": { // [Done]
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2110,7 +2113,8 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_none": { // Done
+
+      case "list_none": { // [Done]
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2138,7 +2142,8 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_any": { // Done
+
+      case "list_any": { // [Done]
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2167,7 +2172,8 @@ class SMTBodyEmitter {
 
         break;
       }
-      case "list_count": { 
+
+      case "list_count": { // [Keep]
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
         const l_entries = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "entries", "l");
@@ -2211,7 +2217,10 @@ class SMTBodyEmitter {
             ))
             `,
             `(assert (forall ((l ${l_type}) (i Int))
-             (=> (and (< 0 i) (< i ${l_size.emit()})) (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite ${count_predicate_i} 1 0))))
+             (=> 
+             (and (< 0 i) (< i ${l_size.emit()})) 
+             (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite ${count_predicate_i} 1 0)))
+             )
              ))`,
             `(assert (forall ((l ${l_type}))
              (= (${fname} l) (rec_${fname} l ${l_size.emit()}))
@@ -2221,6 +2230,7 @@ class SMTBodyEmitter {
 
         break;
       }
+
       case "list_countnot": { // TODO: ask Mark about this one
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
@@ -2265,7 +2275,10 @@ class SMTBodyEmitter {
             ))
             `,
             `(assert (forall ((l ${l_type}) (i Int))
-             (=> (and (< 0 i) (< i ${l_size.emit()})) (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite (not ${count_predicate_i}) 1 0))))
+             (=> 
+             (and (< 0 i) (< i ${l_size.emit()})) 
+             (= (rec_${fname} l i) (+ (rec_${fname} l (- i 1)) (ite (not ${count_predicate_i}) 1 0)))
+             )
              ))`,
             `(assert (forall ((l ${l_type}))
              (= (${fname} l) (rec_${fname} l ${l_size.emit()}))
@@ -2276,6 +2289,7 @@ class SMTBodyEmitter {
 
         break;
       }
+
       case "list_indexof": { // TODO: ask Mark about this one
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
@@ -2325,6 +2339,7 @@ class SMTBodyEmitter {
 
         break;
       }
+
       case "list_indexoflast": { // TODO: ask Mark about this one
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
@@ -2373,8 +2388,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_indexofnot": {  
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
@@ -2426,8 +2441,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_indexoflastnot": { 
 
         const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
@@ -2476,8 +2491,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_count_keytype": { // TODO:
         //const l_type = this.typegen.getSMTTypeFor(this.typegen.getMIRType(idecl.enclosingDecl as string));
         //const l_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, "size", "l");
@@ -2493,8 +2508,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_indexof_keytype": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2507,8 +2522,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_indexoflast_keytype": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2521,8 +2536,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_min": { // TODO:
 
         console.log("Checking idecl of list_min");
@@ -2538,8 +2553,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_max": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2552,8 +2567,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_sum": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2566,8 +2581,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_filter": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2578,8 +2593,9 @@ class SMTBodyEmitter {
 
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
         }
-
+        break;
       }
+
       case "list_filternot": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2592,8 +2608,8 @@ class SMTBodyEmitter {
         }
 
         break;
-
       }
+
       case "list_oftype": { // TODO:
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
@@ -2606,136 +2622,258 @@ class SMTBodyEmitter {
         }
 
         break;
+      }
 
-      }
       case "list_cast": { // TODO:
+        break;
       }
+
       case "list_slice": { // TODO:
+        break;
       }
+
       case "list_takewhile": { // TODO:
+        break;
       }
+
       case "list_discardwhile": { // TODO:
+        break;
       }
+
       case "list_takeuntil": { // TODO:
+        break;
       }
+
       case "list_discarduntil": { // TODO:
+        break;
       }
+
       case "list_unique": { // TODO:
+        break;
       }
+
       case "list_reverse": { // TODO:
+        break;
       }
+
       case "list_map": { // TODO:
+        break;
       }
+
       case "list_mapindex": { // TODO:
+        break;
       }
+
       case "list_project": { // TODO:
+        break;
       }
+
       case "list_tryproject": { // TODO:
+        break;
       }
+
       case "list_defaultproject": { // TODO:
+        break;
       }
+
       case "list_zipindex": { // TODO:
+        break;
       }
+
       case "list_join": { // TODO:
+        break;
       }
+
       case "list_joingroup": { // TODO:
+        break;
       }
+
       case "list_append": { // TODO:
+        break;
       }
+
       case "list_partition": { // TODO:
+        break;
       }
+
       case "list_sort": { // TODO:
+        break;
       }
+
       case "list_toindexmap": { // TODO:
+        break;
       }
+
       case "list_transformindexmap": { // TODO:
+        break;
       }
+
       case "list_transformmap": { // TODO:
+        break;
       }
+
       case "list_zip": { // TODO:
+        break;
       }
+
       case "list_unzip": { // TODO:
+        break;
       }
+
       case "list_range": { // TODO:
+        break;
       }
 
 
       case "set_entry_list": { // TODO:
+        break;
       } 
+
       case "set_hasall": { // TODO:
-      }
-      case "set_subsetof": { // TODO:
-      }
-      case "set_equal": { // TODO:
-      }
-      case "set_disjoint": { // TODO:
-      }
-      case "set_subset": { // TODO:
-      }
-      case "set_oftype": { // TODO:
-      }
-      case "set_cast": { // TODO:
-      }
-      case "set_union": { // TODO:
-      }
-      case "set_intersect": { // TODO:
-      }
-      case "set_difference": { // TODO:
-      }
-      case "set_symmetricdifference": { // TODO:
-      }
-      case "set_unionall": { // TODO:
-      }
-      case "set_intersectall": { // TODO:
+        break;
       }
 
+      case "set_subsetof": { // TODO:
+        break;
+      }
+
+      case "set_equal": { // TODO:
+        break;
+      }
+
+      case "set_disjoint": { // TODO:
+        break;
+      }
+
+      case "set_subset": { // TODO:
+        break;
+      }
+
+      case "set_oftype": { // TODO:
+        break;
+      }
+
+      case "set_cast": { // TODO:
+        break;
+      }
+
+      case "set_union": { // TODO:
+        break;
+      }
+
+      case "set_intersect": { // TODO:
+        break;
+      }
+
+      case "set_difference": { // TODO:
+        break;
+      }
+
+      case "set_symmetricdifference": { // TODO:
+        break;
+      }
+
+      case "set_unionall": { // TODO:
+        break;
+      }
+
+      case "set_intersectall": { // TODO:
+        break;
+      }
 
       case "map_key_list": { // TODO:
+        break;
       }
+        
       case "map_key_set": { // TODO:
+        break;
       }
+        
       case "map_values": { // TODO:
+        break;
       }
+        
       case "map_entries": { // TODO:
+        break;
       }
+        
       case "map_has_all": { // TODO:
+        break;
       }
+        
       case "map_domainincludes": { // TODO:
+        break;
       }
+        
       case "map_submap": { // TODO:
+        break;
       }
+        
       case "map_oftype": { // TODO:
+        break;
       }
+        
       case "map_cast": { // TODO:
+        break;
       }
+        
       case "map_projectall": { // TODO:
+        break;
       }
+        
       case "map_excludeall": { // TODO:
+        break;
       }
+        
       case "map_project": { // TODO:
+        break;
       }
+        
       case "map_exclude": { // TODO:
+        break;
       }
+        
       case "map_remap": { // TODO:
+        break;
       }
+        
       case "map_composewith": { // TODO:
+        break;
       }
+        
       case "map_trycomposewith": { // TODO:
+        break;
       }
+        
       case "map_defaultcomposewith": { // TODO:
+        break;
       }
+        
       case "map_invertinj": { // TODO:
+        break;
       }
+        
       case "map_invertrel": { // TODO:
+        break;
       }
+        
       case "map_union": { // TODO:
+        break;
       }
+        
       case "map_unionall": { // TODO:
+        break;
       }
+        
       case "map_merge": { // TODO:
+        break;
       }
+
       case "map_mergeall": { // TODO:
+        break;
       }
+
+
       default: {
         assert(false, `Need to implement -- ${idecl.iname}`);
         break;
