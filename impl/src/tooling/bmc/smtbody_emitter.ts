@@ -2579,8 +2579,6 @@ class SMTBodyEmitter {
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) {
         }
 
-        break;
-
       }
       case "list_filternot": { // TODO:
 
