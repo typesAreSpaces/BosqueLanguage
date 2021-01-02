@@ -1,0 +1,9 @@
+namespace NSMain;
+
+entrypoint function main() : Int {
+
+  var my_list_int = List<Int>::fill(10, 1);
+  var my_list_bool = List<Bool>::fill(10, true);
+
+  return 0;
+}
