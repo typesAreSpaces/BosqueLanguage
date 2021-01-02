@@ -26,7 +26,6 @@
     "scripts": {
         "build": "tsc -p tsconfig.json && node ./build/resource_copy.js",
         "test": "tsc -p tsconfig.json && node ./build/resource_copy.js && node ./bin/test/test_runner.js",
-        "optimizer": "tsc -p tsconfig.json && node ./bin/optimizer/run_optimizer.js",
         "make-exe": "npm run build && node ./scripts/make-exe.js && npm --force link"
     },
     "files": [
