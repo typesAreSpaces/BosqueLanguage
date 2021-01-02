@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "target": "es6",
+        "sourceMap": true,
+        "outDir": "bin"
+    },
+    "include": [
+        "./src/ast/*.ts",
+        "./src/type_checker/*.ts",
+        "./src/compiler/*.ts",
+        "./src/test/*.ts",
+<<<<<<< HEAD:ref_impl/tsconfig.json
+        "./src/verifier/*.ts",
+        "./src/verifier/testing/*.ts"
+=======
+        "./src/tooling/*.ts",
+        "./src/tooling/aot/*.ts",
+        "./src/tooling/bmc/*.ts",
+        "./src/runtimes/exegen/*.ts",
+        "./src/runtimes/symtest/*.ts",
+        "./src/runtimes/vscmd/*.ts"
+>>>>>>> 5f67e88a5448409d18a1ec777798e54e5fda26cf:impl/tsconfig.json
+    ]
+}
