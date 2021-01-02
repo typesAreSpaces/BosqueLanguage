@@ -2032,16 +2032,13 @@ class SMTBodyEmitter {
 
         break;
       }
-        
-      case "list_fill": { // TODO: double check proper instantiation of list_fill function
+
+      case "list_fill": {
         const l_type = this.typegen.getSMTTypeFor(
           this.typegen.getMIRType(idecl.enclosingDecl as string));
-        const val_type = this.typegen.getSMTTypeFor(
-          this.typegen.getMIRType(idecl.enclosingDecl as string)
+        const value_type = this.typegen.getSMTTypeFor(
+          this.typegen.getMIRType(idecl.binds.get("T") as string)
         );
-
-        console.log(l_type);
-        console.log(val_type);
 
         const l_fill_size = this.typegen.generateSpecialTypeFieldAccessExp(enclkey, 
           "size", `(${fname} k val)`);
@@ -2050,7 +2047,7 @@ class SMTBodyEmitter {
 
         if(this.isAxiomLevelEnabled(AxiomLevel.basic)) {
           this.insertAxioms(
-            `(assert (forall ((l ${l_type}) (k Int) (val Int)) 
+            `(assert (forall ((l ${l_type}) (k Int) (val ${value_type})) 
                (= ${l_fill_size.emit()} k)
              ))`
           );
@@ -2059,16 +2056,14 @@ class SMTBodyEmitter {
         if(this.isAxiomLevelEnabled(AxiomLevel.standard)) {
         }
 
-        // Note: this axioms doesn't include 
         if(this.isAxiomLevelEnabled(AxiomLevel.full)) { 
           this.insertAxioms(
-            `(assert (forall ((k Int) (val Int) (i Int))
+            `(assert (forall ((k Int) (val ${value_type}) (i Int))
               (=>
               (and (<= 0 i) (< i k)) 
               (= (select ${l_fill_entries.emit()} i) val))
             ))`);
         }
-
         break;
       }
       case "list_toset": { // TODO: ask Mark about this one
