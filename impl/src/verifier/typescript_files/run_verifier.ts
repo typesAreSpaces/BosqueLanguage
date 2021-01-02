@@ -33,6 +33,7 @@ setImmediate(() => {
     const translator = new TranslatorBosqueFStar(masm, fstar_file_name);
 
     translator.generateFStarCode(Commander.entrypoint); 
+    // Comment/Uncomment to let fstar check the output file
     //translator.runFStarCode(20, 15, 5);
 
     process.stdout.write(`Done!\n`);
